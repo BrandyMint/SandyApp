@@ -5,13 +5,15 @@ using DepthSensor.Sensor;
 using UnityEngine;
 
 namespace BgConveyer {
-    public class KinectConveyer : BgConveyer {
+    public class DepthSensorConveyer : BgConveyer {
         //private Stopwatch watch = Stopwatch.StartNew();
+        public const string TASK_NAME = "WaitNewFrame";  
         private DepthSensorManager _dsm;
         private readonly AutoResetEvent _newFrameEvent = new AutoResetEvent(false);
 
-        public KinectConveyer() {
-            AddToBG("KinectConveyerSleepIfNeed", null, SleepIfNeed());
+        public DepthSensorConveyer() {
+            AddToBG(TASK_NAME, null, SleepIfNeed());
+            _defaultAfter = TASK_NAME;
         }
 
         private void Start() {
@@ -22,7 +24,7 @@ namespace BgConveyer {
 
         protected new void OnDestroy() {
             if (DepthSensorManager.IsInitialized()) {
-                _dsm.Device.Depth.OnNewFrame -= OnNewFrame;
+                _dsm.Device.Depth.OnNewFrameBackground -= OnNewFrame;
                 _dsm.OnInitialized -= OnDepthSensorInit;
             }
             _newFrameEvent.Dispose();
@@ -31,7 +33,7 @@ namespace BgConveyer {
 
         private void OnDepthSensorInit() {
             Run();
-            _dsm.Device.Depth.OnNewFrame += OnNewFrame;
+            _dsm.Device.Depth.OnNewFrameBackground += OnNewFrame;
         }
 
         private void OnNewFrame(Sensor<ushort> sensor) {
@@ -40,7 +42,7 @@ namespace BgConveyer {
         
         private IEnumerator SleepIfNeed() {
             while (true) {
-                _newFrameEvent.WaitOne();
+                _newFrameEvent.WaitOne(500);
                 /*watch.Reset();
                 watch.Start();*/
                 yield return null;

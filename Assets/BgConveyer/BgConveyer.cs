@@ -24,6 +24,8 @@ namespace BgConveyer {
             REMOVE
         }
 
+        protected string _defaultAfter = null;
+
         private Thread thread = null;
         private List<TaskInfo> currMainThreadTasks = new List<TaskInfo>();
         private List<TaskInfo> watingChangeTasks = new List<TaskInfo>();
@@ -44,7 +46,8 @@ namespace BgConveyer {
         }
 
         protected void OnDestroy() {
-            if (thread != null && thread.IsAlive) {
+            Stop();
+            if (thread != null && thread.IsAlive && !thread.Join(1000)) {
                 loop = false;
                 thread.Abort();
             }
@@ -80,7 +83,7 @@ namespace BgConveyer {
                     }
                 }
             }
-            catch (ThreadAbortException e) {
+            catch (ThreadAbortException) {
                 Debug.Log(GetType().Name + ": Thread aborted");
             } catch (Exception e) {
                 Debug.LogException(e);
@@ -179,6 +182,8 @@ namespace BgConveyer {
             Assert.IsNotNull(info.name, "Name of task must be not null!");
             if (info.type != TaskType.REMOVE)
                 info.id = _idCounter++;
+            else if (info.after == null)
+                info.after = _defaultAfter;
             Monitor.Enter(watingChangeTasks);
             watingChangeTasks.Add(info);
             Monitor.Exit(watingChangeTasks);

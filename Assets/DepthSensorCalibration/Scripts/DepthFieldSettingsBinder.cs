@@ -1,14 +1,11 @@
-﻿using HumanCollider;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace Launcher.KinectCalibration {
+namespace DepthSensorCalibration {
     public class KinectFieldSettingsBinder : MonoBehaviour {
         private Canvas canvas;
-        private HumanMaskCreater hmc;
 
         void Start() {
             canvas = GetComponentInParent<Canvas>();
-            hmc = HumanMaskCreater.GetInstance();
 
             RectTransform rect = GetComponent<RectTransform>();
             Vector3 v = new Vector3(KinectSettings.PosX, KinectSettings.PosY, 1);
@@ -25,7 +22,7 @@ namespace Launcher.KinectCalibration {
         }
 
         private void UpdateBorders() {
-            if (!hmc) return;
+            /*if (!hmc) return;*/
 
             RectTransform rect = GetComponent<RectTransform>();
             Vector2[] viewPortPoints = {
@@ -38,10 +35,10 @@ namespace Launcher.KinectCalibration {
                 p = rect.InverseTransformPoint(p);
                 normalized[i] = Vector2.one - Rect.PointToNormalized(rect.rect, p);
             }
-            hmc.SetBorders(
+            /*hmc.SetBorders(
                 normalized[1].x, normalized[1].y,
                 normalized[0].x, normalized[0].y
-            );
+            );*/
         }
     }
 }

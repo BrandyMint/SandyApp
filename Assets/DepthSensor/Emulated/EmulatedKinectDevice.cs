@@ -25,7 +25,7 @@ namespace DepthSensor.Emulated {
             };
         }
 
-        public override bool IsAvaliable() {
+        public override bool IsAvailable() {
             return true;
         }
 

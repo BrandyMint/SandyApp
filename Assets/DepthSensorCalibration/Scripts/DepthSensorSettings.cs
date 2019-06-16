@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Launcher.KinectCalibration {
+namespace DepthSensorCalibration {
     public class KinectSettings {
         private const string PREFS_TAG = "KinectSettings.";
         public const float INITIAL_SIZE = 8.5f;
@@ -20,7 +20,7 @@ namespace Launcher.KinectCalibration {
             set { PlayerPrefs.SetFloat(PREFS_TAG + "Size", value); }
         }
 
-        public static int ZoneCut {
+        public static int ZeroDepth {
             get { return PlayerPrefs.GetInt(PREFS_TAG + "ZoneCut", 10); }
             set { PlayerPrefs.SetInt(PREFS_TAG + "ZoneCut", value); }
         }

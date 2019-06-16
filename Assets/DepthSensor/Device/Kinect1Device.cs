@@ -109,7 +109,7 @@ namespace DepthSensor.Device {
             }
         }
 
-        public override bool IsAvaliable() {
+        public override bool IsAvailable() {
             return _kinect.IsRunning;
         }
 

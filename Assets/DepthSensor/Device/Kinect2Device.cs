@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Threading;
+using System.Threading.Tasks;
 using Windows.Kinect;
 using DepthSensor.Sensor;
 using UnityEngine;
@@ -17,6 +18,7 @@ namespace DepthSensor.Device {
         private readonly BodySensor.Internal<Windows.Kinect.Body> _internalBody;
         
         private volatile bool _pollFramesLoop = true;
+        private volatile bool _needUpdateMapDepthToColorSpace;
         private readonly AutoResetEvent _frameArrivedEvent = new AutoResetEvent(false);
         private readonly AutoResetEvent _sensorActiveChangedEvent = new AutoResetEvent(false);
         private readonly Thread _pollFrames;
@@ -32,6 +34,7 @@ namespace DepthSensor.Device {
             _pollFrames = new Thread(PollFrames) {
                 Name = GetType().Name
             };
+            _kinect.CoordinateMapper.CoordinateMappingChanged += OnCoordinateMappingChanged;
             _pollFrames.Start();
         }
 
@@ -50,6 +53,7 @@ namespace DepthSensor.Device {
                 init.Color = new ColorByteSensor(
                     colorDesc.Width, colorDesc.Height, (int) colorDesc.BytesPerPixel, TextureFormat.RGBA32);
                 init.Body = new BodySensor(kinect.BodyFrameSource.BodyCount);
+                init.MapDepthToColor = new Sensor<Vector2>(init.Depth.width, init.Depth.height);
             } catch (DllNotFoundException) {
                 Debug.LogWarning("Kinect 2 runtime is not is not installed");
                 throw;
@@ -57,12 +61,14 @@ namespace DepthSensor.Device {
             
             return init;
         }
-        
-        public override bool IsAvaliable() {
+
+        public override bool IsAvailable() {
             return _kinect.IsAvailable;
         }
 
         protected override void SensorActiveChanged<T>(Sensor<T> sensor) {
+            if (ReferenceEquals(sensor, MapDepthToCamera))
+                _needUpdateMapDepthToColorSpace = true;
             _sensorActiveChangedEvent.Set();
         }
 
@@ -83,7 +89,7 @@ namespace DepthSensor.Device {
                 (Body.Active ? FrameSourceTypes.Body : 0) |
                 (Color.Active ? FrameSourceTypes.Color : 0));
         }
-        
+
         private void PollFrames() {
             try {
                 while (_pollFramesLoop) {
@@ -100,10 +106,27 @@ namespace DepthSensor.Device {
                         using (var body = Body.Active ? frame.BodyFrameReference.AcquireFrame() : null)
                             if (body != null || !Body.Active) 
                         {
-                            depth?.CopyFrameDataToArray(Depth.data);
-                            index?.CopyFrameDataToArray(Index.data);
-                            color?.CopyConvertedFrameDataToArray(Color.data, _COLOR_FORMAT);
-                            if (body != null) UpdateBodies(body);
+                            if (body != null) {
+                                UpdateBodies(body);
+                                _internalBody.OnNewFrameBackground();
+                            }
+                            if (color != null) {
+                                color.CopyConvertedFrameDataToArray(Color.data, _COLOR_FORMAT);
+                                _internalColor.OnNewFrameBackground();
+                            }
+                            if (index != null) {
+                                index.CopyFrameDataToArray(Index.data);
+                                _internalIndex.OnNewFrameBackground();
+                            }
+                            if (_needUpdateMapDepthToColorSpace || (MapDepthToCamera.Active && !IsMapDepthToCameraValid())) {
+                                UpdateMapDepthToCamera();
+                                _internalMapDepthToCamera.OnNewFrameBackground();
+                            }
+                            if (depth != null) {
+                                depth.CopyFrameDataToArray(Depth.data);
+                                _internalDepth.OnNewFrameBackground();
+                            }
+                            
                             _frameArrivedEvent.Set();
                             Thread.Sleep(30);
                         }
@@ -114,8 +137,8 @@ namespace DepthSensor.Device {
                 Debug.Log(GetType().Name + ": Thread aborted");
             } catch (Exception e) {
                 Debug.LogException(e);
-                throw;
             }
+            CloseSensors();
         }
 
         private void UpdateBodies(BodyFrame frame) {
@@ -151,16 +174,23 @@ namespace DepthSensor.Device {
             }
         }
 
+        private void OnCoordinateMappingChanged(object sender, CoordinateMappingChangedEventArgs e) {
+            if (MapDepthToCamera.Active) {
+                _needUpdateMapDepthToColorSpace = true;
+            }
+        }
+
         protected override void Close() {
             _pollFramesLoop = false;
-            if (_pollFrames != null && _pollFrames.IsAlive)
+            if (_pollFrames != null && _pollFrames.IsAlive && !_pollFrames.Join(5000))
                 _pollFrames.Abort();
-            CloseSensors();
             if (_kinect != null) {
                 if (_kinect.IsOpen)
                     _kinect.Close();
                 _kinect = null;
             }
+            _frameArrivedEvent.Dispose();
+            _sensorActiveChangedEvent.Dispose();
         }
 
 #region Coordinate Map
@@ -177,6 +207,28 @@ namespace DepthSensor.Device {
         public override Vector2 DepthMapPosToColorMapPos(Vector2 pos, ushort depth) {
             return ToVector2(_kinect.CoordinateMapper.
                 MapDepthPointToColorSpace(ToDepthPoint(pos), depth));
+        }
+
+        private void UpdateMapDepthToCamera() {
+            //TODO: broken table in SDK, workaround with MapDepthFrameToCameraSpace
+            //var map = _kinect.CoordinateMapper.GetDepthFrameToCameraSpaceTable();
+            var map = new CameraSpacePoint[Depth.data.Length];
+            var depth = new ushort[Depth.data.Length];
+            Parallel.For(0, depth.Length, i => {
+                depth[i] = 1000;
+            });
+            _kinect.CoordinateMapper.MapDepthFrameToCameraSpace(depth, map);
+            Parallel.For(0, map.Length, i => {
+                var mapPoint = map[i];
+                MapDepthToCamera.data[i] = new Vector2(mapPoint.X, mapPoint.Y);
+            });
+            _needUpdateMapDepthToColorSpace = false;
+        }
+
+        private bool IsMapDepthToCameraValid() {
+            var i = MapDepthToCamera.data.Length - 1;
+            var x = MapDepthToCamera.data[i].x;
+            return !float.IsNaN(x) && !float.IsInfinity(x) && x != 0f;
         }
 #endregion
         

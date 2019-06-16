@@ -7,6 +7,7 @@ namespace DepthSensor.Sensor {
         public readonly int height;
         public readonly T[] data;
         public event Action<Sensor<T>> OnNewFrame;
+        public event Action<Sensor<T>> OnNewFrameBackground;
         public bool Active {
             get { return _active; }
             set { if (_active != value) {
@@ -43,6 +44,10 @@ namespace DepthSensor.Sensor {
             
             protected internal void OnNewFrame() {
                 if (_sensor.OnNewFrame != null) _sensor.OnNewFrame(_sensor);
+            }
+            
+            protected internal void OnNewFrameBackground() {
+                if (_sensor.OnNewFrameBackground != null) _sensor.OnNewFrameBackground(_sensor);
             }
 
             protected internal void SetOnActiveChanged(Action<Sensor<T>> onActiveChanged = null) {

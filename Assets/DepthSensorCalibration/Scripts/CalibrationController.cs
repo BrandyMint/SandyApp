@@ -1,11 +1,10 @@
 ﻿using System;
-using HumanCollider;
 using Launcher.Scripts;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-namespace Launcher.KinectCalibration {
+namespace DepthSensorCalibration {
     public class CalibrationController : MonoBehaviour {
         [SerializeField] private GameObject kinectField;
         [SerializeField] private GameObject grid;
@@ -21,16 +20,12 @@ namespace Launcher.KinectCalibration {
             public SliderField PosX { get; set; }
             public SliderField PosY { get; set; }
             public SliderField Size { get; set; }
-            public SliderField ZoneCut { get; set; }
-            public SliderField ZoneTouch { get; set; }
-            public SliderField ZoneTouchFoot { get; set; }
+            public SliderField ZeroDepth { get; set; }
         }
         private Fields fields;
         private const float COUNT_INC_DEC_STEPS = 200.0f;
-        private HumanMaskCreater hmc;
 
         void Start() {
-            hmc = HumanMaskCreater.GetInstance();
 
             fields = new Fields();
             SetPropsByGameObjects(fields, pnlSettings, 1);
@@ -38,9 +33,7 @@ namespace Launcher.KinectCalibration {
             SetField(fields.PosX, KinectSettings.PosX, val => UpdatePos());
             SetField(fields.PosY, KinectSettings.PosY, val => UpdatePos());
             SetField(fields.Size, KinectSettings.Size, UpdateSize);
-            SetField(fields.ZoneCut, KinectSettings.ZoneCut, val => hmc.zoneCut = (ushort) val);
-            SetField(fields.ZoneTouch, KinectSettings.ZoneTouch, val => hmc.zoneTouch = (ushort) val);
-            SetField(fields.ZoneTouchFoot, KinectSettings.ZoneTouchFoot, val => hmc.zoneTouchFoot = (ushort) val);
+            SetField(fields.ZeroDepth, KinectSettings.ZeroDepth, val => { } /* hmc.zoneCut = (ushort) val*/);
         }
 
         private static void SetPropsByGameObjects(object obj, Transform root, uint depth) {
@@ -57,25 +50,18 @@ namespace Launcher.KinectCalibration {
             }
         }
 
-        public void OnBtnCreateDepthSnapshot() {
-            hmc.CreateStaticSceneDepth();
-        }
-
         public void OnBtnSave() {
             KinectSettings.PosX = fields.PosX.sl.value;
             KinectSettings.PosY = fields.PosY.sl.value;
             KinectSettings.Size = fields.Size.sl.value;
-            KinectSettings.ZoneCut = (int) fields.ZoneCut.sl.value;
-            KinectSettings.ZoneTouch = (int) fields.ZoneTouch.sl.value;
-            KinectSettings.ZoneTouchFoot = (int) fields.ZoneTouchFoot.sl.value;
+            KinectSettings.ZeroDepth = (int) fields.ZeroDepth.sl.value;
             KinectSettings.Save();
             if (GamesLoader.Instance() != null)
                 GamesLoader.Instance().UnLoadKinectCalibration();
         }
 
         public void OnBtnCancel() {
-            hmc.zoneCut = (ushort) KinectSettings.ZoneCut;
-            hmc.zoneTouch = (ushort) KinectSettings.ZoneTouch;
+            //hmc.zoneCut = (ushort) KinectSettings.ZeroDepth;
             if (GamesLoader.Instance() != null)
                 GamesLoader.Instance().UnLoadKinectCalibration();
         }

@@ -1,4 +1,4 @@
-﻿namespace HumanCollider {
+﻿namespace DepthSensorSandbox {
     public class ArrayIntQueue {
         private int[] a;
         private int start;

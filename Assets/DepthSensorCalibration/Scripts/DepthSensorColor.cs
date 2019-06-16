@@ -2,15 +2,13 @@
 using System.Collections.Generic;
 using DepthSensor;
 using DepthSensor.Sensor;
-using HumanCollider;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Launcher.KinectCalibration {
-    public class KinectColor : MonoBehaviour {
+namespace DepthSensorCalibration {
+    public class DepthSensorColor : MonoBehaviour {
         [SerializeField] private GameObject _imgDepth;
         private RawImage _imgOutput;
-        private HumanMaskCreater hmc;
 
         private readonly Dictionary<string, float> _videoScale = new Dictionary<string, float> {
             {"Kinect1", 1f},
@@ -19,7 +17,7 @@ namespace Launcher.KinectCalibration {
 
         private void Start() {
             _imgOutput = GetComponent<RawImage>();
-            hmc = HumanMaskCreater.GetInstance();
+            /*hmc = HumanMaskCreater.GetInstance();
             if (hmc != null) {
                 hmc.OnDepthToColorOffsetChanged += CalibrateDepthColorOffset;
                 Vector3 offsetPos;
@@ -27,7 +25,7 @@ namespace Launcher.KinectCalibration {
                 if (hmc.GetDethToColorOffset(out offsetPos, out scaleFromDepth)) {
                     CalibrateDepthColorOffset(offsetPos, scaleFromDepth);
                 }
-            }
+            }*/
             StartCoroutine(WaitTextureAndAccept(DepthSensorManager.Instance));
         }
 
@@ -47,9 +45,9 @@ namespace Launcher.KinectCalibration {
             if (DepthSensorManager.IsInitialized()) {
                 DepthSensorManager.Instance.Device.Color.OnNewFrame -= OnNewFrame;
             }
-            if (hmc != null) {
+            /*if (hmc != null) {
                 hmc.OnDepthToColorOffsetChanged -= CalibrateDepthColorOffset;
-            }
+            }*/
         }
 
         private IEnumerator WaitTextureAndAccept(DepthSensorManager dsm) {

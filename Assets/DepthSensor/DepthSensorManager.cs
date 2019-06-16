@@ -85,7 +85,7 @@ namespace DepthSensor {
 
 		public static bool IsInitialized() {
 			return Instance != null && Instance.Device != null 
-			       && Instance.Device.IsAvaliable();
+			       && Instance.Device.IsAvailable();
 		}
 	}
 }
