@@ -18,7 +18,7 @@ namespace DepthSensorSandbox {
             _mesh.MarkDynamic();
             _meshFilter.mesh = _mesh;
             _mesh.indexFormat = IndexFormat.UInt32;
-            _mesh.bounds = new Bounds(Vector3.forward, Vector3.one * _MAX_DEPTH);
+            _mesh.bounds = new Bounds(Vector3.zero, Vector3.one * _MAX_DEPTH);
         }
 
         private void Start() {
