@@ -42,12 +42,15 @@ namespace BgConveyer {
         
         private IEnumerator SleepIfNeed() {
             while (true) {
-                _newFrameEvent.WaitOne(500);
-                /*watch.Reset();
-                watch.Start();*/
-                yield return null;
-                /*watch.Stop();
-                UnityEngine.Debug.Log("Sleep " + watch.ElapsedMilliseconds);*/                
+                if (!_newFrameEvent.WaitOne(500)) {
+                    yield return new ToNewIteration();
+                } else {
+                    /*watch.Reset();
+                    watch.Start();*/
+                    yield return null;
+                    /*watch.Stop();
+                    UnityEngine.Debug.Log("Sleep " + watch.ElapsedMilliseconds);*/
+                }
             }
         }
     }

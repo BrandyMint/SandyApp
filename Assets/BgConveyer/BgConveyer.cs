@@ -7,6 +7,8 @@ using UnityEngine.Assertions;
 
 namespace BgConveyer {
     public class BgConveyer : MonoBehaviour {
+        public class ToNewIteration { }
+        
         protected List<TaskInfo> tasks = new List<TaskInfo>();
 
         protected class TaskInfo {
@@ -72,7 +74,7 @@ namespace BgConveyer {
                     AcceptChangesTasks();
                     foreach (var task in tasks) {
                         if (task.type == TaskType.BG) {
-                            DoAction(task);
+                            if (!DoAction(task)) break;
                         } else {
                             Monitor.Enter(currMainThreadTasks);
                             if (!currMainThreadTasks.Contains(task)) {
@@ -97,7 +99,7 @@ namespace BgConveyer {
         private void AcceptChangesTasks() {
             Monitor.Enter(watingChangeTasks);
             watingChangeTasks.Sort((t1, t2) =>
-                (t2.after == null || t1.name == t2.after) ? 1 : -1
+                (t1.after == null || t1.name == t2.after) ? -1 : 1
             );
             int i = 0;
             while (i < watingChangeTasks.Count) {
@@ -124,6 +126,7 @@ namespace BgConveyer {
                 else
                     ++i;
             }
+            watingChangeTasks.Clear();
             Monitor.Exit(watingChangeTasks);
         }
 
@@ -143,12 +146,15 @@ namespace BgConveyer {
             return tasks.RemoveAll(info => info.id == id) > 0;
         }
 
-        protected void DoAction(TaskInfo task) {
+        protected bool DoAction(TaskInfo task) {
             if (task.action.MoveNext()) {
                 var res = task.action.Current;
+                return !(res is ToNewIteration);
             } else {
                 RemoveTask(task.id);
             }
+
+            return true;
         }
 
         public void RemoveTask(int id) {
@@ -180,10 +186,11 @@ namespace BgConveyer {
 
         private int AddWatingChangeTasks(TaskInfo info) {
             Assert.IsNotNull(info.name, "Name of task must be not null!");
-            if (info.type != TaskType.REMOVE)
+            if (info.type != TaskType.REMOVE) {
                 info.id = _idCounter++;
-            else if (info.after == null)
-                info.after = _defaultAfter;
+                if (info.after == null)
+                    info.after = _defaultAfter;
+            }
             Monitor.Enter(watingChangeTasks);
             watingChangeTasks.Add(info);
             Monitor.Exit(watingChangeTasks);

@@ -12,7 +12,8 @@ namespace DepthSensorCalibration {
 
         private readonly Dictionary<string, float> _videoScale = new Dictionary<string, float> {
             {"Kinect1", 1f},
-            {"Kinect2", 0.333f}
+            {"Kinect2", 0.333f},
+            {"OpenNI2", 1f}
         };
 
         private void Start() {
