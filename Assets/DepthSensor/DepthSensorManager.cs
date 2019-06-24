@@ -11,8 +11,11 @@ namespace DepthSensor {
 		[SerializeField] private bool _emulate;
 		private const float _WAIT_AVAILABLE = 3f;
 		private Type[] _TRYING_INIT_QUEUE = new Type[] {
+#if UNITY_STANDALONE_WIN
 			typeof(Kinect2Device), 
 			/*typeof(Kinect1Device)*/
+#endif
+			typeof(OpenNI2Device)
 		};
 		
 		public static DepthSensorManager Instance {get; private set;}

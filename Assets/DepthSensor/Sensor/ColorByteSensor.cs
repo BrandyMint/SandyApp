@@ -16,5 +16,9 @@ namespace DepthSensor.Sensor {
                 if (OnNewFrame != null) OnNewFrame((ColorByteSensor) sensor);
             };
         }
+
+        public ColorByteSensor(bool available) : this(0, 0, 3, TextureFormat.RGB24) {
+            Available = available;
+        }
     }
 }

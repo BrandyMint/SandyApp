@@ -43,7 +43,7 @@ namespace DepthSensor.Emulated {
             }
         }
 
-        protected override void SensorActiveChanged<T>(Sensor<T> sensor) {
+        protected override void SensorActiveChanged(AbstractSensor sensor) {
             //TODO: implement
         }
 

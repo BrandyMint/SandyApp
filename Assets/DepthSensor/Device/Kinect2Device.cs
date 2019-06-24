@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if UNITY_STANDALONE_WIN
+using System;
 using System.Collections;
 using System.Threading;
 using System.Threading.Tasks;
@@ -66,8 +67,8 @@ namespace DepthSensor.Device {
             return _kinect.IsAvailable;
         }
 
-        protected override void SensorActiveChanged<T>(Sensor<T> sensor) {
-            if (ReferenceEquals(sensor, MapDepthToCamera))
+        protected override void SensorActiveChanged(AbstractSensor sensor) {
+            if (sensor == MapDepthToCamera)
                 _needUpdateMapDepthToColorSpace = true;
             _sensorActiveChangedEvent.Set();
         }
@@ -170,7 +171,7 @@ namespace DepthSensor.Device {
                     if (Color.Active) _internalColor.OnNewFrame();
                     if (Body.Active) _internalBody.OnNewFrame();
                 }
-                yield return new WaitForEndOfFrame();
+                yield return null;
             }
         }
 
@@ -267,3 +268,4 @@ namespace DepthSensor.Device {
 #endregion
     }
 }
+#endif

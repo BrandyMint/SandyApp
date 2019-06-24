@@ -11,6 +11,8 @@ namespace DepthSensor.Device {
         public readonly Sensor<Vector2> MapDepthToCamera;
         public readonly string Platform;
         
+        
+        protected InitInfo _initInfo;
         protected readonly Sensor<ushort>.Internal _internalDepth;
         protected readonly Sensor<byte>.Internal _internalIndex;
         protected readonly Sensor<byte>.Internal _internalColor;
@@ -28,11 +30,11 @@ namespace DepthSensor.Device {
 
         protected DepthSensorDevice(string platform, InitInfo initInfo) {
             Platform = platform;
-            Depth = initInfo.Depth;
-            Index = initInfo.Index;
-            Color = initInfo.Color;
-            Body = initInfo.Body;
-            MapDepthToCamera = initInfo.MapDepthToColor;
+            Depth = initInfo.Depth ?? new Sensor<ushort>(false);
+            Index = initInfo.Index ?? new Sensor<byte>(false);
+            Color = initInfo.Color ?? new ColorByteSensor(false);
+            Body = initInfo.Body ?? new BodySensor(false);
+            MapDepthToCamera = initInfo.MapDepthToColor ?? new Sensor<Vector2>(false);
 
             _internalDepth = new Sensor<ushort>.Internal(Depth);
             _internalDepth.SetOnActiveChanged(SensorActiveChanged);
@@ -42,6 +44,8 @@ namespace DepthSensor.Device {
             _internalColor.SetOnActiveChanged(SensorActiveChanged);
             _internalMapDepthToCamera = new Sensor<Vector2>.Internal(MapDepthToCamera);
             _internalMapDepthToCamera.SetOnActiveChanged(SensorActiveChanged);
+
+            _initInfo = initInfo;
         }
         
         public abstract bool IsAvailable();
@@ -49,7 +53,7 @@ namespace DepthSensor.Device {
         public abstract Vector2 CameraPosToColorMapPos(Vector3 pos);
         public abstract Vector2 DepthMapPosToColorMapPos(Vector2 pos, ushort depth);
 
-        protected abstract void SensorActiveChanged<T>(Sensor<T> sensor);
+        protected abstract void SensorActiveChanged(AbstractSensor sensor);
         protected abstract IEnumerator Update();
         protected abstract void Close();
         

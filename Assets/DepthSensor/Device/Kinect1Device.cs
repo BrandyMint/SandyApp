@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿#if UNITY_STANDALONE_WIN
+using System.Collections;
 using System.Linq;
 using DepthSensor.Sensor;
 using UnityEngine;
@@ -54,7 +55,7 @@ namespace DepthSensor.Device {
                 sensor.Status == KinectStatus.Connected);
         }
 
-        protected override void SensorActiveChanged<T>(Sensor<T> sensor) {
+        protected override void SensorActiveChanged(AbstractSensor sensor) {
             if (ReferenceEquals(sensor, Color)) {
                 if (sensor.Active)
                     _kinect.ColorStream.Enable(_COLOR_FORMAT);
@@ -126,3 +127,4 @@ namespace DepthSensor.Device {
         }
     }
 }
+#endif

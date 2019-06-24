@@ -2,28 +2,22 @@
 using UnityEngine;
 
 namespace DepthSensor.Sensor {
-    public class Sensor<T> {
+    public class Sensor<T> : AbstractSensor  {
         public readonly int width;
         public readonly int height;
         public readonly T[] data;
         public event Action<Sensor<T>> OnNewFrame;
         public event Action<Sensor<T>> OnNewFrameBackground;
-        public bool Active {
-            get { return _active; }
-            set { if (_active != value) {
-                    _active = value;
-                    _onActiveChanged(this);
-                }}
-        }
-
-        private Action<Sensor<T>> _onActiveChanged;
-        private bool _active;
 
         protected internal Sensor(int width, int height, T[] data = null) {
             this.width = width;
             this.height = height;
             this.data = data ?? new T[width * height];
             _onActiveChanged = sensor => {throw new NotImplementedException();};
+        }
+
+        protected internal Sensor(bool available) : this(0, 0) {
+            Available = available;
         }
 
         public class Internal {
@@ -50,7 +44,7 @@ namespace DepthSensor.Sensor {
                 if (_sensor.OnNewFrameBackground != null) _sensor.OnNewFrameBackground(_sensor);
             }
 
-            protected internal void SetOnActiveChanged(Action<Sensor<T>> onActiveChanged = null) {
+            protected internal void SetOnActiveChanged(Action<AbstractSensor> onActiveChanged = null) {
                 _sensor._onActiveChanged = onActiveChanged;
             }
         }

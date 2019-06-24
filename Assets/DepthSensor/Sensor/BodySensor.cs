@@ -15,6 +15,10 @@ namespace DepthSensor.Sensor {
             };
         }
 
+        public BodySensor(bool available) : this(0) {
+            Available = available;
+        }
+
         private static Body[] CreateBodies(int maxCount) {
             var bodies = new Body[maxCount];
             for (int i = 0; i < maxCount; i++) {
