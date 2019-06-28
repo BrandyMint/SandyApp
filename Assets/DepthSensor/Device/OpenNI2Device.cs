@@ -1,3 +1,4 @@
+#if ENABLE_OPENNI2
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -352,3 +353,4 @@ namespace DepthSensor.Device {
 #endregion
     }
 }
+#endif
