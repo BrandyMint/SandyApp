@@ -29,7 +29,7 @@ namespace DepthSensor.Editor {
         public static void ForBuild(string dstPath, BuildTarget target) {
             var targetStr = target.ToString();
             foreach (var platform in _PLATFROMS) {
-                if (targetStr.Contains(platform));
+                if (targetStr.Contains(platform))
                     CopyFromDeploy(dstPath, platform, false);
             }
         }
@@ -106,7 +106,7 @@ namespace DepthSensor.Editor {
 
         public int callbackOrder => -1;
         public void OnPostprocessBuild(BuildTarget target, string path) {
-            ForBuild(path, target);
+            ForBuild(Path.GetDirectoryName(path), target);
         }
     }
 }
