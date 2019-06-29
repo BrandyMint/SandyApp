@@ -11,7 +11,7 @@ namespace DepthSensor.Editor {
         private static string[] _PLATFROMS = {"Linux", "Windows"};
         
         
-        static Deploy() {
+        /*static Deploy() {
             Clear();
             var projPath = GetProjPath();
 #if UNITY_EDITOR_LINUX
@@ -20,7 +20,7 @@ namespace DepthSensor.Editor {
 #if UNITY_EDITOR_WIN
             CopyFromDeploy(projPath, "Windows", true);
 #endif
-        }
+        }*/
 
         private static string GetProjPath() {
             return Directory.GetCurrentDirectory();
