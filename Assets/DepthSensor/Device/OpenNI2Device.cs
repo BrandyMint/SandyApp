@@ -213,13 +213,11 @@ namespace DepthSensor.Device {
         }
 
 #region Background
-        private WaitHandle[] ActivateSensors() {
-            var waits = new List<WaitHandle>();
+        private AutoResetEvent[] ActivateSensors() {
             lock (_sensorsActiveChanged) {
                 foreach (var s in _sensorsActiveChanged) {
                     if (s.stream == null) continue;
                     if (s.sensor.Active) {
-                        waits.Add(s.frameEvent);
                         s.stream.Start();
                     } else {
                         s.stream.Stop();
@@ -228,11 +226,14 @@ namespace DepthSensor.Device {
                 _sensorsActiveChanged.Clear();
             }
 
-            return waits.ToArray();
+            return _niSensors
+                .Where(s => s.sensor.Active && s.stream != null)
+                .Select(s => s.frameEvent)
+                .ToArray();
         }
 
         private void PollFrames() {
-            var waits = new WaitHandle[0];
+            var waits = new AutoResetEvent[0];
             try {
                 while (_pollFramesLoop) {
                     if (_sensorActiveChangedEvent.WaitOne(0))
