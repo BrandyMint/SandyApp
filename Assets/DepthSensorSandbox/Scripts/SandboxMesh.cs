@@ -11,7 +11,8 @@ namespace DepthSensorSandbox {
         private Mesh _mesh;
         private Vector3[] _vert;
         private int[] _triangles;
-        
+        private Vector2[] _uv;
+
         private void Awake() {
             _meshFilter = GetComponent<MeshFilter>();
             _mesh = new Mesh {name = "depth"};
@@ -34,6 +35,13 @@ namespace DepthSensorSandbox {
         private void ReInitMesh(int width, int heigth, int len) {
             if (_vert == null || _vert.Length != len) {
                 _vert = new Vector3[len];
+                _uv = new Vector2[len];
+                Parallel.For(0, len, i => {
+                    _uv[i] =  new Vector2(
+                        (float)(i % width) / width,
+                        (float)(i / width) / heigth
+                    );
+                });
             }
 
             var quadIndexes = 3 * 2;
@@ -64,11 +72,13 @@ namespace DepthSensorSandbox {
             });
         }
 
-        private void OnNewFrame() {
+        private void OnNewFrame(int width, int height, ushort[] depth, Vector2[] mapToCamera) {
             if (_vert != null && _triangles != null) {
                 _mesh.vertices = _vert;
-                if (_mesh.GetIndexCount(0) != _triangles.LongLength)
+                if (_mesh.GetIndexCount(0) != _triangles.LongLength) {
+                    _mesh.uv = _uv;
                     _mesh.triangles = _triangles;
+                }
             }
         }
     }

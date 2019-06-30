@@ -250,12 +250,10 @@ namespace DepthSensor.Device {
                                 UpdateMapDepthToCamera();
                                 _internalMapDepthToCamera.OnNewFrameBackground();
                             }
-
                             if (depth != null) {
                                 MemUtils.CopyBytes(depth.Data, Depth.data, depth.DataSize);
                                 _internalDepth.OnNewFrameBackground();
                             }
-
                             _framesArrivedEvent.Set();
                         }
                     } else {
@@ -343,11 +341,7 @@ namespace DepthSensor.Device {
 
         private void UpdateMapDepthToCamera() {
             Parallel.For(0, MapDepthToCamera.data.LongLength, i => {
-                var p = new Vector2(
-                    i % MapDepthToCamera.width,
-                    i / MapDepthToCamera.height
-                );
-                MapDepthToCamera.data[i] = DepthMapPosToCameraPos(p, _DEPTH_MUL);
+                MapDepthToCamera.data[i] = DepthMapPosToCameraPos(MapDepthToCamera.GetXYFrom(i), _DEPTH_MUL);
             });
             _needUpdateMapDepthToColorSpace = false;
         }

@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Threading.Tasks;
 using DepthSensor.Sensor;
 using UnityEngine;
 
@@ -52,6 +53,12 @@ namespace DepthSensor.Device {
         public abstract Vector2 CameraPosToDepthMapPos(Vector3 pos);
         public abstract Vector2 CameraPosToColorMapPos(Vector3 pos);
         public abstract Vector2 DepthMapPosToColorMapPos(Vector2 pos, ushort depth);
+
+        public virtual void DepthToColorMap(ushort[] depth, Vector2[] depthToColorMap) {
+            Parallel.For(0, depth.Length, i => {
+                depthToColorMap[i] = DepthMapPosToColorMapPos(Depth.GetXYFrom(i), depth[i]);
+            });
+        }
 
         protected abstract void SensorActiveChanged(AbstractSensor sensor);
         protected abstract IEnumerator Update();

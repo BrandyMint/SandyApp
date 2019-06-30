@@ -20,6 +20,20 @@ namespace DepthSensor.Sensor {
             Available = available;
         }
 
+        public Vector2 GetXYFrom(long i) {
+            return new Vector2(
+                i % width,
+                i / width
+            );
+        }
+        
+        public Vector2 GetXYFrom(int i) {
+            return new Vector2(
+                i % width,
+                i / width
+            );
+        }
+
         public class Internal {
             private readonly Sensor<T> _sensor;
 
