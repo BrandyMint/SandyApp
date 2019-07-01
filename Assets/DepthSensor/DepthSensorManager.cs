@@ -75,7 +75,6 @@ namespace DepthSensor {
 				_internalDevice = new DepthSensorDevice.Internal(Device);
 				return true;
 			} catch (EntryPointNotFoundException e) {
-				Debug.Log("exep");
 				Debug.Log(e.Data);
 				Debug.Log(e.HelpLink);
 				Debug.LogException(e);

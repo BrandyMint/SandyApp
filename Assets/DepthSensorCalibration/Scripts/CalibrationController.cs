@@ -3,6 +3,7 @@ using Launcher.Scripts;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
+using Utilities;
 
 namespace DepthSensorCalibration {
     public class CalibrationController : MonoBehaviour {
@@ -25,7 +26,7 @@ namespace DepthSensorCalibration {
         private Fields fields;
         private const float COUNT_INC_DEC_STEPS = 200.0f;
 
-        void Start() {
+        private void Start() {
 
             fields = new Fields();
             SetPropsByGameObjects(fields, pnlSettings, 1);
@@ -38,7 +39,7 @@ namespace DepthSensorCalibration {
 
         private static void SetPropsByGameObjects(object obj, Transform root, uint depth) {
             foreach (var propInfo in obj.GetType().GetProperties()) {
-                var row = root.Find(propInfo.Name);
+                var row = root.FindChildRecursively(propInfo.Name);
                 object prop;
                 if (depth == 0) {
                     prop = row.GetComponent(propInfo.PropertyType.Name);
@@ -70,7 +71,7 @@ namespace DepthSensorCalibration {
             grid.SetActive(enable);
         }
 
-        private void SetField(SliderField fld, float loadedVal, UnityAction<float> act) {
+        private static void SetField(SliderField fld, float loadedVal, UnityAction<float> act) {
             UnityAction<float> changeTxt = val => {
                 fld.txtVal.text = (fld.sl.wholeNumbers)
                     ? val.ToString()
@@ -85,7 +86,7 @@ namespace DepthSensorCalibration {
             fld.btnDec.onClick.AddListener(CreateOnBtnIncDec(fld.sl, -1.0f));
         }
 
-        private UnityAction CreateOnBtnIncDec(Slider sl, float mult) {
+        private static UnityAction CreateOnBtnIncDec(Slider sl, float mult) {
             return () => {
                 var val = (sl.wholeNumbers) ?
                     1 :
@@ -99,18 +100,22 @@ namespace DepthSensorCalibration {
         }
 
         private void UpdatePos(GameObject obj) {
-            RectTransform rect = obj.GetComponent<RectTransform>();
-            rect.localPosition = new Vector3(fields.PosX.sl.value, fields.PosY.sl.value, 0.0f);
+            var t = obj.GetComponent<Transform>();
+            var z = t.localPosition.z;
+            t.localPosition = new Vector3(
+                fields.PosX.sl.value / 1000f, 
+                fields.PosY.sl.value / 1000f, 
+                z
+            );
         }
 
         private void UpdateSize(float val) {
             UpdateSize(kinectField, val);
         }
 
-        private void UpdateSize(GameObject obj, float val) {
-            RectTransform rect = obj.GetComponent<RectTransform>();
-            var size = KinectSettings.INITIAL_SIZE * val;
-            rect.localScale = new Vector3(size, size, 1);
+        private static void UpdateSize(GameObject obj, float val) {
+            var cam = obj.GetComponent<Camera>();
+            cam.orthographicSize = val;
         }
     }
 }

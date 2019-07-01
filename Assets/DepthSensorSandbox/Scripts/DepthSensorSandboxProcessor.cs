@@ -57,7 +57,7 @@ namespace DepthSensorSandbox {
 
         private static DepthSensorDevice GetDeviceIfAvailable() {
             var dsm = DepthSensorManager.Instance;
-            if (dsm != null && dsm.Device.IsAvailable()) {
+            if (dsm != null && dsm.Device != null && dsm.Device.IsAvailable()) {
                 return dsm.Device;
             }
             return null;
