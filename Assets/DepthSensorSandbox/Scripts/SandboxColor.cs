@@ -6,6 +6,10 @@ using Utilities;
 namespace DepthSensorSandbox {
     [RequireComponent(typeof(MeshRenderer))]
     public class SandboxColor : MonoBehaviour {
+        private static readonly int _DEPTH_ZERO = Shader.PropertyToID("_DepthZero");
+        private static readonly int _DEPTH_TO_COLOR_TEX = Shader.PropertyToID("_DepthToColorTex");
+        private static readonly int _COLOR_TEX = Shader.PropertyToID("_ColorTex");
+        
         private Material _mat;
         private Texture2D _texColor;
         private Texture2D _texDepthToColor;
@@ -13,6 +17,8 @@ namespace DepthSensorSandbox {
 
         private void Awake() {
             _mat = GetComponent<MeshRenderer>().material;
+            Prefs.Calibration.OnChanged += OnCalibrationChange;
+            OnCalibrationChange();
         }
 
         private void Start() {
@@ -25,6 +31,11 @@ namespace DepthSensorSandbox {
             DepthSensorSandboxProcessor.OnColor -= OnColor;
             DepthSensorSandboxProcessor.OnNewFrame -= OnNewFrame;
             DepthSensorSandboxProcessor.OnDepthToColorBackground -= OnDepthToColorBackground;
+            Prefs.Calibration.OnChanged -= OnCalibrationChange;
+        }
+
+        private void OnCalibrationChange() {
+            _mat.SetFloat(_DEPTH_ZERO, Prefs.Calibration.ZeroDepth);
         }
 
         private void OnDepthToColorBackground(int width, int height, Vector2[] depthToColor) {
@@ -43,7 +54,7 @@ namespace DepthSensorSandbox {
 
         private void OnNewFrame(int width, int height, ushort[] depth, Vector2[] mapToCamera) {
             if (TexturesHelper.ReCreateIfNeed(ref _texDepthToColor, width, height, TextureFormat.RGHalf)) {
-                _mat.SetTexture("_DepthToColorTex", _texDepthToColor);
+                _mat.SetTexture(_DEPTH_TO_COLOR_TEX, _texDepthToColor);
                 _depthToColorNative = _texDepthToColor.GetRawTextureData<byte>();
             }
             _texDepthToColor.Apply();
@@ -51,7 +62,7 @@ namespace DepthSensorSandbox {
 
         private void OnColor(int width, int height, byte[] data, TextureFormat format) {
             if (TexturesHelper.ReCreateIfNeed(ref _texColor, width, height, format)) {
-                _mat.SetTexture("_ColorTex", _texColor);
+                _mat.SetTexture(_COLOR_TEX, _texColor);
             }
 
             _texColor.LoadRawTextureData(data);

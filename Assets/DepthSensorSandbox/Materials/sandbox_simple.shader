@@ -40,17 +40,14 @@
             v2f vert (appdata v) {
                 v2f o;
                 o.clip = UnityObjectToClipPos(v.vertex);
-                o.pos = UnityObjectToViewPos(v.vertex);
+                float3 pos = UnityObjectToViewPos(v.vertex);
+                o.pos = float3(pos.xy, -pos.z);
                 //o.uv = TRANSFORM_TEX(v.uv, _MainTex);
                 return o;
             }
 
             fixed4 frag (v2f i) : SV_Target {
-#if UNITY_REVERSED_Z 
-                float d = -i.pos.z;
-#else
                 float d = i.pos.z;
-#endif
                 if (d < _Depth1)
                     return _Color1;
                 if (d < _Depth2)

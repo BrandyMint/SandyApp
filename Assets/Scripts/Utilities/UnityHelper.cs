@@ -101,6 +101,20 @@ namespace Utilities {
             return null;
         }
         
+        public static void SetPropsByGameObjects(object obj, Transform root) {
+            foreach (var propInfo in obj.GetType().GetProperties()) {
+                var row = root.FindChildRecursively(propInfo.Name);
+                object prop;
+                if (propInfo.PropertyType.IsSubclassOf(typeof(Component))) {
+                    prop = row.GetComponent(propInfo.PropertyType) ?? row.GetComponentInChildren(propInfo.PropertyType);
+                } else {
+                    prop = Activator.CreateInstance(propInfo.PropertyType);
+                    SetPropsByGameObjects(prop, row);
+                }
+                propInfo.SetValue(obj, prop, null);
+            }
+        }
+        
         public static void AddEventTrigger(this Component obj, EventTriggerType eventType, UnityAction<BaseEventData> action) {
             var et = obj.GetComponent<EventTrigger>() 
                      ?? obj.gameObject.AddComponent<EventTrigger>();
