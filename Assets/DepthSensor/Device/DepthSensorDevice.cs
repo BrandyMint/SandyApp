@@ -1,49 +1,48 @@
 ﻿using System.Collections;
-using System.Threading.Tasks;
-using DepthSensor.Sensor;
+using DepthSensor.Stream;
 using UnityEngine;
 
 namespace DepthSensor.Device {
     public abstract class DepthSensorDevice {
-        public readonly Sensor<ushort> Depth;
-        public readonly Sensor<byte> Index;
-        public readonly ColorByteSensor Color;
-        public readonly BodySensor Body;
-        public readonly Sensor<Vector2> MapDepthToCamera;
+        public readonly DepthStream Depth;
+        public readonly IndexStream Index;
+        public readonly ColorStream Color;
+        public readonly BodyStream Body;
+        public readonly MapDepthToCameraStream MapDepthToCamera;
         public readonly string Platform;
         
         
         protected InitInfo _initInfo;
-        protected readonly Sensor<ushort>.Internal _internalDepth;
-        protected readonly Sensor<byte>.Internal _internalIndex;
-        protected readonly Sensor<byte>.Internal _internalColor;
-        protected readonly Sensor<Vector2>.Internal _internalMapDepthToCamera;
+        protected readonly Stream.DepthStream.Internal _internalDepth;
+        protected readonly IndexStream.Internal _internalIndex;
+        protected readonly ColorStream.Internal _internalColor;
+        protected readonly MapDepthToCameraStream.Internal _internalMapDepthToCamera;
 
         private readonly bool _isInitialised;
 
         protected class InitInfo {
-            public Sensor<ushort> Depth;
-            public Sensor<byte> Index;
-            public ColorByteSensor Color;
-            public BodySensor Body;
-            public Sensor<Vector2> MapDepthToColor;
+            public DepthStream Depth;
+            public IndexStream Index;
+            public ColorStream Color;
+            public BodyStream Body;
+            public MapDepthToCameraStream MapDepthToColor;
         }
 
         protected DepthSensorDevice(string platform, InitInfo initInfo) {
             Platform = platform;
-            Depth = initInfo.Depth ?? new Sensor<ushort>(false);
-            Index = initInfo.Index ?? new Sensor<byte>(false);
-            Color = initInfo.Color ?? new ColorByteSensor(false);
-            Body = initInfo.Body ?? new BodySensor(false);
-            MapDepthToCamera = initInfo.MapDepthToColor ?? new Sensor<Vector2>(false);
+            Depth = initInfo.Depth ?? new Stream.DepthStream(false);
+            Index = initInfo.Index ?? new IndexStream(false);
+            Color = initInfo.Color ?? new ColorStream(false);
+            Body = initInfo.Body ?? new BodyStream(false);
+            MapDepthToCamera = initInfo.MapDepthToColor ?? new MapDepthToCameraStream(false);
 
-            _internalDepth = new Sensor<ushort>.Internal(Depth);
+            _internalDepth = new Stream<ushort>.Internal(Depth);
             _internalDepth.SetOnActiveChanged(SensorActiveChanged);
-            _internalIndex = new Sensor<byte>.Internal(Index);
+            _internalIndex = new Stream<byte>.Internal(Index);
             _internalIndex.SetOnActiveChanged(SensorActiveChanged);
-            _internalColor = new Sensor<byte>.Internal(Color);
+            _internalColor = new TextureStream<byte>.Internal(Color);
             _internalColor.SetOnActiveChanged(SensorActiveChanged);
-            _internalMapDepthToCamera = new Sensor<Vector2>.Internal(MapDepthToCamera);
+            _internalMapDepthToCamera = new Stream<Vector2>.Internal(MapDepthToCamera);
             _internalMapDepthToCamera.SetOnActiveChanged(SensorActiveChanged);
 
             _initInfo = initInfo;
@@ -54,15 +53,16 @@ namespace DepthSensor.Device {
         public abstract Vector2 CameraPosToColorMapPos(Vector3 pos);
         public abstract Vector2 DepthMapPosToColorMapPos(Vector2 pos, ushort depth);
 
-        public virtual void DepthToColorMap(ushort[] depth, Vector2[] depthToColorMap) {
-            Parallel.For(0, depth.Length, i => {
-                depthToColorMap[i] = DepthMapPosToColorMapPos(Depth.GetXYFrom(i), depth[i]);
-            });
-        }
-
-        protected abstract void SensorActiveChanged(AbstractSensor sensor);
+        protected abstract void SensorActiveChanged(AbstractStream stream);
         protected abstract IEnumerator Update();
-        protected abstract void Close();
+
+        protected virtual void Close() {
+            Depth.Dispose();
+            Index.Dispose();
+            Color.Dispose();
+            Body.Dispose();
+            MapDepthToCamera.Dispose();
+        }
         
         public class Internal {
             private readonly DepthSensorDevice _device;

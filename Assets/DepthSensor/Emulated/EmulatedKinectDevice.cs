@@ -4,7 +4,7 @@ using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using DepthSensor.Device;
-using DepthSensor.Sensor;
+using DepthSensor.Stream;
 using UnityEngine;
 
 namespace DepthSensor.Emulated {
@@ -19,9 +19,9 @@ namespace DepthSensor.Emulated {
 
         private static InitInfo Init() {
             return new InitInfo {
-                Color = new ColorByteSensor(1920, 1080, 4, TextureFormat.RGBA32),
-                Index = new Sensor<byte>(512, 424),
-                Depth = new Sensor<ushort>(512, 424)
+                Color = new ColorStream(1920, 1080, TextureFormat.RGBA32),
+                Index = new IndexStream(512, 424),
+                Depth = new Stream.DepthStream(512, 424)
             };
         }
 
@@ -43,7 +43,7 @@ namespace DepthSensor.Emulated {
             }
         }
 
-        protected override void SensorActiveChanged(AbstractSensor sensor) {
+        protected override void SensorActiveChanged(AbstractStream stream) {
             //TODO: implement
         }
 
@@ -65,8 +65,6 @@ namespace DepthSensor.Emulated {
             if (Index.Active) _internalIndex.NewFrame(_index);
             if (Depth.Active) _internalDepth.NewFrame(_depth);
         }
-
-        protected override void Close() { }
 
         public override Vector2 CameraPosToDepthMapPos(Vector3 pos) {
             throw new NotImplementedException();

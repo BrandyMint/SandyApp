@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using DepthSensor.Sensor;
+using DepthSensor.Stream;
 using UnityEngine;
 using OpenNIWrapper;
 
@@ -31,7 +31,7 @@ namespace DepthSensor.Device {
 
         private class NI2Sensor {
             public VideoStream stream;
-            public AbstractSensor sensor;
+            public AbstractStream Stream;
             public readonly AutoResetEvent frameEvent = new AutoResetEvent(false);
         }
 
@@ -62,12 +62,12 @@ namespace DepthSensor.Device {
             _pollFrames.Start();
         }
 
-        private NI2Sensor CreateNi2Sensor(OpenNIWrapper.Device.SensorType type, VideoMode mode, AbstractSensor sensor) {
+        private NI2Sensor CreateNi2Sensor(OpenNIWrapper.Device.SensorType type, VideoMode mode, AbstractStream stream) {
             var ni = new NI2Sensor {
-                sensor = sensor
+                Stream = stream
             };
             
-            if (sensor.Available && _device != null) {
+            if (stream.Available && _device != null) {
                 ni.stream = _device.CreateVideoStream(type);
                 ni.stream.VideoMode = mode;
                 ni.stream.OnNewFrame += s => ni.frameEvent.Set();
@@ -97,33 +97,23 @@ namespace DepthSensor.Device {
                 if (init.modeDepth != null) {
                     if (init.modeDepth.DataPixelFormat != VideoMode.PixelFormat.Depth1Mm)
                         throw new NotImplementedException();
-                    init.Depth = new Sensor<ushort>(
+                    init.Depth = new DepthStream(
                         init.modeDepth.Resolution.Width,
                         init.modeDepth.Resolution.Height
                     );
-                    init.MapDepthToColor = new Sensor<Vector2>(init.Depth.width, init.Depth.height);
-                } else {
-                    init.Depth = new Sensor<ushort>(false);
-                    init.MapDepthToColor = new Sensor<Vector2>(false);
+                    init.MapDepthToColor = new MapDepthToCameraStream(init.Depth.width, init.Depth.height);
                 }
 
                 init.modeColor = GetBestVideoMod(init.device, OpenNIWrapper.Device.SensorType.Color);
                 if (init.modeColor != null) {
                     if (init.modeColor.DataPixelFormat != VideoMode.PixelFormat.Rgb888)
                         throw new NotImplementedException();
-                    init.Color = new ColorByteSensor(
+                    init.Color = new ColorStream(
                         init.modeColor.Resolution.Width,
                         init.modeColor.Resolution.Height,
-                        3, TextureFormat.RGB24
+                        TextureFormat.RGB24
                     );
-                } else {
-                    init.Color = new ColorByteSensor(false);
                 }
-
-
-                init.Index = new Sensor<byte>(false);
-                init.Body = new BodySensor(false);
-
             } catch (OpenNI2Exception e) {
                 OpenNI.Shutdown();
                 Close(ref init.device);
@@ -191,19 +181,20 @@ namespace DepthSensor.Device {
             }
             _framesArrivedEvent.Dispose();
             _sensorActiveChangedEvent.Dispose();
+            base.Close();
         }
 
         public override bool IsAvailable() {
             return _device != null && _device.IsValid;
         }
 
-        protected override void SensorActiveChanged(AbstractSensor sensor) {
-            if (sensor == MapDepthToCamera) {
+        protected override void SensorActiveChanged(AbstractStream stream) {
+            if (stream == MapDepthToCamera) {
                 _needUpdateMapDepthToColorSpace = true;
                 return;
             }
             
-            var niSensor = _niSensors.FirstOrDefault(s => s.sensor == sensor);
+            var niSensor = _niSensors.FirstOrDefault(s => s.Stream == stream);
             if (niSensor == null) return;
             
             lock (_sensorsActiveChanged) {
@@ -217,7 +208,7 @@ namespace DepthSensor.Device {
             lock (_sensorsActiveChanged) {
                 foreach (var s in _sensorsActiveChanged) {
                     if (s.stream == null) continue;
-                    if (s.sensor.Active) {
+                    if (s.Stream.Active) {
                         s.stream.Start();
                     } else {
                         s.stream.Stop();
@@ -227,7 +218,7 @@ namespace DepthSensor.Device {
             }
 
             return _niSensors
-                .Where(s => s.sensor.Active && s.stream != null)
+                .Where(s => s.Stream.Active && s.stream != null)
                 .Select(s => s.frameEvent)
                 .ToArray();
         }
@@ -242,7 +233,7 @@ namespace DepthSensor.Device {
                         using (var depth = Depth.Active ? _niDepth.stream.ReadFrame() : null)
                         using (var color = Color.Active ? _niColor.stream.ReadFrame() : null) {
                             if (color != null) {
-                                MemUtils.CopyBytes(color.Data, Color.data, color.DataSize);
+                                _internalColor.SetBytes(color.Data, color.DataSize);
                                 _internalColor.OnNewFrameBackground();
                             }
 
@@ -251,7 +242,7 @@ namespace DepthSensor.Device {
                                 _internalMapDepthToCamera.OnNewFrameBackground();
                             }
                             if (depth != null) {
-                                MemUtils.CopyBytes(depth.Data, Depth.data, depth.DataSize);
+                                _internalDepth.SetBytes(depth.Data, depth.DataSize);
                                 _internalDepth.OnNewFrameBackground();
                             }
                             _framesArrivedEvent.Set();
@@ -266,7 +257,7 @@ namespace DepthSensor.Device {
                 Debug.LogException(e);
             } finally {
                 foreach (var s in _niSensors) {
-                    if (s.sensor.Active)
+                    if (s.Stream.Active)
                         s.stream?.Stop();
                 }
             }
@@ -340,7 +331,7 @@ namespace DepthSensor.Device {
         }
 
         private void UpdateMapDepthToCamera() {
-            Parallel.For(0, MapDepthToCamera.data.LongLength, i => {
+            Parallel.For(0, MapDepthToCamera.data.Length, i => {
                 MapDepthToCamera.data[i] = DepthMapPosToCameraPos(MapDepthToCamera.GetXYFrom(i), _DEPTH_MUL);
             });
             _needUpdateMapDepthToColorSpace = false;

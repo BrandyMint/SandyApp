@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using DepthSensor.Stream;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -17,6 +18,7 @@ namespace DepthSensorSandbox {
             _meshFilter = GetComponent<MeshFilter>();
             _mesh = new Mesh {name = "depth"};
             _mesh.MarkDynamic();
+            _mesh.OptimizeReorderVertexBuffer();
             _meshFilter.mesh = _mesh;
             _mesh.indexFormat = IndexFormat.UInt32;
             _mesh.bounds = new Bounds(Vector3.zero, Vector3.one * _MAX_DEPTH);
@@ -62,17 +64,17 @@ namespace DepthSensorSandbox {
             }
         }
 
-        private void OnDepthData(int width, int height, ushort[] depth, Vector2[] mapToCamera) {
-            ReInitMesh(width, height, depth.Length);
-            Parallel.For(0, depth.Length, i => {
-                var xy = mapToCamera[i];
-                var ud = depth[i];
+        private void OnDepthData(DepthStream depth, MapDepthToCameraStream mapToCamera) {
+            ReInitMesh(depth.width, depth.height, depth.data.Length);
+            Parallel.For(0, depth.data.Length, i => {
+                var xy = mapToCamera.data[i];
+                var ud = depth.data[i];
                 var d = ud != 0 ? (float) ud / 1000f : float.NaN;
                 _vert[i] = new Vector3(xy.x * d, xy.y * d, d);
             });
         }
 
-        private void OnNewFrame(int width, int height, ushort[] depth, Vector2[] mapToCamera) {
+        private void OnNewFrame(DepthStream depth, MapDepthToCameraStream mapToCamera) {
             if (_vert != null && _triangles != null) {
                 _mesh.vertices = _vert;
                 if (_mesh.GetIndexCount(0) != _triangles.LongLength) {

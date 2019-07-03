@@ -108,6 +108,7 @@ namespace DepthSensor.Device {
                 _kinect.Dispose();
                 _kinect = null;
             }
+            base.Close();
         }
 
         public override bool IsAvailable() {

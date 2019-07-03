@@ -3,19 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace DepthSensor.Sensor {
-    public class BodySensor : Sensor<Body> {
+namespace DepthSensor.Stream {
+    public class BodyStream : ArrayStream<Body> {
         public int CountTracked { get; private set; }
-        public new event Action<BodySensor> OnNewFrame;
 
-        protected internal BodySensor(int maxCount)
-            : base(maxCount, 1, CreateBodies(maxCount)) {
-            base.OnNewFrame += sensor => {
-                if (OnNewFrame != null) OnNewFrame((BodySensor) sensor);
-            };
+        public BodyStream(int maxCount)
+            : base(CreateBodies(maxCount)) {
         }
 
-        public BodySensor(bool available) : this(0) {
+        public BodyStream(bool available) : this(0) {
             Available = available;
         }
 
@@ -35,18 +31,18 @@ namespace DepthSensor.Sensor {
                 public T newBody;
             }
 
-            private readonly BodySensor _sensor;
+            private readonly BodyStream _stream;
             private readonly Dictionary<ulong, UpdateInfo> _updateInfo;
             private readonly Dictionary<Body, Body.Internal> internalBody;
 
-            protected internal Internal(BodySensor sensor) : base(sensor) {
-                _sensor = sensor;
-                _updateInfo = new Dictionary<ulong, UpdateInfo>(sensor.data.Length);
-                for (int i = 0; i < sensor.data.Length; i++) {
-                    _updateInfo[(ulong) i] = new UpdateInfo {body = sensor.data[i]};
+            protected internal Internal(BodyStream stream) : base(stream) {
+                _stream = stream;
+                _updateInfo = new Dictionary<ulong, UpdateInfo>(stream.data.Length);
+                for (int i = 0; i < stream.data.Length; i++) {
+                    _updateInfo[(ulong) i] = new UpdateInfo {body = stream.data[i]};
                 }
 
-                internalBody = sensor.data.ToDictionary(
+                internalBody = stream.data.ToDictionary(
                     body => body, 
                     body => new Body.Internal(body));
             }
@@ -83,7 +79,7 @@ namespace DepthSensor.Sensor {
                         internalBody[info.body].Set(false);
                     }
                 }
-                _sensor.CountTracked = countTracked;
+                _stream.CountTracked = countTracked;
             }
         }
     }

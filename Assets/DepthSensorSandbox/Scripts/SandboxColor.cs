@@ -1,7 +1,6 @@
-using System.Threading.Tasks;
+using DepthSensor.Stream;
 using Unity.Collections;
 using UnityEngine;
-using Utilities;
 
 namespace DepthSensorSandbox {
     [RequireComponent(typeof(MeshRenderer))]
@@ -11,9 +10,9 @@ namespace DepthSensorSandbox {
         private static readonly int _COLOR_TEX = Shader.PropertyToID("_ColorTex");
         
         private Material _mat;
-        private Texture2D _texColor;
-        private Texture2D _texDepthToColor;
-        private NativeArray<byte> _depthToColorNative;
+        private NativeArray<ushort> _depthToColorNative;
+        private bool _isColorSetted;
+        private bool _isDepthToColorSetted;
 
         private void Awake() {
             _mat = GetComponent<MeshRenderer>().material;
@@ -22,15 +21,13 @@ namespace DepthSensorSandbox {
         }
 
         private void Start() {
-            DepthSensorSandboxProcessor.OnDepthToColorBackground += OnDepthToColorBackground;
-            DepthSensorSandboxProcessor.OnNewFrame += OnNewFrame;
+            DepthSensorSandboxProcessor.OnDepthToColor += OnDepthToColor;
             DepthSensorSandboxProcessor.OnColor += OnColor;
         }
 
         private void OnDestroy() {
             DepthSensorSandboxProcessor.OnColor -= OnColor;
-            DepthSensorSandboxProcessor.OnNewFrame -= OnNewFrame;
-            DepthSensorSandboxProcessor.OnDepthToColorBackground -= OnDepthToColorBackground;
+            DepthSensorSandboxProcessor.OnDepthToColor -= OnDepthToColor;
             Prefs.Calibration.OnChanged -= OnCalibrationChange;
         }
 
@@ -38,35 +35,20 @@ namespace DepthSensorSandbox {
             _mat.SetFloat(_DEPTH_ZERO, Prefs.Calibration.ZeroDepth);
         }
 
-        private void OnDepthToColorBackground(int width, int height, Vector2[] depthToColor) {
-            var size = sizeof(ushort);
-            if (_depthToColorNative.Length == depthToColor.Length * 2 * size) {
-                Parallel.For(0, depthToColor.Length, i => {
-                    var p = depthToColor[i];
-                    var ux = Mathf.FloatToHalf(p.x);
-                    var uy = Mathf.FloatToHalf(p.y);
-                    var startI = i * 2 * size;
-                    _depthToColorNative.ReinterpretStore(startI, ux);
-                    _depthToColorNative.ReinterpretStore(startI + size, uy);
-                });
+        private void OnDepthToColor(DepthSensorSandboxProcessor.DepthToColorStream d) {
+            if (!_isDepthToColorSetted) {
+                _mat.SetTexture(_DEPTH_TO_COLOR_TEX, d.texture);
+                _isDepthToColorSetted = true;
             }
+            d.texture.Apply(false);
         }
 
-        private void OnNewFrame(int width, int height, ushort[] depth, Vector2[] mapToCamera) {
-            if (TexturesHelper.ReCreateIfNeed(ref _texDepthToColor, width, height, TextureFormat.RGHalf)) {
-                _mat.SetTexture(_DEPTH_TO_COLOR_TEX, _texDepthToColor);
-                _depthToColorNative = _texDepthToColor.GetRawTextureData<byte>();
+        private void OnColor(ColorStream color) {
+            if (!_isColorSetted) {
+                _mat.SetTexture(_COLOR_TEX, color.texture);
+                _isColorSetted = true;
             }
-            _texDepthToColor.Apply();
-        }
-
-        private void OnColor(int width, int height, byte[] data, TextureFormat format) {
-            if (TexturesHelper.ReCreateIfNeed(ref _texColor, width, height, format)) {
-                _mat.SetTexture(_COLOR_TEX, _texColor);
-            }
-
-            _texColor.LoadRawTextureData(data);
-            _texColor.Apply();
+            color.texture.Apply(false);
         }
     }
 }

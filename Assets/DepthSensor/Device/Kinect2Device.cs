@@ -192,6 +192,7 @@ namespace DepthSensor.Device {
             }
             _frameArrivedEvent.Dispose();
             _sensorActiveChangedEvent.Dispose();
+            base.Close();
         }
 
 #region Coordinate Map

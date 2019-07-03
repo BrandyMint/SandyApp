@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace DepthSensor.Sensor {
+namespace DepthSensor.Stream {
     public class Body {
         public readonly Dictionary<Joint.Type, Joint> joints;
         public bool IsTracked { get; private set; }
         public ulong TrackedId { get; private set; }
 
-        protected internal Body() {
+        public Body() {
             joints = new Dictionary<Joint.Type, Joint>(GetJointsCount());
             foreach (Joint.Type jointType in Enum.GetValues(typeof(Joint.Type))) {
                 joints.Add(jointType, new Joint(jointType));
