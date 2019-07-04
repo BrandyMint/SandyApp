@@ -10,7 +10,8 @@ Shader "Sandbox/Color" {
 		//Blend One OneMinusSrcAlpha
 
         Pass {
-            CGPROGRAM
+            CGPROGRAM            
+            #pragma multi_compile _ CALC_DEPTH
             #pragma vertex vert
             #pragma fragment frag
 
@@ -25,21 +26,13 @@ Shader "Sandbox/Color" {
                 float4 clip : SV_POSITION;
                 float2 uv : TEXCOORD0;
                 float3 pos : TEXCOORD1;
-            };
+            };          
+            
+            #include "sandbox.cginc"
 
             fixed4 _ColorZero;
             float _DepthZero;
-            sampler2D _DepthToColorTex; float4 _DepthToColorTex_ST;
             sampler2D _ColorTex; float4 _ColorTex_TexelSize;
-
-            v2f vert (appdata v) {
-                v2f o;
-                o.clip = UnityObjectToClipPos(v.vertex);
-                float3 pos = UnityObjectToViewPos(v.vertex);
-                o.pos = float3(pos.xy, -pos.z);
-                o.uv = TRANSFORM_TEX(v.uv, _DepthToColorTex);
-                return o;
-            }
 
             fixed4 frag (v2f i) : SV_Target {
                 float2 uv = tex2D(_DepthToColorTex, i.uv).rg * _ColorTex_TexelSize.xy;

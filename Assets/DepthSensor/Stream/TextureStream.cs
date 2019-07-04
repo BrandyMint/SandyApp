@@ -5,11 +5,12 @@ namespace DepthSensor.Stream {
         public readonly Texture2D texture;
         public bool AutoAcceptTexture = false;
         
-        public TextureStream(int width, int height, TextureFormat format) : 
+        public TextureStream(int width, int height, TextureFormat format, bool autoAccept = false) : 
             base(width, height, false) 
         {
             texture = new Texture2D(width, height, format, false);
             data = texture.GetRawTextureData<T>();
+            AutoAcceptTexture = autoAccept;
         }
 
         public TextureStream(bool available) : this(1, 1, TextureFormat.RGB24) {

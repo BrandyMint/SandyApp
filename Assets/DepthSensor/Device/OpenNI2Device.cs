@@ -1,4 +1,5 @@
 #if ENABLE_OPENNI2
+using Unity.Mathematics;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -42,6 +43,7 @@ namespace DepthSensor.Device {
 
         private volatile bool _needUpdateMapDepthToColorSpace;
         private volatile bool _pollFramesLoop = true;
+        private volatile bool _mapDepthToCameraUpdated = true;
         private readonly Thread _pollFrames;
         private readonly AutoResetEvent _framesArrivedEvent = new AutoResetEvent(false);
         private readonly AutoResetEvent _sensorActiveChangedEvent = new AutoResetEvent(false);
@@ -270,6 +272,10 @@ namespace DepthSensor.Device {
                     if (Depth.Active) _internalDepth.OnNewFrame();
                     if (Color.Active) _internalColor.OnNewFrame();
                 }
+                if (_mapDepthToCameraUpdated) {
+                    _internalMapDepthToCamera.OnNewFrame();
+                    _mapDepthToCameraUpdated = false;
+                }
                 yield return null;
             }
         }
@@ -332,9 +338,11 @@ namespace DepthSensor.Device {
 
         private void UpdateMapDepthToCamera() {
             Parallel.For(0, MapDepthToCamera.data.Length, i => {
-                MapDepthToCamera.data[i] = DepthMapPosToCameraPos(MapDepthToCamera.GetXYFrom(i), _DEPTH_MUL);
+                var p = DepthMapPosToCameraPos(MapDepthToCamera.GetXYFrom(i), _DEPTH_MUL);
+                MapDepthToCamera.data[i] = new half2(new float2(p.x, p.y));
             });
             _needUpdateMapDepthToColorSpace = false;
+            _mapDepthToCameraUpdated = true;
         }
 #endregion
     }

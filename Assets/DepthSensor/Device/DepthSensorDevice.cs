@@ -30,19 +30,19 @@ namespace DepthSensor.Device {
 
         protected DepthSensorDevice(string platform, InitInfo initInfo) {
             Platform = platform;
-            Depth = initInfo.Depth ?? new Stream.DepthStream(false);
+            Depth = initInfo.Depth ?? new DepthStream(false);
             Index = initInfo.Index ?? new IndexStream(false);
             Color = initInfo.Color ?? new ColorStream(false);
             Body = initInfo.Body ?? new BodyStream(false);
             MapDepthToCamera = initInfo.MapDepthToColor ?? new MapDepthToCameraStream(false);
 
-            _internalDepth = new Stream<ushort>.Internal(Depth);
+            _internalDepth = new DepthStream.Internal(Depth);
             _internalDepth.SetOnActiveChanged(SensorActiveChanged);
-            _internalIndex = new Stream<byte>.Internal(Index);
+            _internalIndex = new IndexStream.Internal(Index);
             _internalIndex.SetOnActiveChanged(SensorActiveChanged);
-            _internalColor = new TextureStream<byte>.Internal(Color);
+            _internalColor = new ColorStream.Internal(Color);
             _internalColor.SetOnActiveChanged(SensorActiveChanged);
-            _internalMapDepthToCamera = new Stream<Vector2>.Internal(MapDepthToCamera);
+            _internalMapDepthToCamera = new MapDepthToCameraStream.Internal(MapDepthToCamera);
             _internalMapDepthToCamera.SetOnActiveChanged(SensorActiveChanged);
 
             _initInfo = initInfo;

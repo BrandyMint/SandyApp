@@ -1,3 +1,4 @@
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace DepthSensor.Stream {
@@ -6,9 +7,8 @@ namespace DepthSensor.Stream {
         public ColorStream(bool available) : base(available) { }
     }
 
-    public class DepthStream : Stream<ushort> {
-        public DepthStream(int width, int height, bool alloc) : base(width, height, alloc) { }
-        public DepthStream(int width, int height, ushort[] data = null) : base(width, height, data) { }
+    public class DepthStream : TextureStream<ushort> {
+        public DepthStream(int width, int height) : base(width, height, TextureFormat.R16) { }
         public DepthStream(bool available) : base(available) { }
     }
 
@@ -18,9 +18,8 @@ namespace DepthSensor.Stream {
         public IndexStream(bool available) : base(available) { }
     }
 
-    public class MapDepthToCameraStream : Stream<Vector2> {
-        public MapDepthToCameraStream(int width, int height, bool alloc) : base(width, height, alloc) { }
-        public MapDepthToCameraStream(int width, int height, Vector2[] data = null) : base(width, height, data) { }
+    public class MapDepthToCameraStream : TextureStream<half2> {
+        public MapDepthToCameraStream(int width, int height) : base(width, height, TextureFormat.RGHalf, true) { }
         public MapDepthToCameraStream(bool available) : base(available) { }
     }
 }

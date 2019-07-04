@@ -376,6 +376,7 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
+  - component: {fileID: 350103492}
   - component: {fileID: 350103491}
   m_Layer: 0
   m_Name: Sandbox
@@ -384,7 +385,19 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &350103491
+--- !u!114 &350103491
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 350103490}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5df8cdaa69184911afc10fa1f287cd73, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &350103492
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -398,7 +411,7 @@ Transform:
   - {fileID: 1977039026}
   - {fileID: 1778851385}
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &360323536
 PrefabInstance:
@@ -2825,7 +2838,7 @@ Transform:
   - {fileID: 1301400943}
   - {fileID: 941866534}
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1440704546
 MonoBehaviour:
@@ -3477,7 +3490,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 350103491}
+  m_Father: {fileID: 350103492}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!81 &1778851386
@@ -3649,6 +3662,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d4f7765141e94ed1b782fa22ed4f2549, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _updateMeshOnGPU: 1
 --- !u!23 &1977039024
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -3707,7 +3721,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 350103491}
+  m_Father: {fileID: 350103492}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1977039027
