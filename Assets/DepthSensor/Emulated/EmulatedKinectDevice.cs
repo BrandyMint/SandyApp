@@ -61,6 +61,10 @@ namespace DepthSensor.Emulated {
             }
         }
 
+        public override void ManualUpdate() {
+            //TODO: implement
+        }
+
         private void UpdateSensors() {
             if (Index.Active) _internalIndex.NewFrame(_index);
             if (Depth.Active) _internalDepth.NewFrame(_depth);

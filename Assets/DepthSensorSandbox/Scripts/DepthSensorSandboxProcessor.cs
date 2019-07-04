@@ -71,9 +71,11 @@ namespace DepthSensorSandbox {
         }
 
         private void OnDepthSensorAvailable() {
+            _dsm.Device.IsManualUpdate = true;
             ActivateDepthIfNeed();
             ActivateColorIfNeed();
             SetupConveyer(ConveyerUpdateBG(), ConveyerUpdateMain());
+            _dsm.Device.ManualUpdate();
         }
 
         private static DepthSensorDevice GetDeviceIfAvailable() {
@@ -146,6 +148,7 @@ namespace DepthSensorSandbox {
                 _onColor?.Invoke(sColor);
                 if (CreateDepthToColorIfNeed(sDepth))
                     _onDepthToColor?.Invoke(_depthToColorStream);
+                _dsm.Device.ManualUpdate();
                 yield return null;
             }
         }

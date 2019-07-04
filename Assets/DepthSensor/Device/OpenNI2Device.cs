@@ -44,9 +44,11 @@ namespace DepthSensor.Device {
         private volatile bool _needUpdateMapDepthToColorSpace;
         private volatile bool _pollFramesLoop = true;
         private volatile bool _mapDepthToCameraUpdated = true;
+        private volatile bool _isManualUpdate;
         private readonly Thread _pollFrames;
         private readonly AutoResetEvent _framesArrivedEvent = new AutoResetEvent(false);
         private readonly AutoResetEvent _sensorActiveChangedEvent = new AutoResetEvent(false);
+        private readonly AutoResetEvent _manualUpdateEvent = new AutoResetEvent(false);
         private readonly HashSet<NI2Sensor> _sensorsActiveChanged = new HashSet<NI2Sensor>();
 
         public OpenNI2Device() : base("OpenNI2", Init()) {
@@ -190,6 +192,21 @@ namespace DepthSensor.Device {
             return _device != null && _device.IsValid;
         }
 
+        public override bool IsManualUpdate {
+            get => _isManualUpdate; 
+            set {
+                if (_isManualUpdate != value) {
+                    _isManualUpdate = value;
+                    _sensorActiveChangedEvent.Set();
+                }
+            }
+        }
+
+        public override void ManualUpdate() {
+            if (_isManualUpdate)
+                _manualUpdateEvent.Set();
+        }
+
         protected override void SensorActiveChanged(AbstractStream stream) {
             if (stream == MapDepthToCamera) {
                 _needUpdateMapDepthToColorSpace = true;
@@ -219,10 +236,12 @@ namespace DepthSensor.Device {
                 _sensorsActiveChanged.Clear();
             }
 
-            return _niSensors
+            var events = _niSensors
                 .Where(s => s.Stream.Active && s.stream != null)
-                .Select(s => s.frameEvent)
-                .ToArray();
+                .Select(s => s.frameEvent).ToList();
+            if (_isManualUpdate)
+                events.Add(_manualUpdateEvent);
+            return events.ToArray();
         }
 
         private void PollFrames() {
@@ -231,7 +250,7 @@ namespace DepthSensor.Device {
                 while (_pollFramesLoop) {
                     if (_sensorActiveChangedEvent.WaitOne(0))
                         waits = ActivateSensors();
-                    if (waits.Length > 0 && WaitHandle.WaitAll(waits, _FRAME_TIME * 3)) {
+                    if (waits.Length > 0 && WaitHandle.WaitAll(waits, _FRAME_TIME * 5)) {
                         using (var depth = Depth.Active ? _niDepth.stream.ReadFrame() : null)
                         using (var color = Color.Active ? _niColor.stream.ReadFrame() : null) {
                             if (color != null) {

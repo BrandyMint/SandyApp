@@ -47,7 +47,9 @@ namespace DepthSensor.Device {
 
             _initInfo = initInfo;
         }
-        
+
+        public virtual bool IsManualUpdate { get; set; }
+
         public abstract bool IsAvailable();
         public abstract Vector2 CameraPosToDepthMapPos(Vector3 pos);
         public abstract Vector2 CameraPosToColorMapPos(Vector3 pos);
@@ -55,6 +57,7 @@ namespace DepthSensor.Device {
 
         protected abstract void SensorActiveChanged(AbstractStream stream);
         protected abstract IEnumerator Update();
+        public abstract void ManualUpdate();
 
         protected virtual void Close() {
             Depth.Dispose();
