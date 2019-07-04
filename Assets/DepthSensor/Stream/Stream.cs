@@ -40,6 +40,10 @@ namespace DepthSensor.Stream {
             );
         }
 
+        public int GetIFrom(int x, int y) {
+            return y * width + x;
+        }
+
         public Vector2 GetXYFrom(int i) {
             return new Vector2(
                 i % width,
