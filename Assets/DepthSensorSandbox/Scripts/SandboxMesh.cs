@@ -26,6 +26,7 @@ namespace DepthSensorSandbox {
         private bool _isTexturesSetted;
         private Material _mat;
         private bool _prevUpdateMeshOnGPU;
+        private bool _firstFrame = true;
 
         private void Awake() {
             _mat = GetComponent<MeshRenderer>().material;
@@ -35,7 +36,6 @@ namespace DepthSensorSandbox {
             _mesh.OptimizeReorderVertexBuffer();
             _meshFilter.mesh = _mesh;
             _mesh.indexFormat = IndexFormat.UInt32;
-            _mesh.bounds = new Bounds(Vector3.zero, Vector3.one * _MAX_DEPTH);
         }
 
         private void Start() {
@@ -118,17 +118,24 @@ namespace DepthSensorSandbox {
 
         private void OnNewFrameCPU(DepthStream depth, MapDepthToCameraStream mapToCamera) {
             if (_vert != null && _triangles != null) {
-                if (!_updateMeshOnGPU || _mesh.vertexCount != _vert.Length)
+                if (!_updateMeshOnGPU || _mesh.vertexCount != _vert.Length || _firstFrame)
                     _mesh.vertices = _vert;
                 if (_mesh.GetIndexCount(0) != _triangles.LongLength) {
                     _mesh.uv = _uv;
                     _mesh.triangles = _triangles;
+                }
+
+                if (_firstFrame) {
+                    _firstFrame = false;
+                    _mesh.RecalculateBounds();
                 }
             }
         }
 
         private void OnDepthDataGPU(DepthStream depth, MapDepthToCameraStream mapToCamera) {
             ReInitMeshIfNeed(depth.width, depth.height, depth.data.Length);
+            if (_firstFrame)
+                OnDepthDataCPU(depth, mapToCamera);
         }
 
         private void OnNewFrameGPU(DepthStream depth, MapDepthToCameraStream mapToCamera) {

@@ -139,6 +139,9 @@ namespace DepthSensor.Device {
                 var stream = device.CreateVideoStream(type);
                 if (stream != null) {
                     var supportedModes = stream.SensorInfo.GetSupportedVideoModes();
+                    //for Kinect2 Depth 640x480@30 is invalid
+                    if (type == OpenNIWrapper.Device.SensorType.Depth && device.DeviceInfo.Uri.StartsWith("freenect2"))
+                        return supportedModes.First(m => m.Fps == 30 && m.Resolution.Width == 512);
                     
                     mode = supportedModes.Aggregate((m1, m2) => {
                         if (m1.Fps != m2.Fps) {
