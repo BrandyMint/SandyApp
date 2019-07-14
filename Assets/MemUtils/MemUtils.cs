@@ -4,6 +4,16 @@ using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 
 public static class MemUtils {
+    public static NativeArray<T> ConvertPtrToNativeArray<T>(IntPtr ptr, int length, Allocator allocator = Allocator.None) where T : struct {
+        //TODO: ConvertExistingDataToNativeArray not create m_Safety that provides errors read/write 
+        unsafe {
+            var array =  NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<T>(ptr.ToPointer(), length, allocator);
+            var m_Safety = allocator == Allocator.Temp ? AtomicSafetyHandle.GetTempMemoryHandle() : AtomicSafetyHandle.Create();
+            NativeArrayUnsafeUtility.SetAtomicSafetyHandle<T>(ref array, m_Safety);
+            return array;
+        }
+    }
+    
     public static void Copy<T>(IntPtr src, T[] dst) {
         var dstBytes = dst.LongLength * Marshal.SizeOf<T>();
         CopyBytes(src, dst, dstBytes);

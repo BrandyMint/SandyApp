@@ -1,4 +1,7 @@
+using System;
 using UnityEngine;
+using UnityEngine.Experimental.Rendering;
+using UnityEngine.Rendering;
 
 namespace Utilities {
     public static class TexturesHelper {
@@ -30,6 +33,38 @@ namespace Utilities {
                 return true;
             }
             return false;
+        }
+        
+        public static int GetPixelsCount(this Texture t) {
+            var len = t.width * t.height;
+            switch (t.dimension) {
+                case TextureDimension.Tex2D:
+                    break;
+                case TextureDimension.Tex3D:
+                    len *= ((Texture3D) t).depth;
+                    break;
+                case TextureDimension.Cube:
+                    len *= 6;
+                    break;
+                case TextureDimension.Tex2DArray:
+                    len *= ((Texture2DArray) t).depth;
+                    break;
+                case TextureDimension.CubeArray:
+                    len *= ((CubemapArray) t).cubemapCount * 6;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            return len;
+        }
+        
+        public static int GetLengthInBytes(this Texture t) {
+            return t.GetPixelsCount() * t.GetBytesPerPixel();
+        }
+        
+        public static int GetBytesPerPixel(this Texture t) {
+            return (int) GraphicsFormatUtility.GetBlockSize(t.graphicsFormat);
         }
     }
 }
