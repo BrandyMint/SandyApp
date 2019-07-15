@@ -1,6 +1,4 @@
-﻿using System;
-using System.Globalization;
-using Launcher.Scripts;
+﻿using System.Globalization;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -9,13 +7,27 @@ using Utilities;
 namespace DepthSensorCalibration {
     public class CalibrationController : MonoBehaviour {
         private const float COUNT_INC_DEC_STEPS = 200.0f;
+
+        public WallController Wall;
+        public Camera SandboxCam;
         
+        [Header("UI")]
+        [SerializeField] private GameObject _calibrationImg;
+        [SerializeField] private GameObject _settingsAndBtns;
         [SerializeField] private Transform _pnlCalibrationSettings;
         [SerializeField] private Transform _pnlProjectorParams;
         [SerializeField] private Color _colorError = Color.red;
         [SerializeField] private Button _btnSave;
         [SerializeField] private Button _btnCancel;
         [SerializeField] private Button _btnReset;
+        [SerializeField] private Toggle _tglTest;
+        [SerializeField] private Button _btnAutomatic;
+
+        [Header("Auto calibration")]
+        [SerializeField] private AutomaticCalibration _automatic;
+
+        [Header("Test mode")]
+        [SerializeField] private GameObject _imgColor;
 
         private class SliderField {
             public Slider sl { get; set; }
@@ -45,9 +57,16 @@ namespace DepthSensorCalibration {
         private bool _updatePrefFromUI = true;
 
         private void Start() {
+            InitUI();
+            SwitchMode(CalibrationMode.MANUAL);
+        }
+
+        private void InitUI() {
             _btnSave.onClick.AddListener(OnBtnSave);
             _btnCancel.onClick.AddListener(OnBtnCancel);
             _btnReset.onClick.AddListener(OnBtnReset);
+            _btnAutomatic.onClick.AddListener(OnBtnStartAutomatic);
+            _tglTest.onValueChanged.AddListener(OnTglTest);
             
             UnityHelper.SetPropsByGameObjects(_projectorFields, _pnlProjectorParams);
             InitField(_projectorFields.Dist, val => _projector.Distance = val);
@@ -64,6 +83,21 @@ namespace DepthSensorCalibration {
             InitSlider(_calibrationFields.ZeroDepth, val => Prefs.Calibration.ZeroDepth = val / 1000f);
             Prefs.Calibration.OnChanged += OnCalibrationChanged;
             OnCalibrationChanged();
+        }
+
+        public void SwitchMode(CalibrationMode mode) {
+            if (mode != CalibrationMode.TEST && _tglTest.isOn)
+                _tglTest.SetIsOnWithoutNotify(false);
+            
+            if (mode == CalibrationMode.AUTOMATIC)
+                _automatic.StartCalibration();
+            
+            _calibrationImg.SetActive(mode != CalibrationMode.TEST);
+            _imgColor.gameObject.SetActive(mode == CalibrationMode.TEST);
+            _settingsAndBtns.SetActive(mode != CalibrationMode.AUTOMATIC);
+            SandboxCam.targetDisplay = (mode == CalibrationMode.TEST) ? 1 : 0;
+
+            Wall.SwitchMode(mode);
         }
         
         private void OnProjectorChanged() {
@@ -91,7 +125,7 @@ namespace DepthSensorCalibration {
 
         private void OnDestroy() {
             _projector.OnChanged -= OnProjectorChanged;
-            Prefs.Calibration.OnChanged -= OnCalibrationChanged; 
+            Prefs.Calibration.OnChanged -= OnCalibrationChanged;
         }
 
         private void OnBtnSave() {
@@ -107,6 +141,17 @@ namespace DepthSensorCalibration {
         private void OnBtnCancel() {
             Prefs.Calibration.Load();
             _projector.Load();
+        }
+
+        private void OnBtnStartAutomatic() {
+            SwitchMode(CalibrationMode.AUTOMATIC);
+        }
+        
+        private void OnTglTest(bool on) {
+            if (on)
+                SwitchMode(CalibrationMode.TEST);
+            else
+                SwitchMode(CalibrationMode.MANUAL);
         }
 
         private void InitSlider(SliderField fld, UnityAction<float> act) {
@@ -159,7 +204,6 @@ namespace DepthSensorCalibration {
                 _setUIOnChange = true;
             }
         }
-
 
         private void UpdatePosFromUI() {
             Prefs.Calibration.Position = new Vector3(

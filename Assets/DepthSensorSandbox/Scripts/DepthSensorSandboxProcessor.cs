@@ -35,8 +35,8 @@ namespace DepthSensorSandbox {
 
         public static DepthSensorSandboxProcessor Instance { get; private set; }
 
-        public static event Action<DepthStream, MapDepthToCameraStream> _onDepthDataBackground;
-        public static event Action<ColorStream> _onColor;
+        private static event Action<DepthStream, MapDepthToCameraStream> _onDepthDataBackground;
+        private static event Action<ColorStream> _onColor;
         private static event Action<DepthToColorStream> _onDepthToColor;
 
         private DepthSensorConveyer _kinConv;

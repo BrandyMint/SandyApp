@@ -1,19 +1,23 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace DepthSensorCalibration {
     public class WallController : MonoBehaviour {
         [SerializeField] private GameObject _manual;
-        
-        public enum Mode {
-            MANUAL
-        }
+        [SerializeField] private GameObject _automatic;
 
         private void Start() {
-            SwitchMode(Mode.MANUAL);
+            SwitchMode(CalibrationMode.MANUAL);
         }
 
-        public void SwitchMode(Mode mode) {
-            _manual.SetActive(mode == Mode.MANUAL);
+        public void SwitchMode(CalibrationMode mode) {
+            _manual.SetActive(mode == CalibrationMode.MANUAL);
+            _automatic.SetActive(mode == CalibrationMode.AUTOMATIC);
+            gameObject.SetActive(mode != CalibrationMode.TEST);
+        }
+
+        public Texture GetTargetTexture() {
+            return _automatic.GetComponentInChildren<Image>(true).mainTexture;
         }
     }
 }

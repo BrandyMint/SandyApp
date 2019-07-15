@@ -48,6 +48,16 @@ namespace Utilities {
             return AsyncGPUReadback.RequestIntoNativeArray(ref array, t, 0, onDone);
         }
 
+        public static AsyncGPUReadbackRequest AsyncSetFrom(this Mat m, Texture t, Action onSuccessDone = null) {
+            return m.AsyncSetFrom(t, r => {
+                if (r.hasError) {
+                    Debug.LogError("AsyncGPUReadback error");
+                } else {
+                    onSuccessDone?.Invoke();
+                }
+            });
+        }
+
         public static int GetBytesPerMatTypeChanel(int depth) {
             switch (depth) {
                 case MatType.CV_8U:
