@@ -21,5 +21,9 @@ namespace DepthSensorSandbox {
             transform.localRotation = Prefs.Calibration.Rotation;
             _cam.fieldOfView = Prefs.Calibration.Fov;
         }
+
+        public void ResetToCalibration() {
+            OnCalibrationChanged();
+        }
     }
 }

@@ -13,6 +13,12 @@ public static class MemUtils {
             return array;
         }
     }
+
+    public static IntPtr IntPtr<T>(this NativeArray<T> a) where T : struct {
+        unsafe {
+            return new IntPtr(a.GetUnsafePtr());
+        }
+    }
     
     public static void Copy<T>(IntPtr src, T[] dst) {
         var dstBytes = dst.LongLength * Marshal.SizeOf<T>();

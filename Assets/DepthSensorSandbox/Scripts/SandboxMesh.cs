@@ -146,7 +146,6 @@ namespace DepthSensorSandbox {
             }
 
             OnNewFrameCPU(depth, mapToCamera);
-            depth.texture.Apply(false);
         }
     }
 }

@@ -144,10 +144,18 @@ namespace DepthSensorSandbox {
             var sMap = _dsm.Device.MapDepthToCamera;
             var sColor = _dsm.Device.Color;
             while (true) {
-                OnNewFrame?.Invoke(sDepth, sMap);
-                _onColor?.Invoke(sColor);
-                if (CreateDepthToColorIfNeed(sDepth))
-                    _onDepthToColor?.Invoke(_depthToColorStream);
+                if (_onColor != null) {
+                    sColor.ManualApplyTexture();
+                    _onColor.Invoke(sColor);
+                }
+                if (CreateDepthToColorIfNeed(sDepth) && _onDepthToColor != null) {
+                    _depthToColorStream.ManualApplyTexture();
+                    _onDepthToColor.Invoke(_depthToColorStream);
+                }
+                if (OnNewFrame != null) {
+                    sDepth.ManualApplyTexture();
+                    OnNewFrame.Invoke(sDepth, sMap);
+                }
                 _dsm.Device.ManualUpdate();
                 yield return null;
             }

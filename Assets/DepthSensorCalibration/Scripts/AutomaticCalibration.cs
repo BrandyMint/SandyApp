@@ -1,3 +1,4 @@
+using DepthSensorSandbox;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -30,14 +31,18 @@ namespace DepthSensorCalibration {
         }
 
         private void OnDestroy() {
-            StopCalibration();
+            if (_renderToTexture != null)
+                _renderToTexture.Disable();
         }
 
         private void OnBtnCancel() {
+            _ctrl.SandboxCam.GetComponent<SandboxCamera>().ResetToCalibration();
             StopCalibration();
         }
 
         public void StartCalibration() {
+            _ctrl.SandboxCam.transform.localPosition = Vector3.back;
+            _ctrl.SandboxCam.transform.localRotation = Quaternion.identity;
             _pnlAutomatic.SetActive(true);
             _renderToTexture.Enable(_grayScale, RenderTextureFormat.R8, t => {
                 _imageTracker.SetFrame(t);
@@ -45,12 +50,9 @@ namespace DepthSensorCalibration {
         }
 
         private void StopCalibration() {
-            if (_pnlAutomatic != null)
-                _pnlAutomatic.SetActive(false);
-            if (_renderToTexture != null)
-                _renderToTexture.Disable();
-            if (_ctrl != null)
-                _ctrl.SwitchMode(CalibrationMode.MANUAL);
+            _pnlAutomatic.SetActive(false);
+            _renderToTexture.Disable();
+            _ctrl.SwitchMode(CalibrationMode.MANUAL);
         }
     }
 }

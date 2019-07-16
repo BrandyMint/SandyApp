@@ -40,7 +40,6 @@ namespace DepthSensorSandbox {
                 _mat.SetTexture(_DEPTH_TO_COLOR_TEX, d.texture);
                 _isDepthToColorSetted = true;
             }
-            d.texture.Apply(false);
         }
 
         private void OnColor(ColorStream color) {
@@ -48,7 +47,6 @@ namespace DepthSensorSandbox {
                 _mat.SetTexture(_COLOR_TEX, color.texture);
                 _isColorSetted = true;
             }
-            color.texture.Apply(false);
         }
     }
 }
