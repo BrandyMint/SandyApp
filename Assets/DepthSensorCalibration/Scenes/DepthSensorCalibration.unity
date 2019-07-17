@@ -1781,7 +1781,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d9dd095140494a3fa982be6ee78ab452, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _featuresCount: 1000
+  _featuresCount: 500
+  _minMatches: 100
   _debugImg: {fileID: 1299363492}
 --- !u!114 &751749304
 MonoBehaviour:
@@ -1798,6 +1799,10 @@ MonoBehaviour:
   _grayScale: {fileID: 2100000, guid: f8460f107e20e368599ab1497f5bfaed, type: 2}
   _pnlAutomatic: {fileID: 506499031}
   _btnCancelAutomatic: {fileID: 1779594278}
+  _adjustIterations: 8
+  _adjustTargetMaxStep: 0.1
+  _adjustTargetMinDist: 0.05
+  _adjustTargetStepWait: 2
 --- !u!1 &939193026
 GameObject:
   m_ObjectHideFlags: 0
@@ -3209,7 +3214,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1299363489
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3227,7 +3232,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 1080}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1299363490
 MonoBehaviour:
@@ -3269,7 +3274,7 @@ MonoBehaviour:
     x: 0
     y: 0
     width: 1
-    height: -1
+    height: 1
 --- !u!222 &1299363493
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -5356,7 +5361,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.5, g: 0.4976415, b: 0.4976415, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:

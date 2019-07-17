@@ -11,6 +11,9 @@ using Utilities;
 namespace DepthSensorCalibration {
     public class ImageTracker : MonoBehaviour {
         [SerializeField] private int _featuresCount = 500;
+        [SerializeField] private int _minMatches = 10;
+        
+        public Action OnFramePrepared;
 
         private NativeArray<byte> _arrayFrame;
         private Mat _matEmpty = new Mat();
@@ -22,12 +25,7 @@ namespace DepthSensorCalibration {
         private Mat _descriptorsTarget = new Mat();
         private Mat _descriptorsFrame = new Mat();
         private KeyPoint[] _keyPointsTarget;
-
-        private void Awake() {
-            /*_debugMatchImgPath = Path.Combine(Application.persistentDataPath, "debugMatch");
-            if (!Directory.Exists(_debugMatchImgPath))
-                Directory.CreateDirectory(_debugMatchImgPath);*/
-        }
+        private KeyPoint[] _keyPointsFrame;
 
         private void OnDestroy() {
             _matEmpty?.Dispose();
@@ -65,7 +63,7 @@ namespace DepthSensorCalibration {
         }
 
         public void SetFrame(Texture tex) {
-            Set(ref _matFrame, tex, Detect);
+            Set(ref _matFrame, tex, OnFrameChanged);
         }
 
         private static void Set(ref Mat m, Texture t, Action onDone) {
@@ -78,12 +76,47 @@ namespace DepthSensorCalibration {
             PrepareDetect();
         }
 
-        public void Detect() {
+        private void OnFrameChanged() {
             PrepareDetect();
-            _detector.DetectAndCompute(_matFrame, _matEmpty, out var keyPointsFrame, _descriptorsFrame);
+            _detector.DetectAndCompute(_matFrame, _matEmpty, out _keyPointsFrame, _descriptorsFrame);
+            OnFramePrepared?.Invoke();
+        }
+
+        private int MinFeaturesCount() {
+            return _featuresCount / 2;
+        }
+
+        public float DetectRank() {
+            if (_keyPointsFrame == null)
+                return 0f;
+            var len = _keyPointsFrame.Length;
+            if (len < MinFeaturesCount() )
+                return 0f;
+            
+            var avg = _keyPointsFrame.Average(k => k.Response);
+            return avg;
+        }
+
+        public void Detect() {
+            if (_keyPointsTarget == null || _keyPointsFrame.Length < MinFeaturesCount())
+                return;
+            
             var matches = _matcher.Match(_descriptorsFrame);
-            var good = matches.OrderBy(m => m.Distance).Take(10);
-            SaveDebugImgMatch(_matFrame, keyPointsFrame, _matTarget, _keyPointsTarget, good);
+            if (matches.Length < _minMatches)
+                return;
+            
+            var good = matches.OrderBy(m => m.Distance).Take(_minMatches).ToArray();
+            try {
+                using (var src = InputArray.Create(good.Select(m => _keyPointsTarget[m.TrainIdx].Pt)))
+                using (var dst = InputArray.Create(good.Select(m => _keyPointsFrame[m.QueryIdx].Pt)))
+                using (var matr = Cv2.FindHomography(src, dst, HomographyMethods.Ransac)) {
+                    SaveDebugImgMatch(_matFrame, _keyPointsFrame, _matTarget, _keyPointsTarget,
+                        good, matr);
+                }
+            } catch (Exception e) {
+                Debug.LogError(e);
+                return;
+            }
         }
 
         /*private string _debugMatchImgPath;
@@ -92,8 +125,11 @@ namespace DepthSensorCalibration {
         private Mat _debugMat;
         [SerializeField] private RawImage _debugImg;
 
-        private void SaveDebugImgMatch(Mat img1, KeyPoint[] keyPoints1, Mat img2, KeyPoint[] keyPoints2, IEnumerable<DMatch> matches1To2) {
-            //var path = Path.Combine(_debugMatchImgPath, $"{_debugMatchImgCount++:000}.png");
+        private void SaveDebugImgMatch(
+            Mat img1, IEnumerable<KeyPoint> keyPoints1, 
+            Mat img2, IEnumerable<KeyPoint> keyPoints2, 
+            IEnumerable<DMatch> matches1To2, Mat matr
+        ) {
             var height = Mathf.Max(img1.Height, img2.Height);
             var width = img1.Width + img2.Width;
             if (TexturesHelper.ReCreateIfNeed(ref _debugTex, width, height, TextureFormat.RGB24)) {
@@ -103,23 +139,17 @@ namespace DepthSensorCalibration {
                 var a = _debugTex.GetRawTextureData<byte>();
                 _debugMat = new Mat(height, width, MatType.CV_8UC3, a.IntPtr());
             }
-
-            var matches = matches1To2.ToArray();
-            Mat mat; Mat mask = new Mat();
-            using (var src = InputArray.Create(matches.Select(m => keyPoints2[m.TrainIdx].Pt)))
-            using (var dst = InputArray.Create(matches.Select(m => keyPoints1[m.QueryIdx].Pt))) {
-                mat = Cv2.FindHomography(src, dst, HomographyMethods.Ransac, 5D, mask);
-            }
+            
             var pts = Cv2.PerspectiveTransform(new[] {
                 new Point2f(0, 0), new Point2f(0, img2.Height - 1),
                 new Point2f(img2.Width - 1, img2.Height - 1), new Point2f(img2.Width - 1, 0),
-            }, mat);
-            img1.Polylines(new[] {pts.Select(p => new Point(p.X, p.Y))}, true, 255, 3, LineTypes.AntiAlias);
+            }, matr);
+            img1.Polylines(new[] {pts.Select(p => new Point(p.X, p.Y))}, 
+                true, 255, 3, LineTypes.AntiAlias);
             
-            Cv2.DrawMatches(img1, keyPoints1, img2, keyPoints2, matches, _debugMat, 
+            Cv2.DrawMatches(img1, keyPoints1, img2, keyPoints2, matches1To2, _debugMat, 
                 null, null, null, DrawMatchesFlags.NotDrawSinglePoints);
             _debugTex.Apply(false);
-            //Cv2.ImWrite(path, matMatches);
         }
     }
 }

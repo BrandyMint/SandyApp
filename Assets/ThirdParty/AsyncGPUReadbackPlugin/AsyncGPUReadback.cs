@@ -1,7 +1,6 @@
 using UnityEngine;
 using System;
 using System.Runtime.InteropServices;
-using UnityEngine.Rendering;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 

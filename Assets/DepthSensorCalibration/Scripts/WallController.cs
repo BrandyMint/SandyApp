@@ -16,8 +16,8 @@ namespace DepthSensorCalibration {
             gameObject.SetActive(mode != CalibrationMode.TEST);
         }
 
-        public Texture GetTargetTexture() {
-            return _automatic.GetComponentInChildren<Image>(true).mainTexture;
+        public Image GetTargetImage() {
+            return _automatic.GetComponentInChildren<Image>(true);
         }
     }
 }
