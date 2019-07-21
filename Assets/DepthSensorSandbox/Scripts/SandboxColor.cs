@@ -11,8 +11,6 @@ namespace DepthSensorSandbox {
         
         private Material _mat;
         private NativeArray<ushort> _depthToColorNative;
-        private bool _isColorSetted;
-        private bool _isDepthToColorSetted;
 
         private void Awake() {
             _mat = GetComponent<MeshRenderer>().material;
@@ -36,17 +34,11 @@ namespace DepthSensorSandbox {
         }
 
         private void OnDepthToColor(DepthSensorSandboxProcessor.DepthToColorStream d) {
-            if (!_isDepthToColorSetted) {
-                _mat.SetTexture(_DEPTH_TO_COLOR_TEX, d.texture);
-                _isDepthToColorSetted = true;
-            }
+            _mat.SetTexture(_DEPTH_TO_COLOR_TEX, d.texture);
         }
 
         private void OnColor(ColorStream color) {
-            if (!_isColorSetted) {
-                _mat.SetTexture(_COLOR_TEX, color.texture);
-                _isColorSetted = true;
-            }
+            _mat.SetTexture(_COLOR_TEX, color.texture);
         }
     }
 }

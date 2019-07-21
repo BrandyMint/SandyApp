@@ -26,6 +26,11 @@ namespace DepthSensorCalibration {
         private Mat _descriptorsFrame = new Mat();
         private KeyPoint[] _keyPointsTarget;
         private KeyPoint[] _keyPointsFrame;
+        
+        private Mat _visualizeMat;
+        private readonly Point2f[] _IMG_CORNERS = {new Point2f(0, 0), new Point2f(0, 1), new Point2f(1, 1), new Point2f(1, 0)};
+        private Point2f[] _detectedCorners;
+        private bool _frameDetected;
 
         private void OnDestroy() {
             _matEmpty?.Dispose();
@@ -35,7 +40,7 @@ namespace DepthSensorCalibration {
             _detector?.Dispose();
             _descriptorsTarget?.Dispose();
             _descriptorsFrame?.Dispose();
-            _debugMat?.Dispose();
+            _visualizeMat?.Dispose();
         }
 
         public void PrepareDetect() {
@@ -63,6 +68,7 @@ namespace DepthSensorCalibration {
         }
 
         public void SetFrame(Texture tex) {
+            _frameDetected = false;
             Set(ref _matFrame, tex, OnFrameChanged);
         }
 
@@ -79,6 +85,7 @@ namespace DepthSensorCalibration {
         private void OnFrameChanged() {
             PrepareDetect();
             _detector.DetectAndCompute(_matFrame, _matEmpty, out _keyPointsFrame, _descriptorsFrame);
+            _frameDetected = Detect();
             OnFramePrepared?.Invoke();
         }
 
@@ -86,7 +93,7 @@ namespace DepthSensorCalibration {
             return _featuresCount / 2;
         }
 
-        public float DetectRank() {
+        public float FrameFeaturesRank() {
             if (_keyPointsFrame == null)
                 return 0f;
             var len = _keyPointsFrame.Length;
@@ -97,59 +104,61 @@ namespace DepthSensorCalibration {
             return avg;
         }
 
-        public void Detect() {
+        private bool Detect() {
             if (_keyPointsTarget == null || _keyPointsFrame.Length < MinFeaturesCount())
-                return;
+                return false;
             
             var matches = _matcher.Match(_descriptorsFrame);
             if (matches.Length < _minMatches)
-                return;
+                return false;
             
             var good = matches.OrderBy(m => m.Distance).Take(_minMatches).ToArray();
             try {
                 using (var src = InputArray.Create(good.Select(m => _keyPointsTarget[m.TrainIdx].Pt)))
                 using (var dst = InputArray.Create(good.Select(m => _keyPointsFrame[m.QueryIdx].Pt)))
                 using (var matr = Cv2.FindHomography(src, dst, HomographyMethods.Ransac)) {
-                    SaveDebugImgMatch(_matFrame, _keyPointsFrame, _matTarget, _keyPointsTarget,
-                        good, matr);
+                    _detectedCorners = Cv2.PerspectiveTransform(ScaleCorners(_IMG_CORNERS, _matTarget), matr);
                 }
             } catch (Exception e) {
                 Debug.LogError(e);
-                return;
+                return false;
             }
+            return true;
         }
 
-        /*private string _debugMatchImgPath;
-        private int _debugMatchImgCount;*/
-        private Texture2D _debugTex;
-        private Mat _debugMat;
-        [SerializeField] private RawImage _debugImg;
+        public void VisualizeDetection(Texture2D imgVisualize, Color detectedColor) {
+            OpenCVSharpHelper.ReCreateWithLinkedDataIfNeed(ref _visualizeMat, imgVisualize);
+            Cv2.DrawKeypoints(_matFrame, _keyPointsFrame, _visualizeMat, null,
+                DrawMatchesFlags.DrawRichKeypoints);
 
-        private void SaveDebugImgMatch(
-            Mat img1, IEnumerable<KeyPoint> keyPoints1, 
-            Mat img2, IEnumerable<KeyPoint> keyPoints2, 
-            IEnumerable<DMatch> matches1To2, Mat matr
-        ) {
-            var height = Mathf.Max(img1.Height, img2.Height);
-            var width = img1.Width + img2.Width;
-            if (TexturesHelper.ReCreateIfNeed(ref _debugTex, width, height, TextureFormat.RGB24)) {
-                _debugImg.texture = _debugTex;
-                _debugImg.GetComponent<AspectRatioFitter>().aspectRatio = (float) width / height;
-                _debugMat?.Dispose();
-                var a = _debugTex.GetRawTextureData<byte>();
-                _debugMat = new Mat(height, width, MatType.CV_8UC3, a.IntPtr());
+            if (_frameDetected) {
+                _visualizeMat.Polylines(new[] {_detectedCorners.Select(p => new Point(p.X, p.Y))}, true, 
+                    OpenCVSharpHelper.GetScalarFrom(new Color(detectedColor.b, detectedColor.g, detectedColor.r)),
+                    3, LineTypes.AntiAlias);
             }
             
-            var pts = Cv2.PerspectiveTransform(new[] {
-                new Point2f(0, 0), new Point2f(0, img2.Height - 1),
-                new Point2f(img2.Width - 1, img2.Height - 1), new Point2f(img2.Width - 1, 0),
-            }, matr);
-            img1.Polylines(new[] {pts.Select(p => new Point(p.X, p.Y))}, 
-                true, 255, 3, LineTypes.AntiAlias);
-            
-            Cv2.DrawMatches(img1, keyPoints1, img2, keyPoints2, matches1To2, _debugMat, 
-                null, null, null, DrawMatchesFlags.NotDrawSinglePoints);
-            _debugTex.Apply(false);
+            imgVisualize.Apply(false);
+        }
+
+        public bool GetDetectTargetCorners(Vector2[] forCorners) {
+            if (!_frameDetected)
+                return false;
+            Convert(_detectedCorners, forCorners);
+            return MathHelper.IsConvex(forCorners);
+        }
+
+        private static IEnumerable<Point2f> ScaleCorners(IEnumerable<Point2f> src, Mat t) {
+            return src.Select(p => new Point2f(
+                p.X * (t.Width - 1), 
+                p.Y * (t.Height - 1)
+            ));
+        }
+
+        private static void Convert(Point2f[] src, Vector2[] dst) {
+            for (int i = 0; i < src.Length && i < dst.Length; ++i) {
+                dst[i].x = src[i].X;
+                dst[i].y = src[i].Y;
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using Unity.Collections;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering;
@@ -30,6 +31,19 @@ namespace Utilities {
                 if (t != null)
                     t.Release();
                 t = new RenderTexture(width, height, depth, format);
+                return true;
+            }
+            return false;
+        }
+        
+        public static bool ReCreateIfNeed<T>(ref NativeArray<T> a, int len, 
+            Allocator allocator = Allocator.Persistent, 
+            NativeArrayOptions opt = NativeArrayOptions.ClearMemory) where T : struct 
+        {
+            if (!a.IsCreated || a.Length != len) {
+                if (a.IsCreated)
+                    a.Dispose();
+                a = new NativeArray<T>(len, allocator, opt);
                 return true;
             }
             return false;

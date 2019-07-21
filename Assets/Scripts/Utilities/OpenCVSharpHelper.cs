@@ -29,6 +29,19 @@ namespace Utilities {
             return false;
         }
         
+        public static bool ReCreateWithLinkedDataIfNeed(ref Mat m, Texture2D t) {
+            if (GetCompatibleFormat(t.graphicsFormat, out var type)) {
+                var a = t.GetRawTextureData<byte>();
+                var ptr = a.IntPtr();
+                if (m == null || m.DataStart != ptr || m.Width != t.width || m.Height != t.height || m.Type() != type) {
+                    m?.Dispose();
+                    m = new Mat(t.height, t.width, type, a.IntPtr());
+                    return true;
+                };
+            }
+            return false;
+        }
+        
         public static bool ReCreateIfNeedCompatible(ref Texture2D t, Mat m) {
             if (GetCompatibleFormat(m.Type(), out TextureFormat type)) {
                 return TexturesHelper.ReCreateIfNeed(ref t, m.Width, m.Height, type);
@@ -74,6 +87,11 @@ namespace Utilities {
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+        }
+
+        public static Scalar GetScalarFrom(Color c) {
+            const int k = byte.MaxValue; 
+            return Scalar.FromRgb((int) (c.r * k), (int) (c.g * k), (int) (c.b * k));
         }
 
         private class FormatsCompatibles {

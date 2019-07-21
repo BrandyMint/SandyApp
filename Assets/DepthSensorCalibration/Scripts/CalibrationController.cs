@@ -1,4 +1,6 @@
-﻿using System.Globalization;
+﻿using System.Collections;
+using System.Globalization;
+using DepthSensorSandbox;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -24,6 +26,7 @@ namespace DepthSensorCalibration {
         [SerializeField] private Button _btnAutomatic;
 
         [Header("Auto calibration")]
+        [SerializeField] private SandboxMesh _sandboxMesh;
         [SerializeField] private AutomaticCalibration _automatic;
 
         [Header("Test mode")]
@@ -59,6 +62,8 @@ namespace DepthSensorCalibration {
         private void Start() {
             InitUI();
             SwitchMode(CalibrationMode.MANUAL);
+            _btnAutomatic.interactable = false;
+            StartCoroutine(WaitAutomaticAvailable());
         }
 
         private void InitUI() {
@@ -83,6 +88,11 @@ namespace DepthSensorCalibration {
             InitSlider(_calibrationFields.ZeroDepth, val => Prefs.Calibration.ZeroDepth = val / 1000f);
             Prefs.Calibration.OnChanged += OnCalibrationChanged;
             OnCalibrationChanged();
+        }
+
+        private IEnumerator WaitAutomaticAvailable() {
+            yield return new WaitUntil(_sandboxMesh.IsBoundsValid);
+            _btnAutomatic.interactable = true;
         }
 
         public void SwitchMode(CalibrationMode mode) {
@@ -193,7 +203,7 @@ namespace DepthSensorCalibration {
             var s = _projector.Diagonal;
             var d = _projector.Distance;
             var h = s / Mathf.Sqrt((aspect * aspect + 1f));
-            var fov = 180f - 2 * Mathf.Acos(h / 2f / d) * Mathf.Rad2Deg;
+            var fov = MathHelper.IsoscelesTriangleAngle(h, d);
             Prefs.Calibration.Fov = fov;
         }
 

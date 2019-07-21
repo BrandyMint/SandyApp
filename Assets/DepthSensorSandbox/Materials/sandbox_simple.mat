@@ -102,7 +102,7 @@ Material:
     - _BumpScale: 1
     - _Cull: 2
     - _Cutoff: 0.5
-    - _Depth1: 2.09
+    - _Depth1: 1.39
     - _Depth2: 2.51
     - _Depth3: 4
     - _DstBlend: 0

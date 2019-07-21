@@ -1753,6 +1753,7 @@ MonoBehaviour:
   _btnReset: {fileID: 1302876288}
   _tglTest: {fileID: 2043396134}
   _btnAutomatic: {fileID: 172897678}
+  _sandboxMesh: {fileID: 1977039023}
   _automatic: {fileID: 751749304}
   _imgColor: {fileID: 1102363929}
 --- !u!4 &751749302
@@ -1783,7 +1784,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _featuresCount: 500
   _minMatches: 100
-  _debugImg: {fileID: 1299363492}
 --- !u!114 &751749304
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1796,9 +1796,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 683e262de7854a28a3d3617b94df36c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _grayScale: {fileID: 2100000, guid: f8460f107e20e368599ab1497f5bfaed, type: 2}
+  _matGrayScale: {fileID: 2100000, guid: 9ab93dc227218aae7a16ad327c2965d9, type: 2}
+  _matDepth: {fileID: 2100000, guid: d6be0aa508bfdfc479c2030b158121d8, type: 2}
+  _colorDetected: {r: 0, g: 0, b: 1, a: 1}
+  _imgVisualize: {fileID: 1299363492}
   _pnlAutomatic: {fileID: 506499031}
   _btnCancelAutomatic: {fileID: 1779594278}
+  _sandboxMesh: {fileID: 1977039023}
+  _detectIterations: 20
   _adjustIterations: 8
   _adjustTargetMaxStep: 0.1
   _adjustTargetMinDist: 0.05
@@ -3207,14 +3212,13 @@ GameObject:
   - component: {fileID: 1299363489}
   - component: {fileID: 1299363493}
   - component: {fileID: 1299363492}
-  - component: {fileID: 1299363490}
   m_Layer: 5
   m_Name: imgDebug
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1299363489
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3229,25 +3233,11 @@ RectTransform:
   m_Father: {fileID: 319655142}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0.5}
-  m_AnchorMax: {x: 1, y: 0.5}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1299363490
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1299363488}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 86710e43de46f6f4bac7c8e50813a599, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_AspectMode: 1
-  m_AspectRatio: 1.7777778
 --- !u!114 &1299363492
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4492,7 +4482,6 @@ GameObject:
   - component: {fileID: 1778851387}
   - component: {fileID: 1778851386}
   - component: {fileID: 1778851388}
-  - component: {fileID: 1778851389}
   m_Layer: 0
   m_Name: Camera
   m_TagString: MainCamera
@@ -4575,18 +4564,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 98f8f64bf67d45d9893588c150c63cfa, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &1778851389
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1778851384}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f443af4d2c94434091a1e061a60f27e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1779594275

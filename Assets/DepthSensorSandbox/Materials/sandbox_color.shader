@@ -45,4 +45,5 @@ Shader "Sandbox/Color" {
             ENDCG
         }
     }
+    Fallback "Mobile/VertexLit"
 }

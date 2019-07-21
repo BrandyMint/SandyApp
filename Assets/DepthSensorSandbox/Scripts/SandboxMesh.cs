@@ -6,7 +6,6 @@ using UnityEngine.Rendering;
 namespace DepthSensorSandbox {
     [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
     public class SandboxMesh : MonoBehaviour {
-        private const float _MAX_DEPTH = 10f;
         private const string _CALC_DEPTH = "CALC_DEPTH";
         private static readonly int _DEPTH_TEX = Shader.PropertyToID("_DepthTex");
         private static readonly int _MAP_TO_CAMERA_TEX = Shader.PropertyToID("_MapToCameraTex");
@@ -23,13 +22,13 @@ namespace DepthSensorSandbox {
         private Vector3[] _vert;
         private int[] _triangles;
         private Vector2[] _uv;
-        private bool _isTexturesSetted;
-        private Material _mat;
+        private Renderer _r;
         private bool _prevUpdateMeshOnGPU;
         private bool _firstFrame = true;
+        private bool _isBoundsValid;
 
         private void Awake() {
-            _mat = GetComponent<MeshRenderer>().material;
+            _r = GetComponent<MeshRenderer>();
             _meshFilter = GetComponent<MeshFilter>();
             _mesh = new Mesh {name = "depth"};
             _mesh.MarkDynamic();
@@ -41,7 +40,15 @@ namespace DepthSensorSandbox {
         private void Start() {
             SetUpdateMeshOnGPU(_updateMeshOnGPU, true);
         }
-        
+
+        public Bounds GetBounds() {
+            return _mesh.bounds;
+        }
+
+        public bool IsBoundsValid() {
+            return _isBoundsValid;
+        }
+
         private void OnDestroy() {
             DepthSensorSandboxProcessor.OnDepthDataBackground -= OnDepthDataGPU;
             DepthSensorSandboxProcessor.OnNewFrame -= OnNewFrameGPU;
@@ -59,8 +66,7 @@ namespace DepthSensorSandbox {
             if (_prevUpdateMeshOnGPU == onGPU && !force)
                 return;
             if (onGPU) {
-                _isTexturesSetted = false;
-                _mat.EnableKeyword(_CALC_DEPTH);
+                _r.material.EnableKeyword(_CALC_DEPTH);
                 DepthSensorSandboxProcessor.OnDepthDataBackground += OnDepthDataGPU;
                 DepthSensorSandboxProcessor.OnNewFrame += OnNewFrameGPU;
                 DepthSensorSandboxProcessor.OnDepthDataBackground -= OnDepthDataCPU;
@@ -70,7 +76,7 @@ namespace DepthSensorSandbox {
                 DepthSensorSandboxProcessor.OnNewFrame += OnNewFrameCPU;
                 DepthSensorSandboxProcessor.OnDepthDataBackground -= OnDepthDataGPU;
                 DepthSensorSandboxProcessor.OnNewFrame -= OnNewFrameGPU;
-                _mat.DisableKeyword(_CALC_DEPTH);
+                _r.material.DisableKeyword(_CALC_DEPTH);
             }
             _updateMeshOnGPU = _prevUpdateMeshOnGPU = onGPU;
         }
@@ -128,6 +134,7 @@ namespace DepthSensorSandbox {
                 if (_firstFrame) {
                     _firstFrame = false;
                     _mesh.RecalculateBounds();
+                    _isBoundsValid = true;
                 }
             }
         }
@@ -139,11 +146,8 @@ namespace DepthSensorSandbox {
         }
 
         private void OnNewFrameGPU(DepthStream depth, MapDepthToCameraStream mapToCamera) {
-            if (!_isTexturesSetted) {
-                _mat.SetTexture(_DEPTH_TEX, depth.texture);
-                _mat.SetTexture(_MAP_TO_CAMERA_TEX, mapToCamera.texture); 
-                _isTexturesSetted = true;
-            }
+            _r.material.SetTexture(_DEPTH_TEX, depth.texture);
+            _r.material.SetTexture(_MAP_TO_CAMERA_TEX, mapToCamera.texture);
 
             OnNewFrameCPU(depth, mapToCamera);
         }

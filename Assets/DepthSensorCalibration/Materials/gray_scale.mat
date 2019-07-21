@@ -20,7 +20,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: grayScale
+  m_Name: gray_scale
   m_Shader: {fileID: 4800000, guid: 9702d03fef024f92b5025779545727b3, type: 3}
   m_ShaderKeywords: AUTO_CONTRAST
   m_LightmapFlags: 4
