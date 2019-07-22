@@ -1,4 +1,13 @@
-sampler2D _DepthToColorTex; float4 _DepthToColorTex_ST;
+struct appdata {
+    float4 vertex : POSITION;
+    float2 uv : TEXCOORD0;
+};
+
+struct v2f {
+    float4 clip : SV_POSITION;
+    float2 uv : TEXCOORD0;
+    float3 pos : TEXCOORD1;
+};
 
 #ifdef CALC_DEPTH
 #pragma target 4.0
@@ -16,7 +25,7 @@ float4 calcDepth (float2 uv) {
 
 v2f vert (appdata v) {
     v2f o;
-    o.uv = TRANSFORM_TEX(v.uv, _DepthToColorTex);
+    o.uv = v.uv;
 #ifdef CALC_DEPTH
     float4 vertex = calcDepth(o.uv);
 #else

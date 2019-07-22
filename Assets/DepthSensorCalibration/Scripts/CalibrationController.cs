@@ -106,6 +106,9 @@ namespace DepthSensorCalibration {
             _imgColor.gameObject.SetActive(mode == CalibrationMode.TEST);
             _settingsAndBtns.SetActive(mode != CalibrationMode.AUTOMATIC);
             SandboxCam.targetDisplay = (mode == CalibrationMode.TEST) ? 1 : 0;
+            
+            _sandboxMesh.GetComponent<SandboxVisualizerBase>().SetEnable(mode == CalibrationMode.TEST);
+            _sandboxMesh.GetComponent<SandboxVisualizerColor>().SetEnable(mode != CalibrationMode.TEST);
 
             Wall.SwitchMode(mode);
         }
