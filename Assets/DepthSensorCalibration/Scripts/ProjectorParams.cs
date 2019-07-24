@@ -11,12 +11,12 @@ namespace DepthSensorCalibration {
             set => Set(nameof(Diagonal), value);
         }
         public float Width {
-            get => Get(nameof(Width), 800f);
+            get => Get(nameof(Width), Display.displays.Length > 1 ? Display.displays[1].renderingWidth : 800f);
             set => Set(nameof(Width), value);
         }
         
         public float Height {
-            get => Get(nameof(Height), 600f);
+            get => Get(nameof(Height), Display.displays.Length > 1 ? Display.displays[1].renderingHeight : 600f);
             set => Set(nameof(Height), value);
         }
     }

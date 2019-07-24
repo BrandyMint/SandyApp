@@ -20,24 +20,28 @@ namespace DepthSensorSandbox {
         } 
         
         public static event Action<DepthStream, MapDepthToCameraStream> OnDepthDataBackground {
-            add { _onDepthDataBackground += value; ActivateDepthIfNeed(); }
-            remove { _onDepthDataBackground -= value; ActivateDepthIfNeed(); }
+            add { _onDepthDataBackground += value; ActivateSensorsIfNeed(); }
+            remove { _onDepthDataBackground -= value; ActivateSensorsIfNeed(); }
         }
         public static event Action<ColorStream> OnColor {
-            add { _onColor += value; ActivateColorIfNeed(); }
-            remove { _onColor -= value; ActivateColorIfNeed(); }
+            add { _onColor += value; ActivateSensorsIfNeed(); }
+            remove { _onColor -= value; ActivateSensorsIfNeed(); }
         }
         public static event Action<DepthToColorStream> OnDepthToColor {
-            add { _onDepthToColor += value; ActivateColorIfNeed(); }
-            remove { _onDepthToColor -= value; ActivateColorIfNeed(); }
+            add { _onDepthToColor += value; ActivateSensorsIfNeed(); }
+            remove { _onDepthToColor -= value; ActivateSensorsIfNeed(); }
         }
-        public static event Action<DepthStream, MapDepthToCameraStream> OnNewFrame;
+        public static event Action<DepthStream, MapDepthToCameraStream> OnNewFrame {
+            add { _onNewFrame += value; ActivateSensorsIfNeed(); }
+            remove { _onNewFrame -= value; ActivateSensorsIfNeed(); }
+        }
 
         public static DepthSensorSandboxProcessor Instance { get; private set; }
 
         private static event Action<DepthStream, MapDepthToCameraStream> _onDepthDataBackground;
         private static event Action<ColorStream> _onColor;
         private static event Action<DepthToColorStream> _onDepthToColor;
+        private static event Action<DepthStream, MapDepthToCameraStream> _onNewFrame;
 
         private DepthSensorConveyer _kinConv;
         private DepthSensorManager _dsm;
@@ -72,10 +76,8 @@ namespace DepthSensorSandbox {
 
         private void OnDepthSensorAvailable() {
             _dsm.Device.IsManualUpdate = true;
-            ActivateDepthIfNeed();
-            ActivateColorIfNeed();
+            ActivateSensorsIfNeed();
             SetupConveyer(ConveyerUpdateBG(), ConveyerUpdateMain());
-            _dsm.Device.ManualUpdate();
         }
 
         private static DepthSensorDevice GetDeviceIfAvailable() {
@@ -86,19 +88,15 @@ namespace DepthSensorSandbox {
             return null;
         }
         
-        private static void ActivateColorIfNeed() {
+        private static void ActivateSensorsIfNeed() {
             var device = GetDeviceIfAvailable();
             if (device != null) {
-                device.Color.Active = _onColor != null || _onDepthToColor != null;
-            }
-        }
-        
-        private static void ActivateDepthIfNeed() {
-            var device = GetDeviceIfAvailable();
-            if (device != null) {
-                var needDepth = _onDepthDataBackground != null || _onColor != null;
-                device.Depth.Active = needDepth || _onDepthToColor != null;
-                device.MapDepthToCamera.Active = needDepth;
+                var any = false;
+                any |= device.Color.Active = _onColor != null || _onDepthToColor != null;
+                any |= device.Depth.Active = _onNewFrame != null || _onDepthDataBackground != null || _onDepthToColor != null;
+                any |= device.MapDepthToCamera.Active = _onNewFrame != null || _onDepthDataBackground != null;
+                if (any)
+                    device.ManualUpdate();
             }
         }
 
@@ -152,9 +150,9 @@ namespace DepthSensorSandbox {
                     _depthToColorStream.ManualApplyTexture();
                     _onDepthToColor.Invoke(_depthToColorStream);
                 }
-                if (OnNewFrame != null) {
+                if (_onNewFrame != null) {
                     sDepth.ManualApplyTexture();
-                    OnNewFrame.Invoke(sDepth, sMap);
+                    _onNewFrame.Invoke(sDepth, sMap);
                 }
                 _dsm.Device.ManualUpdate();
                 yield return null;

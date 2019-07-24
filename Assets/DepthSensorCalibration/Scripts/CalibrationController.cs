@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Globalization;
 using DepthSensorSandbox;
+using Launcher;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -144,6 +145,7 @@ namespace DepthSensorCalibration {
         private void OnBtnSave() {
             _projector.Save();
             Prefs.Calibration.Save();
+            Scenes.GoBack();
         }
 
         private void OnBtnReset() {
@@ -152,8 +154,9 @@ namespace DepthSensorCalibration {
         }
 
         private void OnBtnCancel() {
-            Prefs.Calibration.Load();
             _projector.Load();
+            Prefs.Calibration.Load();
+            Scenes.GoBack();
         }
 
         private void OnBtnStartAutomatic() {

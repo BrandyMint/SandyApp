@@ -74,13 +74,13 @@ namespace DepthSensorSandbox {
                 return;
             if (onGPU) {
                 DepthSensorSandboxProcessor.OnDepthDataBackground += OnDepthDataGPU;
-                DepthSensorSandboxProcessor.OnNewFrame += OnNewFrameGPU;
                 DepthSensorSandboxProcessor.OnDepthDataBackground -= OnDepthDataCPU;
+                DepthSensorSandboxProcessor.OnNewFrame += OnNewFrameGPU;
                 DepthSensorSandboxProcessor.OnNewFrame -= OnNewFrameCPU;
             } else {
                 DepthSensorSandboxProcessor.OnDepthDataBackground += OnDepthDataCPU;
-                DepthSensorSandboxProcessor.OnNewFrame += OnNewFrameCPU;
                 DepthSensorSandboxProcessor.OnDepthDataBackground -= OnDepthDataGPU;
+                DepthSensorSandboxProcessor.OnNewFrame += OnNewFrameCPU;
                 DepthSensorSandboxProcessor.OnNewFrame -= OnNewFrameGPU;
             }
             _updateMeshOnGPU = _prevUpdateMeshOnGPU = onGPU;
