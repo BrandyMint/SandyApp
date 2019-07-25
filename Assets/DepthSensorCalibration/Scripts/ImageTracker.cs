@@ -19,7 +19,6 @@ namespace DepthSensorCalibration {
         private Mat _matEmpty = new Mat();
         private Mat _matFrame;
         private Mat _matTarget;
-        private Mat _matTargetColor;
         private ORB _detector;
         private DescriptorMatcher _matcher;
         private Mat _descriptorsTarget = new Mat();
@@ -36,7 +35,6 @@ namespace DepthSensorCalibration {
             _matEmpty?.Dispose();
             _matFrame?.Dispose();
             _matTarget?.Dispose();
-            _matTargetColor?.Dispose();
             _detector?.Dispose();
             _descriptorsTarget?.Dispose();
             _descriptorsFrame?.Dispose();

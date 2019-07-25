@@ -17,6 +17,7 @@ namespace DepthSensorCalibration {
         
         [SerializeField] private Material _matGrayScale;
         [SerializeField] private Material _matDepth;
+        [SerializeField] private bool _instantiateMaterials = true;
         [SerializeField] private Color _colorDetected = Color.blue;
         [SerializeField] private RawImage _imgVisualize;
         [SerializeField] private GameObject _pnlAutomatic;
@@ -41,6 +42,10 @@ namespace DepthSensorCalibration {
         private float _savedZeroDepth;
 
         private void Start() {
+            if (_instantiateMaterials) {
+                _matDepth = new Material(_matDepth);
+                _matGrayScale = new Material(_matGrayScale);
+            }
             _imageTracker = GetComponent<ImageTracker>();
             _ctrl = GetComponent<CalibrationController>();
             _renderColor = _ctrl.SandboxCam.gameObject.AddComponent<CameraRenderToTexture>();

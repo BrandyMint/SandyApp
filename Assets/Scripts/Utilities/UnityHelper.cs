@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 
@@ -103,7 +104,11 @@ namespace Utilities {
         
         public static void SetPropsByGameObjects(object obj, Transform root) {
             foreach (var propInfo in obj.GetType().GetProperties()) {
+                if (root == null || propInfo.Name == null) {
+                    Debug.Log("FTF??");
+                }
                 var row = root.FindChildRecursively(propInfo.Name);
+                Assert.IsNotNull(row, $"Not found {propInfo.Name} in {root.name}");
                 object prop;
                 if (propInfo.PropertyType.IsSubclassOf(typeof(Component))) {
                     prop = row.GetComponent(propInfo.PropertyType) ?? row.GetComponentInChildren(propInfo.PropertyType);

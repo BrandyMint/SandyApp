@@ -2,10 +2,11 @@ using System.IO;
 using UnityEngine;
 using UnityEditor;
 using UnityEditor.Build;
+using UnityEditor.Build.Reporting;
 
 namespace DepthSensor.Editor {
     [InitializeOnLoad]
-    public class Deploy : IPostprocessBuild {
+    public class Deploy : IPostprocessBuildWithReport {
         private static string _DEPLOY_PATH = "Deploy";
         private static string _LOG_PATH = "Logs/Deploy.log";
         private static string[] _PLATFROMS = {"Linux", "Windows"};
@@ -105,8 +106,8 @@ namespace DepthSensor.Editor {
         }
 
         public int callbackOrder => -1;
-        public void OnPostprocessBuild(BuildTarget target, string path) {
-            ForBuild(Path.GetDirectoryName(path), target);
+        public void OnPostprocessBuild(BuildReport report) {
+            ForBuild(Path.GetDirectoryName(report.summary.outputPath), report.summary.platform);
         }
     }
 }

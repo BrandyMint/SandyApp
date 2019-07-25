@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Launcher;
 using UnityEngine;
 using UnityEngine.Events;
@@ -6,10 +7,12 @@ using UnityEngine.UI;
 using Utilities;
 
 namespace Games.Landscape {
-    public class LandscapeSettings : MonoBehaviour {
+    public class LandscapeParamsUI : MonoBehaviour {
         private const float _INC_DEC_STEP = 1.0f;
+        private const float _INC_DEC_STEPS_COUNT = 15;
 
         [SerializeField] private Button _btnBack;
+        [SerializeField] private Button _btnReset;
         [SerializeField] private Button _btnSave;
         [SerializeField] private Transform _pnlParams;
         
@@ -18,6 +21,7 @@ namespace Games.Landscape {
             public Text txtVal { get; set; }
             public Button btnInc { get; set; }
             public Button btnDec { get; set; }
+            public ConvertValueUI convert { get; set; }
         }
         
         private class ParamsFields {
@@ -25,56 +29,86 @@ namespace Games.Landscape {
             public SliderField DepthSea { get; set; }
             public SliderField DepthGround { get; set; }
             public SliderField DepthMountains { get; set; }
+            public SliderField DepthIce { get; set; }
+            public SliderField DetailsSize { get; set; }
         }
 
         private readonly ParamsFields _params = new ParamsFields();
+        private bool _invokeChagedUI = true;
+        private readonly List<Action> _onParamsReset = new List<Action>();
 
         private void Start() {
             _btnBack.onClick.AddListener(OnBtnBack);
+            _btnReset.onClick.AddListener(OnBtnReset);
             _btnSave.onClick.AddListener(OnBtnSave);
-            
+
             UnityHelper.SetPropsByGameObjects(_params, _pnlParams);
             InitSlider(_params.DepthSeaBottom, nameof(Prefs.Landscape.DepthSeaBottom));
             InitSlider(_params.DepthSea, nameof(Prefs.Landscape.DepthSea));
             InitSlider(_params.DepthGround, nameof(Prefs.Landscape.DepthGround));
             InitSlider(_params.DepthMountains, nameof(Prefs.Landscape.DepthMountains));
+            InitSlider(_params.DepthIce, nameof(Prefs.Landscape.DepthIce));
+            InitSlider(_params.DetailsSize, nameof(Prefs.Landscape.DetailsSize));
         }
 
         private static void OnBtnSave() {
             Prefs.Landscape.Save();
         }
 
+        private void OnBtnReset() {
+            Prefs.Landscape.Reset();
+            _invokeChagedUI = false;
+            foreach (var action in _onParamsReset) {
+                action();
+            }
+            _invokeChagedUI = true;
+        }
+
         private static void OnBtnBack() {
             Scenes.GoBack();
         }
 
-        private static void InitSlider(SliderField fld, string param) {
+        private void InitSlider(SliderField fld, string param) {
             var obj = Prefs.Landscape;
             var prop = obj.GetType().GetProperty(param);
             InitSlider(fld, 
-                (float) prop.GetValue(obj), 
+                (Func<float>) prop.GetGetMethod().CreateDelegate(typeof(Func<float>), obj), 
                 (Action<float>) prop.GetSetMethod().CreateDelegate(typeof(Action<float>), obj));
         }
 
-        private static void InitSlider(SliderField fld, float initVal, Action<float> set) {
-            UnityAction<float> changeTxt = val => {
+        private void InitSlider(SliderField fld, Func<float> get, Action<float> set) {
+            void ChangeTxt(float val) {
                 fld.txtVal.text = (fld.sl.wholeNumbers)
                     ? val.ToString()
                     : val.ToString("0.0");
-            };
-            fld.sl.onValueChanged.AddListener(changeTxt);
-            fld.sl.value = initVal;
-            fld.sl.onValueChanged.AddListener(val => set(val));
+            }
+            fld.sl.onValueChanged.AddListener(ChangeTxt);
+            
+            void OnParamsReset() => fld.sl.value = fld.convert.Set(get());
+            _onParamsReset.Add(OnParamsReset);
+            OnParamsReset();
+            ChangeTxt(fld.sl.value);
+            
+            void SetFromUI(float val) {
+                if (_invokeChagedUI) set(fld.convert.Get(val));
+            }
+            fld.sl.onValueChanged.AddListener(SetFromUI);
             fld.btnInc.onClick.AddListener(CreateOnBtnIncDec(fld.sl, 1.0f));
             fld.btnDec.onClick.AddListener(CreateOnBtnIncDec(fld.sl, -1.0f));
         }
         
         private static UnityAction CreateOnBtnIncDec(Slider sl, float mult) {
+            var step = 1f;
+            if (!sl.wholeNumbers) {
+                var diff = Math.Abs(sl.maxValue - sl.minValue);
+                if (diff / _INC_DEC_STEP > _INC_DEC_STEPS_COUNT) {
+                    step = _INC_DEC_STEP;
+                } else {
+                    step = diff / _INC_DEC_STEPS_COUNT;
+                }
+            }
             return () => {
-                var val = (sl.wholeNumbers) ?
-                    1 :
-                    _INC_DEC_STEP;
-                sl.value += val * mult;
+                sl.value += step * mult;
             };
         }
     }

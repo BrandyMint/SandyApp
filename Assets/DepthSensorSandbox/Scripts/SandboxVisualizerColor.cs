@@ -7,10 +7,6 @@ namespace DepthSensorSandbox {
         private static readonly int _DEPTH_TO_COLOR_TEX = Shader.PropertyToID("_DepthToColorTex");
         private static readonly int _COLOR_TEX = Shader.PropertyToID("_ColorTex");
 
-        private void OnDestroy() {
-            SetEnable(false);
-        }
-
         public override void SetEnable(bool enable) {
             base.SetEnable(enable);
             if (enable) {

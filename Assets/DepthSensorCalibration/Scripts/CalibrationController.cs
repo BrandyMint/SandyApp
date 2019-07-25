@@ -171,12 +171,13 @@ namespace DepthSensorCalibration {
         }
 
         private void InitSlider(SliderField fld, UnityAction<float> act) {
-            UnityAction<float> changeTxt = val => {
+            void ChangeTxt(float val) {
                 fld.txtVal.text = (fld.sl.wholeNumbers)
                     ? val.ToString()
                     : val.ToString("0.000");
-            };
-            fld.sl.onValueChanged.AddListener(changeTxt);
+            }
+            ChangeTxt(fld.sl.value);
+            fld.sl.onValueChanged.AddListener(ChangeTxt);
             fld.sl.onValueChanged.AddListener(val => { UpdatePrefFromUI(val, act); });
             fld.btnInc.onClick.AddListener(CreateOnBtnIncDec(fld.sl, 1.0f));
             fld.btnDec.onClick.AddListener(CreateOnBtnIncDec(fld.sl, -1.0f));

@@ -6,10 +6,13 @@ namespace DepthSensorSandbox {
         private static readonly int _DEPTH_ZERO = Shader.PropertyToID("_DepthZero");
         
         [SerializeField] protected Material _material;
+        [SerializeField] private bool _instantiateMaterial = true;
 
         private SandboxMesh _sandbox;
         
         protected virtual void Awake() {
+            if (_instantiateMaterial)
+                _material = new Material(_material);
             _sandbox = GetComponent<SandboxMesh>();
         }
 
