@@ -35,9 +35,9 @@ namespace DepthSensorSandbox {
             _mesh = _meshFilter.mesh;
             if (_mesh == null) {
                 _mesh = new Mesh {name = "depth"};
+                _mesh.indexFormat = IndexFormat.UInt32;
                 _mesh.MarkDynamic();
                 _meshFilter.mesh = _mesh;
-                _mesh.indexFormat = IndexFormat.UInt32;
             }
         }
 

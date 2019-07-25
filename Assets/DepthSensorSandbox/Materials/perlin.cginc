@@ -45,5 +45,5 @@ float perlin(float2 P) {
       float2 fade_xy = fade(Pf.xy);
       float2 n_x = lerp(float2(n00, n01), float2(n10, n11), fade_xy.x);
       float n_xy = lerp(n_x.x, n_x.y, fade_xy.y);
-      return 2.3 * n_xy;
+      return 2.3 * n_xy / 2 + 0.5;
 }

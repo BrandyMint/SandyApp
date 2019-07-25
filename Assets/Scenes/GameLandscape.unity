@@ -499,11 +499,6 @@ PrefabInstance:
       propertyPath: m_TargetDisplay
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 6145052358333956587, guid: 47cbe1775872baf289a77a580245e6e6,
-        type: 3}
-      propertyPath: m_Materials.Array.data[0]
-      value: 
-      objectReference: {fileID: 2100000, guid: d2447d1c73e0465b786087af1a74bb94, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 47cbe1775872baf289a77a580245e6e6, type: 3}
 --- !u!1 &507380211 stripped
@@ -524,7 +519,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e6f692ac0000f5d0d89d3470e776e955, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _material: {fileID: 2100000, guid: ab4e8b63f00aec845ae9023cd3272b63, type: 2}
+  _material: {fileID: 2100000, guid: d2447d1c73e0465b786087af1a74bb94, type: 2}
 --- !u!1001 &524830434
 PrefabInstance:
   m_ObjectHideFlags: 0

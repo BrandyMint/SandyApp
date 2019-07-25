@@ -2,7 +2,7 @@
     Properties {
         _MixDepth ("Mix Depth", Float) = 0.01
         _MixNoiseSize ("Perlin Size", Float) = 1
-        _MixNoiseStrength ("Perlin Size", Float) = 1
+        _MixNoiseStrength ("Perlin Strength", Float) = 1
         
         _ColorIce ("Color Ice", Color) = (1, 1, 1, 1)
         _DepthIce ("Depth Ice", Float) = 0.2
