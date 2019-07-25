@@ -1,3 +1,7 @@
+#ifndef EXTENSION_V2F
+#   define EXTENSION_V2F
+#endif
+
 struct appdata {
     float4 vertex : POSITION;
     float2 uv : TEXCOORD0;
@@ -7,6 +11,7 @@ struct v2f {
     float4 clip : SV_POSITION;
     float2 uv : TEXCOORD0;
     float3 pos : TEXCOORD1;
+    EXTENSION_V2F
 };
 
 #ifdef CALC_DEPTH
@@ -17,8 +22,8 @@ sampler2D _MapToCameraTex; float4 _MapToCameraTex_ST;
 float4 calcDepth (float2 uv) {
     float2 p = tex2Dlod(_MapToCameraTex, float4(uv, 0, 0)).rg;
     float d = tex2Dlod(_DepthTex, float4(uv, 0, 0)).r * 65.535;
-    /*if (d < 0.1)
-        d = 5;*/
+    if (d < 0.1)
+        d = 5;
     return float4(p.xy * d, d, 0);
 }
 #endif
@@ -34,7 +39,6 @@ v2f vert (appdata v) {
     o.clip = UnityObjectToClipPos(vertex);
     float3 pos = UnityObjectToViewPos(vertex);
     o.pos = float3(pos.xy, -pos.z);
-    
     return o;
 }
 
