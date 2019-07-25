@@ -33,7 +33,7 @@ namespace DepthSensorSandbox {
             _mat = _r.material;
             _meshFilter = GetComponent<MeshFilter>();
             _mesh = _meshFilter.mesh;
-            if (_mesh == null) {
+            if (_mesh == null || _mesh.vertexCount == 0) {
                 _mesh = new Mesh {name = "depth"};
                 _mesh.indexFormat = IndexFormat.UInt32;
                 _mesh.MarkDynamic();
