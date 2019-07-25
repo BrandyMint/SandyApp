@@ -1,4 +1,3 @@
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -6,7 +5,7 @@ using UnityEngine.UI;
 namespace Launcher {
     [RequireComponent(typeof(Button))]
     public class BtnGoTo : MonoBehaviour {
-        [SerializeField] private Object _scene;
+        [SerializeField] private string _scenePath;
         
         private void Awake() {
             var btn = GetComponent<Button>();
@@ -14,8 +13,7 @@ namespace Launcher {
         }
 
         private void OnBtn() {
-            var scenePath = AssetDatabase.GetAssetPath(_scene);
-            SceneManager.LoadScene(scenePath);
+            SceneManager.LoadScene(_scenePath);
         }
     }
 }

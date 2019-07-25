@@ -282,7 +282,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe10b2eacaec116d092a82cfacbe185b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _scene: {fileID: 102900000, guid: c6f82c9225df0d70ea5afed0d2c3f5c5, type: 3}
+  _scenePath: Assets/Scenes/GameLandscape.unity
 --- !u!1 &1051775779
 GameObject:
   m_ObjectHideFlags: 0
@@ -292,6 +292,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1051775780}
+  - component: {fileID: 1051775785}
   - component: {fileID: 1051775784}
   - component: {fileID: 1051775783}
   - component: {fileID: 1051775782}
@@ -431,6 +432,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1051775779}
   m_CullTransparentMesh: 0
+--- !u!114 &1051775785
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1051775779}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4433ae185a874155bf830dadb0204742, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1143516533
 GameObject:
   m_ObjectHideFlags: 0
@@ -592,7 +605,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe10b2eacaec116d092a82cfacbe185b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _scene: {fileID: 102900000, guid: 65f1d7e90be6de14caf45c1ce53d77f4, type: 3}
+  _scenePath: Assets/DepthSensorCalibration/Scenes/DepthSensorCalibration.unity
 --- !u!1 &1193325781
 GameObject:
   m_ObjectHideFlags: 0

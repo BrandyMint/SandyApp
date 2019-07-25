@@ -8,8 +8,10 @@ public static class MemUtils {
         //TODO: ConvertExistingDataToNativeArray not create m_Safety that provides errors read/write 
         unsafe {
             var array =  NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<T>(ptr.ToPointer(), length, allocator);
+#if ENABLE_UNITY_COLLECTIONS_CHECKS
             var m_Safety = allocator == Allocator.Temp ? AtomicSafetyHandle.GetTempMemoryHandle() : AtomicSafetyHandle.Create();
             NativeArrayUnsafeUtility.SetAtomicSafetyHandle<T>(ref array, m_Safety);
+#endif
             return array;
         }
     }

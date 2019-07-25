@@ -145,7 +145,9 @@ namespace AsyncGPUReadbackPluginNs {
 
                 getData_mainThread(eventId, ref ptr, ref length);
                 var array = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<T>(ptr, length, Allocator.None);
+#if ENABLE_UNITY_COLLECTIONS_CHECKS
                 NativeArrayUnsafeUtility.SetAtomicSafetyHandle(ref array, AtomicSafetyHandle.Create());
+#endif
 
                 return array;
             } else {
