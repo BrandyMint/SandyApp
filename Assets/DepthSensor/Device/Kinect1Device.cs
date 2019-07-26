@@ -1,4 +1,4 @@
-﻿#if UNITY_STANDALONE_WIN
+﻿/*#if UNITY_STANDALONE_WIN
 using System.Collections;
 using System.Linq;
 using DepthSensor.Sensor;
@@ -128,4 +128,4 @@ namespace DepthSensor.Device {
         }
     }
 }
-#endif
+#endif*/

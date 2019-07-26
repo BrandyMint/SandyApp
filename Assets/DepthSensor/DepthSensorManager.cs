@@ -12,8 +12,8 @@ namespace DepthSensor {
 		private const float _WAIT_AVAILABLE = 3f;
 		private Type[] _TRYING_INIT_QUEUE = new Type[] {
 #if UNITY_STANDALONE_WIN
-			typeof(Kinect2Device), 
-			typeof(Kinect1Device)
+			//typeof(Kinect2Device), 
+			//typeof(Kinect1Device),
 #endif
 #if ENABLE_OPENNI2
 			typeof(OpenNI2Device)

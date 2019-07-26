@@ -22,13 +22,21 @@ public static class MemUtils {
         }
     }
     
+    public static long GetLengthInBytes<T>(this NativeArray<T> a) where T : struct {
+        return (long)Marshal.SizeOf<T>() * a.Length;
+    }
+    
+    public static long GetLengthInBytes<T>(this T[] a) {
+        return Marshal.SizeOf<T>() * a.LongLength;
+    }
+    
     public static void Copy<T>(IntPtr src, T[] dst) {
-        var dstBytes = dst.LongLength * Marshal.SizeOf<T>();
+        var dstBytes = dst.GetLengthInBytes();
         CopyBytes(src, dst, dstBytes);
     }
     
     public static void Copy<T>(IntPtr src, NativeArray<T> dst) where T : struct {
-        var dstBytes = dst.Length * Marshal.SizeOf<T>();
+        var dstBytes = dst.GetLengthInBytes();
         CopyBytes(src, dst, dstBytes);
     }
     
@@ -44,14 +52,14 @@ public static class MemUtils {
     
     public static void CopyBytes<T>(IntPtr src, T[] dst, long copyBytes) {
         var handle = GCHandle.Alloc(dst, GCHandleType.Pinned);
-        var dstBytes = dst.LongLength * Marshal.SizeOf<T>();
+        var dstBytes = dst.GetLengthInBytes();
         CopyBytes(src, handle.AddrOfPinnedObject(), dstBytes, copyBytes);
         handle.Free();
     }
     
     public static void CopyBytes<T>(IntPtr src, NativeArray<T> dst, long copyBytes) where T : struct {
         unsafe {
-            var dstBytes = dst.Length * Marshal.SizeOf<T>();
+            var dstBytes = dst.GetLengthInBytes();
             CopyBytes(src, dst.GetUnsafePtr(), dstBytes, copyBytes);
         }
     }

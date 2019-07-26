@@ -58,7 +58,7 @@ namespace DepthSensor.Device {
 
         private volatile bool _needUpdateMapDepthToColorSpace;
         private volatile bool _pollFramesLoop = true;
-        private volatile bool _mapDepthToCameraUpdated = true;
+        private volatile bool _mapDepthToCameraUpdated;
         private volatile bool _isManualUpdate;
         private readonly Thread _pollFrames;
         private readonly AutoResetEvent _framesArrivedEvent = new AutoResetEvent(false);
