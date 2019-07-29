@@ -113,48 +113,71 @@ namespace DepthSensor.Device {
         }
 
         private void PollFrames() {
+            TimeSpan lastTime, currTime;
+            bool CheckTime(TimeSpan time) {
+                if (time <= lastTime) return false;
+                currTime = time;
+                return true;
+            }
             try {
                 while (_pollFramesLoop) {
                     if (_sensorActiveChangedEvent.WaitOne(0))
                         ReActivateSensors();
-                    MultiSourceFrame frame;
-                    if (_multiReader != null && (frame = _multiReader.AcquireLatestFrame()) != null 
-                                             && (!_isManualUpdate || _manualUpdateEvent.WaitOne(0))) {
-                        using (var depth = _kinect.DepthFrameSource.IsActive ? frame.DepthFrameReference.AcquireFrame() : null) 
-                            if (depth != null || !Depth.Active)
-                        using (var index = _kinect.BodyIndexFrameSource.IsActive ? frame.BodyIndexFrameReference.AcquireFrame() : null)
-                            if (index != null || !Index.Active)
-                        using (var color = _kinect.ColorFrameSource.IsActive ? frame.ColorFrameReference.AcquireFrame() : null)
-                            if (color != null || !Color.Active)
-                        using (var body = _kinect.BodyFrameSource.IsActive ? frame.BodyFrameReference.AcquireFrame() : null)
-                            if (body != null || !Body.Active) 
-                        {
-                            if (body != null) {
-                                UpdateBodies(body);
-                                _internalBody.OnNewFrameBackground();
+                    if (_multiReader != null && (!_isManualUpdate || _manualUpdateEvent.WaitOne(150))) {
+                        MultiSourceFrame frame;
+                        var frameArrived = false;
+                        if (_multiReader != null && (frame = _multiReader.AcquireLatestFrame()) != null) {
+                            using (var depth = frame.DepthFrameReference.AcquireFrame())
+                                if (!_multiReader.FrameSourceTypes.HasFlag(FrameSourceTypes.Depth) || (depth != null && CheckTime(depth.RelativeTime)))
+                            using (var index = frame.BodyIndexFrameReference.AcquireFrame())
+                                if (!_multiReader.FrameSourceTypes.HasFlag(FrameSourceTypes.BodyIndex) || (index != null && CheckTime(index.RelativeTime)))
+                            using (var color = frame.ColorFrameReference.AcquireFrame())
+                                if (!_multiReader.FrameSourceTypes.HasFlag(FrameSourceTypes.Color) || (color != null && CheckTime(color.RelativeTime)))
+                            using (var body = frame.BodyFrameReference.AcquireFrame()) 
+                                if (!_multiReader.FrameSourceTypes.HasFlag(FrameSourceTypes.Body) || (body != null && CheckTime(body.RelativeTime))) 
+                            {
+                                frameArrived = true;
+                                lastTime = currTime;
+                                
+                                if (body != null) {
+                                    UpdateBodies(body);
+                                    _internalBody.OnNewFrameBackground();
+                                }
+
+                                if (color != null) {
+                                    color.CopyConvertedFrameDataToIntPtr(Color.data.IntPtr(),
+                                        (uint) Color.data.GetLengthInBytes(), _COLOR_FORMAT);
+                                    _internalColor.OnNewFrameBackground();
+                                }
+
+                                if (index != null) {
+                                    index.CopyFrameDataToIntPtr(Index.data.IntPtr(),
+                                        (uint) Index.data.GetLengthInBytes());
+                                    _internalIndex.OnNewFrameBackground();
+                                }
+
+                                if (_needUpdateMapDepthToColorSpace ||
+                                    (MapDepthToCamera.Active && !IsMapDepthToCameraValid())) {
+                                    UpdateMapDepthToCamera();
+                                    _internalMapDepthToCamera.OnNewFrameBackground();
+                                }
+
+                                if (depth != null) {
+                                    
+                                    depth.CopyFrameDataToIntPtr(Depth.data.IntPtr(),
+                                        (uint) Depth.data.GetLengthInBytes());
+                                    _internalDepth.OnNewFrameBackground();
+                                }
+
+                                _frameArrivedEvent.Set();
+                                Thread.Sleep(15);
                             }
-                            if (color != null) {
-                                color.CopyConvertedFrameDataToIntPtr(Color.data.IntPtr(), (uint) Color.data.GetLengthInBytes(), _COLOR_FORMAT);
-                                _internalColor.OnNewFrameBackground();
-                            }
-                            if (index != null) {
-                                index.CopyFrameDataToIntPtr(Index.data.IntPtr(), (uint) Index.data.GetLengthInBytes());
-                                _internalIndex.OnNewFrameBackground();
-                            }
-                            if (_needUpdateMapDepthToColorSpace || (MapDepthToCamera.Active && !IsMapDepthToCameraValid())) {
-                                UpdateMapDepthToCamera();
-                                _internalMapDepthToCamera.OnNewFrameBackground();
-                            }
-                            if (depth != null) {
-                                depth.CopyFrameDataToIntPtr(Depth.data.IntPtr(), (uint) Depth.data.GetLengthInBytes());
-                                _internalDepth.OnNewFrameBackground();
-                            }
-                            
-                            _frameArrivedEvent.Set();
-                            Thread.Sleep(15);
                         }
-                    } else
-                        Thread.Sleep(1);
+                        if (!frameArrived && _isManualUpdate) {
+                            _manualUpdateEvent.Set();
+                        }
+                    }
+                    Thread.Sleep(1);
                 }
             } catch (ThreadAbortException) {
                 Debug.Log(GetType().Name + ": Thread aborted");

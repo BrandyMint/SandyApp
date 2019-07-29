@@ -15,6 +15,9 @@ namespace Launcher {
             
             _scenes.Push(SceneManager.GetActiveScene().buildIndex);
             SceneManager.sceneLoaded += OnSceneLoaded;
+        }
+
+        private void Start() {
             ActivateDisplays();
         }
 
