@@ -5,22 +5,11 @@ namespace DepthSensor.Stream {
         public readonly Texture2D texture;
         public bool AutoApplyTexture = false;
         
-        private readonly Texture2D _internalTexture;
-
         public TextureStream(int width, int height, TextureFormat format, bool autoApply = false) : 
             base(width, height, false) 
         {
-            if (format == TextureFormat.YUY2) {
-                _internalTexture = new Texture2D(width, height, TextureFormat.RG16, false);
-                data = _internalTexture.GetRawTextureData<T>();
-                texture= Texture2D.CreateExternalTexture(width, height, TextureFormat.YUY2,
-                    false, true,
-                    _internalTexture.GetNativeTexturePtr()
-                );
-            } else {
-                _internalTexture = texture = new Texture2D(width, height, format, false);
-                data = texture.GetRawTextureData<T>();
-            }
+            texture = new Texture2D(width, height, format, false);
+            data = texture.GetRawTextureData<T>();
             AutoApplyTexture = autoApply;
         }
 
@@ -29,14 +18,13 @@ namespace DepthSensor.Stream {
         }
 
         public override void Dispose() {
-            Object.Destroy(_internalTexture);
             Object.Destroy(texture);
         }
 
         public virtual void ManualApplyTexture() {
             if (!AutoApplyTexture)
-                _internalTexture.Apply(false);
-        }
+                texture.Apply(false);
+        } 
 
         public new class Internal : Stream<T>.Internal {
             private readonly TextureStream<T> _stream;
@@ -47,7 +35,7 @@ namespace DepthSensor.Stream {
 
             protected internal override void OnNewFrame() {
                 if (_stream.AutoApplyTexture)
-                    _stream._internalTexture.Apply(false);
+                    _stream.texture.Apply(false);
                 base.OnNewFrame();
             }
         }
