@@ -7,11 +7,6 @@ using Unity.Collections.LowLevel.Unsafe;
 namespace AsyncGPUReadbackPluginNs {
     // Tries to match the official API
     public class AsyncGPUReadback {
-
-        public static AsyncGPUReadbackRequest Request(Texture src, Action<AsyncGPUReadbackRequest> onDone = null) {
-            return Request(src, 0, onDone);
-        }
-        
         public static AsyncGPUReadbackRequest Request(Texture src, int mipLevel = 0, 
             Action<AsyncGPUReadbackRequest> onDone = null) 
         {
@@ -19,17 +14,12 @@ namespace AsyncGPUReadbackPluginNs {
             request.Init(src, mipLevel, onDone);
             return request;
         }
-        
-        public static AsyncGPUReadbackRequest RequestIntoNativeArray<T>(ref NativeArray<T> dst, Texture src, 
-            Action<AsyncGPUReadbackRequest> onDone = null) where T : struct {
-            return RequestIntoNativeArray(ref dst, src, 0, onDone);
-        }
 
         public static AsyncGPUReadbackRequest RequestIntoNativeArray<T>(ref NativeArray<T> dst, Texture src, int mipLevel = 0, 
             Action<AsyncGPUReadbackRequest> onDone = null) where T : struct 
         {
             var request = new AsyncGPUReadbackRequest();
-            request.Init(src, ref dst, 0, onDone);
+            request.Init(src, ref dst, mipLevel, onDone);
             return request;
         }
     }

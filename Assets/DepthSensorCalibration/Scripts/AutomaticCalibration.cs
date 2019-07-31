@@ -213,7 +213,7 @@ namespace DepthSensorCalibration {
             var depthValid = false;
             _renderDepth.Enable(_matDepth, RenderTextureFormat.R16, t => {
                 TexturesHelper.ReCreateIfNeed(ref _depth, t.GetPixelsCount());
-                AsyncGPUReadback.RequestIntoNativeArray(ref _depth, t, r => {
+                AsyncGPUReadback.RequestIntoNativeArray(ref _depth, t, 0, r => {
                     if (!r.hasError) depthValid = true;
                 });
             });
