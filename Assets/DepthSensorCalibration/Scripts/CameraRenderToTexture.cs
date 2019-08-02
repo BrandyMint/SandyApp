@@ -8,6 +8,7 @@ namespace DepthSensorCalibration {
     public class CameraRenderToTexture : MonoBehaviour {
         private Camera _cam;
         private RenderTexture _renderTarget;
+        private RenderTexture _tempCopy;
         private CommandBuffer _commandBuffer;
         private Material _mat;
         private RenderTextureFormat _format;
@@ -26,8 +27,12 @@ namespace DepthSensorCalibration {
 
         private void OnDestroy() {
             DisposeCommandBuffer(ref _commandBuffer, _cameraEvent);
-            if (_renderTarget != null)
+            if (_renderTarget != null) {
                 Destroy(_renderTarget);
+            }
+            if (_tempCopy != null) {
+                Destroy(_tempCopy);
+            }
         }
 
         private static CommandBuffer CreateCommandBufferBlit(
@@ -103,6 +108,12 @@ namespace DepthSensorCalibration {
             this.enabled = false;
             DisposeCommandBuffer(ref _commandBuffer, _cameraEvent);
             _onNewFrame = null;
+        }
+
+        public RenderTexture GetTempCopy() {
+            TexturesHelper.ReCreateIfNeedCompatible(ref _tempCopy, _renderTarget);
+            Graphics.Blit(_renderTarget, _tempCopy);
+            return _tempCopy;
         }
 
         private void Update() {

@@ -5,7 +5,6 @@ using OpenCvSharp;
 using OpenCvSharp.Flann;
 using Unity.Collections;
 using UnityEngine;
-using UnityEngine.UI;
 using Utilities;
 
 namespace DepthSensorCalibration {
@@ -32,13 +31,13 @@ namespace DepthSensorCalibration {
         private bool _frameDetected;
 
         private void OnDestroy() {
-            _matEmpty?.Dispose();
-            _matFrame?.Dispose();
-            _matTarget?.Dispose();
+            _matEmpty?.DisposeManual();
+            _matFrame?.DisposeManual();
+            _matTarget?.DisposeManual();
             _detector?.Dispose();
-            _descriptorsTarget?.Dispose();
-            _descriptorsFrame?.Dispose();
-            _visualizeMat?.Dispose();
+            _descriptorsTarget?.DisposeManual();
+            _descriptorsFrame?.DisposeManual();
+            _visualizeMat?.DisposeManual();
         }
 
         public void PrepareDetect() {
@@ -72,7 +71,12 @@ namespace DepthSensorCalibration {
 
         private static void Set(ref Mat m, Texture t, Action onDone) {
             OpenCVSharpHelper.ReCreateIfNeedCompatible(ref m, t);
+#if USE_MAT_ASYNC_SET
             m.AsyncSetFrom(t, onDone);
+#else
+            m.SetFrom(t);
+            onDone?.Invoke();
+#endif
         }
 
         private void OnTargetChanged() {

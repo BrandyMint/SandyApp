@@ -23,6 +23,11 @@ namespace Utilities {
 
             return false;
         }
+
+        public static bool ReCreateIfNeedCompatible(ref Texture2D t, Texture tRef) {
+            return ReCreateIfNeed(ref t, tRef.width, tRef.height,
+                GraphicsFormatUtility.GetTextureFormat(tRef.graphicsFormat), tRef.mipmapCount > 1);
+        }
         
         public static bool ReCreateIfNeed(ref RenderTexture t, int width, int height, int depth = 0,
             RenderTextureFormat format = RenderTextureFormat.ARGB32) 
@@ -34,6 +39,15 @@ namespace Utilities {
                 return true;
             }
             return false;
+        }
+        
+        public static bool ReCreateIfNeedCompatible(ref RenderTexture t, Texture tRef) {
+            var depth = 0;
+            var refRend = tRef as RenderTexture;
+            if (refRend != null)
+                depth = refRend.depth;
+            return ReCreateIfNeed(ref t, tRef.width, tRef.height, depth,
+                GraphicsFormatUtility.GetRenderTextureFormat(tRef.graphicsFormat));
         }
         
         public static bool ReCreateIfNeed<T>(ref NativeArray<T> a, int len, 
@@ -79,6 +93,13 @@ namespace Utilities {
         
         public static int GetBytesPerPixel(this Texture t) {
             return (int) GraphicsFormatUtility.GetBlockSize(t.graphicsFormat);
+        }
+
+        public static void Copy(RenderTexture src, Texture2D dst) {
+            var prevRend = RenderTexture.active;
+            RenderTexture.active = src;
+            dst.ReadPixels(new UnityEngine.Rect(0, 0, src.width, src.height), 0, 0);
+            RenderTexture.active = prevRend;
         }
     }
 }

@@ -123,18 +123,18 @@ namespace DepthSensor.Device {
                 while (_pollFramesLoop) {
                     if (_sensorActiveChangedEvent.WaitOne(0))
                         ReActivateSensors();
-                    if (_multiReader != null && (!_isManualUpdate || _manualUpdateEvent.WaitOne(150))) {
+                    if (_kinect != null && _multiReader != null && (!_isManualUpdate || _manualUpdateEvent.WaitOne(150))) {
                         MultiSourceFrame frame;
                         var frameArrived = false;
                         if (_multiReader != null && (frame = _multiReader.AcquireLatestFrame()) != null) {
-                            using (var depth = frame.DepthFrameReference.AcquireFrame())
-                                if (!_multiReader.FrameSourceTypes.HasFlag(FrameSourceTypes.Depth) || (depth != null && CheckTime(depth.RelativeTime)))
+                            using (var body = frame.BodyFrameReference.AcquireFrame()) 
+                                if (!_multiReader.FrameSourceTypes.HasFlag(FrameSourceTypes.Body) || (body != null && CheckTime(body.RelativeTime)))
                             using (var index = frame.BodyIndexFrameReference.AcquireFrame())
                                 if (!_multiReader.FrameSourceTypes.HasFlag(FrameSourceTypes.BodyIndex) || (index != null && CheckTime(index.RelativeTime)))
                             using (var color = frame.ColorFrameReference.AcquireFrame())
                                 if (!_multiReader.FrameSourceTypes.HasFlag(FrameSourceTypes.Color) || (color != null && CheckTime(color.RelativeTime)))
-                            using (var body = frame.BodyFrameReference.AcquireFrame()) 
-                                if (!_multiReader.FrameSourceTypes.HasFlag(FrameSourceTypes.Body) || (body != null && CheckTime(body.RelativeTime))) 
+                            using (var depth = frame.DepthFrameReference.AcquireFrame())
+                                if (!_multiReader.FrameSourceTypes.HasFlag(FrameSourceTypes.Depth) || (depth != null && CheckTime(depth.RelativeTime)))
                             {
                                 frameArrived = true;
                                 lastTime = currTime;
@@ -250,21 +250,25 @@ namespace DepthSensor.Device {
 
         #region Coordinate Map
         public override Vector2 CameraPosToDepthMapPos(Vector3 pos) {
+            if (_kinect == null) return Vector2.zero;
             return ToVector2(_kinect.CoordinateMapper.
                 MapCameraPointToDepthSpace(ToCameraPoint(pos)));
         }
 
         public override Vector2 CameraPosToColorMapPos(Vector3 pos) {
+            if (_kinect == null) return Vector2.zero;
             return ToVector2(_kinect.CoordinateMapper.
                 MapCameraPointToColorSpace(ToCameraPoint(pos)));
         }
         
         public override Vector2 DepthMapPosToColorMapPos(Vector2 pos, ushort depth) {
+            if (_kinect == null) return Vector2.zero;
             return ToVector2(_kinect.CoordinateMapper.
                 MapDepthPointToColorSpace(ToDepthPoint(pos), depth));
         }
 
         private void UpdateMapDepthToCamera() {
+            if (_kinect == null) return;
             //TODO: broken table in SDK, workaround with MapDepthFrameToCameraSpace
             //var map = _kinect.CoordinateMapper.GetDepthFrameToCameraSpaceTable();
             var map = new CameraSpacePoint[Depth.data.Length];

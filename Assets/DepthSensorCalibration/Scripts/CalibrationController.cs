@@ -63,8 +63,6 @@ namespace DepthSensorCalibration {
         private void Start() {
             InitUI();
             SwitchMode(CalibrationMode.MANUAL);
-            _btnAutomatic.interactable = false;
-            StartCoroutine(WaitAutomaticAvailable());
         }
 
         private void InitUI() {
@@ -89,11 +87,6 @@ namespace DepthSensorCalibration {
             InitSlider(_calibrationFields.ZeroDepth, val => Prefs.Calibration.ZeroDepth = val / 1000f);
             Prefs.Calibration.OnChanged += OnCalibrationChanged;
             OnCalibrationChanged();
-        }
-
-        private IEnumerator WaitAutomaticAvailable() {
-            yield return new WaitUntil(_sandboxMesh.IsBoundsValid);
-            _btnAutomatic.interactable = true;
         }
 
         public void SwitchMode(CalibrationMode mode) {

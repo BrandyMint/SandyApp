@@ -4,7 +4,7 @@ using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 
 public static class MemUtils {
-    public static NativeArray<T> ConvertPtrToNativeArray<T>(IntPtr ptr, int length, Allocator allocator = Allocator.None) where T : struct {
+    public static NativeArray<T> ConvertPtrToNativeArray<T>(IntPtr ptr, int length, Allocator allocator = Allocator.Invalid) where T : struct {
         //TODO: ConvertExistingDataToNativeArray not create m_Safety that provides errors read/write 
         unsafe {
             var array =  NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<T>(ptr.ToPointer(), length, allocator);

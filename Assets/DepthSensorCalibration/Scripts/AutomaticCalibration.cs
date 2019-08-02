@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
-using AsyncGPUReadbackPluginNs;
+using System.Collections.Generic;
+using System.Linq;
 using DepthSensorSandbox;
 using Unity.Collections;
 using UnityEngine;
@@ -24,6 +25,7 @@ namespace DepthSensorCalibration {
         [SerializeField] private Button _btnCancelAutomatic;
         [SerializeField] private SandboxMesh _sandboxMesh;
         [SerializeField] private int _detectIterations = 20;
+        [SerializeField] private int _findStartPosIterations = 2;
         [SerializeField] private int _adjustIterations = 8;
         [SerializeField] private float _adjustTargetMaxStep = 0.2f;
         [SerializeField] private float _adjustTargetMinDist = 0.05f;
@@ -40,6 +42,9 @@ namespace DepthSensorCalibration {
         private NativeArray<ushort> _depth;
         private bool _savedSandboxGPU;
         private float _savedZeroDepth;
+#if !USE_MAT_ASYNC_SET
+        private Texture2D _depthTex;
+#endif
 
         private void Start() {
             if (_instantiateMaterials) {
@@ -72,8 +77,13 @@ namespace DepthSensorCalibration {
                 _renderColor.Disable();
             if (_renderDepth != null)
                 _renderDepth.Disable();
+#if USE_MAT_ASYNC_SET
             if (_depth.IsCreated)
                 _depth.Dispose();
+#else
+            if (_depthTex != null)
+                Destroy(_depthTex);
+#endif
         }
 
         private void RestorePrefs() {
@@ -87,25 +97,31 @@ namespace DepthSensorCalibration {
         }
 
         public void StartCalibration() {
-            _savedSandboxGPU = _sandboxMesh.UpdateMeshOnGpu;
-            _savedZeroDepth = Prefs.Calibration.ZeroDepth;
-            
-            var b = _sandboxMesh.GetBounds();
-            var d = MathHelper.IsoscelesTriangleHeight(b.size.y / 2f, _ctrl.SandboxCam.fieldOfView);
-            
-            Prefs.Calibration.ZeroDepth = _ctrl.SandboxCam.farClipPlane;
-            _ctrl.SandboxCam.transform.localPosition = b.center + Vector3.back * d;
-            _ctrl.SandboxCam.transform.localRotation = Quaternion.identity;
-            _ctrl.SandboxCam.farClipPlane = d + b.size.z;
-            
+            StopCalibration();
+            StartCoroutine(Calibrating());
+        }
+
+        public IEnumerator PrepareCalibration() {
             _pnlAutomatic.SetActive(true);
             _imgVisualize.gameObject.SetActive(true);
             _maySetFrame = true;
             _frameReady = false;
             
+            _savedSandboxGPU = _sandboxMesh.UpdateMeshOnGpu;
+            _savedZeroDepth = Prefs.Calibration.ZeroDepth;
+
+            _sandboxMesh.RequestUpdateBounds();
+            yield return new WaitUntil(_sandboxMesh.IsBoundsValid);
+            var b = _sandboxMesh.GetBounds();
+            var d = MathHelper.IsoscelesTriangleHeight(b.size.y / 3f, _ctrl.SandboxCam.fieldOfView);
+            
+            Prefs.Calibration.ZeroDepth = _ctrl.SandboxCam.farClipPlane;
+            _ctrl.SandboxCam.transform.localPosition = Vector3.back * d;
+            _ctrl.SandboxCam.transform.localRotation = Quaternion.identity;
+            _ctrl.SandboxCam.farClipPlane = d + b.size.z;
+            
             _imageTracker.OnFramePrepared += OnFramePrepared;
             _renderColor.Enable(_matGrayScale, RenderTextureFormat.R8, OnNewFrame);
-            StartCoroutine(Calibrating());
         }
 
         private void StopCalibration() {
@@ -136,13 +152,52 @@ namespace DepthSensorCalibration {
         private void OnFramePrepared() {
             _frameReady = true;
             _imageTracker.VisualizeDetection((Texture2D)_imgVisualize.texture, _colorDetected);
+            _maySetFrame = true;
         }
 
         private IEnumerator Calibrating() {
+            yield return PrepareCalibration();
             yield return AdjustTargetContrast();
+            //yield return FindCameraStartCameraPos();
             _sandboxMesh.UpdateMeshOnGpu = false;
             yield return PrepareDepthMap();
+            yield return FindCameraPos();
+            StopCalibration();
+        }
+
+        private IEnumerator FindCameraStartCameraPos() {
+            var posDif = _sandboxMesh.GetBounds().extents / 5f;
+            var poses = new List<Vector3> {
+                _ctrl.SandboxCam.transform.localPosition,
+            };
+            for (int y = -1; y <= 1; ++y) {
+                for (int x = -1; x <= 1; ++x) {
+                    poses.Add(poses[0] + new Vector3(posDif.x * x, posDif.y * y));
+                }
+            }
+            var rect = new Rect(0, 0, _ctrl.SandboxCam.pixelWidth, _ctrl.SandboxCam.pixelHeight);
+            var bestPos = poses[0];
+            var bestPosRank = 0;
+            for (int pI = 0; pI < poses.Count; ++pI) {
+                var rank = 0;
+                _ctrl.SandboxCam.transform.localPosition = poses[pI];
+                for (int i = 0; i < _findStartPosIterations; ++i) {
+                    yield return WaitFrame(() => {
+                        if (_imageTracker.GetDetectTargetCorners(_target2D) && _target2D.All(p => rect.Contains(p))) {
+                            ++rank;
+                            if (rank > bestPosRank) {
+                                bestPosRank = rank;
+                                bestPos = poses[pI];
+                            }
+                        }
+                    });
+                }
+            }
             
+            _ctrl.SandboxCam.transform.localPosition = bestPos;
+        }
+
+        private IEnumerator FindCameraPos() {
             Vector3 sumPos = Vector3.zero, sumForward = Vector3.zero, sumUp = Vector3.zero;
             float sumZeroDepth = 0f;
             int count = 0;
@@ -169,7 +224,6 @@ namespace DepthSensorCalibration {
             } else {
                 RestorePrefs();
             }
-            StopCalibration();
         }
 
         private bool CalcCameraPos(out Vector3 pos, out Vector3 forward, out Vector3 up, out float zeroDepth) {
@@ -212,10 +266,17 @@ namespace DepthSensorCalibration {
         private IEnumerator PrepareDepthMap() {
             var depthValid = false;
             _renderDepth.Enable(_matDepth, RenderTextureFormat.R16, t => {
+#if USE_MAT_ASYNC_SET
                 TexturesHelper.ReCreateIfNeed(ref _depth, t.GetPixelsCount());
-                AsyncGPUReadback.RequestIntoNativeArray(ref _depth, t, 0, r => {
+                AsyncGPUReadback.RequestIntoNativeArray(ref _depth, _renderDepth.GetTempCopy(), 0, r => {
                     if (!r.hasError) depthValid = true;
                 });
+#else
+                TexturesHelper.ReCreateIfNeedCompatible(ref _depthTex, t);
+                TexturesHelper.Copy(t, _depthTex);
+                _depth = _depthTex.GetRawTextureData<ushort>();
+                depthValid = true;
+#endif
             });
             yield return new WaitUntil(() => { return depthValid; });
         }
@@ -289,7 +350,6 @@ namespace DepthSensorCalibration {
             yield return new WaitUntil(() => _frameReady);
             _frameReady = false;
             act?.Invoke();
-            _maySetFrame = true;
         }
     }
 }

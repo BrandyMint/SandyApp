@@ -8,9 +8,32 @@ using UnityEngine.Experimental.Rendering;
 
 namespace Utilities {
     public static class OpenCVSharpHelper {
+        /*public class LshIndexParams : IndexParams {
+            public LshIndexParams(int table_number = 12, int key_size = 20, int multi_probe_level = 2) {
+                SetAlgorithm(6);
+                // The number of hash tables to use
+                SetInt("table_number", table_number);
+                // The length of the key in the hash tables
+                SetInt("key_size", key_size);
+                // Number of levels to use in multi-probe (0 for standard LSH)
+                SetInt("multi_probe_level", multi_probe_level);
+            }
+        };*/
+
+        public static void DisposeManual(this Mat m) {
+            m.IsEnabledDispose = true;
+            m?.Dispose();
+        }
+        
+        public static void DisposeManual(ref Mat m) {
+            m?.DisposeManual();
+            m = null;
+        }
+        
         public static bool ReCreateIfNeed(ref Mat m, int width, int height, MatType t) {
             if (m == null) {
                 m = new Mat();
+                m.IsEnabledDispose = false;
             }
 
             if (m.Width != width || m.Height != height || m.Type() != t) {
@@ -34,8 +57,9 @@ namespace Utilities {
                 var a = t.GetRawTextureData<byte>();
                 var ptr = a.IntPtr();
                 if (m == null || m.DataStart != ptr || m.Width != t.width || m.Height != t.height || m.Type() != type) {
-                    m?.Dispose();
+                    m?.DisposeManual();
                     m = new Mat(t.height, t.width, type, a.IntPtr());
+                    m.IsEnabledDispose = false;
                     return true;
                 };
             }
@@ -57,8 +81,35 @@ namespace Utilities {
             var lenBytes = t.GetLengthInBytes();
             Assert.AreEqual(m.GetLengthInBytes(), lenBytes, "Mat and Texture must be equal length");
             Assert.IsTrue(m.IsContinuous(), "Mat must be continuous");
+            m.IsEnabledDispose = false;
             var array = MemUtils.ConvertPtrToNativeArray<byte>(m.Data, lenBytes);
             return AsyncGPUReadback.RequestIntoNativeArray(ref array, t, 0, onDone);
+        }
+
+        public static void SetFrom(this Mat m, Texture2D t) {
+            var a = t.GetRawTextureData();
+            m.SetArray(0, 0, a.ToArray());
+        }
+
+        private static Texture2D _texCache;
+        public static void SetFrom(this Mat m, RenderTexture t) {
+            TexturesHelper.ReCreateIfNeedCompatible(ref _texCache, t);
+            TexturesHelper.Copy(t, _texCache);
+            m.SetFrom(_texCache);
+        }
+        
+        public static void SetFrom(this Mat m, Texture t) {
+            var t2d = t as Texture2D;
+            if (t2d != null) {
+                m.SetFrom(t2d);
+                return;
+            }
+            var rend = t as RenderTexture;
+            if (rend != null) {
+                m.SetFrom(rend);
+                return;
+            }
+            throw new NotImplementedException();
         }
 
         public static AsyncGPUReadbackRequest AsyncSetFrom(this Mat m, Texture t, Action onSuccessDone = null) {
