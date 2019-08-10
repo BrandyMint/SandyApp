@@ -1,7 +1,7 @@
-﻿using System.Collections;
-using System.Globalization;
+﻿using System.Globalization;
 using DepthSensorSandbox;
 using Launcher;
+using Launcher.MultiMonitorSupport;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -99,7 +99,7 @@ namespace DepthSensorCalibration {
             _calibrationImg.SetActive(mode != CalibrationMode.TEST);
             _imgColor.gameObject.SetActive(mode == CalibrationMode.TEST);
             _settingsAndBtns.SetActive(mode != CalibrationMode.AUTOMATIC);
-            SandboxCam.targetDisplay = (mode == CalibrationMode.TEST) ? 1 : 0;
+            MultiMonitor.SetTargetDisplay(SandboxCam, mode == CalibrationMode.TEST ? 1 : 0);
             
             _sandboxMesh.GetComponent<SandboxVisualizerBase>().SetEnable(mode == CalibrationMode.TEST);
             _sandboxMesh.GetComponent<SandboxVisualizerColor>().SetEnable(mode != CalibrationMode.TEST);

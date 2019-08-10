@@ -75,5 +75,21 @@ namespace Utilities {
             // Calculate the Z coordinate of the cross product.
             return (BAx * BCy - BAy * BCx);
         }
+        
+        public static Vector2 Div(Vector2 p1, Vector2 p2) {
+            return new Vector2(p1.x / p2.x, p1.y / p2.y);
+        }
+        
+        public static Vector3 Div(Vector3 p1, Vector3 p2) {
+            return new Vector3(p1.x / p2.x, p1.y / p2.y, p1.z / p2.z);
+        }
+        
+        public static Vector2 Mul(Vector2 p1, Vector2 p2) {
+            return new Vector2(p1.x * p2.x, p1.y * p2.y);
+        }
+        
+        public static Vector3 Mul(Vector3 p1, Vector3 p2) {
+            return new Vector3(p1.x * p2.x, p1.y * p2.y, p1.z * p2.z);
+        }
     }
 }

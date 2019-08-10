@@ -767,6 +767,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _material: {fileID: 2100000, guid: d2447d1c73e0465b786087af1a74bb94, type: 2}
   _instantiateMaterial: 1
+--- !u!20 &507380213 stripped
+Camera:
+  m_CorrespondingSourceObject: {fileID: 6145052358850914144, guid: 47cbe1775872baf289a77a580245e6e6,
+    type: 3}
+  m_PrefabInstance: {fileID: 507380210}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &524830434
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1875,9 +1881,9 @@ Canvas:
   m_GameObject: {fileID: 678713454}
   m_Enabled: 1
   serializedVersion: 3
-  m_RenderMode: 0
-  m_Camera: {fileID: 0}
-  m_PlaneDistance: 100
+  m_RenderMode: 1
+  m_Camera: {fileID: 1618057604}
+  m_PlaneDistance: 0.5
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
   m_OverrideSorting: 0
@@ -2043,9 +2049,9 @@ Canvas:
   m_GameObject: {fileID: 966543290}
   m_Enabled: 1
   serializedVersion: 3
-  m_RenderMode: 0
-  m_Camera: {fileID: 0}
-  m_PlaneDistance: 100
+  m_RenderMode: 1
+  m_Camera: {fileID: 507380213}
+  m_PlaneDistance: 0.1
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
   m_OverrideSorting: 0
@@ -2797,7 +2803,7 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.3
-  far clip plane: 1000
+  far clip plane: 1
   field of view: 60
   orthographic: 1
   orthographic size: 5
@@ -3611,6 +3617,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1839134595}
     m_Modifications:
+    - target: {fileID: 220261004960981864, guid: 90891424b76abbad5b55ff313ac789ee,
+        type: 3}
+      propertyPath: m_Name
+      value: RowTitle
+      objectReference: {fileID: 0}
     - target: {fileID: 5506004120098998, guid: 90891424b76abbad5b55ff313ac789ee, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -3694,11 +3705,6 @@ PrefabInstance:
     - target: {fileID: 5506004120098998, guid: 90891424b76abbad5b55ff313ac789ee, type: 3}
       propertyPath: m_Pivot.y
       value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 220261004960981864, guid: 90891424b76abbad5b55ff313ac789ee,
-        type: 3}
-      propertyPath: m_Name
-      value: RowTitle
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 90891424b76abbad5b55ff313ac789ee, type: 3}

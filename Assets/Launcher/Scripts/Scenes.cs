@@ -14,21 +14,7 @@ namespace Launcher {
             DontDestroyOnLoad(gameObject);
             
             _scenes.Push(SceneManager.GetActiveScene().buildIndex);
-            SceneManager.sceneLoaded += OnSceneLoaded;
-        }
-
-        private void Start() {
-            ActivateDisplays();
-        }
-
-        private void ActivateDisplays() {
-#if !UNITY_EDITOR
-            if (Display.displays.Length > 1) {
-                Display.displays[1].Activate();
-            } else {
-                Debug.LogError("Dont find second display!");
-            }
-#endif
+            SceneManager.sceneLoaded += OnSceneLoaded; 
         }
 
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode) {

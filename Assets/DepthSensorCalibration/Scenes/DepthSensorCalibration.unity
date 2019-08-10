@@ -672,9 +672,9 @@ Canvas:
   m_GameObject: {fileID: 319655138}
   m_Enabled: 1
   serializedVersion: 3
-  m_RenderMode: 0
-  m_Camera: {fileID: 0}
-  m_PlaneDistance: 100
+  m_RenderMode: 1
+  m_Camera: {fileID: 626931950}
+  m_PlaneDistance: 1
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
   m_OverrideSorting: 0
@@ -1203,7 +1203,7 @@ PrefabInstance:
     - target: {fileID: 224000013346711826, guid: c584347df697ac549bd7fc3987726ea4,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: -1031.8542
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224000013346711826, guid: c584347df697ac549bd7fc3987726ea4,
         type: 3}
@@ -1618,7 +1618,7 @@ Camera:
   m_GameObject: {fileID: 626931948}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 2
+  m_ClearFlags: 3
   m_BackGroundColor: {r: 0, g: 0, b: 0, a: 1}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
@@ -1632,12 +1632,12 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 1
+  near clip plane: 0.5
   far clip plane: 2
   field of view: 60
   orthographic: 1
   orthographic size: 5
-  m_Depth: -1
+  m_Depth: 1
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 32
@@ -1754,12 +1754,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _matGrayScale: {fileID: 2100000, guid: 9ab93dc227218aae7a16ad327c2965d9, type: 2}
   _matDepth: {fileID: 2100000, guid: d6be0aa508bfdfc479c2030b158121d8, type: 2}
+  _instantiateMaterials: 1
   _colorDetected: {r: 0, g: 0, b: 1, a: 1}
   _imgVisualize: {fileID: 1299363492}
   _pnlAutomatic: {fileID: 506499031}
   _btnCancelAutomatic: {fileID: 1779594278}
   _sandboxMesh: {fileID: 1977039023}
   _detectIterations: 20
+  _findStartPosIterations: 2
   _adjustIterations: 8
   _adjustTargetMaxStep: 0.1
   _adjustTargetMinDist: 0.05
@@ -1899,9 +1901,9 @@ Canvas:
   m_GameObject: {fileID: 941866533}
   m_Enabled: 1
   serializedVersion: 3
-  m_RenderMode: 0
+  m_RenderMode: 1
   m_Camera: {fileID: 1301400942}
-  m_PlaneDistance: 100
+  m_PlaneDistance: 1
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
   m_OverrideSorting: 0
@@ -3255,7 +3257,7 @@ Camera:
   m_GameObject: {fileID: 1301400941}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 2
+  m_ClearFlags: 3
   m_BackGroundColor: {r: 0, g: 0, b: 0, a: 1}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
@@ -3269,12 +3271,12 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 1
+  near clip plane: 0.5
   far clip plane: 2
   field of view: 60
   orthographic: 1
   orthographic size: 5
-  m_Depth: -1
+  m_Depth: 1
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 32
@@ -3746,7 +3748,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1440704544}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: -15, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1301400943}
@@ -4716,7 +4718,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1945182784
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6087,6 +6089,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _material: {fileID: 2100000, guid: 555a97bd4b858645f94b71790dafd5f8, type: 2}
+  _instantiateMaterial: 1
 --- !u!114 &6145052357072468318
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6100,6 +6103,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _material: {fileID: 2100000, guid: ab4e8b63f00aec845ae9023cd3272b63, type: 2}
+  _instantiateMaterial: 1
 --- !u!1001 &7602217316295766345
 PrefabInstance:
   m_ObjectHideFlags: 0
