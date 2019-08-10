@@ -1,7 +1,10 @@
+#if !UNITY_STANDALONE_WIN && !ENABLE_OPENNI2
+	#define ENABLE_OPENNI2
+#endif
+
 using System;
 using System.Collections;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using DepthSensor.Device;
 using DepthSensor.Emulated;
 using UnityEngine;

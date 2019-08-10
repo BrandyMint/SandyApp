@@ -43,6 +43,7 @@ namespace Launcher.MultiMonitorSupport {
                     var disp = Display.displays[i];
                     if (!disp.active) disp.Activate();
                     disp.SetRenderingResolution(disp.systemWidth, disp.systemHeight);
+                    Debug.Log($"Activated display {i} {disp.systemWidth}x{disp.systemHeight}");
                 }
             } else {
                 Debug.LogError($"Cant find {_useMonitors} displays!");

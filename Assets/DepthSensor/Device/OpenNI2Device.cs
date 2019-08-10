@@ -1,3 +1,7 @@
+#if !UNITY_STANDALONE_WIN && !ENABLE_OPENNI2
+    #define ENABLE_OPENNI2
+#endif
+
 #if ENABLE_OPENNI2
 using Unity.Mathematics;
 using System;
