@@ -9,7 +9,7 @@ namespace Utilities {
 
         private void Awake() {
             foreach (var singleton in _singletonPrefabs) {
-                var hash = singleton.GetHashCode();
+                var hash = singleton.GetInstanceID();
                 if (!_alreadyLoaded.Contains(hash)) {
                     _alreadyLoaded.Add(hash);
                     Instantiate(singleton, null, false);
