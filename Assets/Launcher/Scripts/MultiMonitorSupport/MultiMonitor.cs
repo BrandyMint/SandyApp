@@ -1,8 +1,3 @@
-#if !UNITY_EDITOR && UNITY_STANDALONE
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Runtime.InteropServices;
-#endif
 using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -15,11 +10,26 @@ namespace Launcher.MultiMonitorSupport {
         
         public static MultiMonitor Instance { get; private set; }
 
-        private MultiMonitor() {
+        private MultiMonitorSystemApiBase _systemApi;
+
+        private void Awake() {
+            if (!MultiMonitorWindowsApi.GetIfAvailable(out _systemApi)
+             && !MultiMonitorXLibApi.GetIfAvailable(out _systemApi)) {
+                _systemApi = new MultiMonitorSystemApiBase();
+                Debug.Log("Unsupported system for MultiMonitor, turn off MultiMonitorFix");
+                _useMultiMonitorFix = false;
+            }
+            _systemApi.UseMonitors = _useMonitors;
+            
             Instance = this;
         }
 
+        private void OnDestroy() {
+            _systemApi?.Dispose();
+        }
+
         private void Start() {
+            _systemApi.OnNotEnoughMonitors += NotEnoughMonitors;
             ActivateDisplays();
             FixCamerasIn(SceneManager.GetActiveScene());
             SceneManager.sceneLoaded += OnSceneLoaded;
@@ -33,10 +43,7 @@ namespace Launcher.MultiMonitorSupport {
                 if (GetMultiMonitorRect(out var multiRect)) {
                     Debug.Log("Setting multi-display window rect: " + multiRect);
                     Screen.SetResolution((int) multiRect.width, (int) multiRect.height, false);
-                    Display.displays[0].Activate(0,0,0);
-                    Display.displays[0].SetParams((int) multiRect.width, (int) multiRect.height, (int) multiRect.x, (int) multiRect.y);
-                    //var window = GetForegroundWindow();
-                    //MoveWindow(window, (int) rect.x, (int) rect.y, (int) rect.width, (int) rect.height, 1);
+                    _systemApi.MoveMainWindow(multiRect);
                 }
             } else if (Display.displays.Length >= _useMonitors) {
                 for (int i = 0; i < Math.Min(Display.displays.Length, _useMonitors); ++i) {
@@ -46,8 +53,12 @@ namespace Launcher.MultiMonitorSupport {
                     Debug.Log($"Activated display {i} {disp.systemWidth}x{disp.systemHeight}");
                 }
             } else {
-                Debug.LogError($"Cant find {_useMonitors} displays!");
+                NotEnoughMonitors(_useMonitors);
             }
+        }
+
+        private static void NotEnoughMonitors(int useMonitors) {
+            Debug.LogError($"Cant find {useMonitors} displays!");
         }
 
         private static void OnSceneLoaded(Scene scene, LoadSceneMode mode) {
@@ -69,7 +80,7 @@ namespace Launcher.MultiMonitorSupport {
         }
 
         public static bool UseMultiMonitorFix() {
-#if !UNITY_EDITOR && UNITY_STANDALONE_WIN
+#if !UNITY_EDITOR && UNITY_STANDALONE
             return Instance._useMultiMonitorFix;
 #endif
             return false;
@@ -100,8 +111,7 @@ namespace Launcher.MultiMonitorSupport {
         }
 
         public static Rect GetDisplayRect(int dispNum) {
-#if !UNITY_EDITOR && UNITY_STANDALONE_WIN
-            if (UseMultiMonitorFix() && GetWinApiMonitorRects(out var monitors) && GetMultiMonitorRect(out var multiRect)) {
+            if (UseMultiMonitorFix() && Instance._systemApi.GetMonitorRects(out var monitors) && GetMultiMonitorRect(out var multiRect)) {
                 var rect = monitors[dispNum];
                 rect.position -= multiRect.position;
                 rect.position = new Vector2(
@@ -110,77 +120,15 @@ namespace Launcher.MultiMonitorSupport {
                 );
                 
                 return rect;
+            } else {
+                var disp = Display.displays[dispNum];
+                return new Rect(0, 0, disp.systemWidth, disp.systemHeight);
             }
-#endif
-            var disp = Display.displays[dispNum];
-            return new Rect(0, 0, disp.systemWidth, disp.systemHeight);
         }
         
         public static bool GetMultiMonitorRect(out Rect rect) {
-#if !UNITY_EDITOR && UNITY_STANDALONE_WIN
-            if (GetWinApiMonitorRects(out var monitors)) {
-                if (monitors.Count < Instance._useMonitors) {
-                    Debug.LogError($"Cant find {Instance._useMonitors} displays!");
-                    rect = Rect.zero;
-                    return false;
-                }
-                
-                rect = Rect.MinMaxRect(float.MaxValue, float.MaxValue, float.MinValue, float.MinValue);
-                for (int i = 0; i < Math.Min(monitors.Count, Instance._useMonitors); ++i) {
-                    var monitor = monitors[i];
-                    if (monitor.xMin < rect.xMin) rect.xMin = monitor.xMin;
-                    if (monitor.yMin < rect.yMin) rect.yMin = monitor.yMin;
-                    if (monitor.xMax > rect.xMax) rect.xMax = monitor.xMax;
-                    if (monitor.yMax > rect.yMax) rect.yMax = monitor.yMax;
-                }
-                return true;
-            }
-#endif
-            rect = Rect.zero;
-            return false;
+            return Instance._systemApi.GetMultiMonitorRect(out rect);
         }
-        
-#if !UNITY_EDITOR && UNITY_STANDALONE_WIN
-        public static bool GetWinApiMonitorRects(out List<Rect> rects) {
-            var first = Rect.zero;
-            var rawRects = new List<Rect>();
-            var success = EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero,
-                (IntPtr monitor, IntPtr hdc, ref RectApi rect, int data) => {
-                    var r = Rect.MinMaxRect(rect.left, rect.top, rect.right, rect.bottom);
-                    if (rect.left == 0 && rect.top == 0)
-                        first = r;
-                    rawRects.Add(r);
-                    return true;
-                }, 0);
-            if (success) {
-                rects = rawRects.OrderBy(r => Vector3.Distance(r.center, first.center)).ToList();
-                return true;
-            } else {
-                Debug.Log("Fail on Win Api EnumDisplayMonitors");
-                rects = null;
-                return false;
-            }
-        }
-        
-        [StructLayout(LayoutKind.Sequential)]
-        struct RectApi {
-            public int left;
-            public int top;
-            public int right;
-            public int bottom;
-        }
-        
-        delegate bool MonitorEnumProc(IntPtr hMonitor, IntPtr hdc, ref RectApi pRect, int dwData);
-
-        [DllImport("user32.dll")]
-        static extern IntPtr GetForegroundWindow();
-
-        [DllImport("user32.dll", EntryPoint = "MoveWindow")]
-        static extern int MoveWindow(IntPtr hWnd, int x, int y, int nWidth, int nHeight, int bRepaint);
-        
-        [DllImport("user32.dll")]
-        static extern bool EnumDisplayMonitors(IntPtr hdc, IntPtr lpRect, MonitorEnumProc callback, int dwData);
-#endif
     }
 
 }
