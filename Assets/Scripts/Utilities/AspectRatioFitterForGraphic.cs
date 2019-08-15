@@ -5,7 +5,8 @@ using UnityEngine.UI;
 namespace Utilities {
     [RequireComponent(typeof(MaskableGraphic))]
     public class AspectRatioFitterForGraphic : AspectRatioFitter {
-        private void Start() {
+        protected override void Start() {
+            base.Start();
             UpdateFit();
         }
 
