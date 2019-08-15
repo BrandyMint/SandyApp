@@ -1,3 +1,7 @@
+#if !UNITY_STANDALONE_WIN && !ENABLE_OPENNI2
+    #define ENABLE_OPENNI2
+#endif
+
 using System.IO;
 using UnityEngine;
 using UnityEditor;
