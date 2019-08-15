@@ -59,13 +59,19 @@ namespace BuildHelper.Editor.Core {
         /// </summary>
         /// <param name="target">Target of build</param>
         /// <param name="version">Version of build</param>
+        /// <param name="pathBuild">Build output path</param>
         /// <param name="specifyTarget">Default is <i>true</i>. If <i>true</i> then 
         /// name of target will be present in the returned path.</param>
         /// <param name="specifyName">Optional</param>
         /// <returns>Generated path to builds</returns>
         /// <exception cref="OperationCanceledException">User closed folder panel.</exception>
-        public static string GetBuildPath(BuildTarget target, string version, bool specifyTarget = true, string specifyName = null) {
-            var pathBuild = EditorUserBuildSettings.GetBuildLocation(target);
+        public static string GetBuildPath(BuildTarget target, string version, string pathBuild = null, bool specifyTarget = true, string specifyName = null) {
+            var needTrim = false;
+            if (string.IsNullOrEmpty(pathBuild)) {
+                pathBuild = EditorUserBuildSettings.GetBuildLocation(target);
+                needTrim = true;
+            }
+
             var fileExtension = BuildLocationFileExtension(target);
             if (string.IsNullOrEmpty(pathBuild)) {
                 var title = string.Format("Select folder for {0} builds for this project", target);
@@ -82,9 +88,11 @@ namespace BuildHelper.Editor.Core {
             var targetStr = specifyTarget ? "." + BuiltTargetToPrettyString(target) : "";
             var specifyExt = string.IsNullOrEmpty(specifyName) ? "" : "." + specifyName; 
             if (fileExtension != null) {
-                var pathSeparators = new char[] {'/', '\\'};
-                var subLength = Math.Min(Math.Max(0, pathBuild.LastIndexOfAny(pathSeparators)), pathBuild.Length);
-                pathBuild = pathBuild.Substring(0, subLength).TrimEnd(pathSeparators);
+                if (needTrim) {
+                    var pathSeparators = new char[] {'/', '\\'};
+                    var subLength = Math.Min(Math.Max(0, pathBuild.LastIndexOfAny(pathSeparators)), pathBuild.Length);
+                    pathBuild = pathBuild.Substring(0, subLength).TrimEnd(pathSeparators);
+                }
                 return string.Format("{0}/{1} {2}{3}/{1}{4}{5}", 
                     pathBuild, PlayerSettings.productName, version, targetStr, specifyExt, fileExtension);
             } else {

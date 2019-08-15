@@ -25,6 +25,11 @@ namespace BuildHelper.Editor.Core {
         /// Restore settings after UnityEditor crash.
         /// </summary>
         static BuildTime() {
+            RestoreAll();
+        }
+
+        [MenuItem("Build/Restore")]
+        public static void RestoreAll() {
             RestoreOverridenIcons();
             RestoreSettings();
         }
@@ -59,8 +64,7 @@ namespace BuildHelper.Editor.Core {
         /// </summary>
         /// <param name="report"></param>
         public void OnPostprocessBuild(BuildReport report) {
-            RestoreOverridenIcons();
-            RestoreSettings();
+            RestoreAll();
         }
 
         /// <summary>
@@ -127,8 +131,7 @@ namespace BuildHelper.Editor.Core {
             try {
                 buildAction();
             } catch (Exception e) {
-                RestoreOverridenIcons();
-                RestoreSettings();
+                RestoreAll();
                 throw e;
             }
         }
