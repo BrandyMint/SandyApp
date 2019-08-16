@@ -42,6 +42,12 @@ namespace X11
 
     public partial class Xlib
     {
+        [DllImport("libX11")]
+        public static extern void XLockDisplay(IntPtr display);
+        
+        [DllImport("libX11")]
+        public static extern void XUnlockDisplay(IntPtr display);
+        
         /// <summary>
         /// Initiate a connection to the name X session.
         /// (or respect the DISPLAY environment variable if the display parameter is null).

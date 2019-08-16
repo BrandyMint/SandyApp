@@ -187,6 +187,16 @@ namespace X11
         public Window sibling;
         public int stack_mode;
     }
+    
+    [StructLayout(LayoutKind.Sequential)]
+    public struct MotifWmHints {
+        public IntPtr flags;
+        public IntPtr functions;
+        public IntPtr decorations;
+        public IntPtr inputMode;
+        public IntPtr status;
+    } 
+
 
     public partial class Xlib
     {
@@ -194,8 +204,8 @@ namespace X11
         public static extern int XFree(IntPtr data);
 
         
-        [DllImport("libX11")]
-        public static extern ulong XInternAtom(IntPtr display, string atomName, bool onlyIfExists);
+        [DllImport("libX11", EntryPoint = "XInternAtom")]
+        public static extern IntPtr XInternAtom(IntPtr display, string atom_name, bool only_if_exists);
 
 
         /// <summary>
@@ -228,14 +238,25 @@ namespace X11
         /// <param name="propReturn"></param>
         /// <returns></returns>
         [DllImport("libX11")]
-        public static extern int XGetWindowProperty(IntPtr display, Window window, ulong atom, long offset,
+        public static extern int XGetWindowProperty(IntPtr display, Window window, IntPtr atom, long offset,
             long length,
             bool delete, Atom reqType, out Atom actualTypeReturn, out int actualFormatReturn, out ulong nItemsReturn,
             out ulong bytesAfterReturn, out IntPtr propReturn);
+
+        [DllImport("libX11", EntryPoint = "XChangeProperty")]
+        public static extern int XChangeProperty(IntPtr display, Window window, IntPtr property, IntPtr type, int format,
+            PropMode mode, ref MotifWmHints data, int nelements);
         
-        [DllImport("libX11")]
-        public static extern void XChangeProperty(IntPtr display, Window w, ulong property, ulong type, int format,
-            PropMode mode, IntPtr data, int nelements);
+        [DllImport("libX11", EntryPoint = "XChangeProperty")]//, CLSCompliant(false)]
+        public static extern int XChangeProperty(IntPtr display, Window window, IntPtr property, IntPtr type, int format,
+            PropMode mode, ref IntPtr value, int nelements);
+        
+        [DllImport("libX11", EntryPoint = "XSetTransientForHint")]
+        public static extern int XSetTransientForHint(IntPtr display, Window window, Window prop_window);
+        
+        [DllImport("libX11", EntryPoint = "XChangeProperty")]//, CLSCompliant(false)]
+        public static extern int XChangeProperty(IntPtr display, Window window, IntPtr property, IntPtr type, int format,
+            PropMode mode, ref uint value, int nelements);
         
         /// <summary>
         /// The XGetWindowAttributes function returns the current attributes for the specified window to an XWindowAt‐

@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Utilities;
@@ -43,7 +44,7 @@ namespace Launcher.MultiMonitorSupport {
                 if (GetMultiMonitorRect(out var multiRect)) {
                     Debug.Log("Setting multi-display window rect: " + multiRect);
                     Screen.SetResolution((int) multiRect.width, (int) multiRect.height, false);
-                    _systemApi.MoveMainWindow(multiRect);
+                    StartCoroutine(DoOnNextFrame(() => _systemApi.MoveMainWindow(multiRect)));
                 }
             } else if (Display.displays.Length >= _useMonitors) {
                 for (int i = 0; i < Math.Min(Display.displays.Length, _useMonitors); ++i) {
@@ -55,6 +56,11 @@ namespace Launcher.MultiMonitorSupport {
             } else {
                 NotEnoughMonitors(_useMonitors);
             }
+        }
+
+        private static IEnumerator DoOnNextFrame(Action act) {
+            yield return null;
+            act?.Invoke();
         }
 
         private static void NotEnoughMonitors(int useMonitors) {

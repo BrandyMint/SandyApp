@@ -28,13 +28,13 @@ namespace Launcher.MultiMonitorSupport {
 #if UNITY_STANDALONE_LINUX
         private IntPtr _display;
         private Window _window = Window.None;
-        private ulong _atomPID;
+        private IntPtr _atomPID;
         private ulong _pid;
 
         private MultiMonitorXLibApi(IntPtr display) {
             _display = display;
             _atomPID = Xlib.XInternAtom(_display, "_NET_WM_PID", true);
-            if(_atomPID == 0L) {
+            if(_atomPID == IntPtr.Zero) {
                 Debug.LogError("Xlib: No such atom");
             }
             _pid = (ulong) Process.GetCurrentProcess().Id;
@@ -48,24 +48,53 @@ namespace Launcher.MultiMonitorSupport {
         public override void MoveMainWindow(Rect rect) {
             var window = GetWindow();
             TurnOffDecorate(window);
+            
+            Xlib.XLockDisplay(_display);
             Xlib.XMoveResizeWindow(_display, window, (int) rect.x, (int) rect.y, (uint) rect.width, (uint) rect.height);
+            Xlib.XFlush(_display);
+            Xlib.XUnlockDisplay(_display);
         }
         
-        private struct Hints {
-            public ulong flags;
-            public ulong functions;
-            public ulong decorations;
-            public long inputMode;
-            public ulong status;
-        } 
-
         private void TurnOffDecorate(Window wnd) {
-            var hints = new Hints {flags = 2, decorations = 0};
-            ulong property = Xlib.XInternAtom(_display, "_MOTIF_WM_HINTS", true);
-            var handle = GCHandle.Alloc(hints, GCHandleType.Pinned);
-            Xlib.XChangeProperty(_display, wnd, property, property,32, PropMode.Replace, handle.AddrOfPinnedObject(),5);
-            Xlib.XMapWindow(_display, wnd);
-            handle.Free();
+            var success = DisableMotifDecorations(wnd) || DisableGnomeDecorations(wnd);
+            Xlib.XLockDisplay(_display);
+            Window root = Window.None, parent = Window.None;
+            Xlib.XQueryTree(_display, wnd, ref root, ref parent, out _);
+            Xlib.XSetTransientForHint(_display, wnd, root);
+            if (success)
+            {
+                Xlib.XUnmapWindow(_display, wnd);
+                Xlib.XMapWindow(_display, wnd);
+            }
+            Xlib.XUnlockDisplay(_display);
+        }
+
+        private bool DisableMotifDecorations(Window wnd) {
+            var success = false;
+            Xlib.XLockDisplay(_display);
+            var atom = Xlib.XInternAtom(_display, "_MOTIF_WM_HINTS", true);
+            if (atom != IntPtr.Zero) {
+                var hints = new MotifWmHints {flags = (IntPtr) 2};
+                Xlib.XChangeProperty(_display, wnd, atom, atom, 32, PropMode.Replace,
+                    ref hints, Marshal.SizeOf(hints) / IntPtr.Size);
+                success = true;
+            }
+            Xlib.XUnlockDisplay(_display);
+            return success;
+        }
+
+        private bool DisableGnomeDecorations(Window wnd) {
+            var success = false;
+            Xlib.XLockDisplay(_display);
+            IntPtr atom = Xlib.XInternAtom(_display, "_WIN_HINTS", true);
+            if (atom != IntPtr.Zero) {
+                var hints = IntPtr.Zero;
+                Xlib.XChangeProperty(_display, wnd, atom, atom, 32, PropMode.Replace,
+                    ref hints, Marshal.SizeOf(hints) / IntPtr.Size);
+                success = true;
+            }
+            Xlib.XUnlockDisplay(_display);
+            return success;
         }
 
         protected override bool GetMonitorRectsInternal(out List<Rect> rects) {
