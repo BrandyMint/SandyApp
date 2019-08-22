@@ -1,5 +1,5 @@
 using System.Threading.Tasks;
-using DepthSensor.Stream;
+using DepthSensor.Buffer;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -128,7 +128,7 @@ namespace DepthSensorSandbox {
             }
         }
 
-        private void OnDepthDataCPU(DepthStream depth, MapDepthToCameraStream mapToCamera) {
+        private void OnDepthDataCPU(DepthBuffer depth, MapDepthToCameraBuffer mapToCamera) {
             ReInitMeshIfNeed(depth.width, depth.height, depth.data.Length);
             Parallel.For(0, depth.data.Length, i => {
                 var xy = mapToCamera.data[i];
@@ -138,7 +138,7 @@ namespace DepthSensorSandbox {
             });
         }
 
-        private void OnNewFrameCPU(DepthStream depth, MapDepthToCameraStream mapToCamera) {
+        private void OnNewFrameCPU(DepthBuffer depth, MapDepthToCameraBuffer mapToCamera) {
             if (_vert != null && _triangles != null) {
                 if (!_updateMeshOnGPU || _mesh.vertexCount != _vert.Length || _needUpdateBounds)
                     _mesh.vertices = _vert;
@@ -155,13 +155,13 @@ namespace DepthSensorSandbox {
             }
         }
 
-        private void OnDepthDataGPU(DepthStream depth, MapDepthToCameraStream mapToCamera) {
+        private void OnDepthDataGPU(DepthBuffer depth, MapDepthToCameraBuffer mapToCamera) {
             ReInitMeshIfNeed(depth.width, depth.height, depth.data.Length);
             if (_needUpdateBounds)
                 OnDepthDataCPU(depth, mapToCamera);
         }
 
-        private void OnNewFrameGPU(DepthStream depth, MapDepthToCameraStream mapToCamera) {
+        private void OnNewFrameGPU(DepthBuffer depth, MapDepthToCameraBuffer mapToCamera) {
             _mat.SetTexture(_DEPTH_TEX, depth.texture);
             _mat.SetTexture(_MAP_TO_CAMERA_TEX, mapToCamera.texture);
 

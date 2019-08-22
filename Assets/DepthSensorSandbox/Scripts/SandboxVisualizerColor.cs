@@ -1,4 +1,4 @@
-using DepthSensor.Stream;
+using DepthSensor.Buffer;
 using UnityEngine;
 
 namespace DepthSensorSandbox {
@@ -18,11 +18,11 @@ namespace DepthSensorSandbox {
             }
         }
 
-        private void OnDepthToColor(DepthSensorSandboxProcessor.DepthToColorStream d) {
+        private void OnDepthToColor(DepthSensorSandboxProcessor.DepthToColorBuffer d) {
             _material.SetTexture(_DEPTH_TO_COLOR_TEX, d.texture);
         }
 
-        private void OnColor(ColorStream color) {
+        private void OnColor(ColorBuffer color) {
             _material.SetTexture(_COLOR_TEX, color.texture);
         }
     }

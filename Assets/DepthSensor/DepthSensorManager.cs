@@ -6,12 +6,10 @@ using System;
 using System.Collections;
 using System.Reflection;
 using DepthSensor.Device;
-using DepthSensor.Emulated;
 using UnityEngine;
 
 namespace DepthSensor {
 	public class DepthSensorManager : MonoBehaviour {
-		[SerializeField] private bool _emulate;
 		private const float _WAIT_AVAILABLE = 3f;
 		private Type[] _TRYING_INIT_QUEUE = new Type[] {
 #if UNITY_STANDALONE_WIN
@@ -47,9 +45,9 @@ namespace DepthSensor {
 		}
 
 		private IEnumerator TryInit() {
-			if (_emulate) {
+			/*if (_emulate) {
 				CreateDevice<EmulatedKinectDevice>();
-			} else {
+			} else {*/
 				foreach (var typeSensor in _TRYING_INIT_QUEUE) {
 					if (CreateDeviceFromType(typeSensor)) {
 						var maxWait = Time.realtimeSinceStartup + _WAIT_AVAILABLE;
@@ -57,7 +55,7 @@ namespace DepthSensor {
 						if (IsInitialized()) break;
 					}
 				}
-			}
+			/*}*/
 			
 			if (IsInitialized())
 				Initialized();

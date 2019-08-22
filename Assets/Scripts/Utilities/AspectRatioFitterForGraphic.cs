@@ -15,8 +15,9 @@ namespace Utilities {
             aspectRatio = (float) tex.width / tex.height;
         }
 
-        private void OnValidate() {
+        protected override void OnValidate() {
             UpdateFit();
+            base.OnValidate();
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Threading;
 using DepthSensor;
-using DepthSensor.Stream;
+using DepthSensor.Sensor;
 
 namespace BgConveyer {
     public class DepthSensorConveyer : BgConveyer {
@@ -35,7 +35,7 @@ namespace BgConveyer {
             _dsm.Device.Depth.OnNewFrameBackground += OnNewFrame;
         }
 
-        private void OnNewFrame(AbstractStream abstractStream) {
+        private void OnNewFrame(AbstractSensor abstractBuffer) {
             _newFrameEvent.Set();
         }
         

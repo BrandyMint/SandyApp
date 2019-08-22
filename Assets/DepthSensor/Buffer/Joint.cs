@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace DepthSensor.Stream {
+namespace DepthSensor.Buffer {
     public class Joint {
         public enum Type : int {
             SPINE_BASE                                =0,

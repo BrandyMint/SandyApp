@@ -1,5 +1,5 @@
 using System;
-using DepthSensor.Stream;
+using DepthSensor.Buffer;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -26,9 +26,9 @@ namespace DepthSensorSandbox {
             DepthSensorSandboxProcessor.OnColor -= OnColor;
         }
 
-        private void OnColor(ColorStream s) {
-            _img.texture = s.texture;
-            var aspect = (float) s.width / s.height;
+        private void OnColor(ColorBuffer b) {
+            _img.texture = b.texture;
+            var aspect = (float) b.width / b.height;
             if (Math.Abs(_aspect.aspectRatio - aspect) > 0.01f)
                 _aspect.aspectRatio = aspect;
         }

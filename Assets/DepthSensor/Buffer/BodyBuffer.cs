@@ -3,16 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace DepthSensor.Stream {
-    public class BodyStream : ArrayStream<Body> {
+namespace DepthSensor.Buffer {
+    public class BodyBuffer : ArrayBuffer<Body> {
         public int CountTracked { get; private set; }
 
-        public BodyStream(int maxCount)
+        public BodyBuffer(int maxCount)
             : base(CreateBodies(maxCount)) {
-        }
-
-        public BodyStream(bool available) : this(0) {
-            Available = available;
         }
 
         private static Body[] CreateBodies(int maxCount) {
@@ -23,7 +19,7 @@ namespace DepthSensor.Stream {
             return bodies;
         }
 
-        public class Internal<T> : Internal where T : class {
+        public class Internal<T> {
             protected internal delegate bool GetIdFunc(T body, out ulong id);
                 
             private class UpdateInfo {
@@ -31,18 +27,18 @@ namespace DepthSensor.Stream {
                 public T newBody;
             }
 
-            private readonly BodyStream _stream;
+            private readonly BodyBuffer _buffer;
             private readonly Dictionary<ulong, UpdateInfo> _updateInfo;
             private readonly Dictionary<Body, Body.Internal> internalBody;
 
-            protected internal Internal(BodyStream stream) : base(stream) {
-                _stream = stream;
-                _updateInfo = new Dictionary<ulong, UpdateInfo>(stream.data.Length);
-                for (int i = 0; i < stream.data.Length; i++) {
-                    _updateInfo[(ulong) i] = new UpdateInfo {body = stream.data[i]};
+            protected internal Internal(BodyBuffer buffer) {
+                _buffer = buffer;
+                _updateInfo = new Dictionary<ulong, UpdateInfo>(buffer.data.Length);
+                for (int i = 0; i < buffer.data.Length; i++) {
+                    _updateInfo[(ulong) i] = new UpdateInfo {body = buffer.data[i]};
                 }
 
-                internalBody = stream.data.ToDictionary(
+                internalBody = buffer.data.ToDictionary(
                     body => body, 
                     body => new Body.Internal(body));
             }
@@ -53,10 +49,10 @@ namespace DepthSensor.Stream {
                 foreach (var newBody in newBodies) {
                     ulong id;
                     UpdateInfo info;
-                    if (GetId(newBody, out id) && _updateInfo.TryGetValue(id, out info)) 
+                    if (GetId(newBody, out id) && _updateInfo.TryGetValue(id, out info))
                         info.newBody = newBody;
                 }
-                
+
                 foreach (var newBody in newBodies) {
                     ulong id;
                     if (GetId(newBody, out id) && !_updateInfo.ContainsKey(id)) {
@@ -68,18 +64,19 @@ namespace DepthSensor.Stream {
                         idxInfo.Value.newBody = newBody;
                     }
                 }
-                
+
                 int countTracked = 0;
                 foreach (var info in _updateInfo.Values) {
                     if (info.newBody != null) {
                         Update(internalBody[info.body], info.newBody);
-                        info.newBody = null;
+                        info.newBody = default(T);
                         ++countTracked;
                     } else {
                         internalBody[info.body].Set(false);
                     }
                 }
-                _stream.CountTracked = countTracked;
+
+                _buffer.CountTracked = countTracked;
             }
         }
     }
