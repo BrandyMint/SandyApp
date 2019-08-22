@@ -14,7 +14,7 @@ namespace DepthSensor.Sensor {
             }}
         }
         
-        public int BuffersValid { get; private set; }
+        public int BuffersValid { get; protected set; }
         public int BuffersCount {
             get => _buffersCount;
             set {

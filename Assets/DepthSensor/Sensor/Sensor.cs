@@ -33,6 +33,7 @@ namespace DepthSensor.Sensor {
 
             _buffers = newBuffers;
             _first = newFirst;
+            BuffersValid = Math.Min(newCount, BuffersValid);
         }
 
         public T Get(int i) {

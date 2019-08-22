@@ -26,39 +26,22 @@ namespace Test.Editor {
         }
 
         private class TestSensor : Sensor<TestBuffer> {
-            protected List<int> _list = new List<int> {0};
             public TestSensor() : base(new TestBuffer()) { }
             public TestSensor(bool available) : base(available) { }
             public new class Internal : Sensor<TestBuffer>.Internal {
                 private readonly TestSensor _sensor;
-                private int _validCount;
-                private int _counter = 1;
+                private readonly List<int> _lastBuffers = new List<int>();
+                
                 protected internal Internal(TestSensor sensor) : base(sensor) {
                     _sensor = sensor;
                 }
-
-                private int GetOldestIdx() {
-                    UpdateTestBuffersCount();
-                    return _sensor.BuffersCount - 1;
-                }
-
-                private void UpdateTestBuffersCount() {
-                    while (_sensor._list.Count < _sensor.BuffersCount) {
-                        _sensor._list.Add( _counter++);
-                    }
-                }
-
-                private void TestBufferNewFrame() {
-                    var idxLast = GetOldestIdx();
-                    var id = _sensor._list[idxLast];
-                    _sensor._list.RemoveAt(idxLast);
-                    _sensor._list.Insert(0, id);
-                    _validCount = Math.Min(++_validCount, _sensor.BuffersCount);
-                }
                 
                 public new void OnNewFrameBackground() {
-                    UpdateTestBuffersCount();
-                    TestBufferNewFrame();
+                    _lastBuffers.Clear();
+                    for (int i = 0; i < _sensor.BuffersValid; ++i) {
+                        _lastBuffers.Add(_sensor.Get(i).id);
+                    }
+                    
                     base.OnNewFrameBackground();
                 }
 
@@ -66,24 +49,25 @@ namespace Test.Editor {
                     if (_sensor.BuffersValid < 1) return;
                     
                     Debug.Log("========Validate buffers Queue========");
+                    PrintBuffers();
                     for (int i = 0; i < _sensor.BuffersValid; ++i) {
-                        var valNeed = _sensor._list[i];
                         var valTesting = _sensor.Get(i).id;
-                        Debug.Log(valNeed + "\t" + valTesting);
-                        Assert.AreEqual(valNeed, valTesting, $"wrong buffer at {i}");
-                    }
-                    Assert.AreEqual(_sensor._list[0], _sensor.GetNewest().id, "wrong newest");
-                    Assert.AreEqual(_sensor._list[GetOldestIdx()], _sensor.GetOldest().id, "wrong oldest");
-                }
+                        if (i > 0) {
+                            var valNeed = _lastBuffers[i - 1];
+                            Debug.Log(valNeed + "\t" + valTesting);
+                            Assert.AreEqual(valNeed, valTesting, $"wrong buffer at {i}");
+                        }
 
-                public void AssertBufferValidCount() {
-                    Assert.AreEqual(_validCount, _sensor.BuffersValid, "wrong valid buffers count");
+                        for (int j = i + 1; j < _sensor.BuffersValid; j++) {
+                            if (_sensor.Get(j).id == valTesting) 
+                                Assert.Fail($"buffers duplicates at {i} and {j} ");
+                        }
+                    }
                 }
 
                 public void PrintBuffers() {
                     Debug.Log($"Buffers count in use: {_sensor.BuffersCount}, first: {_sensor._first}");
                     Debug.Log("testing: " + string.Join(", ", _sensor._buffers.Select(b => b.id)));
-                    Debug.Log("control: " + string.Join(", ", _sensor._list));
                 }
             }
         }
@@ -135,9 +119,7 @@ namespace Test.Editor {
 
                 foreach (var bufferCount in bufferCounts) {
                     sensor.BuffersCount = bufferCount;
-                    intern.PrintBuffers();
                     for (int i = 0; i < iterations; ++i) {
-                        intern.AssertBufferValidCount();
                         intern.AssertBuffersQueue();
                         intern.OnNewFrameBackground();
                     }
