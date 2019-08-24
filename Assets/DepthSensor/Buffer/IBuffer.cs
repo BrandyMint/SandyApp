@@ -2,7 +2,7 @@ using System;
 
 namespace DepthSensor.Buffer {
     public interface IBuffer : IDisposable {
-        AbstractBuffer CreateSome();
+        T CreateSome<T>() where T : IBuffer;
         
         bool Lock(int milliseconds = -1);
 

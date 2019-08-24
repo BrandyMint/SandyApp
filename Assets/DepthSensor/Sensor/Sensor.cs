@@ -27,7 +27,7 @@ namespace DepthSensor.Sensor {
                 if (i < BuffersCount) {
                     newBuffers[newI] = Get(i);
                 } else {
-                    newBuffers[newI] = (T) GetNewest().CreateSome();
+                    newBuffers[newI] = GetNewest().CreateSome<T>();
                 }
             }
 

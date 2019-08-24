@@ -12,14 +12,14 @@ namespace DepthSensor.Buffer {
             this.data = data;
         }
 
-        public override AbstractBuffer CreateSome() {
-            return new ArrayBuffer<T>(data.Length);
-        }
-
         protected internal virtual void Set(T[] newData) {
             lock (SyncRoot) {
                 Array.Copy(newData, data, newData.Length);
             }
+        }
+
+        protected internal override object[] GetArgsForCreateSome() {
+            return new object[] {data.Length};
         }
 
         protected internal override void Set(IntPtr newData) {

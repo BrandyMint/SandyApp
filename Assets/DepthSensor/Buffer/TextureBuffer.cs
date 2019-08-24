@@ -11,8 +11,8 @@ namespace DepthSensor.Buffer {
             data = texture.GetRawTextureData<T>();
         }
 
-        public override AbstractBuffer CreateSome() {
-            return new TextureBuffer<T>(width, height, texture.format);
+        protected internal override object[] GetArgsForCreateSome() {
+            return new object[] {width, height, texture.format};
         }
 
         public override void Dispose() {

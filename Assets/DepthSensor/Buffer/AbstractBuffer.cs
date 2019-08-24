@@ -1,11 +1,21 @@
 using System;
+using System.Linq;
 using System.Threading;
+using UnityEngine.Assertions;
 
 namespace DepthSensor.Buffer {
     public abstract class AbstractBuffer : IBuffer {
         public readonly object SyncRoot = new object();
-        
-        public abstract AbstractBuffer CreateSome();
+
+        public T CreateSome<T>() where T : IBuffer {
+            var type = typeof(T);
+            var args = GetArgsForCreateSome();
+            var constructor = type.GetConstructor(args.Select(a => a.GetType()).ToArray());
+            Assert.IsNotNull(constructor, $"Cant find constructor for {type.Name}");
+            return (T) constructor.Invoke(args);
+        }
+
+        protected internal abstract object[] GetArgsForCreateSome();
 
         protected internal abstract void Set(IntPtr newData);
 

@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Threading;
 using System.Threading.Tasks;
 using BgConveyer;
 using DepthSensor;
@@ -52,6 +53,7 @@ namespace DepthSensorSandbox {
         private DepthBuffer _bufDepth;
         private MapDepthToCameraBuffer _bufMapToCamera;
 
+        private AutoResetEvent _evUnlock = new AutoResetEvent(false);
         private int _coveyerId = -1;
 
 #region Initializing
@@ -69,6 +71,7 @@ namespace DepthSensorSandbox {
         private void OnDestroy() {
             if (_dsm != null)
                 _dsm.OnInitialized -= OnDepthSensorAvailable;
+            RemoveConveyers();
             DisposeBuffer(ref _depthToColorBuffer);
         }
 
@@ -88,7 +91,7 @@ namespace DepthSensorSandbox {
             dev.Depth.BuffersCount = _BUFFERS_COUNT;
             
             ActivateSensorsIfNeed();
-            SetupConveyer(ConveyerUpdateBG(), ConveyerUpdateMain());
+            SetupConveyer(ConveyerUpdateBG(), ConveyerUpdateMain(), ConveyerBGUnlock());
         }
 
         private static DepthSensorDevice GetDeviceIfAvailable() {
@@ -119,14 +122,20 @@ namespace DepthSensorSandbox {
             }
         }
 
-        private void SetupConveyer(IEnumerator bg, IEnumerator main) {
-            if (_coveyerId >= 0)
-                _kinConv.RemoveTask(_coveyerId);
+        private void SetupConveyer(IEnumerator bg, IEnumerator main, IEnumerator bgUnlock) {
+            RemoveConveyers();
             
             var taskMainName = GetType().Name;
             var taskBGName = taskMainName + "BG";
-            _kinConv.AddToBG(taskBGName, null, bg);
+            var taskBGUnlock = taskBGName + "Unlock";
+            _coveyerId = _kinConv.AddToBG(taskBGName, null, bg);
             _kinConv.AddToMainThread(taskMainName, taskBGName, main);
+            _kinConv.AddToBG(taskBGUnlock, taskMainName, bgUnlock);
+        }
+
+        private void RemoveConveyers() {
+            if (_coveyerId >= 0)
+                _kinConv.RemoveTask(_coveyerId);
         }
         
         private bool CreateDepthToColorIfNeed(DepthBuffer depth) {
@@ -142,12 +151,16 @@ namespace DepthSensorSandbox {
             return true;
         }
 
-        private static void FlushTextureBuffer<T>(T buffer, Action<T> action, bool needUnlock = true) where  T : ITextureBuffer {
+        private static void FlushTextureBuffer<T>(T buffer, Action<T> action) where  T : ITextureBuffer {
             if (buffer != null) {
                 buffer.UpdateTexture();
                 action?.Invoke(buffer);
-                if (needUnlock)
-                    buffer.Unlock();
+            }
+        }
+
+        private static void UnlockBuffer<T>(T buffer) where T : IBuffer {
+            if (buffer != null) {
+                buffer.Unlock();
             }
         }
 #endregion
@@ -175,9 +188,19 @@ namespace DepthSensorSandbox {
                 FlushTextureBuffer(_bufColor, _onColor);
                 
                 if (CreateDepthToColorIfNeed(_bufDepth))
-                    FlushTextureBuffer(_depthToColorBuffer, _onDepthToColor, false);
+                    FlushTextureBuffer(_depthToColorBuffer, _onDepthToColor);
                 
                 FlushTextureBuffer(_bufDepth, InvokeOnNewFrame);
+                _evUnlock.Set();
+                yield return null;
+            }
+        }
+
+        private IEnumerator ConveyerBGUnlock() {
+            while (true) {
+                _evUnlock.WaitOne(200);
+                UnlockBuffer(_bufColor);
+                UnlockBuffer(_bufDepth);
                 yield return null;
             }
         }

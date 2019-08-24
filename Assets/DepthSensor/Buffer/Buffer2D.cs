@@ -27,8 +27,8 @@ namespace DepthSensor.Buffer {
                     : new NativeArray<T>(width * height, Allocator.Persistent);
         }
 
-        public override AbstractBuffer CreateSome() {
-            return new Buffer2D<T>(width, height, _wasAlloc);
+        protected internal override object[] GetArgsForCreateSome() {
+            return new object[] {width, height, _wasAlloc};
         }
 
         protected internal virtual void Set(T[] newData) {

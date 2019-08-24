@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using DepthSensor.Buffer;
@@ -11,12 +10,12 @@ namespace Test.Editor {
         private class TestBuffer : ArrayBuffer<int> {
             public static int Counter;
             
-            public readonly int id; 
+            public readonly int id;
 
-            public override AbstractBuffer CreateSome() {
-                return new TestBuffer();
+            protected override object[] GetArgsForCreateSome() {
+                return new object[] {};
             }
-            
+
             public TestBuffer() : this(Counter++, 0) {}
             private TestBuffer(int id, int len) : this(len) {
                 this.id = id;

@@ -8,6 +8,10 @@ namespace DepthSensor.Buffer {
 
     public class DepthBuffer : TextureBuffer<ushort> {
         public DepthBuffer(int width, int height) : base(width, height, TextureFormat.R16) { }
+
+        protected internal override object[] GetArgsForCreateSome() {
+            return new object[] {width, height};
+        }
     }
 
     public class IndexBuffer : Buffer2D<byte> {
@@ -17,5 +21,9 @@ namespace DepthSensor.Buffer {
 
     public class MapDepthToCameraBuffer : TextureBuffer<half2> {
         public MapDepthToCameraBuffer(int width, int height) : base(width, height, TextureFormat.RGHalf) { }
+        
+        protected internal override object[] GetArgsForCreateSome() {
+            return new object[] {width, height};
+        }
     }
 }
