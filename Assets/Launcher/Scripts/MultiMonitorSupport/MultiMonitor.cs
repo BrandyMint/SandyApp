@@ -42,9 +42,7 @@ namespace Launcher.MultiMonitorSupport {
 #endif            
             if (UseMultiMonitorFix()) {
                 if (GetMultiMonitorRect(out var multiRect)) {
-                    Debug.Log("Setting multi-display window rect: " + multiRect);
-                    Screen.SetResolution((int) multiRect.width, (int) multiRect.height, false);
-                    StartCoroutine(DoOnNextFrame(() => _systemApi.MoveMainWindow(multiRect)));
+                    StartCoroutine(ActivatingDisplays(multiRect));
                 }
             } else if (Display.displays.Length >= _useMonitors) {
                 for (int i = 0; i < Math.Min(Display.displays.Length, _useMonitors); ++i) {
@@ -58,9 +56,14 @@ namespace Launcher.MultiMonitorSupport {
             }
         }
 
-        private static IEnumerator DoOnNextFrame(Action act) {
+        private IEnumerator ActivatingDisplays(Rect multiRect) {
+            Debug.Log("Setting multi-display window rect: " + multiRect);
+            Screen.SetResolution((int) multiRect.width, (int) multiRect.height, false);
+#if !UNITY_STANDALONE_WIN
             yield return null;
-            act?.Invoke();
+#endif
+            _systemApi.MoveMainWindow(multiRect);
+            yield break;
         }
 
         private static void NotEnoughMonitors(int useMonitors) {
