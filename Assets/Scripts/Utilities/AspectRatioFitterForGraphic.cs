@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -15,9 +14,11 @@ namespace Utilities {
             aspectRatio = (float) tex.width / tex.height;
         }
 
+#if UNITY_EDITOR
         protected override void OnValidate() {
             UpdateFit();
             base.OnValidate();
         }
+#endif
     }
 }
