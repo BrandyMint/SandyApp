@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Threading;
 using DepthSensor;
 using DepthSensor.Sensor;
@@ -9,6 +10,7 @@ namespace BgConveyer {
         public const string TASK_NAME = "WaitNewFrame";  
         private DepthSensorManager _dsm;
         private readonly AutoResetEvent _newFrameEvent = new AutoResetEvent(false);
+        public event Action OnNoFrame;
 
         public DepthSensorConveyer() {
             AddToBG(TASK_NAME, null, SleepIfNeed());
@@ -41,7 +43,8 @@ namespace BgConveyer {
         
         private IEnumerator SleepIfNeed() {
             while (true) {
-                if (!_newFrameEvent.WaitOne(500)) {
+                if (!_newFrameEvent.WaitOne(300)) {
+                    OnNoFrame?.Invoke();
                     yield return new ToNewIteration();
                 } else {
                     /*watch.Reset();

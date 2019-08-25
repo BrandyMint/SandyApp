@@ -31,7 +31,8 @@ namespace DepthSensor.Device {
         private volatile bool _mapDepthToCameraUpdated;
         private readonly AutoResetEvent _frameArrivedEvent = new AutoResetEvent(false);
         private readonly AutoResetEvent _sensorActiveChangedEvent = new AutoResetEvent(false);
-        private readonly Thread _pollFrames;
+        private readonly Thread _reactivateSensors;
+        private readonly object _multiReaderSync = new object();
 
         public Kinect2Device() : base("Kinect2", Init()) {
             var init = (InitInfoKinect2) _initInfo;
@@ -40,11 +41,11 @@ namespace DepthSensor.Device {
             _bodyKinect = new Windows.Kinect.Body[Body.GetOldest().data.Length];
             if (!_kinect.IsOpen)
                 _kinect.Open();
-            _pollFrames = new Thread(PollFrames) {
+            _reactivateSensors = new Thread(ReactivateSensorsBGLoop) {
                 Name = GetType().Name
             };
             _kinect.CoordinateMapper.CoordinateMappingChanged += OnCoordinateMappingChanged;
-            _pollFrames.Start();
+            _reactivateSensors.Start();
         }
 
         private static InitInfo Init() {
@@ -89,7 +90,8 @@ namespace DepthSensor.Device {
 
         private void CloseSensors() {
             if (_multiReader != null) {
-                //_multiReader.Dispose();
+                _multiReader.MultiSourceFrameArrived -= PollFrames;
+                _multiReader.Dispose();
                 _multiReader = null;
             }
         }
@@ -103,86 +105,73 @@ namespace DepthSensor.Device {
                 (Index.Active ? FrameSourceTypes.BodyIndex : 0) | 
                 (Body.Active ? FrameSourceTypes.Body : 0) |
                 (Color.Active ? FrameSourceTypes.Color : 0));
+            _multiReader.MultiSourceFrameArrived += PollFrames;
         }
 
-        private void PollFrames() {
-            TimeSpan lastTime, currTime;
-            bool CheckTime(TimeSpan time) {
-                if (time <= lastTime) return false;
-                currTime = time;
-                return true;
-            }
-            try {
-                while (_pollFramesLoop) {
-                    if (_sensorActiveChangedEvent.WaitOne(0))
+        private void ReactivateSensorsBGLoop() {
+            while (_pollFramesLoop) {
+                if (_sensorActiveChangedEvent.WaitOne(100)) {
+                    lock (_multiReaderSync) {
+                        Thread.Sleep(100);
                         ReActivateSensors();
-                    if (_kinect != null && _multiReader != null) {
-                        MultiSourceFrame frame;
-                        var frameArrived = false;
-                        if (_multiReader != null && (frame = _multiReader.AcquireLatestFrame()) != null) {
-                            using (var body = frame.BodyFrameReference.AcquireFrame()) 
-                                if (!_multiReader.FrameSourceTypes.HasFlag(FrameSourceTypes.Body) || (body != null && CheckTime(body.RelativeTime)))
-                            using (var index = frame.BodyIndexFrameReference.AcquireFrame())
-                                if (!_multiReader.FrameSourceTypes.HasFlag(FrameSourceTypes.BodyIndex) || (index != null && CheckTime(index.RelativeTime)))
-                            using (var color = frame.ColorFrameReference.AcquireFrame())
-                                if (!_multiReader.FrameSourceTypes.HasFlag(FrameSourceTypes.Color) || (color != null && CheckTime(color.RelativeTime)))
-                            using (var depth = frame.DepthFrameReference.AcquireFrame())
-                                if (!_multiReader.FrameSourceTypes.HasFlag(FrameSourceTypes.Depth) || (depth != null && CheckTime(depth.RelativeTime)))
-                            {
-                                frameArrived = true;
-                                lastTime = currTime;
-                                
-                                if (body != null) {
-                                    UpdateBodies(body);
-                                    _internalBody.OnNewFrameBackground();
-                                }
-
-                                if (color != null) {
-                                    var buff = Color.GetOldest();
-                                    lock (buff.SyncRoot) {
-                                        color.CopyConvertedFrameDataToIntPtr(buff.data.IntPtr(),
-                                            (uint) buff.data.GetLengthInBytes(), _COLOR_FORMAT);
-                                    }
-                                    _internalColor.OnNewFrameBackground();
-                                }
-
-                                if (index != null) {
-                                    var buff = Index.GetOldest();
-                                    lock (buff.SyncRoot) {
-                                        index.CopyFrameDataToIntPtr(buff.data.IntPtr(),
-                                            (uint) buff.data.GetLengthInBytes());
-                                    }
-                                    _internalIndex.OnNewFrameBackground();
-                                }
-
-                                if (_needUpdateMapDepthToColorSpace ||
-                                    (MapDepthToCamera.Active && !IsMapDepthToCameraValid())) {
-                                    UpdateMapDepthToCamera();
-                                    _internalMapDepthToCamera.OnNewFrameBackground();
-                                }
-
-                                if (depth != null) {
-                                    var buff = Depth.GetOldest();
-                                    lock (buff.SyncRoot) {
-                                        depth.CopyFrameDataToIntPtr(buff.data.IntPtr(),
-                                            (uint) buff.data.GetLengthInBytes());
-                                    }
-                                    _internalDepth.OnNewFrameBackground();
-                                }
-
-                                _frameArrivedEvent.Set();
-                                Thread.Sleep(15);
-                            }
-                        }
                     }
-                    Thread.Sleep(1);
                 }
-            } catch (ThreadAbortException) {
-                Debug.Log(GetType().Name + ": Thread aborted");
-            } catch (Exception e) {
-                Debug.LogException(e);
             }
-            CloseSensors();
+        }
+
+        private void PollFrames(object sender, MultiSourceFrameArrivedEventArgs multiSourceFrame) {
+            if (!Monitor.TryEnter(_multiReaderSync, 0))
+                return;
+
+            var frame = multiSourceFrame.FrameReference.AcquireFrame();;
+            
+            if (frame != null) {
+                using (var body = frame.BodyFrameReference.AcquireFrame())
+                using (var index = frame.BodyIndexFrameReference.AcquireFrame())
+                using (var color = frame.ColorFrameReference.AcquireFrame())
+                using (var depth = frame.DepthFrameReference.AcquireFrame()) {
+                    if (body != null) {
+                        UpdateBodies(body);
+                        _internalBody.OnNewFrameBackground();
+                    }
+
+                    if (color != null) {
+                        var buff = Color.GetOldest();
+                        lock (buff.SyncRoot) {
+                            color.CopyConvertedFrameDataToIntPtr(buff.data.IntPtr(),
+                                (uint) buff.data.GetLengthInBytes(), _COLOR_FORMAT);
+                        }
+                        _internalColor.OnNewFrameBackground();
+                    }
+
+                    if (index != null) {
+                        var buff = Index.GetOldest();
+                        lock (buff.SyncRoot) {
+                            index.CopyFrameDataToIntPtr(buff.data.IntPtr(),
+                                (uint) buff.data.GetLengthInBytes());
+                        }
+                        _internalIndex.OnNewFrameBackground();
+                    }
+
+                    if (_needUpdateMapDepthToColorSpace ||
+                        (MapDepthToCamera.Active && !IsMapDepthToCameraValid())) {
+                        UpdateMapDepthToCamera();
+                        _internalMapDepthToCamera.OnNewFrameBackground();
+                    }
+
+                    if (depth != null) {
+                        var buff = Depth.GetOldest();
+                        lock (buff.SyncRoot) {
+                            depth.CopyFrameDataToIntPtr(buff.data.IntPtr(),
+                                (uint) buff.data.GetLengthInBytes());
+                        }
+                        _internalDepth.OnNewFrameBackground();
+                    }
+
+                    _frameArrivedEvent.Set();
+                }
+            }
+            Monitor.Exit(_multiReaderSync);
         }
 
         private void UpdateBodies(BodyFrame frame) {
@@ -237,11 +226,13 @@ namespace DepthSensor.Device {
 
         protected override void Close() {
             _pollFramesLoop = false;
-            if (_pollFrames != null && _pollFrames.IsAlive && !_pollFrames.Join(5000))
-                _pollFrames.Abort();
+            if (_reactivateSensors != null && _reactivateSensors.IsAlive && !_reactivateSensors.Join(5000))
+                _reactivateSensors.Abort();
+            lock (_multiReaderSync) {
+                CloseSensors();
+            }
             Close(ref _kinect);
             _frameArrivedEvent.Dispose();
-            _sensorActiveChangedEvent.Dispose();
             base.Close();
         }
 

@@ -22,20 +22,20 @@ namespace DepthSensorSandbox {
         } 
         
         public static event Action<DepthBuffer, MapDepthToCameraBuffer> OnDepthDataBackground {
-            add { _onDepthDataBackground += value; ActivateSensorsIfNeed(); }
-            remove { _onDepthDataBackground -= value; ActivateSensorsIfNeed(); }
+            add { _onDepthDataBackground += value; ActivateSensors(); }
+            remove { _onDepthDataBackground -= value; ActivateSensors(); }
         }
         public static event Action<ColorBuffer> OnColor {
-            add { _onColor += value; ActivateSensorsIfNeed(); }
-            remove { _onColor -= value; ActivateSensorsIfNeed(); }
+            add { _onColor += value; ActivateSensors(); }
+            remove { _onColor -= value; ActivateSensors(); }
         }
         public static event Action<DepthToColorBuffer> OnDepthToColor {
-            add { _onDepthToColor += value; ActivateSensorsIfNeed(); }
-            remove { _onDepthToColor -= value; ActivateSensorsIfNeed(); }
+            add { _onDepthToColor += value; ActivateSensors(); }
+            remove { _onDepthToColor -= value; ActivateSensors(); }
         }
         public static event Action<DepthBuffer, MapDepthToCameraBuffer> OnNewFrame {
-            add { _onNewFrame += value; ActivateSensorsIfNeed(); }
-            remove { _onNewFrame -= value; ActivateSensorsIfNeed(); }
+            add { _onNewFrame += value; ActivateSensors(); }
+            remove { _onNewFrame -= value; ActivateSensors(); }
         }
 
         public static DepthSensorSandboxProcessor Instance { get; private set; }
@@ -44,8 +44,9 @@ namespace DepthSensorSandbox {
         private static event Action<ColorBuffer> _onColor;
         private static event Action<DepthToColorBuffer> _onDepthToColor;
         private static event Action<DepthBuffer, MapDepthToCameraBuffer> _onNewFrame;
+        private static volatile bool _needActivateSensors;
 
-        private DepthSensorConveyer _kinConv;
+        private DepthSensorConveyer _conveyer;
         private DepthSensorManager _dsm;
         private DepthToColorBuffer _depthToColorBuffer;
 
@@ -62,13 +63,16 @@ namespace DepthSensorSandbox {
         }
 
         private void Start() {
-            _kinConv = gameObject.AddComponent<DepthSensorConveyer>();
+            _conveyer = gameObject.AddComponent<DepthSensorConveyer>();
+            _conveyer.OnNoFrame += ActivateSensorsIfNeed;
             _dsm = DepthSensorManager.Instance;
             if (_dsm != null)
                 _dsm.OnInitialized += OnDepthSensorAvailable;
         }
 
         private void OnDestroy() {
+            if (_conveyer != null)
+                _conveyer.OnNoFrame -= ActivateSensorsIfNeed;
             if (_dsm != null)
                 _dsm.OnInitialized -= OnDepthSensorAvailable;
             RemoveConveyers();
@@ -90,7 +94,6 @@ namespace DepthSensorSandbox {
             dev.Color.BuffersCount = _BUFFERS_COUNT;
             dev.Depth.BuffersCount = _BUFFERS_COUNT;
             
-            ActivateSensorsIfNeed();
             SetupConveyer(ConveyerUpdateBG(), ConveyerUpdateMain(), ConveyerBGUnlock());
         }
 
@@ -101,15 +104,23 @@ namespace DepthSensorSandbox {
             }
             return null;
         }
+
+        private static void ActivateSensors() {
+            _needActivateSensors = true;
+        }
         
         private static void ActivateSensorsIfNeed() {
+            if (!_needActivateSensors)
+                return;
+
             var device = GetDeviceIfAvailable();
             if (device != null) {
                 var activeColor = _onColor != null || _onDepthToColor != null;
-                ActivateSensorsIfNeed(device.Color, ref Instance._bufColor, activeColor);
                 var activeDepth = _onNewFrame != null || _onDepthDataBackground != null || _onDepthToColor != null;
-                ActivateSensorsIfNeed(device.Depth, ref Instance._bufDepth, activeDepth);
                 var activeMap = _onNewFrame != null || _onDepthDataBackground != null;
+                _needActivateSensors = false;
+                ActivateSensorsIfNeed(device.Color, ref Instance._bufColor, activeColor);
+                ActivateSensorsIfNeed(device.Depth, ref Instance._bufDepth, activeDepth);
                 ActivateSensorsIfNeed(device.MapDepthToCamera, ref Instance._bufMapToCamera, activeMap);
             }
         }
@@ -128,14 +139,14 @@ namespace DepthSensorSandbox {
             var taskMainName = GetType().Name;
             var taskBGName = taskMainName + "BG";
             var taskBGUnlock = taskBGName + "Unlock";
-            _coveyerId = _kinConv.AddToBG(taskBGName, null, bg);
-            _kinConv.AddToMainThread(taskMainName, taskBGName, main);
-            _kinConv.AddToBG(taskBGUnlock, taskMainName, bgUnlock);
+            _coveyerId = _conveyer.AddToBG(taskBGName, null, bg);
+            _conveyer.AddToMainThread(taskMainName, taskBGName, main);
+            _conveyer.AddToBG(taskBGUnlock, taskMainName, bgUnlock);
         }
 
         private void RemoveConveyers() {
             if (_coveyerId >= 0)
-                _kinConv.RemoveTask(_coveyerId);
+                _conveyer.RemoveTask(_coveyerId);
         }
         
         private bool CreateDepthToColorIfNeed(DepthBuffer depth) {
@@ -201,6 +212,7 @@ namespace DepthSensorSandbox {
                 _evUnlock.WaitOne(200);
                 UnlockBuffer(_bufColor);
                 UnlockBuffer(_bufDepth);
+                ActivateSensorsIfNeed();
                 yield return null;
             }
         }
