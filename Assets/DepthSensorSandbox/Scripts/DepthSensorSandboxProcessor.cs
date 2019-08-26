@@ -17,8 +17,8 @@ namespace DepthSensorSandbox {
         public const ushort _BAD_HOLE_FIX = 5000;
         public const int  _BUFFERS_COUNT = 3;
         
-        public class DepthToColorBuffer : TextureBuffer<half2> {
-            public DepthToColorBuffer(int width, int height) : base(width, height, TextureFormat.RGHalf) { }
+        public class DepthToColorBuffer : TextureBuffer<Vector2> {
+            public DepthToColorBuffer(int width, int height) : base(width, height, TextureFormat.RGFloat) { }
         } 
         
         public static event Action<DepthBuffer, MapDepthToCameraBuffer> OnDepthDataBackground {
@@ -161,19 +161,6 @@ namespace DepthSensorSandbox {
             }
             return true;
         }
-
-        private static void FlushTextureBuffer<T>(T buffer, Action<T> action) where  T : ITextureBuffer {
-            if (buffer != null) {
-                buffer.UpdateTexture();
-                action?.Invoke(buffer);
-            }
-        }
-
-        private static void UnlockBuffer<T>(T buffer) where T : IBuffer {
-            if (buffer != null) {
-                buffer.Unlock();
-            }
-        }
 #endregion
 
 #region Conveyer
@@ -189,7 +176,7 @@ namespace DepthSensorSandbox {
                 FixDepthHoles(_bufDepth);
                 _onDepthDataBackground?.Invoke(_bufDepth, _bufMapToCamera);
                 if (_onDepthToColor != null)
-                    UpdateDepthToColor(_bufDepth.data);
+                    UpdateDepthToColor(_bufDepth);
                 yield return null;
             }
         }
@@ -227,6 +214,24 @@ namespace DepthSensorSandbox {
             _onNewFrame?.Invoke(buff, _bufMapToCamera);
         }
 
+        private void UpdateDepthToColor(DepthBuffer depth) {
+            if (_depthToColorBuffer == null || _depthToColorBuffer.data.Length != depth.data.Length)
+                return;
+            _dsm.Device.DepthMapToColorMap(depth.data, _depthToColorBuffer.data);
+        }
+
+        private static void FlushTextureBuffer<T>(T buffer, Action<T> action) where  T : ITextureBuffer {
+            if (buffer != null) {
+                buffer.UpdateTexture();
+                action?.Invoke(buffer);
+            }
+        }
+
+        private static void UnlockBuffer<T>(T buffer) where T : IBuffer {
+            if (buffer != null) {
+                buffer.Unlock();
+            }
+        }
 #endregion
 
 #region Processing
@@ -315,16 +320,6 @@ namespace DepthSensorSandbox {
             if (v3 != _INVALID_DEPTH)
                 return v3;
             return _BAD_HOLE_FIX;
-        }
-
-        private void UpdateDepthToColor(NativeArray<ushort> depth) {
-            if (_depthToColorBuffer == null || _depthToColorBuffer.data.Length != depth.Length)
-                return;
-            Parallel.For(0, depth.Length, i => {
-                var p = _depthToColorBuffer.GetXYFrom(i);
-                var d = new half2(_dsm.Device.DepthMapPosToColorMapPos(p, depth[i]));
-                _depthToColorBuffer.data[i] = d;
-            });
         }
 #endregion
     }

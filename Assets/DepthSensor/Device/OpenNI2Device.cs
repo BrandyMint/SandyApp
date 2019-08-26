@@ -14,6 +14,7 @@ using DepthSensor.Buffer;
 using DepthSensor.Sensor;
 using UnityEngine;
 using OpenNIWrapper;
+using Unity.Collections;
 
 namespace DepthSensor.Device {
     public class OpenNI2Device : DepthSensorDevice {
@@ -349,8 +350,16 @@ namespace DepthSensor.Device {
             
             return new Vector2(vx, vy);
         }
+        
+        public override void DepthMapToColorMap(NativeArray<ushort> depth, NativeArray<Vector2> color) {
+            var buf = Depth.GetOldest();
+            Parallel.For(0, depth.Length, i => {
+                var p = buf.GetXYFrom(i);
+                color[i] = DepthMapPosToColorMapPos(p, depth[i]);
+            });
+        }
 
-        public Vector3 DepthMapPosToCameraPos(Vector2 pos, ushort depth) {
+        private Vector3 DepthMapPosToCameraPos(Vector2 pos, ushort depth) {
             Vector3 v = Vector3.zero;
             if (_niDepth.stream != null)
                 CoordinateConverter.ConvertDepthToWorld(

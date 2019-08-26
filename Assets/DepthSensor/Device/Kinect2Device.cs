@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Windows.Kinect;
 using DepthSensor.Buffer;
 using DepthSensor.Sensor;
+using Unity.Collections;
 using UnityEngine;
 using Body = DepthSensor.Buffer.Body;
 using Joint = DepthSensor.Buffer.Joint;
@@ -79,7 +80,7 @@ namespace DepthSensor.Device {
         }
 
         public override bool IsAvailable() {
-            return _kinect.IsAvailable;
+            return _kinect != null && _kinect.IsAvailable;
         }
 
         protected override void SensorActiveChanged(AbstractSensor sensor) {
@@ -136,19 +137,20 @@ namespace DepthSensor.Device {
                     }
 
                     if (color != null) {
-                        var buff = Color.GetOldest();
-                        lock (buff.SyncRoot) {
-                            color.CopyConvertedFrameDataToIntPtr(buff.data.IntPtr(),
-                                (uint) buff.data.GetLengthInBytes(), _COLOR_FORMAT);
+                        using (var raw = color.LockRawImageBuffer()) {
+                            //Color.GetOldest().SetBytes(raw.UnderlyingBuffer, raw.Length);
+                            var buff = Color.GetOldest();
+                            lock (buff.SyncRoot) {
+                                color.CopyConvertedFrameDataToIntPtr(buff.data.IntPtr(),
+                                    (uint) buff.data.GetLengthInBytes(), _COLOR_FORMAT);
+                            }
                         }
                         _internalColor.OnNewFrameBackground();
                     }
 
                     if (index != null) {
-                        var buff = Index.GetOldest();
-                        lock (buff.SyncRoot) {
-                            index.CopyFrameDataToIntPtr(buff.data.IntPtr(),
-                                (uint) buff.data.GetLengthInBytes());
+                        using (var buffer = index.LockImageBuffer()) {
+                            Index.GetOldest().SetBytes(buffer.UnderlyingBuffer, buffer.Length);
                         }
                         _internalIndex.OnNewFrameBackground();
                     }
@@ -160,10 +162,8 @@ namespace DepthSensor.Device {
                     }
 
                     if (depth != null) {
-                        var buff = Depth.GetOldest();
-                        lock (buff.SyncRoot) {
-                            depth.CopyFrameDataToIntPtr(buff.data.IntPtr(),
-                                (uint) buff.data.GetLengthInBytes());
+                        using (var buffer = depth.LockImageBuffer()) {
+                            Depth.GetOldest().SetBytes(buffer.UnderlyingBuffer, buffer.Length);
                         }
                         _internalDepth.OnNewFrameBackground();
                     }
@@ -261,6 +261,13 @@ namespace DepthSensor.Device {
             if (_kinect == null) return Vector2.zero;
             return ToVector2(_kinect.CoordinateMapper.
                 MapDepthPointToColorSpace(ToDepthPoint(pos), depth));
+        }
+
+        public override void DepthMapToColorMap(NativeArray<ushort> depth, NativeArray<Vector2> color) {
+            if (_kinect == null) return;
+            _kinect.CoordinateMapper.MapDepthFrameToColorSpaceUsingIntPtr(
+                depth.IntPtr(), depth.Length * sizeof(ushort),
+                color.IntPtr(), (uint) color.Length);
         }
 
         private void UpdateMapDepthToCamera() {

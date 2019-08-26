@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using DepthSensor.Sensor;
+using Unity.Collections;
 using UnityEngine;
 
 namespace DepthSensor.Device {
@@ -55,6 +56,7 @@ namespace DepthSensor.Device {
         public abstract Vector2 CameraPosToDepthMapPos(Vector3 pos);
         public abstract Vector2 CameraPosToColorMapPos(Vector3 pos);
         public abstract Vector2 DepthMapPosToColorMapPos(Vector2 pos, ushort depth);
+        public abstract void DepthMapToColorMap(NativeArray<ushort> depth, NativeArray<Vector2> color);
 
         protected abstract void SensorActiveChanged(AbstractSensor sensor);
         protected abstract IEnumerator Update();
