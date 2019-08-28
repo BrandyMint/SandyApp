@@ -5,6 +5,7 @@ using OpenCvSharp;
 using OpenCvSharp.Flann;
 using Unity.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 using Utilities;
 
 namespace DepthSensorCalibration {
@@ -40,7 +41,7 @@ namespace DepthSensorCalibration {
             _visualizeMat?.DisposeManual();
         }
 
-        public void PrepareDetect() {
+        private void PrepareDetect() {
             var isDetectorChanged = true;
             if (_detector == null) {
                 _detector = ORB.Create(_featuresCount);
@@ -126,6 +127,16 @@ namespace DepthSensorCalibration {
                 return false;
             }
             return true;
+        }
+
+        public void VisualizeDetection(RawImage img, Color detectedColor) {
+            Texture2D visTex = null;
+            if (img.texture != null)
+                visTex = (Texture2D) img.texture; 
+            if (TexturesHelper.ReCreateIfNeed(ref visTex, _matFrame.Width, _matFrame.Height, TextureFormat.RGB24)) {
+                img.texture = visTex;
+            }
+            VisualizeDetection(visTex, detectedColor);
         }
 
         public void VisualizeDetection(Texture2D imgVisualize, Color detectedColor) {

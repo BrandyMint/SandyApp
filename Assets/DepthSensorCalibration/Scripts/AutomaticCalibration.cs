@@ -136,13 +136,6 @@ namespace DepthSensorCalibration {
         }
 
         private void OnNewFrame(RenderTexture frame) {
-            Texture2D visTex = null;
-            if (_imgVisualize.texture != null)
-                visTex = (Texture2D) _imgVisualize.texture; 
-            if (TexturesHelper.ReCreateIfNeed(ref visTex, frame.width, frame.height, TextureFormat.RGB24)) {
-                _imgVisualize.texture = visTex;
-            }
-            
             if (_maySetFrame) {
                 _maySetFrame = false;
                 _imageTracker.SetFrame(frame);
@@ -151,7 +144,7 @@ namespace DepthSensorCalibration {
 
         private void OnFramePrepared() {
             _frameReady = true;
-            _imageTracker.VisualizeDetection((Texture2D)_imgVisualize.texture, _colorDetected);
+            _imageTracker.VisualizeDetection(_imgVisualize, _colorDetected);
             _maySetFrame = true;
         }
 
