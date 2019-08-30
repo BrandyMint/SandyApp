@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using DepthSensorSandbox;
+using DepthSensorSandbox.Visualisation;
 using Unity.Collections;
 using UnityEngine;
 using UnityEngine.UI;

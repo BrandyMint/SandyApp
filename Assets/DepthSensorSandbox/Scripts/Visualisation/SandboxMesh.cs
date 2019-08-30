@@ -3,7 +3,7 @@ using DepthSensor.Buffer;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace DepthSensorSandbox {
+namespace DepthSensorSandbox.Visualisation {
     [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
     public class SandboxMesh : MonoBehaviour {
         private const string _CALC_DEPTH = "CALC_DEPTH";

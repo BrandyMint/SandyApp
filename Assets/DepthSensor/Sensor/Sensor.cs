@@ -1,11 +1,14 @@
 using System;
 using DepthSensor.Buffer;
+using UnityEngine;
 using UnityEngine.Assertions;
 
 namespace DepthSensor.Sensor {
     public class Sensor<T> : AbstractSensor where T : AbstractBuffer {
         protected T[] _buffers;
         protected int _first;
+        
+        private T[] _buffersCacheForExternalUse;
 
         public Sensor(T buffer) {
             _buffersCount = 1;
@@ -52,6 +55,19 @@ namespace DepthSensor.Sensor {
             var buffer = GetNewest();
             buffer.Lock();
             return buffer;
+        }
+
+        public T[] GetFreeBuffersAndLock() {
+            var len = Mathf.Min(BuffersValid, BuffersCount - 1);
+            if (_buffersCacheForExternalUse == null || _buffersCacheForExternalUse.Length != len)
+                _buffersCacheForExternalUse = new T[len];
+            for (int i = 0; i < len; ++i) {
+                var b = Get(i);
+                b.Lock();
+                _buffersCacheForExternalUse[i] = b;
+            }
+
+            return _buffersCacheForExternalUse;
         }
 
         private static int GetIdx(int i, int first, int len) {

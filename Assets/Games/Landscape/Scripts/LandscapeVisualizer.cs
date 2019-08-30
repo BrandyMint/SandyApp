@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using DepthSensorSandbox;
+using DepthSensorSandbox.Visualisation;
 using UnityEngine;
 
 namespace Games.Landscape {

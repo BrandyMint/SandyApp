@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace DepthSensorSandbox {
+namespace DepthSensorSandbox.Visualisation {
     [RequireComponent(typeof(SandboxMesh))]
     public class SandboxVisualizerBase : MonoBehaviour {
         private static readonly int _DEPTH_ZERO = Shader.PropertyToID("_DepthZero");

@@ -1,7 +1,7 @@
 using DepthSensor.Buffer;
 using UnityEngine;
 
-namespace DepthSensorSandbox {
+namespace DepthSensorSandbox.Visualisation {
     [RequireComponent(typeof(SandboxMesh))]
     public class SandboxVisualizerColor : SandboxVisualizerBase {
         private static readonly int _DEPTH_TO_COLOR_TEX = Shader.PropertyToID("_DepthToColorTex");

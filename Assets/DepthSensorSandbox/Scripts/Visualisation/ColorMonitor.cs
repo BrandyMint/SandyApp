@@ -3,7 +3,7 @@ using DepthSensor.Buffer;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace DepthSensorSandbox {
+namespace DepthSensorSandbox.Visualisation {
     [RequireComponent(typeof(RawImage), typeof(AspectRatioFitter))]
     public class ColorMonitor : MonoBehaviour {
         private AspectRatioFitter _aspect;

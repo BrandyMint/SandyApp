@@ -1,7 +1,6 @@
-using System;
 using UnityEngine;
 
-namespace DepthSensorSandbox {
+namespace DepthSensorSandbox.Visualisation {
     [RequireComponent(typeof(Camera))]
     public class SandboxCamera : MonoBehaviour {
         private Camera _cam;

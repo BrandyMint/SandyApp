@@ -1,4 +1,4 @@
-﻿namespace DepthSensorSandbox {
+namespace DepthSensorSandbox.Processing {
     public class ArrayIntQueue {
         private int[] a;
         private int start;
