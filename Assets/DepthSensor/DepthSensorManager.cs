@@ -4,7 +4,6 @@
 
 using System;
 using System.Collections;
-using System.Reflection;
 using DepthSensor.Device;
 using UnityEngine;
 
@@ -45,17 +44,13 @@ namespace DepthSensor {
 		}
 
 		private IEnumerator TryInit() {
-			/*if (_emulate) {
-				CreateDevice<EmulatedKinectDevice>();
-			} else {*/
-				foreach (var typeSensor in _TRYING_INIT_QUEUE) {
-					if (CreateDeviceFromType(typeSensor)) {
-						var maxWait = Time.realtimeSinceStartup + _WAIT_AVAILABLE;
-						yield return new WaitUntil(() => IsInitialized() || Time.realtimeSinceStartup > maxWait);
-						if (IsInitialized()) break;
-					}
+			foreach (var typeSensor in _TRYING_INIT_QUEUE) {
+				if (CreateDeviceFromType(typeSensor)) {
+					var maxWait = Time.realtimeSinceStartup + _WAIT_AVAILABLE;
+					yield return new WaitUntil(() => IsInitialized() || Time.realtimeSinceStartup > maxWait);
+					if (IsInitialized()) break;
 				}
-			/*}*/
+			}
 			
 			if (IsInitialized())
 				Initialized();
@@ -64,15 +59,9 @@ namespace DepthSensor {
 		}
 
 		private bool CreateDeviceFromType(Type type) {
-			var methodCreate = GetType().GetMethod("CreateDevice", BindingFlags.NonPublic | BindingFlags.Instance);
-			var genericMethod = methodCreate.MakeGenericMethod(type);
-			return (bool) genericMethod.Invoke(this, null);
-		}
-		
-		private bool CreateDevice<T>() where T : DepthSensorDevice, new() {
 			try {
-				Debug.Log("Initializing " + typeof(T).Name);
-				Device = new T();
+				Debug.Log("Initializing " + type.Name);
+				Device = (DepthSensorDevice) Activator.CreateInstance(type);
 				_internalDevice = new DepthSensorDevice.Internal(Device);
 				return true;
 			} catch (EntryPointNotFoundException e) {
