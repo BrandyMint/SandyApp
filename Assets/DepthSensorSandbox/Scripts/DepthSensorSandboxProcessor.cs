@@ -206,7 +206,7 @@ namespace DepthSensorSandbox {
         
         private static void OnUpdateMapDepthToCamera(AbstractSensor abstractSensor) {
             var sensor = (SensorMapDepthToCamera) abstractSensor;
-            var buffer = sensor.GetNewestAndLock();
+            var buffer = sensor.GetNewest();
             FlushTextureBuffer(buffer, null);
         }
 
