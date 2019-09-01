@@ -376,7 +376,7 @@ namespace DepthSensor.Device {
             lock (buffer.SyncRoot) {
                 Parallel.For(0, buffer.data.Length, i => {
                     var p = DepthMapPosToCameraPos(buffer.GetXYFrom(i), _DEPTH_MUL);
-                    buffer.data[i] = new half2(new float2(p.x, p.y));
+                    buffer.data[i] = new half2((half) p.x, (half) p.y);
                 });
             }
             _needUpdateMapDepthToColorSpace = false;

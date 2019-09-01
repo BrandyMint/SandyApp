@@ -1,4 +1,5 @@
 using DepthSensor.Buffer;
+using UnityEngine;
 
 namespace DepthSensorSandbox.Processing {
     public abstract class ProcessingBase {
@@ -28,6 +29,10 @@ namespace DepthSensorSandbox.Processing {
                 || y < 0 || y >= depth.height)
                 return INVALID_DEPTH;
             return depth.data[depth.GetIFrom(x, y)];
+        }
+
+        protected static ushort SafeGet(DepthBuffer depth, Vector2Int xy) {
+            return SafeGet(depth, xy.x, xy.y);
         }
     }
 }

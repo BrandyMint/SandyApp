@@ -91,5 +91,61 @@ namespace Utilities {
         public static Vector3 Mul(Vector3 p1, Vector3 p2) {
             return new Vector3(p1.x * p2.x, p1.y * p2.y, p1.z * p2.z);
         }
+
+        public static ushort GetMedian(ushort[] a) {
+            var n = a.Length;
+            int low, high;
+            int median;
+            int middle, ll, hh;
+
+            low = 0; high = n-1; median = (low + high) / 2;
+            for (;;) {
+                if (high <= low) /* One element only */
+                    return a[median];
+
+                if (high == low + 1) {  /* Two elements only */
+                    if (a[low] > a[high])
+                        ElemSwap(a, low, high);
+                    return a[median];
+                }
+
+                /* Find median of low, middle and high items; swap into position low */
+                middle = (low + high) / 2;
+                if (a[middle] > a[high])    ElemSwap(a, middle, high);
+                if (a[low] > a[high])       ElemSwap(a, low, high);
+                if (a[middle] > a[low])     ElemSwap(a, middle, low);
+
+                /* Swap low item (now in position middle) into position (low+1) */
+                ElemSwap(a, middle, low + 1);
+
+                /* Nibble from each end towards middle, swapping items when stuck */
+                ll = low + 1;
+                hh = high;
+                for (;;) {
+                    do ll++; while (a[low] > a[ll]);
+                    do hh--; while (a[hh] > a[low]);
+
+                    if (hh < ll)
+                        break;
+
+                    ElemSwap(a, ll, hh);
+                }
+
+                /* Swap middle item (in position low) back into correct position */
+                ElemSwap(a, low, hh);
+
+                /* Re-set active partition */
+                if (hh <= median)
+                    low = ll;
+                if (hh >= median)
+                    high = hh - 1;
+            }
+        }
+
+        private static void ElemSwap<T>(T[] a, int i, int j) {
+            var t = a[i];
+            a[i] = a[j];
+            a[j] = t;
+        }
     }
 }

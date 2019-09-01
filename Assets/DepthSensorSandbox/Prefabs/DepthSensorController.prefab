@@ -44,7 +44,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c57283669a6147558ead66ea44dca13, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _emulate: 0
 --- !u!114 &4689643101899965791
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -57,3 +56,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 79186ed3944074147b24e08ba940e87d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _buffersCount: 3

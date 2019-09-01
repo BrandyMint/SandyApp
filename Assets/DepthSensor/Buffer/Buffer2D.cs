@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Unity.Collections;
 using UnityEngine;
 
@@ -29,6 +30,20 @@ namespace DepthSensor.Buffer {
 
         protected internal override object[] GetArgsForCreateSome() {
             return new object[] {width, height, _wasAlloc};
+        }
+        
+        public override T1 Copy<T1>() {
+            var copy = CreateSome<T1>();
+            var buff = copy as Buffer2D<T>;
+            data.CopyTo(buff.data);
+            return copy;
+        }
+
+        public override void Clear() {
+            lock (SyncRoot) {
+                var val = default(T);
+                Parallel.For(0, data.Length, i => { data[i] = val; });
+            }
         }
 
         protected internal virtual void Set(T[] newData) {
@@ -61,6 +76,13 @@ namespace DepthSensor.Buffer {
 
         public Vector2 GetXYFrom(int i) {
             return new Vector2(
+                i % width,
+                i / width
+            );
+        }
+        
+        public Vector2Int GetXYiFrom(int i) {
+            return new Vector2Int(
                 i % width,
                 i / width
             );

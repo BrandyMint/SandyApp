@@ -44,6 +44,7 @@ namespace DepthSensorSandbox {
         public static DepthSensorSandboxProcessor Instance { get; private set; }
 
         public readonly FixHolesProcessing FixHoles = new FixHolesProcessing();
+        public readonly NoiseFilterProcessing NoiseFilter = new NoiseFilterProcessing();
 
         private static event Action<DepthBuffer, MapDepthToCameraBuffer> _onDepthDataBackground;
         private static event Action<ColorBuffer> _onColor;
@@ -67,6 +68,7 @@ namespace DepthSensorSandbox {
 
         private DepthSensorSandboxProcessor() {
             _processings = new ProcessingBase[] {
+                NoiseFilter,
                 FixHoles
             };
         }
@@ -146,11 +148,11 @@ namespace DepthSensorSandbox {
         }
 
         private static void ActivateSensorIfNeed<T>(AbstractSensor sensor, ref T buffer, bool activate) where T: AbstractBuffer {
-            sensor.Active = activate;
             if (!activate && buffer != null) {
                 buffer.SafeUnlock();
-                buffer = null;
+                //buffer = null;
             }
+            sensor.Active = activate;
         }
 
         private void SetupConveyer(IEnumerator bg, IEnumerator main/*, IEnumerator bgUnlock*/) {
@@ -280,10 +282,10 @@ namespace DepthSensorSandbox {
 #if UNITY_EDITOR
 
         private void OnValidate() {
-            /*var dev = GetDeviceIfAvailable();
+            var dev = GetDeviceIfAvailable();
             if (dev != null && dev.Depth.BuffersCount != BuffersCount) {
                 UpdateBuffersCount(BuffersCount);
-            }*/
+            }
         }
 #endif
     }
