@@ -50,7 +50,7 @@ namespace DepthSensor.Device {
         }
 
         private static InitInfo Init() {
-            var init = new InitInfoKinect2();;
+            var init = new InitInfoKinect2();
             
             try {
                 init.kinect = KinectSensor.GetDefault();
