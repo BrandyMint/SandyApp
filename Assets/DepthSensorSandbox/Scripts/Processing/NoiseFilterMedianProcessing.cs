@@ -16,18 +16,14 @@ namespace DepthSensorSandbox.Processing {
         }
 
         private readonly List<ParallelLocalState> _stateCaches = new List<ParallelLocalState>();
-        private DepthBuffer[] _rawBuffers;
-        private DepthBuffer _inOut;
         private readonly Vector2Int[] _neighbors = {
             new Vector2Int(-1, 0), new Vector2Int(0, 1), new Vector2Int(1, 0), new Vector2Int(0, -1),
             new Vector2Int(-1, 1), new Vector2Int(1, 1), new Vector2Int(1, -1), new Vector2Int(-1, -1),
             /*new Vector2Int(-2, 0), new Vector2Int(0, 2), new Vector2Int(2, 0), new Vector2Int(0, -2),*/
         };
         
-        protected override void ProcessInternal(DepthBuffer[] rawBuffers, DepthBuffer inOut) {
-            _rawBuffers = rawBuffers;
-            _inOut = inOut;
-            Parallel.For(0, inOut.data.Length,
+        protected override void ProcessInternal() {
+            Parallel.For(0, _inOut.data.Length,
                 InitLocalState,
                 FilterBody,
                 FinallyLocalState

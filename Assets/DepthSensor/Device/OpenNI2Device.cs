@@ -350,13 +350,20 @@ namespace DepthSensor.Device {
             
             return new Vector2(vx, vy);
         }
-        
+
+        private DepthBuffer _parBuf;
+        private NativeArray<ushort> _parDepth;
+        private NativeArray<Vector2> _parColor;
         public override void DepthMapToColorMap(NativeArray<ushort> depth, NativeArray<Vector2> color) {
-            var buf = Depth.GetOldest();
-            Parallel.For(0, depth.Length, i => {
-                var p = buf.GetXYFrom(i);
-                color[i] = DepthMapPosToColorMapPos(p, depth[i]);
-            });
+            _parBuf = Depth.GetOldest();
+            _parDepth = depth;
+            _parColor = color;
+            Parallel.For(0, depth.Length, DepthMapToColorMapBody);
+        }
+
+        private void DepthMapToColorMapBody(int i) {
+            var p = _parBuf.GetXYFrom(i);
+            _parColor[i] = DepthMapPosToColorMapPos(p, _parDepth[i]);
         }
 
         private Vector3 DepthMapPosToCameraPos(Vector2 pos, ushort depth) {
@@ -371,16 +378,19 @@ namespace DepthSensor.Device {
             return v / _DEPTH_MUL;
         }
 
+        private MapDepthToCameraBuffer _parMap;
         private void UpdateMapDepthToCamera() {
-            var buffer = MapDepthToCamera.GetOldest();
-            lock (buffer.SyncRoot) {
-                Parallel.For(0, buffer.data.Length, i => {
-                    var p = DepthMapPosToCameraPos(buffer.GetXYFrom(i), _DEPTH_MUL);
-                    buffer.data[i] = new half2((half) p.x, (half) p.y);
-                });
+            _parMap = MapDepthToCamera.GetOldest();
+            lock (_parMap.SyncRoot) {
+                Parallel.For(0, _parMap.data.Length, UpdateMapDepthToCameraBody);
             }
             _needUpdateMapDepthToColorSpace = false;
             _mapDepthToCameraUpdated = true;
+        }
+
+        private void UpdateMapDepthToCameraBody(int i) {
+            var p = DepthMapPosToCameraPos(_parMap.GetXYFrom(i), _DEPTH_MUL);
+            _parMap.data[i] = new half2((half) p.x, (half) p.y);
         }
 #endregion
     }

@@ -7,14 +7,19 @@ namespace DepthSensorSandbox.Processing {
         
         public bool OnlyRawBuffersIsInput = true;
         public bool Active = true;
+        
+        protected DepthBuffer[] _rawBuffers;
+        protected DepthBuffer _inOut;
 
         public void Process(DepthBuffer[] rawBuffers, DepthBuffer inOut) {
             if (Active) {
-                ProcessInternal(rawBuffers, inOut);
+                _rawBuffers = rawBuffers;
+                _inOut = inOut;
+                ProcessInternal();
             }
         }
 
-        protected abstract void ProcessInternal(DepthBuffer[] rawBuffers, DepthBuffer inOut);
+        protected abstract void ProcessInternal();
 
         protected bool ReCreateIfNeed<T>(ref T[] a, int len) {
             if (a == null || a.Length != len) {

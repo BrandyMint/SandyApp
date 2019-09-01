@@ -1,6 +1,5 @@
 using System.Threading.Tasks;
 using DepthSensor.Buffer;
-using Unity.Collections;
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -9,39 +8,38 @@ namespace DepthSensorSandbox.Processing {
         private const ushort _BAD_HOLE_FIX = 5000;
 
         private int4[] _holesSize;
+        private int _maxDem;
+
+        private DepthBuffer _inDepth;
         
-        protected override void ProcessInternal(DepthBuffer[] rawBuffers, DepthBuffer inOut) {
-            ReCreateIfNeed(ref _holesSize, inOut.data.Length);
-            var inBuffer = OnlyRawBuffersIsInput ? rawBuffers[0] : inOut;
-            FindHoles(inBuffer);
-            FixDepthHoles(inBuffer, inOut);
+        protected override void ProcessInternal() {
+            ReCreateIfNeed(ref _holesSize, _inOut.data.Length);
+            _inDepth = OnlyRawBuffersIsInput ? _rawBuffers[0] : _inOut;
+            _maxDem = Mathf.Max(_inDepth.width, _inDepth.height);
+            Parallel.For(0, _maxDem, FindHolesBody);
+            Parallel.For(0, _inDepth.height, FixDepthHolesBody);
         }
 
-        private void FindHoles(DepthBuffer depth) {
-            var darr = depth.data;
-
-            var maxDem = Mathf.Max(depth.width, depth.height);
-            Parallel.For(0, maxDem, x => {
-                int hUp = 0, hDown = 0, hLeft = 0, hRight = 0;
-                for (int y = 0; y < maxDem; ++y) {
-                    if (x < depth.width && y < depth.height) {
-                        hUp = CheckHole(depth, darr, x, y, 1, hUp);
-                        hDown = CheckHole(depth, darr, x, depth.height - y - 1, 3, hDown);
-                    }
-                    if (x < depth.height && y < depth.width) {
-                        hLeft = CheckHole(depth, darr, y, x, 0, hLeft);
-                        hRight = CheckHole(depth, darr, depth.width - y - 1,  x, 2, hRight);
-                    }
+        private void FindHolesBody(int x) {
+            int hUp = 0, hDown = 0, hLeft = 0, hRight = 0;
+            for (int y = 0; y < _maxDem; ++y) {
+                if (x < _inDepth.width && y < _inDepth.height) {
+                    hUp = CheckHole(_inDepth, x, y, 1, hUp);
+                    hDown = CheckHole(_inDepth, x, _inDepth.height - y - 1, 3, hDown);
                 }
-            });
+                if (x < _inDepth.height && y < _inDepth.width) {
+                    hLeft = CheckHole(_inDepth, y, x, 0, hLeft);
+                    hRight = CheckHole(_inDepth, _inDepth.width - y - 1,  x, 2, hRight);
+                }
+            }
         }
 
         //      w.3
         //x.0->     <-z.2
         //      y.1
-        private int CheckHole(DepthBuffer depth, NativeArray<ushort> darr, int x, int y, int dir, int h)  {
+        private int CheckHole(DepthBuffer depth, int x, int y, int dir, int h)  {
             var i = depth.GetIFrom(x, y);
-            var d = darr[i];
+            var d = depth.data[i];
             if (d == INVALID_DEPTH)
                 ++h;
             else {
@@ -51,28 +49,26 @@ namespace DepthSensorSandbox.Processing {
             return h;
         }
 
-        private void FixDepthHoles(DepthBuffer inBuffer, DepthBuffer outBuffer) {
-            Parallel.For(0, inBuffer.height, y => {
-                for (int x = 0; x < inBuffer.width; ++x) {
-                    var i = inBuffer.GetIFrom(x, y);
-                    var d = inBuffer.data[i];
-                    var h = _holesSize[i];
-                    if (d == INVALID_DEPTH) {
-                        var up = SafeGet(inBuffer, x, y + h.w);
-                        var down = SafeGet(inBuffer, x, y - h.y);
-                        var left = SafeGet(inBuffer, x - h.x, y);
-                        var right = SafeGet(inBuffer, x + h.z, y);
-                        up = SetPriorityToIfInvalid(up, down, left, right);
-                        down = SetPriorityToIfInvalid(down, up, left, right);
-                        left = SetPriorityToIfInvalid(left, right, up, down);
-                        right = SetPriorityToIfInvalid(right, left, up, down);
-                        var dd = FixDepthHole(up, down, h.w, h.y) + FixDepthHole(left, right, h.x, h.z);
-                        outBuffer.data[i] = (ushort) (dd / 2);
-                    } else if (OnlyRawBuffersIsInput) {
-                        outBuffer.data[i] = d;
-                    }
+        private void FixDepthHolesBody(int y) {
+            for (int x = 0; x < _inDepth.width; ++x) {
+                var i = _inDepth.GetIFrom(x, y);
+                var d = _inDepth.data[i];
+                var h = _holesSize[i];
+                if (d == INVALID_DEPTH) {
+                    var up = SafeGet(_inDepth, x, y + h.w);
+                    var down = SafeGet(_inDepth, x, y - h.y);
+                    var left = SafeGet(_inDepth, x - h.x, y);
+                    var right = SafeGet(_inDepth, x + h.z, y);
+                    up = SetPriorityToIfInvalid(up, down, left, right);
+                    down = SetPriorityToIfInvalid(down, up, left, right);
+                    left = SetPriorityToIfInvalid(left, right, up, down);
+                    right = SetPriorityToIfInvalid(right, left, up, down);
+                    var dd = FixDepthHole(up, down, h.w, h.y) + FixDepthHole(left, right, h.x, h.z);
+                    _inOut.data[i] = (ushort) (dd / 2);
+                } else if (OnlyRawBuffersIsInput) {
+                    _inOut.data[i] = d;
                 }
-            });
+            }
         }
 
         private ushort FixDepthHole(ushort v1, ushort v2, int s1, int s2) {

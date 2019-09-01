@@ -1,19 +1,13 @@
 using System.Threading.Tasks;
-using DepthSensor.Buffer;
 using UnityEngine;
 
 namespace DepthSensorSandbox.Processing {
     public class NoiseFilterProcessing : ProcessingBase {
         public float Smooth = 0.9f;
         public ushort MaxError = 50;
-
-        private DepthBuffer[] _rawBuffers;
-        private DepthBuffer _inOut;
         
-        protected override void ProcessInternal(DepthBuffer[] rawBuffers, DepthBuffer inOut) {
-            _rawBuffers = rawBuffers;
-            _inOut = inOut;
-            Parallel.For(0, inOut.data.Length, FilterBody);
+        protected override void ProcessInternal() {
+            Parallel.For(0, _inOut.data.Length, FilterBody);
         }
 
         private void FilterBody(int i) {
