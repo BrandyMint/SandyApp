@@ -11,6 +11,7 @@ struct v2f {
     float4 clip : SV_POSITION;
     float2 uv : TEXCOORD0;
     float3 pos : TEXCOORD1;
+    float4 screenPos: TEXCOORD2;
     EXTENSION_V2F
 };
 
@@ -37,6 +38,7 @@ v2f vert (appdata v) {
     float4 vertex = v.vertex;
 #endif
     o.clip = UnityObjectToClipPos(vertex);
+    o.screenPos = ComputeScreenPos(o.clip);
     float3 pos = UnityObjectToViewPos(vertex);
     o.pos = float3(pos.xy, -pos.z);
     return o;

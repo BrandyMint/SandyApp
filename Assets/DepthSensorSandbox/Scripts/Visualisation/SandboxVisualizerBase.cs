@@ -8,7 +8,7 @@ namespace DepthSensorSandbox.Visualisation {
         [SerializeField] protected Material _material;
         [SerializeField] private bool _instantiateMaterial = true;
 
-        private SandboxMesh _sandbox;
+        protected SandboxMesh _sandbox;
         
         protected virtual void Awake() {
             if (_instantiateMaterial)
@@ -16,7 +16,7 @@ namespace DepthSensorSandbox.Visualisation {
             _sandbox = GetComponent<SandboxMesh>();
         }
 
-        protected void OnDestroy() {
+        protected virtual void OnDestroy() {
             SetEnable(false);
         }
 
@@ -28,6 +28,7 @@ namespace DepthSensorSandbox.Visualisation {
             } else {
                 Prefs.Calibration.OnChanged -= OnCalibrationChange;
             }
+            enabled = enable;
         }
         
         protected virtual void OnCalibrationChange() {

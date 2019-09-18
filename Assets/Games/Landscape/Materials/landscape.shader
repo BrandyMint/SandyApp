@@ -61,9 +61,9 @@
             float _DepthSeaBottom;            
             
             #define EXTENSION_V2F \
-                float2 uvMountains : TEXCOORD4; \
-                float2 uvGround : TEXCOORD3;\
-                float2 uvSand : TEXCOORD2;                
+                float2 uvMountains : TEXCOORD5; \
+                float2 uvGround : TEXCOORD4;\
+                float2 uvSand : TEXCOORD3;                
 
             #include "Assets/DepthSensorSandbox/Materials/utils.cginc"
             #include "Assets/DepthSensorSandbox/Materials/sandbox.cginc"
