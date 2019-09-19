@@ -1,7 +1,3 @@
-#if !UNITY_STANDALONE_WIN && !ENABLE_OPENNI2
-	#define ENABLE_OPENNI2
-#endif
-
 using System;
 using System.Collections;
 using DepthSensor.Device;
@@ -15,7 +11,7 @@ namespace DepthSensor {
 			typeof(Kinect2Device), 
 			//typeof(Kinect1Device),
 #endif
-#if ENABLE_OPENNI2
+#if !DISABLE_OPENNI2
 			typeof(OpenNI2Device)
 #endif
 		};

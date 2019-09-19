@@ -1,8 +1,5 @@
-#if !UNITY_STANDALONE_WIN && !ENABLE_OPENNI2
-    #define ENABLE_OPENNI2
-#endif
-
 using System.IO;
+using System.Linq;
 using UnityEngine;
 using UnityEditor;
 using UnityEditor.Build;
@@ -14,18 +11,22 @@ namespace DepthSensor.Editor {
         private static string _DEPLOY_PATH = "Deploy";
         private static string _LOG_PATH = "Logs/Deploy.log";
         private static string[] _PLATFROMS = {"Linux", "Windows"};
+        private static string[] _LIB_EXTENSIONS = {".dll", ".so"};
         
-        
-        /*static Deploy() {
-            Clear();
-            var projPath = GetProjPath();
+        static Deploy() {
+            EditorApplication.playModeStateChanged += state => {
+                if (state != PlayModeStateChange.EnteredPlayMode)
+                    return;
+                var projPath = GetProjPath();
 #if UNITY_EDITOR_LINUX
-            CopyFromDeploy(projPath, "Linux", true);
+                CopyFromDeploy(projPath, "Linux", true, false);
 #endif
 #if UNITY_EDITOR_WIN
-            CopyFromDeploy(projPath, "Windows", true);
+                CopyFromDeploy(projPath, "Windows", true, false);
 #endif
-        }*/
+            };
+            
+        }
 
         private static string GetProjPath() {
             return Directory.GetCurrentDirectory();
@@ -39,6 +40,7 @@ namespace DepthSensor.Editor {
             }
         }
 
+        [MenuItem("Build/Clear Deployed for Editor")]
         public static void Clear() {
             var logPath = GetLogPath();
             var projPath = GetProjPath();
@@ -56,47 +58,51 @@ namespace DepthSensor.Editor {
             }
         }
         
-        private static void CopyFromDeploy(string dstPath, string platform, bool log) {
-#if ENABLE_OPENNI2
-            CopyFromDeployWithAll(dstPath, platform, "OpenNI2", log);
+        private static void CopyFromDeploy(string dstPath, string platform, bool log, bool overwrite = true) {
+#if !DISABLE_OPENNI2
+            CopyFromDeployWithAll(dstPath, platform, "OpenNI2", log, overwrite);
 #if ENABLE_NITE2
-            CopyFromDeployWithAll(dstPath, platform, "NiTE2", log);
+            CopyFromDeployWithAll(dstPath, platform, "NiTE2", log, overwrite);
 #endif
 #endif
         }
 
-        private static void CopyFromDeployWithAll(string dstPath, string platform, string target, bool log) {
+        private static void CopyFromDeployWithAll(string dstPath, string platform, string target, bool log, bool overwrite) {
             Debug.Log($"Deploying {target} for {platform}...");
-            CopyFromDeploy(dstPath, "All", target, log);
-            if (CopyFromDeploy(dstPath, platform, target, log))
+            CopyFromDeploy(dstPath, "All", target, log, overwrite);
+            if (CopyFromDeploy(dstPath, platform, target, log, overwrite))
                 Debug.Log("Done!");
             else {
                 Debug.LogWarning($"Not exist deploy {target} for {platform}");
             }
         }
         
-        private static bool CopyFromDeploy(string dstPath, string platform, string target, bool log) {
+        private static bool CopyFromDeploy(string dstPath, string platform, string target, bool log, bool overwrite) {
             var projPath = GetProjPath();
             var srcPath = Path.Combine(projPath, "Deploy", target, platform);
             if (Directory.Exists(srcPath)) {
                 var diSrc = new DirectoryInfo(srcPath);
                 var diDst = new DirectoryInfo(dstPath);
-                CopyRecursive(diSrc, diDst, log);
+                CopyRecursive(diSrc, diDst, log, overwrite);
                 return true;
             }
             return false;
         }
 
-        private static void CopyRecursive(DirectoryInfo source, DirectoryInfo target, bool log) {
+        private static void CopyRecursive(DirectoryInfo source, DirectoryInfo target, bool log, bool overwriteLibs) {
             using (var appendLog = log ? File.AppendText(GetLogPath()) : null) {
                 foreach (var fi in source.GetFiles()) {
-                    fi.CopyTo(Path.Combine(target.FullName, fi.Name), true);
+                    var destination = Path.Combine(target.FullName, fi.Name);
+                    if (File.Exists(destination) && _LIB_EXTENSIONS.Contains(fi.Extension) && !overwriteLibs)
+                        continue;
+
+                    fi.CopyTo(destination, true);
                     appendLog?.WriteLine(fi.Name);
                 }
                 
                 foreach (var diSourceSubDir in source.GetDirectories()) {
                     var nextTargetSubDir = target.CreateSubdirectory(diSourceSubDir.Name);
-                    CopyRecursive(diSourceSubDir, nextTargetSubDir, false);
+                    CopyRecursive(diSourceSubDir, nextTargetSubDir, false, overwriteLibs);
                     appendLog?.WriteLine(diSourceSubDir.Name);
                 }
             }
