@@ -58,6 +58,11 @@ namespace DepthSensorSandbox.Visualisation {
             set { _r.material = _mat = value; InitMaterial(); }
         }
 
+        public void AddDrawToCommandBuffer(CommandBuffer cmb, Material m = null) {
+            if (m == null) m = _mat;
+            cmb.DrawRenderer(_r, m);
+        }
+
         private void OnDestroy() {
             DepthSensorSandboxProcessor.OnDepthDataBackground -= OnDepthDataGPU;
             DepthSensorSandboxProcessor.OnNewFrame -= OnNewFrameGPU;

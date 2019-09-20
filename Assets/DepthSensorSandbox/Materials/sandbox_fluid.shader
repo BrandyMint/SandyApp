@@ -1,7 +1,6 @@
 Shader "Sandbox/Fluid" {
     Properties {
         _DepthZero ("Depth Zero", Float) = 1.6
-        _Water ("Depth Water", Float) = 3.0
     }
 
     SubShader {
@@ -11,6 +10,7 @@ Shader "Sandbox/Fluid" {
 
         Pass {
             CGPROGRAM
+            #pragma require mrt4
             #pragma multi_compile _ CALC_DEPTH
             #pragma vertex vert
             #pragma fragment frag
@@ -23,14 +23,14 @@ Shader "Sandbox/Fluid" {
             sampler2D _FluidPrevTex;
             
             struct FragmentOutput {
-                fixed4 color : SV_Target0;
-                half4 fluid : SV_Target1;
+                fixed4 color : COLOR0;
+                half4 fluid : COLOR1;
             };
 
             FragmentOutput frag (v2f i) {
                 FragmentOutput o;
                 half4 fluid = tex2D(_FluidPrevTex, i.screenPos.xy/i.screenPos.w);
-                half color = fluid.z / _Water;
+                half color = fluid.z;
                 o.color = fixed4(color, 0, 0, 1);
                 
                 float d = i.pos.z;
