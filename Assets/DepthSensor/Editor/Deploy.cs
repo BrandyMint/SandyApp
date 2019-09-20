@@ -59,6 +59,7 @@ namespace DepthSensor.Editor {
         }
         
         private static void CopyFromDeploy(string dstPath, string platform, bool log, bool overwrite = true) {
+            CopyFromDeployWithAll(dstPath, platform, "files", log, overwrite);
 #if !DISABLE_OPENNI2
             CopyFromDeployWithAll(dstPath, platform, "OpenNI2", log, overwrite);
 #if ENABLE_NITE2
