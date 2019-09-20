@@ -65,9 +65,9 @@
                 float2 uvGround : TEXCOORD4;\
                 float2 uvSand : TEXCOORD3;                
 
-            #include "Assets/DepthSensorSandbox/Materials/utils.cginc"
-            #include "Assets/DepthSensorSandbox/Materials/sandbox.cginc"
-            #include "Assets/DepthSensorSandbox/Materials/perlin.cginc"
+            #include "Assets/DepthSensorSandbox/Resources/Materials/utils.cginc"
+            #include "Assets/DepthSensorSandbox/Resources/Materials/sandbox.cginc"
+            #include "Assets/DepthSensorSandbox/Resources/Materials/perlin.cginc"
             
             v2f vertLandscape (appdata v) {
                 v2f o = vert(v);

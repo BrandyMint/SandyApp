@@ -13,10 +13,15 @@ namespace DepthSensorSandbox.Visualisation {
         private readonly RenderTexture[] _texFluidBuffers = new RenderTexture[2];
         private readonly CommandBuffer[] _commandBuffers = new CommandBuffer[2];
         private int _currFluidBuffer;
-        private bool _needClearFluidFlow;
         private int _prevCamCullingMask = -1;
+        private Camera _clearCam;
+        private Shader _clearFluidShader;
 
         private void Start() {
+            _clearCam = new GameObject("CameraClearFluid").AddComponent<Camera>();
+            _clearCam.enabled = false;
+            _clearCam.transform.parent = transform.parent;
+            _clearFluidShader = Shader.Find("Sandbox/FluidClear");
             SetEnable(true);
         }
 
@@ -38,8 +43,7 @@ namespace DepthSensorSandbox.Visualisation {
             if (enable) {
                 _prevCamCullingMask = _cam.cullingMask;
                 _cam.cullingMask = 0;
-                CreateBuffersIfNeed();
-                BindBuffers();
+                ClearFluidFlows();
             } else {
                 if (_prevCamCullingMask >= 0)
                     _cam.cullingMask = _prevCamCullingMask;
@@ -47,15 +51,19 @@ namespace DepthSensorSandbox.Visualisation {
         }
 
         public void ClearFluidFlows() {
-            _needClearFluidFlow = true;
+            CreateBuffersIfNeed();
+            _clearCam.CopyFrom(_cam);
+            foreach (var buffer in _commandBuffers) {
+                _clearCam.RemoveCommandBuffer(_FLUID_SET_EVENT, buffer);
+            }
+            _clearCam.cullingMask = _prevCamCullingMask;
+            foreach (var buffer in _texFluidBuffers) {
+                _clearCam.targetTexture = buffer;
+                _clearCam.RenderWithShader(_clearFluidShader, "");
+            }
         }
 
         private void Update() {
-            if (_needClearFluidFlow) {
-                BindBuffers();
-                _cam.RenderWithShader(_material.shader, "ClearFluidFlows");
-                _needClearFluidFlow = false;
-            }
             SwapBuffers();
         }
 
