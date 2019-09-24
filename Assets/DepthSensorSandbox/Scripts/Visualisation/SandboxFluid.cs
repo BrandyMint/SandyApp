@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 using Utilities;
@@ -6,7 +7,10 @@ using Utilities;
 namespace DepthSensorSandbox.Visualisation {
     public class SandboxFluid : SandboxVisualizerBase {
         private const CameraEvent _FLUID_SET_EVENT = CameraEvent.BeforeForwardOpaque;
+        private const string _CLEAR_FLUID = "CLEAR_FLUID";
         private static readonly int _FLUID_PREV_TEX = Shader.PropertyToID("_FluidPrevTex");
+        private static readonly int _NEIGHBOURS = Shader.PropertyToID("_Neighbours");
+        private const int _CLEAR_STEP_FINISH = 4;
         
         [SerializeField] private Camera _cam;
         
@@ -15,14 +19,27 @@ namespace DepthSensorSandbox.Visualisation {
         private int _currFluidBuffer;
         private int _prevCamCullingMask = -1;
         private Camera _clearCam;
-        private Shader _clearFluidShader;
+        private readonly Vector4[] _neighbours = InitNeighboursArray();
+        private int _clearStep;
 
         private void Start() {
             _clearCam = new GameObject("CameraClearFluid").AddComponent<Camera>();
             _clearCam.enabled = false;
             _clearCam.transform.parent = transform.parent;
-            _clearFluidShader = Shader.Find("Sandbox/FluidClear");
             SetEnable(true);
+        }
+
+        private static Vector4[] InitNeighboursArray() {
+            var array = new List<Vector4>();
+            for (int x = -1; x <= 1; ++x) {
+                for (int y = -1; y <= 1; ++y) {
+                    if (x == 0 && y == 0) continue;
+                    array.Add(new Vector3(x, y, new Vector2(x, y).sqrMagnitude));
+                    //array.Add(new Vector2(x, y).normalized);
+                }
+            }
+            return array.ToArray();
+            //return new Vector4[] {Vector2.up, Vector2.left, Vector2.down, Vector2.right};
         }
 
         protected override void OnDestroy() {
@@ -52,18 +69,20 @@ namespace DepthSensorSandbox.Visualisation {
 
         public void ClearFluidFlows() {
             CreateBuffersIfNeed();
-            _clearCam.CopyFrom(_cam);
-            foreach (var buffer in _commandBuffers) {
-                _clearCam.RemoveCommandBuffer(_FLUID_SET_EVENT, buffer);
-            }
-            _clearCam.cullingMask = _prevCamCullingMask;
-            foreach (var buffer in _texFluidBuffers) {
-                _clearCam.targetTexture = buffer;
-                _clearCam.RenderWithShader(_clearFluidShader, "");
-            }
+            _clearStep = 0;
         }
 
         private void Update() {
+            _material.SetVectorArray(_NEIGHBOURS, _neighbours);
+            if (_clearStep <= _CLEAR_STEP_FINISH) {
+                if (_clearStep == 0) {
+                    _material.EnableKeyword(_CLEAR_FLUID);
+                } else 
+                if (_clearStep == _CLEAR_STEP_FINISH) {
+                    _material.DisableKeyword(_CLEAR_FLUID);
+                }
+                ++_clearStep;
+            }
             SwapBuffers();
         }
 
@@ -79,8 +98,10 @@ namespace DepthSensorSandbox.Visualisation {
         private void CreateBuffersIfNeed() {
             for (int i = 0; i < _texFluidBuffers.Length; ++i) {
                 var newTexture = TexturesHelper.ReCreateIfNeed(ref _texFluidBuffers[i],
-                    _cam.pixelWidth, _cam.pixelHeight, 0, RenderTextureFormat.ARGBHalf); 
+                    _cam.pixelWidth, _cam.pixelHeight, 0, RenderTextureFormat.ARGBFloat); 
                 if (newTexture || _commandBuffers[i] == null) {
+                    _texFluidBuffers[i].filterMode = FilterMode.Point;
+                    _texFluidBuffers[i].wrapMode = TextureWrapMode.Clamp;
                     DisposeCommandBuffer(ref _commandBuffers[i], _FLUID_SET_EVENT);
                     _commandBuffers[i] = CreateCommandBuffer(
                         new RenderTargetIdentifier[] {BuiltinRenderTextureType.CameraTarget, _texFluidBuffers[i].colorBuffer}
@@ -101,6 +122,8 @@ namespace DepthSensorSandbox.Visualisation {
             var cmb = new CommandBuffer {
                 name = nameof(SandboxFluid)
             };
+            cmb.SetRenderTarget(targets[1], targets[0]);
+            cmb.ClearRenderTarget(false, true, Color.black);
             cmb.SetRenderTarget(targets, targets[0]);
             _sandbox.AddDrawToCommandBuffer(cmb);
             return cmb;

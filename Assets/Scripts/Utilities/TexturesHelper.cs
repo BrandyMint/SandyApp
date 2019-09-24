@@ -36,7 +36,6 @@ namespace Utilities {
                 if (t != null)
                     t.Release();
                 t = new RenderTexture(width, height, depth, format);
-                t.Create();
                 return true;
             }
             return false;

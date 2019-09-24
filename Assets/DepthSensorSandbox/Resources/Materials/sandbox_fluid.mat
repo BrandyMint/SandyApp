@@ -58,9 +58,11 @@ Material:
     m_Floats:
     - _BumpScale: 1
     - _Cutoff: 0.5
-    - _DepthZero: 1.6
+    - _DepthZero: 1.7
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
+    - _FluidSpeed: 1
+    - _FluidViscosity: 1
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
@@ -71,6 +73,8 @@ Material:
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
+    - _Thickness: 0
+    - _ThicknessRunoff: 0
     - _UVSec: 0
     - _Water: 3
     - _ZWrite: 1
