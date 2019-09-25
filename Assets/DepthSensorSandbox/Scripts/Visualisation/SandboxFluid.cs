@@ -6,20 +6,20 @@ using Utilities;
 
 namespace DepthSensorSandbox.Visualisation {
     public class SandboxFluid : SandboxVisualizerBase {
-        private const CameraEvent _FLUID_SET_EVENT = CameraEvent.BeforeForwardOpaque;
+        private const CameraEvent _FLUID_EVENT = CameraEvent.BeforeForwardOpaque;
         private const string _CLEAR_FLUID = "CLEAR_FLUID";
-        private static readonly int _FLUID_PREV_TEX = Shader.PropertyToID("_FluidPrevTex");
-        private static readonly int _NEIGHBOURS = Shader.PropertyToID("_Neighbours");
+        private static readonly int _FLUX_PREV_TEX = Shader.PropertyToID("_FluxPrevTex");
+        private static readonly int _HEIGHT_PREV_TEX = Shader.PropertyToID("_HeightPrevTex");
         private const int _CLEAR_STEP_FINISH = 4;
         
         [SerializeField] private Camera _cam;
         
-        private readonly RenderTexture[] _texFluidBuffers = new RenderTexture[2];
+        private readonly RenderTexture[] _texFluxBuffers = new RenderTexture[2];
+        private readonly RenderTexture[] _texHeightBuffers = new RenderTexture[2];
         private readonly CommandBuffer[] _commandBuffers = new CommandBuffer[2];
         private int _currFluidBuffer;
         private int _prevCamCullingMask = -1;
         private Camera _clearCam;
-        private readonly Vector4[] _neighbours = InitNeighboursArray();
         private int _clearStep;
 
         private void Start() {
@@ -29,25 +29,12 @@ namespace DepthSensorSandbox.Visualisation {
             SetEnable(true);
         }
 
-        private static Vector4[] InitNeighboursArray() {
-            var array = new List<Vector4>();
-            for (int x = -1; x <= 1; ++x) {
-                for (int y = -1; y <= 1; ++y) {
-                    if (x == 0 && y == 0) continue;
-                    array.Add(new Vector3(x, y, new Vector2(x, y).sqrMagnitude));
-                    //array.Add(new Vector2(x, y).normalized);
-                }
-            }
-            return array.ToArray();
-            //return new Vector4[] {Vector2.up, Vector2.left, Vector2.down, Vector2.right};
-        }
-
         protected override void OnDestroy() {
             base.OnDestroy();
             for (int i = 0; i < _commandBuffers.Length; ++i) {
-                DisposeCommandBuffer(ref _commandBuffers[i], _FLUID_SET_EVENT);
+                DisposeCommandBuffer(ref _commandBuffers[i], _FLUID_EVENT);
             }
-            foreach (var t in _texFluidBuffers) {
+            foreach (var t in _texFluxBuffers) {
                 if (t != null) t.Release();
             }
         }
@@ -55,7 +42,7 @@ namespace DepthSensorSandbox.Visualisation {
         public override void SetEnable(bool enable) {
             base.SetEnable(enable);
             for (int i = 0; i < _commandBuffers.Length; ++i) {
-                DisposeCommandBuffer(ref _commandBuffers[i], _FLUID_SET_EVENT);
+                DisposeCommandBuffer(ref _commandBuffers[i], _FLUID_EVENT);
             }
             if (enable) {
                 _prevCamCullingMask = _cam.cullingMask;
@@ -73,7 +60,6 @@ namespace DepthSensorSandbox.Visualisation {
         }
 
         private void Update() {
-            _material.SetVectorArray(_NEIGHBOURS, _neighbours);
             if (_clearStep <= _CLEAR_STEP_FINISH) {
                 if (_clearStep == 0) {
                     _material.EnableKeyword(_CLEAR_FLUID);
@@ -87,7 +73,7 @@ namespace DepthSensorSandbox.Visualisation {
         }
 
         private void SwapBuffers() {
-            _currFluidBuffer = NextCircleId(_currFluidBuffer, _texFluidBuffers);
+            _currFluidBuffer = NextCircleId(_currFluidBuffer, _texFluxBuffers);
             BindBuffers();
         }
 
@@ -95,16 +81,29 @@ namespace DepthSensorSandbox.Visualisation {
             return (id + 1) % a.Length;
         }
 
+        private bool ReCreateBufferIfNeed(ref RenderTexture t, RenderTextureFormat f) {
+            var created = TexturesHelper.ReCreateIfNeed(ref t,
+                _cam.pixelWidth, _cam.pixelHeight, 0, f);
+            if (created) {
+                t.filterMode = FilterMode.Point;
+                t.wrapMode = TextureWrapMode.Clamp;
+                t.Create();
+            }
+            return created;
+        }
+
         private void CreateBuffersIfNeed() {
-            for (int i = 0; i < _texFluidBuffers.Length; ++i) {
-                var newTexture = TexturesHelper.ReCreateIfNeed(ref _texFluidBuffers[i],
-                    _cam.pixelWidth, _cam.pixelHeight, 0, RenderTextureFormat.ARGBFloat); 
+            for (int i = 0; i < _texFluxBuffers.Length; ++i) {
+                var newTexture = ReCreateBufferIfNeed(ref _texFluxBuffers[i], RenderTextureFormat.ARGBFloat);
+                newTexture |= ReCreateBufferIfNeed(ref _texHeightBuffers[i], RenderTextureFormat.RGFloat);
                 if (newTexture || _commandBuffers[i] == null) {
-                    _texFluidBuffers[i].filterMode = FilterMode.Point;
-                    _texFluidBuffers[i].wrapMode = TextureWrapMode.Clamp;
-                    DisposeCommandBuffer(ref _commandBuffers[i], _FLUID_SET_EVENT);
+                    DisposeCommandBuffer(ref _commandBuffers[i], _FLUID_EVENT);
                     _commandBuffers[i] = CreateCommandBuffer(
-                        new RenderTargetIdentifier[] {BuiltinRenderTextureType.CameraTarget, _texFluidBuffers[i].colorBuffer}
+                        new RenderTargetIdentifier[] {
+                            BuiltinRenderTextureType.CameraTarget,
+                            _texHeightBuffers[i].colorBuffer,
+                            _texFluxBuffers[i].colorBuffer
+                        }
                     );
                     _commandBuffers[i].name += i;
                 }
@@ -112,18 +111,19 @@ namespace DepthSensorSandbox.Visualisation {
         }
 
         private void BindBuffers() {
-            var prevBuffer = NextCircleId(_currFluidBuffer, _texFluidBuffers);
-            _cam.RemoveCommandBuffer(_FLUID_SET_EVENT, _commandBuffers[prevBuffer]);
-            _cam.AddCommandBuffer(_FLUID_SET_EVENT, _commandBuffers[_currFluidBuffer]);
-            _material.SetTexture(_FLUID_PREV_TEX, _texFluidBuffers[prevBuffer], RenderTextureSubElement.Color);
+            var prevBuffer = NextCircleId(_currFluidBuffer, _texFluxBuffers);
+            _cam.RemoveCommandBuffer(_FLUID_EVENT, _commandBuffers[prevBuffer]);
+            _cam.AddCommandBuffer(_FLUID_EVENT, _commandBuffers[_currFluidBuffer]);
+            _material.SetTexture(_HEIGHT_PREV_TEX, _texHeightBuffers[prevBuffer], RenderTextureSubElement.Color);
+            _material.SetTexture(_FLUX_PREV_TEX, _texFluxBuffers[prevBuffer], RenderTextureSubElement.Color);
         }
 
         private CommandBuffer CreateCommandBuffer(RenderTargetIdentifier[] targets) {
             var cmb = new CommandBuffer {
                 name = nameof(SandboxFluid)
             };
-            cmb.SetRenderTarget(targets[1], targets[0]);
-            cmb.ClearRenderTarget(false, true, Color.black);
+            cmb.SetRenderTarget(new [] {targets[1], targets[2]}, targets[0]);
+            cmb.ClearRenderTarget(false, true, Color.clear);
             cmb.SetRenderTarget(targets, targets[0]);
             _sandbox.AddDrawToCommandBuffer(cmb);
             return cmb;
