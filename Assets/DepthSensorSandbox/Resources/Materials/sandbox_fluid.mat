@@ -57,12 +57,17 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - _BumpScale: 1
+    - _CellArea: 1
+    - _CellHeight: 1
+    - _ColorBright: 1
     - _Cutoff: 0.5
     - _DepthZero: 1.7
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
     - _FluidSpeed: 1
     - _FluidViscosity: 1
+    - _FluxAcceleration: 9.8
+    - _FluxBright: 100
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
@@ -73,10 +78,14 @@ Material:
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
+    - _TerrainMax: 1.19
+    - _TerrainMin: 1.89
     - _Thickness: 0
     - _ThicknessRunoff: 0
     - _UVSec: 0
     - _Water: 3
+    - _WaterMax: -9.91
+    - _WaterMin: 16.85
     - _ZWrite: 1
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}

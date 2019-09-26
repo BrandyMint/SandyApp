@@ -270,6 +270,8 @@ MonoBehaviour:
   _instantiateMaterial: 1
   _cam: {fileID: 585363456}
   _btnResetFluid: {fileID: 1450655343}
+  _InstrumentSize: 50
+  _InstrumentStrength: 0.3
 --- !u!1 &925452556
 GameObject:
   m_ObjectHideFlags: 0

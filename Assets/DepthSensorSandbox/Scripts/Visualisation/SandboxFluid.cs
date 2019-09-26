@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 using Utilities;
@@ -59,7 +58,7 @@ namespace DepthSensorSandbox.Visualisation {
             _clearStep = 0;
         }
 
-        private void Update() {
+        protected virtual void Update() {
             if (_clearStep <= _CLEAR_STEP_FINISH) {
                 if (_clearStep == 0) {
                     _material.EnableKeyword(_CLEAR_FLUID);

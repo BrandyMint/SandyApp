@@ -84,8 +84,14 @@ TYPE_HEIGHT calcHeight(v2f i, TYPE_HEIGHT h, TYPE_FLUX f, TYPE_FLUX fl, TYPE_FLU
     return h;
 }
 
+#ifdef MODIFY_FLUID
+    void modifyFluid(v2f i, inout TYPE_HEIGHT height, inout TYPE_FLUX flux,
+        TYPE_HEIGHT h, TYPE_HEIGHT hl, TYPE_HEIGHT hr, TYPE_HEIGHT ht, TYPE_HEIGHT hb,
+        TYPE_FLUX f, TYPE_FLUX fl, TYPE_FLUX fr, TYPE_FLUX ft, TYPE_FLUX fb
+    );
+#endif
+
 void calcFluid(v2f i, out TYPE_HEIGHT height, out TYPE_FLUX flux) {
-    float2 xy = i.screenPos.xy / i.screenPos.w;
     TYPE_HEIGHT h = HEIGHT_SAMPLE(CURR);    
     TYPE_HEIGHT hl = HEIGHT_SAMPLE(L);
     TYPE_HEIGHT hr = HEIGHT_SAMPLE(R);
@@ -96,8 +102,15 @@ void calcFluid(v2f i, out TYPE_HEIGHT height, out TYPE_FLUX flux) {
     TYPE_FLUX fr = FLUX_SAMPLE(R);
     TYPE_FLUX ft = FLUX_SAMPLE(T);
     TYPE_FLUX fb = FLUX_SAMPLE(B);
+    float2 xy = i.screenPos.xy / i.screenPos.w;
     flux = calcFlux(xy, f, h, hl, hr, ht, hb);
     height = calcHeight(i, h, f, fl, fr, ft, fb);
+#ifdef MODIFY_FLUID
+    modifyFluid(i, height, flux,
+        h, hl, hr, ht, hb,
+        f, fl, fr, ft, fb
+    );
+#endif
 }
 
 #ifdef USE_MRT_FLUID
