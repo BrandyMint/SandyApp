@@ -10,6 +10,7 @@ namespace Games.Landscape.Test {
         [SerializeField] private Button _btnResetFluid;
         [SerializeField] private float _InstrumentSize = 25;
         [SerializeField] private float _InstrumentStrength = 1;
+        [SerializeField] private float _CellSize = 1;
 
         protected override void Awake() {
             base.Awake();
@@ -36,6 +37,8 @@ namespace Games.Landscape.Test {
             }
             _material.SetVector(_INSTRUMENT, instrument);
             _material.SetInt(_INSTRUMENT_TYPE, type);
+            _material.SetFloat("_CellHeight", _CellSize);
+            _material.SetFloat("_CellArea", _CellSize * _CellSize);
         }
     }
 }
