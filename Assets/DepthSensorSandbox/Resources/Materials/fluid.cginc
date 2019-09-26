@@ -74,8 +74,8 @@ TYPE_HEIGHT calcHeight(v2f i, TYPE_HEIGHT h, TYPE_FLUX f, TYPE_FLUX fl, TYPE_FLU
     TYPE_FLUX inFlux;
     L_FLUX(inFlux) = R_FLUX(fl);
     R_FLUX(inFlux) = L_FLUX(fr);
-    T_FLUX(inFlux) = B_FLUX(fb);
-    B_FLUX(inFlux) = T_FLUX(ft);
+    T_FLUX(inFlux) = B_FLUX(ft);
+    B_FLUX(inFlux) = T_FLUX(fb);
     
     float waterDiff = SUM_C(inFlux) - SUM_C(outFlux);
     
