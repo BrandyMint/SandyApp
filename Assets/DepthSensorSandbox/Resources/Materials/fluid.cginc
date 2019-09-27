@@ -48,8 +48,8 @@ float _CellHeight;
 
 #define SUM_C(col) ((col.x + col.y + col.z + col.w))
 
-#define BOUNDARY_MIN(tex, col, x) ((col.##x < tex##_TexelSize.##x / 2))
-#define BOUNDARY_MAX(tex, col, x) ((col.##x > 1 - tex##_TexelSize.##x / 2))
+#define BOUNDARY_MIN(tex, col, x) ((col.##x < tex##_TexelSize.##x))
+#define BOUNDARY_MAX(tex, col, x) ((col.##x > 1 - tex##_TexelSize.##x))
 #define BOUNDARY(type, h) (!(type##_H(h) > 0))
 
 float2 fragHeightClear (v2f i) : SV_Target {
@@ -76,10 +76,10 @@ TYPE_FLUX calcFlux (float2 xy, TYPE_FLUX flux, TYPE_HEIGHT h, TYPE_HEIGHT hl, TY
     flux = max(0, flux + unity_DeltaTime.x * _FluxAcceleration * _CellArea * heightDiff / _CellHeight);
     flux *= min(1, WATER_H(h) * _CellArea / (SUM_C(flux) * unity_DeltaTime.x));
     
-    if (BOUNDARY_MIN(_FluxPrevTex, xy, x) || BOUNDARY(TERRAIN, hl)) L_FLUX(flux) = 0;
-    if (BOUNDARY_MAX(_FluxPrevTex, xy, x) || BOUNDARY(TERRAIN, hr)) R_FLUX(flux) = 0;
-    if (BOUNDARY_MIN(_FluxPrevTex, xy, y) || BOUNDARY(TERRAIN, hb)) B_FLUX(flux) = 0;
-    if (BOUNDARY_MAX(_FluxPrevTex, xy, y) || BOUNDARY(TERRAIN, ht)) T_FLUX(flux) = 0;
+    if (BOUNDARY_MAX(_FluxPrevTex, xy, x) || BOUNDARY(TERRAIN, hl)) L_FLUX(flux) = 0;
+    if (BOUNDARY_MIN(_FluxPrevTex, xy, x) || BOUNDARY(TERRAIN, hr)) R_FLUX(flux) = 0;
+    if (BOUNDARY_MIN(_FluxPrevTex, xy, y) || BOUNDARY(TERRAIN, ht)) T_FLUX(flux) = 0;
+    if (BOUNDARY_MAX(_FluxPrevTex, xy, y) || BOUNDARY(TERRAIN, hb)) B_FLUX(flux) = 0;
     
     return max(0, flux);
 }
