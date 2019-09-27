@@ -18,10 +18,10 @@
         _SandTex ("Sand", 2D) = "white" {}
         _hsvSand ("HSV Sand", Vector) = (0, 0, 0, 0)
                 
-        _ColorSeaMin ("Color Sea", Color) = (0, 1, 1, 1)
+        _ColorSeaMin ("Color Sea Min", Color) = (0, 1, 1, 1)
         _DepthSea ("Depth Sea", Float) = 0
         
-        _ColorSeaMax ("Color Sea", Color) = (0, 0, 1, 1)
+        _ColorSeaMax ("Color Sea Max", Color) = (0, 0, 1, 1)
         _DepthSeaBottom ("Depth Sea Bottom", Float) = -0.2
         
         _DepthZero ("Depth Zero", Float) = 3.0
@@ -35,7 +35,9 @@
 
         Pass {
             CGPROGRAM
-            #pragma multi_compile _ CALC_DEPTH
+            #pragma multi_compile _ CALC_DEPTH 
+            #pragma multi_compile __ DYNAMIC_FLUID 
+            #pragma multi_compile ___ DRAW_LANDSCAPE
             #pragma vertex vertLandscape
             #pragma fragment frag
 
@@ -55,9 +57,11 @@
             float _MixNoiseStrength;
             float _DepthIce;
             float _DepthMountains;
-            float _DepthGround;            
+            float _DepthGround;
+#ifndef DYNAMIC_FLUID
             float _DepthSea;
             float _DepthZero;
+#endif
             float _DepthSeaBottom;            
             
             #define EXTENSION_V2F \
@@ -68,6 +72,9 @@
             #include "Assets/DepthSensorSandbox/Resources/Materials/utils.cginc"
             #include "Assets/DepthSensorSandbox/Resources/Materials/sandbox.cginc"
             #include "Assets/DepthSensorSandbox/Resources/Materials/perlin.cginc"
+#ifdef DYNAMIC_FLUID
+            #include "Assets/DepthSensorSandbox/Resources/Materials/fluid.cginc"
+#endif
             
             v2f vertLandscape (appdata v) {
                 v2f o = vert(v);
@@ -94,6 +101,13 @@
 
             fixed4 frag (v2f i) : SV_Target {
                 float z = i.pos.z;
+#ifdef DYNAMIC_FLUID
+                TYPE_HEIGHT h = HEIGHT_SAMPLE(CURR);
+    #ifdef DRAW_LANDSCAPE
+                z = TERRAIN_H(h);
+    #endif
+#endif
+                
                 float dSea = _DepthZero - _DepthSea;
                 float dBottom = dSea - _DepthSeaBottom;
                 float dGround = dSea - _DepthGround;
@@ -106,6 +120,9 @@
                 addSample(c, _MountainsTex, _hsvMountains, i.uvMountains, dMountains, z, noise);
                 c.rgb = lerp(c.rgb, _ColorIce.rgb, _ColorIce.a * smooth(dMountains, dIce, z));
                 
+#ifdef DYNAMIC_FLUID
+                dSea = HEIGHT_FULL(h) * 1.01;
+#endif
                 fixed4 sea = lerp(_ColorSeaMin, _ColorSeaMax, smooth(dSea, dBottom, z));
                 c.rgb = lerp(c.rgb, sea.rgb, sea.a * smooth(dSea, z));
                 return c;

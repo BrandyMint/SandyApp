@@ -269,7 +269,7 @@ MonoBehaviour:
   _material: {fileID: 2100000, guid: 25a4d5c54effba0458ff0c683e14fd58, type: 2}
   _instantiateMaterial: 1
   _cam: {fileID: 585363456}
-  _matFluidCalc: {fileID: 2100000, guid: b4636a42f29ac4e44bc016591532292f, type: 2}
+  _matFluidCalc: {fileID: 2100000, guid: cf9e65e6eea3f244fbb47cae8cdedee4, type: 2}
   _fluidMapHeight: 128
   _btnResetFluid: {fileID: 1450655343}
   _InstrumentSize: 50

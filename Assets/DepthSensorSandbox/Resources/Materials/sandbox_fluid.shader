@@ -13,7 +13,8 @@ Shader "Sandbox/Fluid" {
 
         Pass {
             CGPROGRAM
-            #pragma multi_compile _ CALC_DEPTH CLEAR_FLUID
+            #pragma multi_compile _ CALC_DEPTH
+            #pragma multi_compile __ CLEAR_FLUID
             #pragma vertex vert
             #pragma fragment fragFluid
        

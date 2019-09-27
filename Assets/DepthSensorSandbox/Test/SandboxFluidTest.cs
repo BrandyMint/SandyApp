@@ -4,6 +4,8 @@ using UnityEngine.UI;
 
 namespace DepthSensorSandbox.Test {
     public class SandboxFluidTest : SandboxFluid {
+        private const string _DYNAMIC_FLUID = "DYNAMIC_FLUID";
+        private const string _DRAW_LANDSCAPE = "DRAW_LANDSCAPE";
         private static readonly int _INSTRUMENT = Shader.PropertyToID("_Instrument");
         private static readonly int _INSTRUMENT_TYPE = Shader.PropertyToID("_InstrumentType");
         private static readonly int _DEPTH_ZERO = Shader.PropertyToID("_DepthZero");
@@ -20,6 +22,8 @@ namespace DepthSensorSandbox.Test {
 
         protected override void Awake() {
             base.Awake();
+            _material.EnableKeyword(_DYNAMIC_FLUID);
+            _material.EnableKeyword(_DRAW_LANDSCAPE);
             _btnResetFluid.onClick.AddListener(ClearFluidFlows);
         }
 
@@ -42,10 +46,13 @@ namespace DepthSensorSandbox.Test {
             }
             _matFluidCalc.SetVector(_INSTRUMENT, instrument);
             _matFluidCalc.SetInt(_INSTRUMENT_TYPE, type);
-            _matFluidCalc.SetFloat(_DEPTH_ZERO, _depthZero);
             _matFluidCalc.SetFloat(_FLUX_ACCELERATION, _fluxAcceleration);
             _matFluidCalc.SetFloat(_CELL_HEIGHT, _cellSize);
             _matFluidCalc.SetFloat(_CELL_AREA, _cellSize * _cellSize);
+            
+            var props = _sandbox.PropertyBlock;
+            props.SetFloat(_DEPTH_ZERO, _depthZero);
+            _sandbox.PropertyBlock = props;
         }
     }
 }
