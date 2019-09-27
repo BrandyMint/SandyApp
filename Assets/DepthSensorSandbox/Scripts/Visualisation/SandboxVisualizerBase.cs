@@ -6,7 +6,7 @@ namespace DepthSensorSandbox.Visualisation {
         private static readonly int _DEPTH_ZERO = Shader.PropertyToID("_DepthZero");
         
         [SerializeField] protected Material _material;
-        [SerializeField] private bool _instantiateMaterial = true;
+        [SerializeField] protected bool _instantiateMaterial = true;
 
         protected SandboxMesh _sandbox;
         
@@ -32,7 +32,9 @@ namespace DepthSensorSandbox.Visualisation {
         }
         
         protected virtual void OnCalibrationChange() {
-            _material.SetFloat(_DEPTH_ZERO, Prefs.Calibration.ZeroDepth);
+            var props = _sandbox.PropertyBlock;
+            props.SetFloat(_DEPTH_ZERO, Prefs.Calibration.ZeroDepth);
+            _sandbox.PropertyBlock = props;
         }
     }
 }

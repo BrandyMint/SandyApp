@@ -1,5 +1,18 @@
-﻿sampler2D_float _FluxPrevTex; float4 _FluxPrevTex_TexelSize;
-sampler2D_float _HeightPrevTex; float4 _HeightPrevTex_TexelSize;
+﻿#pragma require mrt4
+
+#define TYPE_HEIGHT float2
+#define TYPE_FLUX float4
+
+#ifdef FORCE_POINT_SAMPLER
+    Texture2D<TYPE_FLUX> _FluxPrevTex;
+    Texture2D<TYPE_HEIGHT> _HeightPrevTex;
+    SamplerState point_clamp_sampler;
+#else
+    sampler2D_float _FluxPrevTex;
+    sampler2D_float _HeightPrevTex;
+#endif
+float4 _FluxPrevTex_TexelSize;
+float4 _HeightPrevTex_TexelSize;
 
 float _DepthSea;
 float _DepthZero;
@@ -7,15 +20,17 @@ float _FluxAcceleration;
 float _CellArea;
 float _CellHeight;
 
-#define TYPE_HEIGHT float2
-#define TYPE_FLUX float4
-
 #define TERRAIN_H(col) (col.r)
 #define WATER_H(col) (col.g)
 #define HEIGHT_FULL(col) ((TERRAIN_H(col) - WATER_H(col)))
 
-#define SAMPLE_FROM_SCREEN_POS(tex, screenPos, offset) \
-    (tex2D(tex, screenPos.xy / screenPos.w + offset * tex##_TexelSize.xy))
+#ifdef FORCE_POINT_SAMPLER
+    #define SAMPLE_FROM_SCREEN_POS(tex, screenPos, offset) \
+        (tex.SampleLevel(point_clamp_sampler, screenPos.xy / screenPos.w + offset * tex##_TexelSize.xy, 0))
+#else
+    #define SAMPLE_FROM_SCREEN_POS(tex, screenPos, offset) \
+        (tex2Dlod(tex, float4(screenPos.xy / screenPos.w + offset * tex##_TexelSize.xy, 0, 0)))
+#endif
 #define SAMPLE_OFFSET(tex, offset) (SAMPLE_FROM_SCREEN_POS(tex, i.screenPos, offset))
 #define FLUX_SAMPLE(offset) (SAMPLE_OFFSET(_FluxPrevTex, offset))
 #define HEIGHT_SAMPLE(offset) (SAMPLE_OFFSET(_HeightPrevTex, offset).rg)
@@ -80,7 +95,7 @@ TYPE_HEIGHT calcHeight(v2f i, TYPE_HEIGHT h, TYPE_FLUX f, TYPE_FLUX fl, TYPE_FLU
     float waterDiff = SUM_C(inFlux) - SUM_C(outFlux);
     
     TERRAIN_H(h) = i.pos.z;
-    WATER_H(h) = max(0, WATER_H(h) + unity_DeltaTime.x * waterDiff / _CellArea);    
+    WATER_H(h) += unity_DeltaTime.x * waterDiff / _CellArea;    
     return h;
 }
 
@@ -92,7 +107,7 @@ TYPE_HEIGHT calcHeight(v2f i, TYPE_HEIGHT h, TYPE_FLUX f, TYPE_FLUX fl, TYPE_FLU
 #endif
 
 void calcFluid(v2f i, out TYPE_HEIGHT height, out TYPE_FLUX flux) {
-    TYPE_HEIGHT h = HEIGHT_SAMPLE(CURR);    
+    TYPE_HEIGHT h = HEIGHT_SAMPLE(CURR);
     TYPE_HEIGHT hl = HEIGHT_SAMPLE(L);
     TYPE_HEIGHT hr = HEIGHT_SAMPLE(R);
     TYPE_HEIGHT ht = HEIGHT_SAMPLE(T);
@@ -113,35 +128,19 @@ void calcFluid(v2f i, out TYPE_HEIGHT height, out TYPE_FLUX flux) {
 #endif
 }
 
-#ifdef USE_MRT_FLUID
-    #pragma require mrt4
+struct FragColorFluid {
+    TYPE_HEIGHT height : SV_Target0;
+    TYPE_FLUX flux : SV_Target1;
+};
     
-    struct FragColorFluid {
-        fixed4 color : SV_Target0;
-        TYPE_HEIGHT height : SV_Target1;
-        TYPE_FLUX flux : SV_Target2;
-    };
-
-#ifdef PROVIDE_FLUX
-    fixed4 fragColor (v2f i, TYPE_HEIGHT height, TYPE_FLUX flux);
-#else
-    fixed4 fragColor (v2f i, TYPE_HEIGHT height);
-#endif
-    
-    FragColorFluid frag (v2f i) {
-        FragColorFluid o;
+FragColorFluid fragFluid (v2f i) {
+    FragColorFluid o;
 #ifdef CLEAR_FLUID 
-        o.flux = fragFluxClear(i);
-        o.height = fragHeightClear(i);
+    o.flux = fragFluxClear(i);
+    o.height = fragHeightClear(i);
 #else
-        calcFluid(i, o.height, o.flux);
+    calcFluid(i, o.height, o.flux);
 #endif
-#ifdef PROVIDE_FLUX
-        o.color = fragColor(i, o.height, o.flux);
-#else
-        o.color = fragColor(i, o.height);
-#endif
-        return o;
-    }
-#endif
+    return o;
+}
 

@@ -24,6 +24,7 @@ namespace DepthSensorSandbox.Visualisation {
         private Vector2[] _uv;
         private Renderer _r;
         private Material _mat;
+        private MaterialPropertyBlock _propBlock;
         private bool _prevUpdateMeshOnGPU;
         private bool _needUpdateBounds = true;
         private bool _isBoundsValid;
@@ -33,6 +34,7 @@ namespace DepthSensorSandbox.Visualisation {
             _mat = _r.material;
             _meshFilter = GetComponent<MeshFilter>();
             _mesh = _meshFilter.mesh;
+            _propBlock = new MaterialPropertyBlock();
             if (_mesh == null || _mesh.vertexCount == 0) {
                 _mesh = new Mesh {name = "depth"};
                 _mesh.indexFormat = IndexFormat.UInt32;
@@ -55,7 +57,15 @@ namespace DepthSensorSandbox.Visualisation {
 
         public Material Material {
             get => _mat;
-            set { _r.material = _mat = value; InitMaterial(); }
+            set { _r.material = _mat = value; }
+        }
+
+        public MaterialPropertyBlock PropertyBlock {
+            get {
+                _r.GetPropertyBlock(_propBlock);
+                return _propBlock;
+            }
+            set => _r.SetPropertyBlock(value);
         }
 
         public void AddDrawToCommandBuffer(CommandBuffer cmb, Material m = null) {
@@ -84,22 +94,15 @@ namespace DepthSensorSandbox.Visualisation {
                 DepthSensorSandboxProcessor.OnDepthDataBackground -= OnDepthDataCPU;
                 DepthSensorSandboxProcessor.OnNewFrame += OnNewFrameGPU;
                 DepthSensorSandboxProcessor.OnNewFrame -= OnNewFrameCPU;
+                Shader.EnableKeyword(_CALC_DEPTH);
             } else {
+                Shader.DisableKeyword(_CALC_DEPTH);
                 DepthSensorSandboxProcessor.OnDepthDataBackground += OnDepthDataCPU;
                 DepthSensorSandboxProcessor.OnDepthDataBackground -= OnDepthDataGPU;
                 DepthSensorSandboxProcessor.OnNewFrame += OnNewFrameCPU;
                 DepthSensorSandboxProcessor.OnNewFrame -= OnNewFrameGPU;
             }
             _updateMeshOnGPU = _prevUpdateMeshOnGPU = onGPU;
-            InitMaterial();
-        }
-
-        private void InitMaterial() {
-            if (_updateMeshOnGPU) {
-                _mat.EnableKeyword(_CALC_DEPTH);
-            } else {
-                _mat.DisableKeyword(_CALC_DEPTH);
-            }
         }
 
         private void ReInitMeshIfNeed(int width, int heigth, int len) {
@@ -167,8 +170,10 @@ namespace DepthSensorSandbox.Visualisation {
         }
 
         private void OnNewFrameGPU(DepthBuffer depth, MapDepthToCameraBuffer mapToCamera) {
-            _mat.SetTexture(_DEPTH_TEX, depth.texture);
-            _mat.SetTexture(_MAP_TO_CAMERA_TEX, mapToCamera.texture);
+            var props = PropertyBlock;
+            props.SetTexture(_DEPTH_TEX, depth.texture);
+            props.SetTexture(_MAP_TO_CAMERA_TEX, mapToCamera.texture);
+            PropertyBlock = props;
 
             OnNewFrameCPU(depth, mapToCamera);
         }

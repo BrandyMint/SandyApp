@@ -6,19 +6,24 @@ namespace Games.Landscape.Test {
     public class SandboxFluidTest : SandboxFluid {
         private static readonly int _INSTRUMENT = Shader.PropertyToID("_Instrument");
         private static readonly int _INSTRUMENT_TYPE = Shader.PropertyToID("_InstrumentType");
+        private static readonly int _DEPTH_ZERO = Shader.PropertyToID("_DepthZero");
+        private static readonly int _FLUX_ACCELERATION = Shader.PropertyToID("_FluxAcceleration");
+        private static readonly int _CELL_HEIGHT = Shader.PropertyToID("_CellHeight");
+        private static readonly int _CELL_AREA = Shader.PropertyToID("_CellArea");
         
         [SerializeField] private Button _btnResetFluid;
         [SerializeField] private float _InstrumentSize = 25;
         [SerializeField] private float _InstrumentStrength = 1;
-        [SerializeField] private float _CellSize = 1;
+        [SerializeField] private float _depthZero = 1.6f;
+        [SerializeField] private float _fluxAcceleration = 9.8f;
+        [SerializeField] private float _cellSize = 1;
 
         protected override void Awake() {
             base.Awake();
             _btnResetFluid.onClick.AddListener(ClearFluidFlows);
         }
 
-        protected override void OnCalibrationChange() {
-        }
+        protected override void OnCalibrationChange() { }
 
         protected override void Update() {
             base.Update();
@@ -35,10 +40,12 @@ namespace Games.Landscape.Test {
             if (Input.GetMouseButton(1)) {
                 type = 2;
             }
-            _material.SetVector(_INSTRUMENT, instrument);
-            _material.SetInt(_INSTRUMENT_TYPE, type);
-            _material.SetFloat("_CellHeight", _CellSize);
-            _material.SetFloat("_CellArea", _CellSize * _CellSize);
+            _matFluidCalc.SetVector(_INSTRUMENT, instrument);
+            _matFluidCalc.SetInt(_INSTRUMENT_TYPE, type);
+            _matFluidCalc.SetFloat(_DEPTH_ZERO, _depthZero);
+            _matFluidCalc.SetFloat(_FLUX_ACCELERATION, _fluxAcceleration);
+            _matFluidCalc.SetFloat(_CELL_HEIGHT, _cellSize);
+            _matFluidCalc.SetFloat(_CELL_AREA, _cellSize * _cellSize);
         }
     }
 }

@@ -12,19 +12,18 @@ namespace DepthSensorSandbox.Visualisation {
         private const int _CLEAR_STEP_FINISH = 4;
         
         [SerializeField] private Camera _cam;
+        [SerializeField] protected Material _matFluidCalc;
+        [SerializeField] private int _fluidMapHeight = 256;
         
         private readonly RenderTexture[] _texFluxBuffers = new RenderTexture[2];
         private readonly RenderTexture[] _texHeightBuffers = new RenderTexture[2];
         private readonly CommandBuffer[] _commandBuffers = new CommandBuffer[2];
         private int _currFluidBuffer;
-        private int _prevCamCullingMask = -1;
-        private Camera _clearCam;
         private int _clearStep;
 
         private void Start() {
-            _clearCam = new GameObject("CameraClearFluid").AddComponent<Camera>();
-            _clearCam.enabled = false;
-            _clearCam.transform.parent = transform.parent;
+            if (_instantiateMaterial)
+                _matFluidCalc = new Material(_matFluidCalc);
             SetEnable(true);
         }
 
@@ -36,20 +35,13 @@ namespace DepthSensorSandbox.Visualisation {
             foreach (var t in _texFluxBuffers) {
                 if (t != null) t.Release();
             }
+            Destroy(_matFluidCalc);
         }
 
         public override void SetEnable(bool enable) {
             base.SetEnable(enable);
-            for (int i = 0; i < _commandBuffers.Length; ++i) {
-                DisposeCommandBuffer(ref _commandBuffers[i], _FLUID_EVENT);
-            }
             if (enable) {
-                _prevCamCullingMask = _cam.cullingMask;
-                _cam.cullingMask = 0;
                 ClearFluidFlows();
-            } else {
-                if (_prevCamCullingMask >= 0)
-                    _cam.cullingMask = _prevCamCullingMask;
             }
         }
 
@@ -61,10 +53,10 @@ namespace DepthSensorSandbox.Visualisation {
         protected virtual void Update() {
             if (_clearStep <= _CLEAR_STEP_FINISH) {
                 if (_clearStep == 0) {
-                    _material.EnableKeyword(_CLEAR_FLUID);
+                    _matFluidCalc.EnableKeyword(_CLEAR_FLUID);
                 } else 
                 if (_clearStep == _CLEAR_STEP_FINISH) {
-                    _material.DisableKeyword(_CLEAR_FLUID);
+                    _matFluidCalc.DisableKeyword(_CLEAR_FLUID);
                 }
                 ++_clearStep;
             }
@@ -81,11 +73,14 @@ namespace DepthSensorSandbox.Visualisation {
         }
 
         private bool ReCreateBufferIfNeed(ref RenderTexture t, RenderTextureFormat f) {
+            var width = (int) (_cam.aspect * _fluidMapHeight);
             var created = TexturesHelper.ReCreateIfNeed(ref t,
-                _cam.pixelWidth, _cam.pixelHeight, 0, f);
+                width, _fluidMapHeight, 0, f);
             if (created) {
-                t.filterMode = FilterMode.Point;
+                t.filterMode = FilterMode.Bilinear;
                 t.wrapMode = TextureWrapMode.Clamp;
+                t.useMipMap = false;
+                t.autoGenerateMips = false;
                 t.Create();
             }
             return created;
@@ -93,16 +88,16 @@ namespace DepthSensorSandbox.Visualisation {
 
         private void CreateBuffersIfNeed() {
             for (int i = 0; i < _texFluxBuffers.Length; ++i) {
-                var newTexture = ReCreateBufferIfNeed(ref _texFluxBuffers[i], RenderTextureFormat.ARGBFloat);
-                newTexture |= ReCreateBufferIfNeed(ref _texHeightBuffers[i], RenderTextureFormat.RGFloat);
+                var newTexture = ReCreateBufferIfNeed(ref _texHeightBuffers[i], RenderTextureFormat.RGFloat);
+                newTexture |= ReCreateBufferIfNeed(ref _texFluxBuffers[i], RenderTextureFormat.ARGBFloat);
                 if (newTexture || _commandBuffers[i] == null) {
                     DisposeCommandBuffer(ref _commandBuffers[i], _FLUID_EVENT);
                     _commandBuffers[i] = CreateCommandBuffer(
                         new RenderTargetIdentifier[] {
-                            BuiltinRenderTextureType.CameraTarget,
                             _texHeightBuffers[i].colorBuffer,
                             _texFluxBuffers[i].colorBuffer
-                        }
+                        },
+                        _texHeightBuffers[i].depthBuffer
                     );
                     _commandBuffers[i].name += i;
                 }
@@ -113,18 +108,19 @@ namespace DepthSensorSandbox.Visualisation {
             var prevBuffer = NextCircleId(_currFluidBuffer, _texFluxBuffers);
             _cam.RemoveCommandBuffer(_FLUID_EVENT, _commandBuffers[prevBuffer]);
             _cam.AddCommandBuffer(_FLUID_EVENT, _commandBuffers[_currFluidBuffer]);
-            _material.SetTexture(_HEIGHT_PREV_TEX, _texHeightBuffers[prevBuffer], RenderTextureSubElement.Color);
-            _material.SetTexture(_FLUX_PREV_TEX, _texFluxBuffers[prevBuffer], RenderTextureSubElement.Color);
+            var props = _sandbox.PropertyBlock;
+            props.SetTexture(_HEIGHT_PREV_TEX, _texHeightBuffers[prevBuffer], RenderTextureSubElement.Color);
+            props.SetTexture(_FLUX_PREV_TEX, _texFluxBuffers[prevBuffer], RenderTextureSubElement.Color);
+            _sandbox.PropertyBlock = props;
         }
 
-        private CommandBuffer CreateCommandBuffer(RenderTargetIdentifier[] targets) {
+        private CommandBuffer CreateCommandBuffer(RenderTargetIdentifier[] targets, RenderTargetIdentifier depth) {
             var cmb = new CommandBuffer {
                 name = nameof(SandboxFluid)
             };
-            cmb.SetRenderTarget(new [] {targets[1], targets[2]}, targets[0]);
+            cmb.SetRenderTarget(targets, depth);
             cmb.ClearRenderTarget(false, true, Color.clear);
-            cmb.SetRenderTarget(targets, targets[0]);
-            _sandbox.AddDrawToCommandBuffer(cmb);
+            _sandbox.AddDrawToCommandBuffer(cmb, _matFluidCalc);
             return cmb;
         }
 
