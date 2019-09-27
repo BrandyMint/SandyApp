@@ -1,4 +1,4 @@
-﻿Shader "Sandbox/ColorTestFluid" {
+﻿Shader "Sandbox/ColorDebugFluid" {
     Properties {
         _TerrainMin ("Terrain Min", Float) = 2
         _TerrainMax ("Terrain Max", Float) = 0.1
@@ -20,8 +20,8 @@
             #pragma fragment frag
 
             #include "UnityCG.cginc"
-            #include "sandbox.cginc"
-            #include "fluid.cginc"
+            #include "Assets/DepthSensorSandbox/Resources/Materials/sandbox.cginc"
+            #include "Assets/DepthSensorSandbox/Resources/Materials/fluid.cginc"
             
             float _TerrainMin;
             float _TerrainMax;

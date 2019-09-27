@@ -2,7 +2,7 @@ using DepthSensorSandbox.Visualisation;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Games.Landscape.Test {
+namespace DepthSensorSandbox.Test {
     public class SandboxFluidTest : SandboxFluid {
         private static readonly int _INSTRUMENT = Shader.PropertyToID("_Instrument");
         private static readonly int _INSTRUMENT_TYPE = Shader.PropertyToID("_InstrumentType");
