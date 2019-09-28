@@ -13,7 +13,7 @@ namespace DepthSensorSandbox.Visualisation {
         
         [SerializeField] private Camera _cam;
         [SerializeField] protected Material _matFluidCalc;
-        [SerializeField] private int _fluidMapHeight = 256;
+        [SerializeField] protected int _fluidMapHeight = 256;
         
         private readonly RenderTexture[] _texFluxBuffers = new RenderTexture[2];
         private readonly RenderTexture[] _texHeightBuffers = new RenderTexture[2];
@@ -35,18 +35,16 @@ namespace DepthSensorSandbox.Visualisation {
             foreach (var t in _texFluxBuffers) {
                 if (t != null) t.Release();
             }
-            Destroy(_matFluidCalc);
         }
 
         public override void SetEnable(bool enable) {
             base.SetEnable(enable);
             if (enable) {
-                ClearFluidFlows();
+                CreateBuffersIfNeed();
             }
         }
 
         public void ClearFluidFlows() {
-            CreateBuffersIfNeed();
             _clearStep = 0;
         }
 
@@ -86,7 +84,7 @@ namespace DepthSensorSandbox.Visualisation {
             return created;
         }
 
-        private void CreateBuffersIfNeed() {
+        protected void CreateBuffersIfNeed() {
             for (int i = 0; i < _texFluxBuffers.Length; ++i) {
                 var newTexture = ReCreateBufferIfNeed(ref _texHeightBuffers[i], RenderTextureFormat.RGFloat);
                 newTexture |= ReCreateBufferIfNeed(ref _texFluxBuffers[i], RenderTextureFormat.ARGBFloat);
@@ -100,6 +98,7 @@ namespace DepthSensorSandbox.Visualisation {
                         _texHeightBuffers[i].depthBuffer
                     );
                     _commandBuffers[i].name += i;
+                    ClearFluidFlows();
                 }
             }
         }

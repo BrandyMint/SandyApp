@@ -38,6 +38,26 @@ namespace Games.Landscape {
                 get => Get(nameof(DetailsSize), 1f);
                 set => Set(nameof(DetailsSize), value);
             }
+            
+            public bool EnableWaterSimulation {
+                get => Get(nameof(EnableWaterSimulation), true);
+                set => Set(nameof(EnableWaterSimulation), value);
+            }
+            
+            public float FluidResolution {
+                get => Get(nameof(FluidResolution), 256);
+                set => Set(nameof(FluidResolution), value);
+            }
+            
+            public float FluidCellSize {
+                get => Get(nameof(FluidCellSize), 1f);
+                set => Set(nameof(FluidCellSize), value);
+            }
+            
+            public float FluidAcceleration {
+                get => Get(nameof(FluidAcceleration), 9.8f);
+                set => Set(nameof(FluidAcceleration), value);
+            }
         }
     }
 }

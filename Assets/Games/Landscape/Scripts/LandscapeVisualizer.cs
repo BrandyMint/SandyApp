@@ -3,7 +3,8 @@ using DepthSensorSandbox.Visualisation;
 using UnityEngine;
 
 namespace Games.Landscape {
-    public class LandscapeVisualizer : SandboxVisualizerBase {
+    public class LandscapeVisualizer : SandboxFluid {
+        private const string _DYNAMIC_FLUID = "DYNAMIC_FLUID";
         private static readonly int _DEPTH_SEA_BOTTOM = Shader.PropertyToID("_DepthSeaBottom");
         private static readonly int _DEPTH_SEA = Shader.PropertyToID("_DepthSea");
         private static readonly int _DEPTH_GROUND = Shader.PropertyToID("_DepthGround");
@@ -11,6 +12,9 @@ namespace Games.Landscape {
         private static readonly int _DEPTH_ICE = Shader.PropertyToID("_DepthIce");
         private static readonly int _MIX_DEPTH = Shader.PropertyToID("_MixDepth");
         private static readonly int _MIX_NOISE_STRENGTH = Shader.PropertyToID("_MixNoiseStrength");
+        private static readonly int _FLUX_ACCELERATION = Shader.PropertyToID("_FluxAcceleration");
+        private static readonly int _CELL_HEIGHT = Shader.PropertyToID("_CellHeight");
+        private static readonly int _CELL_AREA = Shader.PropertyToID("_CellArea");
 
         private readonly int[] _DetailSizeFloats = new[] {
             _MIX_DEPTH,
@@ -46,8 +50,11 @@ namespace Games.Landscape {
         }
 
         private void OnPrefsChanged() {
-            _material.SetFloat(_DEPTH_SEA_BOTTOM, Prefs.Landscape.DepthSeaBottom);
+            var props = _sandbox.PropertyBlock;
             _material.SetFloat(_DEPTH_SEA, Prefs.Landscape.DepthSea);
+            _sandbox.PropertyBlock = props;
+
+            _material.SetFloat(_DEPTH_SEA_BOTTOM, Prefs.Landscape.DepthSeaBottom);
             _material.SetFloat(_DEPTH_GROUND, Prefs.Landscape.DepthGround);
             _material.SetFloat(_DEPTH_MOUNTAINS, Prefs.Landscape.DepthMountains);
             _material.SetFloat(_DEPTH_ICE, Prefs.Landscape.DepthIce);
@@ -70,6 +77,20 @@ namespace Games.Landscape {
             
             var noiseStrength = _detailSizeFloatDefaults[_MIX_NOISE_STRENGTH];
             _material.SetFloat(_MIX_NOISE_STRENGTH, noiseStrength / mixDepthDef * mixDepth);
+            
+            //water
+            if (Prefs.Landscape.EnableWaterSimulation) {
+                _material.EnableKeyword(_DYNAMIC_FLUID);
+            } else {
+                _material.DisableKeyword(_DYNAMIC_FLUID);
+            }
+            
+            _matFluidCalc.SetFloat(_FLUX_ACCELERATION, Prefs.Landscape.FluidAcceleration);
+            _matFluidCalc.SetFloat(_CELL_HEIGHT, Prefs.Landscape.FluidCellSize);
+            _matFluidCalc.SetFloat(_CELL_AREA, Prefs.Landscape.FluidCellSize * Prefs.Landscape.FluidCellSize);
+            
+            _fluidMapHeight = (int) Prefs.Landscape.FluidResolution;
+            CreateBuffersIfNeed();
         }
     }
 }

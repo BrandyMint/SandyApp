@@ -14,6 +14,9 @@ namespace Games.Landscape {
         [SerializeField] private Button _btnBack;
         [SerializeField] private Button _btnReset;
         [SerializeField] private Button _btnSave;
+        [SerializeField] private Button _btnResetWater;
+        [SerializeField] private Toggle _tglWater;
+        [SerializeField] private LandscapeVisualizer _landscape;
         [SerializeField] private Transform _pnlParams;
         
         private class SliderField {
@@ -31,6 +34,12 @@ namespace Games.Landscape {
             public SliderField DepthMountains { get; set; }
             public SliderField DepthIce { get; set; }
             public SliderField DetailsSize { get; set; }
+            
+            public SliderField FluidResolution { get; set; }
+            
+            public SliderField FluidCellSize { get; set; }
+            
+            public SliderField FluidAcceleration { get; set; }
         }
 
         private readonly ParamsFields _params = new ParamsFields();
@@ -41,6 +50,10 @@ namespace Games.Landscape {
             _btnBack.onClick.AddListener(OnBtnBack);
             _btnReset.onClick.AddListener(OnBtnReset);
             _btnSave.onClick.AddListener(OnBtnSave);
+            _btnResetWater.onClick.AddListener(OnBtnResetWater);
+
+            _tglWater.isOn = Prefs.Landscape.EnableWaterSimulation;
+            _tglWater.onValueChanged.AddListener(OnTglWater);
 
             UnityHelper.SetPropsByGameObjects(_params, _pnlParams);
             InitSlider(_params.DepthSeaBottom, nameof(Prefs.Landscape.DepthSeaBottom));
@@ -49,6 +62,9 @@ namespace Games.Landscape {
             InitSlider(_params.DepthMountains, nameof(Prefs.Landscape.DepthMountains));
             InitSlider(_params.DepthIce, nameof(Prefs.Landscape.DepthIce));
             InitSlider(_params.DetailsSize, nameof(Prefs.Landscape.DetailsSize));
+            InitSlider(_params.FluidResolution, nameof(Prefs.Landscape.FluidResolution));
+            InitSlider(_params.FluidCellSize, nameof(Prefs.Landscape.FluidCellSize));
+            InitSlider(_params.FluidAcceleration, nameof(Prefs.Landscape.FluidAcceleration));
         }
 
         private static void OnBtnSave() {
@@ -66,6 +82,14 @@ namespace Games.Landscape {
 
         private static void OnBtnBack() {
             Scenes.GoBack();
+        }
+        
+        private void OnBtnResetWater() {
+            _landscape.ClearFluidFlows();
+        }
+
+        private static void OnTglWater(bool enable) {
+            Prefs.Landscape.EnableWaterSimulation = enable;
         }
 
         private void InitSlider(SliderField fld, string param) {
