@@ -10,7 +10,7 @@ namespace DepthSensor.Device {
         public readonly SensorColor Color;
         public readonly SensorBody Body;
         public readonly SensorMapDepthToCamera MapDepthToCamera;
-        public readonly string Platform;
+        public readonly string Name;
         
         
         protected InitInfo _initInfo;
@@ -23,6 +23,7 @@ namespace DepthSensor.Device {
         private readonly bool _isInitialised;
 
         protected class InitInfo {
+            public string Name;
             public SensorDepth Depth;
             public SensorIndex SensorIndex;
             public SensorColor SensorColor;
@@ -30,8 +31,8 @@ namespace DepthSensor.Device {
             public SensorMapDepthToCamera MapDepthToCamera;
         }
 
-        protected DepthSensorDevice(string platform, InitInfo initInfo) {
-            Platform = platform;
+        protected DepthSensorDevice(InitInfo initInfo) {
+            Name = initInfo.Name;
             Depth = initInfo.Depth ?? new SensorDepth(false);
             Index = initInfo.SensorIndex ?? new SensorIndex(false);
             Color = initInfo.SensorColor ?? new SensorColor(false);

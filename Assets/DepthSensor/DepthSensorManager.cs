@@ -22,16 +22,28 @@ namespace DepthSensor {
 
 		private DepthSensorDevice.Internal _internalDevice;
 
+		private bool _initializing;
+
 		private void Awake() {
 			Instance = this;
 			DontDestroyOnLoad(gameObject);
 		}
 
 		private void Start() {
-			StartCoroutine(TryInit());
+			TryInit();
 		}
 
 		private void OnDestroy() {
+			Stop(true);
+		}
+
+		public void TryInit() {
+			StartCoroutine(Initing());
+		}
+
+		public void Stop(bool force = false) {
+			if (_initializing && !force)
+				return;
 			StopAllCoroutines();
 			if (Device != null) {
 				_internalDevice.Close();
@@ -39,7 +51,8 @@ namespace DepthSensor {
 			}
 		}
 
-		private IEnumerator TryInit() {
+		private IEnumerator Initing() {
+			_initializing = true;
 			foreach (var typeSensor in _TRYING_INIT_QUEUE) {
 				if (CreateDeviceFromType(typeSensor)) {
 					var maxWait = Time.realtimeSinceStartup + _WAIT_AVAILABLE;
@@ -52,6 +65,7 @@ namespace DepthSensor {
 				Initialized();
 			else
 				Debug.LogWarning(GetType().Name + ": No devices are available!");
+			_initializing = false;
 		}
 
 		private bool CreateDeviceFromType(Type type) {
@@ -76,6 +90,10 @@ namespace DepthSensor {
 		public static bool IsInitialized() {
 			return Instance != null && Instance.Device != null 
 			       && Instance.Device.IsAvailable();
+		}
+
+		public static bool Initializing() {
+			return Instance != null && Instance._initializing;
 		}
 	}
 }

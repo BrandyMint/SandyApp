@@ -35,7 +35,7 @@ namespace DepthSensor.Device {
         private readonly Thread _reactivateSensors;
         private readonly object _multiReaderSync = new object();
 
-        public Kinect2Device() : base("Kinect2", Init()) {
+        public Kinect2Device() : base(Init()) {
             var init = (InitInfoKinect2) _initInfo;
             _kinect = init.kinect;
             
@@ -50,7 +50,9 @@ namespace DepthSensor.Device {
         }
 
         private static InitInfo Init() {
-            var init = new InitInfoKinect2();
+            var init = new InitInfoKinect2 {
+                Name = "Kinect2"
+            };
             
             try {
                 init.kinect = KinectSensor.GetDefault();

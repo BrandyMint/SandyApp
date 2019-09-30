@@ -66,7 +66,7 @@ namespace DepthSensor.Device {
         private readonly AutoResetEvent _sensorActiveChangedEvent = new AutoResetEvent(false);
         private readonly HashSet<NI2Sensor> _sensorsActiveChanged = new HashSet<NI2Sensor>();
 
-        public OpenNI2Device() : base("OpenNI2", Init()) {
+        public OpenNI2Device() : base(Init()) {
             var init = (InitInfoOpenNI2) _initInfo;
             _device = init.device;
             if (_device != null)
@@ -97,7 +97,9 @@ namespace DepthSensor.Device {
         }
 
         private static InitInfo Init() {
-            var init = new InitInfoOpenNI2();
+            var init = new InitInfoOpenNI2 {
+                Name = "OpenNI2"
+            };
 
             try {
                 var status = OpenNI.Initialize();
@@ -111,6 +113,7 @@ namespace DepthSensor.Device {
                 }
 
                 Debug.Log($"OpenNI2: selected device {deviceInfo.Name} {deviceInfo.Uri}");
+                init.Name = $"{deviceInfo.Vendor} {deviceInfo.Name}";
 
                 init.modeDepth = GetBestVideoMod(init.device, OpenNIWrapper.Device.SensorType.Depth);
                 if (init.modeDepth != null) {
