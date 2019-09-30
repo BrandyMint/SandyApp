@@ -14,8 +14,11 @@ namespace Launcher.MultiMonitorSupport {
         private Camera _prevCamera;
 
         private void Awake() {
-            Assert.IsTrue(MultiMonitor.UseMultiMonitorFix(), 
-                "MultiMonitorCanvasFix must be used when MultiMonitor.UseMultiMonitorFix() == true");
+            if (!MultiMonitor.UseMultiMonitorFix()) {
+                Destroy(this);
+                return;
+            }
+            
             Assert.IsFalse(_canvas.renderMode == RenderMode.ScreenSpaceOverlay,
                 "MultiMonitorCanvasFix dont support RenderMode.ScreenSpaceOverlay!");
             _canvas = GetComponent<Canvas>();
