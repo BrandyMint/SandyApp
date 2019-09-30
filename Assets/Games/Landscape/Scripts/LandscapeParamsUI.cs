@@ -40,6 +40,7 @@ namespace Games.Landscape {
             public SliderField FluidCellSize { get; set; }
             
             public SliderField FluidAcceleration { get; set; }
+            public SliderField FluidFading { get; set; }
         }
 
         private readonly ParamsFields _params = new ParamsFields();
@@ -65,6 +66,7 @@ namespace Games.Landscape {
             InitSlider(_params.FluidResolution, nameof(Prefs.Landscape.FluidResolution));
             InitSlider(_params.FluidCellSize, nameof(Prefs.Landscape.FluidCellSize));
             InitSlider(_params.FluidAcceleration, nameof(Prefs.Landscape.FluidAcceleration));
+            InitSlider(_params.FluidFading, nameof(Prefs.Landscape.FluidFading));
         }
 
         private static void OnBtnSave() {

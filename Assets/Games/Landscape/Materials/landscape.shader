@@ -109,7 +109,6 @@
 #endif
                 
                 float dSea = _DepthZero - _DepthSea;
-                float dBottom = dSea - _DepthSeaBottom;
                 float dGround = dSea - _DepthGround;
                 float dMountains = dGround - _DepthMountains;
                 float dIce = dMountains - _DepthIce;
@@ -121,10 +120,13 @@
                 c.rgb = lerp(c.rgb, _ColorIce.rgb, _ColorIce.a * smooth(dMountains, dIce, z));
                 
 #ifdef DYNAMIC_FLUID
-                dSea = HEIGHT_FULL(h) * 1.01;
+                dSea = 0;
+                z = WATER_H(h);
 #endif
-                fixed4 sea = lerp(_ColorSeaMin, _ColorSeaMax, smooth(dSea, dBottom, z));
-                c.rgb = lerp(c.rgb, sea.rgb, sea.a * smooth(dSea, z));
+                float kSeaColor = smooth(dSea, dSea - _DepthSeaBottom, z);
+                float kSeaAlptha = smooth(dSea, dSea + _MixDepth / 2, z);
+                fixed4 sea = lerp(_ColorSeaMin, _ColorSeaMax, kSeaColor);
+                c.rgb = lerp(c.rgb, sea.rgb, sea.a * kSeaAlptha);
                 return c;
             }
             ENDCG

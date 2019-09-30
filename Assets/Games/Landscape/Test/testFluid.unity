@@ -270,13 +270,15 @@ MonoBehaviour:
   _instantiateMaterial: 1
   _cam: {fileID: 585363456}
   _matFluidCalc: {fileID: 2100000, guid: cf9e65e6eea3f244fbb47cae8cdedee4, type: 2}
-  _fluidMapHeight: 128
+  _fluidMapHeight: 256
   _btnResetFluid: {fileID: 1450655343}
-  _InstrumentSize: 50
-  _InstrumentStrength: 0.3
+  _InstrumentSize: 70
+  _InstrumentStrength: 0.5
   _depthZero: 1.6
-  _fluxAcceleration: 9.8
-  _cellSize: 1
+  _fluxAcceleration: 40
+  _fluxFading: 0.1
+  _cellWidth: 0.5
+  _cellHeight: 5
 --- !u!1 &925452556
 GameObject:
   m_ObjectHideFlags: 0

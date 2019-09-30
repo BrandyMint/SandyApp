@@ -71,11 +71,11 @@ Material:
     - _BumpScale: 1
     - _Cutoff: 0.5
     - _Depth1: 0.1
-    - _DepthGround: 0.035
+    - _DepthGround: 0.01
     - _DepthIce: 0.2
     - _DepthMountains: 0.1
     - _DepthSea: 0
-    - _DepthSeaBottom: -0.15
+    - _DepthSeaBottom: -0.1
     - _DepthZero: 1.65
     - _DetailNormalMapScale: 1
     - _DstBlend: 0

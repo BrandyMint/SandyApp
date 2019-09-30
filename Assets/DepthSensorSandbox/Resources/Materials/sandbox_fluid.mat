@@ -66,6 +66,7 @@ Material:
     - _DstBlend: 0
     - _FluxAcceleration: 9.8
     - _FluxBright: 100
+    - _FluxFading: 0.1
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1

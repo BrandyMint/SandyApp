@@ -10,6 +10,7 @@ namespace DepthSensorSandbox.Test {
         private static readonly int _INSTRUMENT_TYPE = Shader.PropertyToID("_InstrumentType");
         private static readonly int _DEPTH_ZERO = Shader.PropertyToID("_DepthZero");
         private static readonly int _FLUX_ACCELERATION = Shader.PropertyToID("_FluxAcceleration");
+        private static readonly int _FLUX_FADING = Shader.PropertyToID("_FluxFading");
         private static readonly int _CELL_HEIGHT = Shader.PropertyToID("_CellHeight");
         private static readonly int _CELL_AREA = Shader.PropertyToID("_CellArea");
         
@@ -18,7 +19,9 @@ namespace DepthSensorSandbox.Test {
         [SerializeField] private float _InstrumentStrength = 1;
         [SerializeField] private float _depthZero = 1.6f;
         [SerializeField] private float _fluxAcceleration = 9.8f;
-        [SerializeField] private float _cellSize = 1;
+        [SerializeField] private float _fluxFading = 0.1f;
+        [SerializeField] private float _cellWidth = 1;
+        [SerializeField] private float _cellHeight = 1;
 
         protected override void Awake() {
             base.Awake();
@@ -47,8 +50,9 @@ namespace DepthSensorSandbox.Test {
             _matFluidCalc.SetVector(_INSTRUMENT, instrument);
             _matFluidCalc.SetInt(_INSTRUMENT_TYPE, type);
             _matFluidCalc.SetFloat(_FLUX_ACCELERATION, _fluxAcceleration);
-            _matFluidCalc.SetFloat(_CELL_HEIGHT, _cellSize);
-            _matFluidCalc.SetFloat(_CELL_AREA, _cellSize * _cellSize);
+            _matFluidCalc.SetFloat(_FLUX_FADING, _fluxFading);
+            _matFluidCalc.SetFloat(_CELL_HEIGHT, _cellHeight);
+            _matFluidCalc.SetFloat(_CELL_AREA, _cellWidth * _cellWidth);
             
             var props = _sandbox.PropertyBlock;
             props.SetFloat(_DEPTH_ZERO, _depthZero);

@@ -45,7 +45,7 @@ namespace Games.Landscape {
             }
             
             public float FluidResolution {
-                get => Get(nameof(FluidResolution), 256);
+                get => Get(nameof(FluidResolution), 256f);
                 set => Set(nameof(FluidResolution), value);
             }
             
@@ -57,6 +57,11 @@ namespace Games.Landscape {
             public float FluidAcceleration {
                 get => Get(nameof(FluidAcceleration), 9.8f);
                 set => Set(nameof(FluidAcceleration), value);
+            }
+            
+            public float FluidFading {
+                get => Get(nameof(FluidFading), 0.1f);
+                set => Set(nameof(FluidFading), value);
             }
         }
     }

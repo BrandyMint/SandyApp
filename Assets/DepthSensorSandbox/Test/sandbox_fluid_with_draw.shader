@@ -1,6 +1,7 @@
 Shader "Sandbox/FluidWithDraw" {
     Properties {
         _FluxAcceleration ("Flux Acceleration", Float) = 9.8
+        _FluxFading ("Flux Fading", Float) = 0.999
         _DepthZero ("Depth Zero", Float) = 1.6
         _CellArea ("Cell Area", Float) = 1
         _CellHeight ("Cell Height", Float) = 1

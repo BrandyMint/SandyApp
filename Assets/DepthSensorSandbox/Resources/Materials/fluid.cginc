@@ -17,6 +17,7 @@ float4 _HeightPrevTex_TexelSize;
 float _DepthSea;
 float _DepthZero;
 float _FluxAcceleration;
+float _FluxFading;
 float _CellArea;
 float _CellHeight;
 
@@ -73,6 +74,7 @@ TYPE_FLUX calcFlux (float2 xy, TYPE_FLUX flux, TYPE_HEIGHT h, TYPE_HEIGHT hl, TY
     T_FLUX(heightDiff) += HEIGHT_FULL(ht);
     B_FLUX(heightDiff) += HEIGHT_FULL(hb);
     
+    flux *= 1 - unity_DeltaTime.x * _FluxFading;
     flux = max(0, flux + unity_DeltaTime.x * _FluxAcceleration * _CellArea * heightDiff / _CellHeight);
     flux *= min(1, WATER_H(h) * _CellArea / (SUM_C(flux) * unity_DeltaTime.x));
     

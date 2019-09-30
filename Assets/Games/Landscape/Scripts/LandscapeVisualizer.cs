@@ -13,6 +13,7 @@ namespace Games.Landscape {
         private static readonly int _MIX_DEPTH = Shader.PropertyToID("_MixDepth");
         private static readonly int _MIX_NOISE_STRENGTH = Shader.PropertyToID("_MixNoiseStrength");
         private static readonly int _FLUX_ACCELERATION = Shader.PropertyToID("_FluxAcceleration");
+        private static readonly int _FLUX_FADING = Shader.PropertyToID("_FluxFading");
         private static readonly int _CELL_HEIGHT = Shader.PropertyToID("_CellHeight");
         private static readonly int _CELL_AREA = Shader.PropertyToID("_CellArea");
 
@@ -86,6 +87,7 @@ namespace Games.Landscape {
             }
             
             _matFluidCalc.SetFloat(_FLUX_ACCELERATION, Prefs.Landscape.FluidAcceleration);
+            _matFluidCalc.SetFloat(_FLUX_FADING, Prefs.Landscape.FluidFading);
             _matFluidCalc.SetFloat(_CELL_HEIGHT, Prefs.Landscape.FluidCellSize);
             _matFluidCalc.SetFloat(_CELL_AREA, Prefs.Landscape.FluidCellSize * Prefs.Landscape.FluidCellSize);
             
