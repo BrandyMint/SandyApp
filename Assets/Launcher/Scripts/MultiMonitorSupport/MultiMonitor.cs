@@ -6,6 +6,8 @@ using Utilities;
 
 namespace Launcher.MultiMonitorSupport {
     public class MultiMonitor : MonoBehaviour {
+        public static event Action OnNotEnoughMonitors;
+        
         [SerializeField] private bool _useMultiMonitorFix = true;
         [SerializeField, Range(1, 8)] private int _useMonitors = 2;
         
@@ -68,6 +70,7 @@ namespace Launcher.MultiMonitorSupport {
 
         private static void NotEnoughMonitors(int useMonitors) {
             Debug.LogError($"Cant find {useMonitors} displays!");
+            OnNotEnoughMonitors?.Invoke();
         }
 
         private static void OnSceneLoaded(Scene scene, LoadSceneMode mode) {
@@ -77,14 +80,20 @@ namespace Launcher.MultiMonitorSupport {
         private static void FixCamerasIn(Scene scene) {
             if (!UseMultiMonitorFix())
                 return;
-            foreach (var rootObjs in scene.GetRootGameObjects()) {
-                foreach (var canvas in rootObjs.GetComponentsInChildren<Canvas>(true)) {
-                    canvas.gameObject.AddComponent<MultiMonitorCanvasFix>();
-                }
-                foreach (var cam in rootObjs.GetComponentsInChildren<Camera>(true)) {
-                    if (cam.targetTexture == null)
-                        SetTargetDisplay(cam, cam.targetDisplay);
-                }
+            foreach (var rootObj in scene.GetRootGameObjects()) {
+                FixCamerasIn(rootObj);
+            }
+        }
+
+        public static void FixCamerasIn(GameObject obj) {
+            if (!UseMultiMonitorFix())
+                return;
+            foreach (var canvas in obj.GetComponentsInChildren<Canvas>(true)) {
+                canvas.gameObject.AddComponent<MultiMonitorCanvasFix>();
+            }
+            foreach (var cam in obj.GetComponentsInChildren<Camera>(true)) {
+                if (cam.targetTexture == null)
+                    SetTargetDisplay(cam, cam.targetDisplay);
             }
         }
 
@@ -130,8 +139,13 @@ namespace Launcher.MultiMonitorSupport {
                 
                 return rect;
             } else {
-                var disp = Display.displays[dispNum];
-                return new Rect(0, 0, disp.systemWidth, disp.systemHeight);
+                if (Display.displays.Length < dispNum) {
+                    var disp = Display.displays[dispNum];
+                    return new Rect(0, 0, disp.systemWidth, disp.systemHeight);
+                } else {
+                    NotEnoughMonitors(dispNum);
+                    return new Rect();
+                }
             }
         }
         
