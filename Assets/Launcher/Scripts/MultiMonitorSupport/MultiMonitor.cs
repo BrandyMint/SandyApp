@@ -9,6 +9,7 @@ namespace Launcher.MultiMonitorSupport {
         public static event Action OnNotEnoughMonitors;
         
         [SerializeField] private bool _useMultiMonitorFix = true;
+        [SerializeField] private bool _revertDefaultScreenSettingsOnExit = true;
         [SerializeField, Range(1, 8)] private int _useMonitors = 2;
         
         public static MultiMonitor Instance { get; private set; }
@@ -28,6 +29,11 @@ namespace Launcher.MultiMonitorSupport {
         }
 
         private void OnDestroy() {
+            if (_revertDefaultScreenSettingsOnExit) {
+                PlayerPrefs.DeleteKey("Screenmanager Fullscreen mode");
+                PlayerPrefs.DeleteKey("Screenmanager Resolution Width");
+                PlayerPrefs.DeleteKey("Screenmanager Resolution Height");
+            }
             _systemApi?.Dispose();
         }
 
@@ -41,7 +47,7 @@ namespace Launcher.MultiMonitorSupport {
         private void ActivateDisplays() {
 #if UNITY_EDITOR || !UNITY_STANDALONE
             return;
-#endif            
+#endif
             if (UseMultiMonitorFix()) {
                 if (GetMultiMonitorRect(out var multiRect)) {
                     StartCoroutine(ActivatingDisplays(multiRect));
@@ -49,7 +55,10 @@ namespace Launcher.MultiMonitorSupport {
             } else if (Display.displays.Length >= _useMonitors) {
                 for (int i = 0; i < Math.Min(Display.displays.Length, _useMonitors); ++i) {
                     var disp = Display.displays[i];
-                    if (!disp.active) disp.Activate();
+                    if (!disp.active)
+                        disp.Activate();
+                    else
+                        Screen.SetResolution(disp.systemWidth, disp.systemHeight, false);
                     disp.SetRenderingResolution(disp.systemWidth, disp.systemHeight);
                     Debug.Log($"Activated display {i} {disp.systemWidth}x{disp.systemHeight}");
                 }

@@ -56,5 +56,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b29eb95824bdb0d42841fcc658ae6e5f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _useMultiMonitorFix: 1
+  _useMultiMonitorFix: 0
   _useMonitors: 2
