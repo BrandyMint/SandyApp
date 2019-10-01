@@ -93,8 +93,11 @@ namespace UINotify {
                 OnFinish?.Invoke();
                 Destroy(gameObject);
             }
-            if (!_infinityTime || _infinityTime && _timer > _timeHide)
+            
+            if (!_infinityTime || _infinityTime && _timer > _timeHide + _timeMove)
                 _timer -= Time.deltaTime;
+            else
+                SetHide(0f);
         }
 
         private void SetShow(float k) {

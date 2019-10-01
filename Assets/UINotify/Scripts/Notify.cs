@@ -125,7 +125,7 @@ namespace UINotify {
         public static Control Show(Style style, LifeTime time, string text) {
             return Show(new Params {
                 style = style,
-                time = LifeTime.SHORT,
+                time = time,
                 text = text
             });
         }
@@ -133,7 +133,7 @@ namespace UINotify {
         public static Control Show(Style style, LifeTime time, string title, string text) {
             return Show(new Params {
                 style = style,
-                time = LifeTime.SHORT,
+                time = time,
                 title = title,
                 text = text
             });
