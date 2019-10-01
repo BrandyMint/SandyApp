@@ -2,6 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+#if USE_MAT_ASYNC_SET
+    using AsyncGPUReadbackPluginNs;
+#endif
 using DepthSensorSandbox.Visualisation;
 using UINotify;
 using Unity.Collections;
