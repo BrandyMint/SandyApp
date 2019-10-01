@@ -53,12 +53,13 @@ namespace Launcher.MultiMonitorSupport {
                     StartCoroutine(ActivatingDisplays(multiRect));
                 }
             } else if (Display.displays.Length >= _useMonitors) {
+                var fullscreen = Application.platform == RuntimePlatform.LinuxPlayer;
                 for (int i = 0; i < Math.Min(Display.displays.Length, _useMonitors); ++i) {
                     var disp = Display.displays[i];
                     if (!disp.active)
                         disp.Activate();
                     else
-                        Screen.SetResolution(disp.systemWidth, disp.systemHeight, false);
+                        Screen.SetResolution(disp.systemWidth, disp.systemHeight, fullscreen);
                     disp.SetRenderingResolution(disp.systemWidth, disp.systemHeight);
                     Debug.Log($"Activated display {i} {disp.systemWidth}x{disp.systemHeight}");
                 }
