@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 using UnityEngine;
 
 public abstract class SerializableParams {
-    public event Action OnChanged; 
+    public event Action OnChanged;
     
     protected virtual string GetFileName() {
         return GetType().Name + ".json";
@@ -39,12 +39,14 @@ public abstract class SerializableParams {
             InvokeChanged();
     }
 
-    public void Save() {
+    public bool Save() {
         try {
             var json = JsonConvert.SerializeObject(this, Formatting.Indented);
             File.WriteAllText(GetFullPath(), json);
+            return true;
         } catch (Exception e) {
             Debug.LogException(e);
+            return false;
         }
     }
 

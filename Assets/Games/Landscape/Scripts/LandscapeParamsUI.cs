@@ -70,7 +70,7 @@ namespace Games.Landscape {
         }
 
         private static void OnBtnSave() {
-            Prefs.Landscape.Save();
+            Prefs.NotifySaved(Prefs.Landscape.Save());
         }
 
         private void OnBtnReset() {

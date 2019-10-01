@@ -136,8 +136,9 @@ namespace DepthSensorCalibration {
         }
 
         private void OnBtnSave() {
-            _projector.Save();
-            Prefs.Calibration.Save();
+            var success = _projector.Save();
+            success &= Prefs.Calibration.Save();
+            Prefs.NotifySaved(success);
             Scenes.GoBack();
         }
 

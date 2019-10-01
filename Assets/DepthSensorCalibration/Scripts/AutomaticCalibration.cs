@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using DepthSensorSandbox.Visualisation;
+using UINotify;
 using Unity.Collections;
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,6 +12,10 @@ using Utilities;
 namespace DepthSensorCalibration {
     [RequireComponent(typeof(CalibrationController), typeof(ImageTracker))]
     public class AutomaticCalibration : MonoBehaviour {
+        private const string _TXT_CALIBRATION_SUCCESS = "Калибровка завершилась успешно!";
+        private const string _TXT_CALIBRATION_FAIL = "Калибровка прошла неудачно.\n" 
+                 + "Удостовертесь, что маркер полностью виден на этом экране, отсутсвует завсетка, детали четкие.\n"
+                 + "Попробуйте изменить освещение комнаты или поменять яркость проектора.";
         private const string _AUTO_CONTRAST = "AUTO_CONTRAST";
         private static readonly int _CONTRAST_WIDTH = Shader.PropertyToID("_ContrastWidth");
         private static readonly int _CONTRAST_CENTER = Shader.PropertyToID("_ContrastCenter");
@@ -214,8 +219,10 @@ namespace DepthSensorCalibration {
                 Prefs.Calibration.Position = pos;
                 Prefs.Calibration.Rotation = Quaternion.LookRotation(forward, up);
                 Prefs.Calibration.ZeroDepth = zeroDepth;
+                Notify.Show(Style.SUCCESS, _TXT_CALIBRATION_SUCCESS);
             } else {
                 RestorePrefs();
+                Notify.Show(Style.FAIL, LifeTime.LONG, _TXT_CALIBRATION_FAIL);
             }
         }
 
