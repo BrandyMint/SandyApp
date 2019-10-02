@@ -7,7 +7,7 @@ namespace DepthSensorSandbox.Processing {
         public ushort MaxError = 50;
         
         protected override void ProcessInternal() {
-            Parallel.For(0, _inOut.data.Length, FilterBody);
+            Parallel.For(0, _inOut.length, FilterBody);
         }
 
         private void FilterBody(int i) {

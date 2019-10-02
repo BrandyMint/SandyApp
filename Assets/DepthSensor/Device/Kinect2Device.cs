@@ -39,7 +39,7 @@ namespace DepthSensor.Device {
             var init = (InitInfoKinect2) _initInfo;
             _kinect = init.kinect;
             
-            _bodyKinect = new Windows.Kinect.Body[Body.GetOldest().data.Length];
+            _bodyKinect = new Windows.Kinect.Body[Body.GetOldest().length];
             if (!_kinect.IsOpen)
                 _kinect.Open();
             _reactivateSensors = new Thread(ReactivateSensorsBGLoop) {
@@ -278,8 +278,8 @@ namespace DepthSensor.Device {
             //var map = _kinect.CoordinateMapper.GetDepthFrameToCameraSpaceTable();
             var depthBuff = Depth.GetOldest();
             lock (depthBuff.SyncRoot) {
-                var map = new CameraSpacePoint[depthBuff.data.Length];
-                var depth = new ushort[depthBuff.data.Length];
+                var map = new CameraSpacePoint[depthBuff.length];
+                var depth = new ushort[depthBuff.length];
                 Parallel.For(0, depth.Length, i => {
                     depth[i] = 1000;
                 });
@@ -297,7 +297,7 @@ namespace DepthSensor.Device {
 
         private bool IsMapDepthToCameraValid() {
             var mapBuff = MapDepthToCamera.GetOldest();
-            var i = mapBuff.data.Length - 1;
+            var i = mapBuff.length - 1;
             var x = mapBuff.data[i].x;
             return !float.IsNaN(x) && !float.IsInfinity(x) && x != 0f;
         }

@@ -33,8 +33,8 @@ namespace DepthSensor.Buffer {
 
             protected internal Internal(BodyBuffer buffer) {
                 _buffer = buffer;
-                _updateInfo = new Dictionary<ulong, UpdateInfo>(buffer.data.Length);
-                for (int i = 0; i < buffer.data.Length; i++) {
+                _updateInfo = new Dictionary<ulong, UpdateInfo>(buffer.length);
+                for (int i = 0; i < buffer.length; i++) {
                     _updateInfo[(ulong) i] = new UpdateInfo {body = buffer.data[i]};
                 }
 

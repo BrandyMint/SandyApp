@@ -1,16 +1,20 @@
+using System;
+
 namespace DepthSensorSandbox.Processing {
     public class ArrayIntQueue {
-        private int[] a;
-        private int start;
-        private int end;
-        private int count;
-        private int maxSize;
+        private int[] _a;
+        private int _start;
+        private int _end;
+        private int _count;
+        private int _maxSize;
 
         public int MaxSize {
-            get { return maxSize; }
+            get { return _maxSize; }
             set {
-                maxSize = value;
-                a = new int[value];
+                if (_maxSize != value) {
+                    _maxSize = value;
+                    Array.Resize(ref _a, value);
+                }
             }
         }
 
@@ -20,27 +24,27 @@ namespace DepthSensorSandbox.Processing {
         }
 
         public void Clear() {
-            start = -1;
-            end = 0;
-            count = 0;
+            _start = -1;
+            _end = 0;
+            _count = 0;
         }
 
         public void Enqueue(int i) {
-            a[end] = i;
-            ++end;
-            end %= maxSize;
-            ++count;
+            _a[_end] = i;
+            ++_end;
+            _end %= _maxSize;
+            ++_count;
         }
 
         public int Dequeue() {
-            --count;
-            ++start;
-            start %= maxSize;
-            return a[start];
+            --_count;
+            ++_start;
+            _start %= _maxSize;
+            return _a[_start];
         }
 
         public int GetCount() {
-            return count;
+            return _count;
         }
     }
 }

@@ -45,6 +45,7 @@ namespace DepthSensorSandbox {
 
         public readonly FixHolesProcessing FixHoles = new FixHolesProcessing();
         public readonly NoiseFilterProcessing NoiseFilter = new NoiseFilterProcessing();
+        public readonly HandsProcessing Hands = new HandsProcessing();
 
         private static event Action<DepthBuffer, MapDepthToCameraBuffer> _onDepthDataBackground;
         private static event Action<ColorBuffer> _onColor;
@@ -69,7 +70,8 @@ namespace DepthSensorSandbox {
         private DepthSensorSandboxProcessor() {
             _processings = new ProcessingBase[] {
                 NoiseFilter,
-                FixHoles
+                FixHoles,
+                Hands
             };
         }
 
@@ -93,6 +95,9 @@ namespace DepthSensorSandbox {
             RemoveConveyers();
             DisposeBuffer(ref _bufDepthToColor);
             DisposeBuffer(ref _bufDepth);
+            foreach (var processing in _processings) {
+                processing.Dispose();
+            }
         }
 
         private static void DisposeBuffer<T>(ref T stream) where T: AbstractBuffer {
@@ -176,7 +181,7 @@ namespace DepthSensorSandbox {
                 DisposeBuffer(ref _bufDepthToColor);
                 return false;
             }
-            if (_bufDepthToColor == null || _bufDepthToColor.data.Length != depth.data.Length) {
+            if (_bufDepthToColor == null || _bufDepthToColor.length != depth.length) {
                 DisposeBuffer(ref _bufDepthToColor);
                 _bufDepthToColor = new DepthToColorBuffer(depth.width, depth.height);
                 return false;
@@ -258,7 +263,7 @@ namespace DepthSensorSandbox {
         }
 
         private void UpdateDepthToColor(DepthBuffer depth) {
-            if (_bufDepthToColor == null || _bufDepthToColor.data.Length != depth.data.Length)
+            if (_bufDepthToColor == null || _bufDepthToColor.length != depth.length)
                 return;
             _dsm.Device.DepthMapToColorMap(depth.data, _bufDepthToColor.data);
         }

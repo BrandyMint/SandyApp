@@ -9,12 +9,9 @@ namespace DepthSensorSandbox.Processing {
 
         private int4[] _holesSize;
         private int _maxDem;
-
-        private DepthBuffer _inDepth;
         
         protected override void ProcessInternal() {
-            ReCreateIfNeed(ref _holesSize, _inOut.data.Length);
-            _inDepth = OnlyRawBuffersIsInput ? _rawBuffers[0] : _inOut;
+            ReCreateIfNeed(ref _holesSize, _inOut.length);
             _maxDem = Mathf.Max(_inDepth.width, _inDepth.height);
             Parallel.For(0, _maxDem, FindHolesBody);
             Parallel.For(0, _inDepth.height, FixDepthHolesBody);

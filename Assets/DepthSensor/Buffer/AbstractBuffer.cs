@@ -8,8 +8,11 @@ namespace DepthSensor.Buffer {
         public readonly object SyncRoot = new object();
 
         public T CreateSome<T>() where T : IBuffer {
-            var type = GetType();
-            var args = GetArgsForCreateSome();
+            return Create<T>(GetArgsForCreateSome());
+        }
+        
+        public static T Create<T>(object[] args) where T : IBuffer {
+            var type = typeof(T);
             var constructor = type.GetConstructor(args.Select(a => a.GetType()).ToArray());
             Assert.IsNotNull(constructor, $"Cant find constructor for {type.Name}");
             return (T) constructor.Invoke(args);

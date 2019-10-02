@@ -14,9 +14,12 @@ namespace DepthSensor.Buffer {
         }
     }
 
-    public class IndexBuffer : Buffer2D<byte> {
-        public IndexBuffer(int width, int height, bool alloc) : base(width, height, alloc) { }
-        public IndexBuffer(int width, int height, byte[] data = null) : base(width, height, data) { }
+    public class IndexBuffer : TextureBuffer<byte> {
+        public IndexBuffer(int width, int height) : base(width, height, TextureFormat.R8) { }
+        
+        protected internal override object[] GetArgsForCreateSome() {
+            return new object[] {width, height};
+        }
     }
 
     public class MapDepthToCameraBuffer : TextureBuffer<half2> {

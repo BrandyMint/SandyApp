@@ -4,24 +4,38 @@ using Unity.Collections;
 using UnityEngine;
 
 namespace DepthSensor.Buffer {
-    public class Buffer2D<T> : AbstractBuffer where T : struct {
+    public abstract class Buffer2D : ArrayBuffer {
         public readonly int width;
         public readonly int height;
+
+        protected Buffer2D(int width, int height) : base(width * height) {
+            this.width = width;
+            this.height = height;
+        }
+        
+        public static bool ReCreateIfNeed<T>(ref T buffer, int width, int height) where T : Buffer2D {
+            var needCreate = buffer == null || buffer.width != width || buffer.height != height;
+            if (needCreate) {
+                buffer?.Dispose();
+                buffer = Create<T>(new object[] {width, height});
+                return true;
+            }
+            return false;
+        }
+    }
+    
+    public class Buffer2D<T> : Buffer2D where T : struct {
         public NativeArray<T> data;
 
         protected bool _wasAlloc;
         
-        public Buffer2D(int width, int height, bool alloc) {
-            this.width = width;
-            this.height = height;
+        public Buffer2D(int width, int height, bool alloc) : base(width, height) {
             _wasAlloc = alloc;
             if (alloc)
                 data = new NativeArray<T>(width * height, Allocator.Persistent);
         }
 
-        public Buffer2D(int width, int height, T[] data = null) {
-            this.width = width;
-            this.height = height;
+        public Buffer2D(int width, int height, T[] data = null) : base(width, height) {
             _wasAlloc = true;
             this.data = data != null 
                     ? new NativeArray<T>(data, Allocator.Persistent)
@@ -42,7 +56,7 @@ namespace DepthSensor.Buffer {
         public override void Clear() {
             lock (SyncRoot) {
                 var val = default(T);
-                Parallel.For(0, data.Length, i => { data[i] = val; });
+                Parallel.For(0, length, i => { data[i] = val; });
             }
         }
 

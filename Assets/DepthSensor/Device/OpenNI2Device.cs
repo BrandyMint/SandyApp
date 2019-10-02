@@ -381,7 +381,7 @@ namespace DepthSensor.Device {
         private void UpdateMapDepthToCamera() {
             _parMap = MapDepthToCamera.GetOldest();
             lock (_parMap.SyncRoot) {
-                Parallel.For(0, _parMap.data.Length, UpdateMapDepthToCameraBody);
+                Parallel.For(0, _parMap.length, UpdateMapDepthToCameraBody);
             }
             _needUpdateMapDepthToColorSpace = false;
             _mapDepthToCameraUpdated = true;

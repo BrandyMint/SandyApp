@@ -137,8 +137,8 @@ namespace DepthSensorSandbox.Visualisation {
         }
 
         private void OnDepthDataCPU(DepthBuffer depth, MapDepthToCameraBuffer mapToCamera) {
-            ReInitMeshIfNeed(depth.width, depth.height, depth.data.Length);
-            Parallel.For(0, depth.data.Length, i => {
+            ReInitMeshIfNeed(depth.width, depth.height, depth.length);
+            Parallel.For(0, depth.length, i => {
                 var xy = mapToCamera.data[i];
                 var ud = depth.data[i];
                 var d = ud != 0 ? (float) ud / 1000f : float.NaN;
@@ -164,7 +164,7 @@ namespace DepthSensorSandbox.Visualisation {
         }
 
         private void OnDepthDataGPU(DepthBuffer depth, MapDepthToCameraBuffer mapToCamera) {
-            ReInitMeshIfNeed(depth.width, depth.height, depth.data.Length);
+            ReInitMeshIfNeed(depth.width, depth.height, depth.length);
             if (_needUpdateBounds)
                 OnDepthDataCPU(depth, mapToCamera);
         }

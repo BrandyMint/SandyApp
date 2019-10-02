@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using DepthSensor.Buffer;
 using UnityEngine;
 using Utilities;
 
@@ -23,7 +22,7 @@ namespace DepthSensorSandbox.Processing {
         };
         
         protected override void ProcessInternal() {
-            Parallel.For(0, _inOut.data.Length,
+            Parallel.For(0, _inOut.length,
                 InitLocalState,
                 FilterBody,
                 FinallyLocalState
