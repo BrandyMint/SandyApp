@@ -1,5 +1,4 @@
 using DepthSensor.Buffer;
-using UnityEngine;
 
 namespace DepthSensorSandbox.Processing {
     public abstract class ProcessingBase {

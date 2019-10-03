@@ -192,24 +192,27 @@ namespace DepthSensorSandbox {
             var sMap = _dsm.Device.MapDepthToCamera;
             
             while (true) {
-                _bufColor = sColor.GetNewest();
-                _bufMapToCamera = sMap.GetNewest();
+                _bufColor = sColor.Active ? sColor.GetNewest() : null;
+                _bufMapToCamera =  sMap.Active ? sMap.GetNewest() : null;
 
                 if (_bufDepth != null) {
-                    var depthBuffers = sDepth.GetFreeBuffersAndLock();
-                    var bufferChanged = false;
-                    foreach (var p in _processings) {
-                        p.OnlyRawBuffersIsInput = !bufferChanged;
-                        p.Process(depthBuffers, _bufDepth);
-                        bufferChanged |= p.Active;
-                    }
-                    foreach (var buffer in depthBuffers) {
-                        buffer.Unlock();
-                    }
+                    var depthBuffers = sDepth.Active ? sDepth.GetFreeBuffersAndLock(200) : null;
+                    if (depthBuffers != null) {
+                        var bufferChanged = false;
+                        foreach (var p in _processings) {
+                            p.OnlyRawBuffersIsInput = !bufferChanged;
+                            p.Process(depthBuffers, _bufDepth);
+                            bufferChanged |= p.Active;
+                        }
 
-                    _onDepthDataBackground?.Invoke(_bufDepth, _bufMapToCamera);
-                    if (_onDepthToColor != null)
-                        UpdateDepthToColor(_bufDepth);
+                        foreach (var buffer in depthBuffers) {
+                            buffer.Unlock();
+                        }
+
+                        _onDepthDataBackground?.Invoke(_bufDepth, _bufMapToCamera);
+                        if (_onDepthToColor != null)
+                            UpdateDepthToColor(_bufDepth);
+                    }
                 }
 
                 yield return null;
@@ -222,12 +225,11 @@ namespace DepthSensorSandbox {
                 if (_bufDepth == null) {
                     _bufDepth = sDepth.GetNewest().CreateSome<DepthBuffer>();
                 } else {
-                    _bufColor.Lock();
                     FlushTextureBuffer(_bufColor, _onColor, true);
-                
+
                     if (CreateDepthToColorIfNeed(_bufDepth))
                         FlushTextureBuffer(_bufDepthToColor, _onDepthToColor);
-                
+
                     FlushTextureBuffer(_bufDepth, InvokeOnNewFrame);
                 }
 
@@ -263,12 +265,14 @@ namespace DepthSensorSandbox {
             _dsm.Device.DepthMapToColorMap(depth.data, _bufDepthToColor.data);
         }
 
-        private static void FlushTextureBuffer<T>(T buffer, Action<T> action, bool unlock = false) where  T : ITextureBuffer {
+        private static void FlushTextureBuffer<T>(T buffer, Action<T> action, bool dolock = false) where  T : ITextureBuffer {
             if (buffer != null) {
-                buffer.UpdateTexture();
-                action?.Invoke(buffer);
-                if (unlock)
-                    buffer.Unlock();
+                if (!dolock || buffer.Lock(200)) {
+                    buffer.UpdateTexture();
+                    action?.Invoke(buffer);
+                    if (dolock)
+                        buffer.Unlock();
+                }
             }
         }
 
