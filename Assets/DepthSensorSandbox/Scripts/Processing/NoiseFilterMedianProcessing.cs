@@ -49,8 +49,8 @@ namespace DepthSensorSandbox.Processing {
         private ParallelLocalState FilterBody(int i, ParallelLoopState loop, ParallelLocalState local) {
             var depth = _rawBuffers[0];
             var actualVal = depth.data[i];
-            if (actualVal == INVALID_DEPTH) {
-                _inOut.data[i] = INVALID_DEPTH;
+            if (actualVal == Sampler.INVALID_DEPTH) {
+                _inOut.data[i] = Sampler.INVALID_DEPTH;
                 return local;
             }
 
@@ -58,14 +58,14 @@ namespace DepthSensorSandbox.Processing {
             var j = 1;
             var p = _inOut.GetXYiFrom(i);
             for (int k = 0; k < _neighbors.Length; ++k) {
-                var d = SafeGet(depth, p + _neighbors[k]);
+                var d = _s.SafeGet(depth, p + _neighbors[k]);
                 Accumulate(local.medianArr, j++, d, actualVal);
             }
 
             var median = MathHelper.GetMedian(local.medianArr);
             var prevVal = _inOut.data[i];
             var error = Mathf.Abs(median - prevVal);
-            if (error > MaxError || prevVal == INVALID_DEPTH || median == INVALID_DEPTH) {
+            if (error > MaxError || prevVal == Sampler.INVALID_DEPTH || median == Sampler.INVALID_DEPTH) {
                 _inOut.data[i] = median;
             } else {
                 var k = Smooth * Mathf.Sqrt((float)(MaxError - error) / MaxError);
@@ -76,7 +76,7 @@ namespace DepthSensorSandbox.Processing {
         }
 
         private static void Accumulate(ushort[] a, int i, ushort val, ushort def) {
-            a[i] = val == INVALID_DEPTH ? def : val;
+            a[i] = val == Sampler.INVALID_DEPTH ? def : val;
         }
     }
 }

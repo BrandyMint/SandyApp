@@ -13,14 +13,14 @@ namespace DepthSensorSandbox.Processing {
         private void FilterBody(int i) {
             var depth = _rawBuffers[0];
             var actualVal = depth.data[i];
-            if (actualVal == INVALID_DEPTH) {
-                _inOut.data[i] = INVALID_DEPTH;
+            if (actualVal == Sampler.INVALID_DEPTH) {
+                _inOut.data[i] = Sampler.INVALID_DEPTH;
                 return;
             }
             
             var prevVal = _inOut.data[i];
             var error = Mathf.Abs(actualVal - prevVal);
-            if (error > MaxError || prevVal == INVALID_DEPTH) {
+            if (error > MaxError || prevVal == Sampler.INVALID_DEPTH) {
                 _inOut.data[i] = actualVal;
             } else {
                 var k = Smooth * Mathf.Sqrt((float)(MaxError - error) / MaxError);

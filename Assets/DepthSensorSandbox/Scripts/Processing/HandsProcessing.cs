@@ -60,7 +60,7 @@ namespace DepthSensorSandbox.Processing {
         }
 
         private bool Fill(byte color, int i, ushort minDiffer) {
-            if (i != INVALID_ID && _handsMask.data[i] == CLEAR_COLOR 
+            if (i !=  Sampler.INVALID_ID && _handsMask.data[i] == CLEAR_COLOR 
                                 && _inDepth.data[i] - _depthLongExpos.data[i] > minDiffer) {
                 _handsMask.data[i] = color;
                 lock (_queue) {
@@ -75,7 +75,7 @@ namespace DepthSensorSandbox.Processing {
             while (_queue.GetCount() > 0) {
                 int i = _queue.Dequeue();
                 for (int n = 0; n < 8; ++n) {
-                    int j = GetIndexOfNeighbor(i, n);
+                    int j = _s.GetIndexOfNeighbor(i, n);
                     if (Fill(COLOR, j, MaxError)) {
                         _queue.Enqueue(j);
                     }

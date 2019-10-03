@@ -37,7 +37,7 @@ namespace DepthSensorSandbox.Processing {
         private int CheckHole(DepthBuffer depth, int x, int y, int dir, int h)  {
             var i = depth.GetIFrom(x, y);
             var d = depth.data[i];
-            if (d == INVALID_DEPTH)
+            if (d == Sampler.INVALID_DEPTH)
                 ++h;
             else {
                 h = 0;
@@ -51,11 +51,11 @@ namespace DepthSensorSandbox.Processing {
                 var i = _inDepth.GetIFrom(x, y);
                 var d = _inDepth.data[i];
                 var h = _holesSize[i];
-                if (d == INVALID_DEPTH) {
-                    var up = SafeGet(_inDepth, x, y + h.w);
-                    var down = SafeGet(_inDepth, x, y - h.y);
-                    var left = SafeGet(_inDepth, x - h.x, y);
-                    var right = SafeGet(_inDepth, x + h.z, y);
+                if (d == Sampler.INVALID_DEPTH) {
+                    var up = _s.SafeGet(_inDepth, x, y + h.w);
+                    var down = _s.SafeGet(_inDepth, x, y - h.y);
+                    var left = _s.SafeGet(_inDepth, x - h.x, y);
+                    var right = _s.SafeGet(_inDepth, x + h.z, y);
                     up = SetPriorityToIfInvalid(up, down, left, right);
                     down = SetPriorityToIfInvalid(down, up, left, right);
                     left = SetPriorityToIfInvalid(left, right, up, down);
@@ -74,13 +74,13 @@ namespace DepthSensorSandbox.Processing {
         }
         
         private static ushort SetPriorityToIfInvalid(ushort val, ushort v1, ushort v2, ushort v3) {
-            if (val != INVALID_DEPTH)
+            if (val != Sampler.INVALID_DEPTH)
                 return val;
-            if (v1 != INVALID_DEPTH)
+            if (v1 != Sampler.INVALID_DEPTH)
                 return v1;
-            if (v2 != INVALID_DEPTH)
+            if (v2 != Sampler.INVALID_DEPTH)
                 return v2;
-            if (v3 != INVALID_DEPTH)
+            if (v3 != Sampler.INVALID_DEPTH)
                 return v3;
             return _BAD_HOLE_FIX;
         }
