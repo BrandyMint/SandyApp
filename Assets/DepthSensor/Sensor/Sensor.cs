@@ -67,8 +67,8 @@ namespace DepthSensor.Sensor {
                 if (!b.Lock(milliseconds)) {
                     for (int j = i - 1; j >= 0; --j) {
                         _buffersCacheForExternalUse[j].Unlock();
-                        return null;
                     }
+                    return null;
                 }
                 _buffersCacheForExternalUse[i] = b;
             }
