@@ -34,6 +34,10 @@ namespace DepthSensor.Buffer {
         }
 
         public bool Lock(int milliseconds = -1) {
+            if (milliseconds < 0) {
+                Monitor.Enter(SyncRoot);
+                return true;
+            }
             return Monitor.TryEnter(SyncRoot, milliseconds);
         }
 
