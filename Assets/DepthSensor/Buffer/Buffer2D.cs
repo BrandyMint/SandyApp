@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Unity.Collections;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace DepthSensor.Buffer {
     public abstract class Buffer2D : ArrayBuffer {
@@ -14,10 +15,11 @@ namespace DepthSensor.Buffer {
         }
         
         public static bool ReCreateIfNeed<T>(ref T buffer, int width, int height) where T : Buffer2D {
-            var needCreate = buffer == null || buffer.width != width || buffer.height != height;
-            if (needCreate) {
+            Assert.IsNotNull(buffer, "Create buffer before using recreate!");
+            if (buffer.width != width || buffer.height != height) {
+                var type = buffer.GetType();
                 buffer?.Dispose();
-                buffer = Create<T>(new object[] {width, height});
+                buffer = (T) Create(type, new object[] {width, height});
                 return true;
             }
             return false;
@@ -29,17 +31,17 @@ namespace DepthSensor.Buffer {
 
         protected bool _wasAlloc;
         
+        public Buffer2D(int width, int height) : this(width, height, true) {}
+        
         public Buffer2D(int width, int height, bool alloc) : base(width, height) {
             _wasAlloc = alloc;
             if (alloc)
                 data = new NativeArray<T>(width * height, Allocator.Persistent);
         }
 
-        public Buffer2D(int width, int height, T[] data = null) : base(width, height) {
+        public Buffer2D(int width, int height, T[] data) : base(width, height) {
             _wasAlloc = true;
-            this.data = data != null 
-                    ? new NativeArray<T>(data, Allocator.Persistent)
-                    : new NativeArray<T>(width * height, Allocator.Persistent);
+            this.data = new NativeArray<T>(data, Allocator.Persistent);
         }
 
         protected internal override object[] GetArgsForCreateSome() {
@@ -80,7 +82,7 @@ namespace DepthSensor.Buffer {
 
         public override void Dispose() {
             base.Dispose();
-            if (_wasAlloc)
+            if (_wasAlloc && data.IsCreated)
                 data.Dispose();
         }
 

@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿#if UNITY_EDITOR
+    using UnityEditor;
+#endif
+using UnityEngine;
 
 namespace DepthSensor.Buffer {
     public class TextureBuffer<T> : Buffer2D<T>, ITextureBuffer where T : struct {
@@ -17,6 +20,11 @@ namespace DepthSensor.Buffer {
 
         public override void Dispose() {
             base.Dispose();
+#if UNITY_EDITOR
+            if (!EditorApplication.isPlayingOrWillChangePlaymode)
+                Object.DestroyImmediate(texture);
+            else
+#endif
             Object.Destroy(texture);
         }
 

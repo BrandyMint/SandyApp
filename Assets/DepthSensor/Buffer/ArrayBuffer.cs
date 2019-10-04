@@ -1,4 +1,5 @@
 using System;
+using UnityEngine.Assertions;
 
 namespace DepthSensor.Buffer {
     public abstract class ArrayBuffer : AbstractBuffer {
@@ -9,10 +10,11 @@ namespace DepthSensor.Buffer {
         }
         
         public static bool ReCreateIfNeed<T>(ref T buffer, int len) where T : ArrayBuffer {
-            bool needCreate = buffer == null || buffer.length != len;
-            if (needCreate) {
+            Assert.IsNotNull(buffer, "Create buffer before using recreate!");
+            if (buffer.length != len) {
+                var type = buffer.GetType();
                 buffer?.Dispose();
-                buffer = Create<T>(new object[] {len});
+                buffer = (T) Create(type, new object[] {len});
                 return true;
             }
             return false;

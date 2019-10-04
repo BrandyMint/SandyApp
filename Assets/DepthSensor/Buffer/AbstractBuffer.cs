@@ -13,9 +13,14 @@ namespace DepthSensor.Buffer {
         
         public static T Create<T>(object[] args) where T : IBuffer {
             var type = typeof(T);
+            return (T) Create(type, args);
+        }
+        
+        public static object Create(Type type, object[] args) {
+            Assert.IsTrue(typeof(IBuffer).IsAssignableFrom(type));
             var constructor = type.GetConstructor(args.Select(a => a.GetType()).ToArray());
             Assert.IsNotNull(constructor, $"Cant find constructor for {type.Name}");
-            return (T) constructor.Invoke(args);
+            return constructor.Invoke(args);
         }
 
         public abstract T Copy<T>() where T : IBuffer;
