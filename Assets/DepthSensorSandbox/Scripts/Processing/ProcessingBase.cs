@@ -23,12 +23,24 @@ namespace DepthSensorSandbox.Processing {
 
         protected abstract void ProcessInternal();
 
-        protected bool ReCreateIfNeed<T>(ref T[] a, int len) {
+        public void InitInMainThread(DepthBuffer buffer) {
+            if (Active) {
+                InitInMainThreadInternal(buffer);
+            }
+        }
+
+        protected virtual void InitInMainThreadInternal(DepthBuffer buffer) {}
+
+        protected static bool ReCreateIfNeed<T>(ref T[] a, int len) {
             if (a == null || a.Length != len) {
                 a = new T[len];
                 return true;
             }
             return false;
+        }
+        
+        protected bool CheckValid(Buffer2D b) {
+            return b != null && b.width == _inOut.width && b.height == _inOut.height;
         }
 
         public virtual void Dispose() {}

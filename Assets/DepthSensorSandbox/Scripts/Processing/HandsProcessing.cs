@@ -1,4 +1,11 @@
-﻿using System.Threading.Tasks;
+﻿#if !UNITY_EDITOR
+    #undef HANDS_WAVE_STEP_DEBUG
+#endif
+
+#if HANDS_WAVE_STEP_DEBUG
+    using System.Threading;
+#endif
+using System.Threading.Tasks;
 using DepthSensor.Buffer;
 using UnityEngine;
 
@@ -10,22 +17,43 @@ namespace DepthSensorSandbox.Processing {
         public float Exposition = 0.99f;
         public ushort MaxError = 10;
         public ushort MinDistance = 100;
+        
+        public Buffer2D<byte> HandsMask => _handsMask;
+#if HANDS_WAVE_STEP_DEBUG
+        public int CurrWave { get;  private set; }
+        public readonly AutoResetEvent EvRequestNextWave = new AutoResetEvent(false);
+        public readonly AutoResetEvent EvWaveReady = new AutoResetEvent(false);
+#endif
 
-        private ArrayBuffer<byte> _handsMask;
-        private ArrayBuffer<ushort> _depthLongExpos;
+        private Buffer2D<byte> _handsMask;
+        private Buffer2D<ushort> _depthLongExpos;
         private readonly ArrayIntQueue _queue = new ArrayIntQueue();
 
         public override void Dispose() {
+#if HANDS_WAVE_STEP_DEBUG
+            EvRequestNextWave?.Dispose();
+            EvWaveReady?.Dispose();
+#endif
             _handsMask?.Dispose();
+        }
+        
+        protected override void InitInMainThreadInternal(DepthBuffer buffer) {
+            if (_handsMask == null) {
+                _handsMask = new Buffer2D<byte>(1, 1);
+                _depthLongExpos = new Buffer2D<ushort>(1, 1);
+
+            }
+            
+            if (Buffer2D.ReCreateIfNeed(ref _depthLongExpos, buffer.width, buffer.height)) {
+                buffer.data.CopyTo(_depthLongExpos.data);
+                Buffer2D.ReCreateIfNeed(ref _handsMask, buffer.width, buffer.height);
+                _queue.MaxSize = buffer.length;
+            }
         }
 
         protected override void ProcessInternal() {
-            if (ArrayBuffer.ReCreateIfNeed(ref _depthLongExpos, _inOut.length)) {
-                _inDepth.data.CopyTo(_depthLongExpos.data);
-                ArrayBuffer.ReCreateIfNeed(ref _handsMask, _inOut.length);
-                _queue.MaxSize = _inOut.length;
+            if (!CheckValid(_depthLongExpos) || !CheckValid(_handsMask))
                 return;
-            }
             
             _queue.Clear();
             _handsMask.Clear();
@@ -72,6 +100,12 @@ namespace DepthSensorSandbox.Processing {
         }
 
         private void FillHandsMask() {
+#if HANDS_WAVE_STEP_DEBUG
+            int countInCurrWave = _queue.GetCount();
+            CurrWave = 0;
+            EvWaveReady.Set();
+            EvRequestNextWave.WaitOne();
+#endif
             while (_queue.GetCount() > 0) {
                 int i = _queue.Dequeue();
                 for (int n = 0; n < 8; ++n) {
@@ -80,6 +114,16 @@ namespace DepthSensorSandbox.Processing {
                         _queue.Enqueue(j);
                     }
                 }
+#if HANDS_WAVE_STEP_DEBUG
+                --countInCurrWave;
+                if (countInCurrWave == 0) {
+                    countInCurrWave = _queue.GetCount();
+                    ++CurrWave;
+                }
+
+                EvWaveReady.Set();
+                EvRequestNextWave.WaitOne();
+#endif
             }
         }
 
