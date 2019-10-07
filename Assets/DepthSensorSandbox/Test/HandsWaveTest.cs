@@ -19,16 +19,19 @@ namespace DepthSensorSandbox.Test {
         
         private void Start() {
             _hands = DepthSensorSandboxProcessor.Instance.Hands;
+            _hands.WaveBarrier.AddParticipant();
             _btnStep.onClick.AddListener(OnBtnStep);
             _btnContinue.onClick.AddListener(OnBtnContinue);
             DepthSensorSandboxProcessor.OnNewFrame += OnNewFrame;
         }
 
         private void OnDestroy() {
+            if (DepthSensorSandboxProcessor.Instance != null && DepthSensorSandboxProcessor.Instance.Hands != null)
+                DepthSensorSandboxProcessor.Instance.Hands.WaveBarrier.RemoveParticipant();
             DepthSensorSandboxProcessor.OnNewFrame -= OnNewFrame;
         }
 
-        private void OnNewFrame(DepthBuffer depth, MapDepthToCameraBuffer map) { }
+        private static void OnNewFrame(DepthBuffer depth, MapDepthToCameraBuffer map) { }
 
         private void OnBtnContinue() {
             _waitStep = false;
@@ -47,20 +50,12 @@ namespace DepthSensorSandbox.Test {
 
         private void ShowWave() {
 #if HANDS_WAVE_STEP_DEBUG
-            if (!_hands.EvWaveReady.WaitOne(1000)) return;
-            
-            var t = _image.texture as Texture2D;
-            if (TexturesHelper.ReCreateIfNeed(ref t, _hands.HandsMask.width, _hands.HandsMask.height,
-                TextureFormat.R8)) {
-                t.filterMode = FilterMode.Point;
-                _image.texture = t;
-                _image.gameObject.SetActive(true);
-            }
-            
-            t.SetPixelData(_hands.HandsMask.data, 0);
-            t.Apply(false);
+            if (_hands.HandsMask.texture.filterMode != FilterMode.Point)
+                _hands.HandsMask.texture.filterMode = FilterMode.Point;
+            _hands.HandsMask.UpdateTexture();
+            _image.texture = _hands.HandsMask.texture;
             _txtWawe.text = _hands.CurrWave.ToString();
-            _hands.EvRequestNextWave.Set();
+            _hands.WaveBarrier.SignalAndWait(3000);
 #else
             _txtWawe.text = "define HANDS_WAVE_STEP_DEBUG";
 #endif

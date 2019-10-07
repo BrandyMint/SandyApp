@@ -18,30 +18,27 @@ namespace DepthSensorSandbox.Processing {
         public ushort MaxError = 10;
         public ushort MinDistance = 100;
         
-        public Buffer2D<byte> HandsMask => _handsMask;
+        public IndexBuffer HandsMask => _handsMask;
 #if HANDS_WAVE_STEP_DEBUG
         public int CurrWave { get;  private set; }
-        public readonly AutoResetEvent EvRequestNextWave = new AutoResetEvent(false);
-        public readonly AutoResetEvent EvWaveReady = new AutoResetEvent(false);
+        public readonly Barrier WaveBarrier = new Barrier(1);
 #endif
 
-        private Buffer2D<byte> _handsMask;
+        private IndexBuffer _handsMask;
         private Buffer2D<ushort> _depthLongExpos;
         private readonly ArrayIntQueue _queue = new ArrayIntQueue();
 
         public override void Dispose() {
 #if HANDS_WAVE_STEP_DEBUG
-            EvRequestNextWave?.Dispose();
-            EvWaveReady?.Dispose();
+            WaveBarrier?.Dispose();
 #endif
             _handsMask?.Dispose();
         }
         
         protected override void InitInMainThreadInternal(DepthBuffer buffer) {
             if (_handsMask == null) {
-                _handsMask = new Buffer2D<byte>(1, 1);
+                _handsMask = new IndexBuffer(1, 1);
                 _depthLongExpos = new Buffer2D<ushort>(1, 1);
-
             }
             
             if (Buffer2D.ReCreateIfNeed(ref _depthLongExpos, buffer.width, buffer.height)) {
@@ -103,8 +100,7 @@ namespace DepthSensorSandbox.Processing {
 #if HANDS_WAVE_STEP_DEBUG
             int countInCurrWave = _queue.GetCount();
             CurrWave = 0;
-            EvWaveReady.Set();
-            EvRequestNextWave.WaitOne();
+            WaveBarrier.SignalAndWait();
 #endif
             while (_queue.GetCount() > 0) {
                 int i = _queue.Dequeue();
@@ -119,10 +115,8 @@ namespace DepthSensorSandbox.Processing {
                 if (countInCurrWave == 0) {
                     countInCurrWave = _queue.GetCount();
                     ++CurrWave;
+                    WaveBarrier.SignalAndWait();
                 }
-
-                EvWaveReady.Set();
-                EvRequestNextWave.WaitOne();
 #endif
             }
         }
