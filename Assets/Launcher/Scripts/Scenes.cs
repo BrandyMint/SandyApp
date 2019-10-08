@@ -23,6 +23,11 @@ namespace Launcher {
 
             MultiMonitor.OnNotEnoughMonitors += OnNotEnoughMonitors;
         }
+        
+        private void OnDestroy() {
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+            MultiMonitor.OnNotEnoughMonitors -= OnNotEnoughMonitors;
+        }
 
         private void OnNotEnoughMonitors() {
             if (_notifyNoMonitors == null)

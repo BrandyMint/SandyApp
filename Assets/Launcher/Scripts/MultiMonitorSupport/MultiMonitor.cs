@@ -38,6 +38,7 @@ namespace Launcher.MultiMonitorSupport {
                 PlayerPrefs.DeleteKey("Screenmanager Resolution Height");
             }
             _systemApi?.Dispose();
+            SceneManager.sceneLoaded -= OnSceneLoaded;
         }
 
         private void Start() {
