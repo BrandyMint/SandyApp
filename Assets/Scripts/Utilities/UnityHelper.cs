@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -10,15 +9,11 @@ using UnityEngine.EventSystems;
 namespace Utilities {
     public static class UnityHelper {
         public static T[] GetComponentsOnlyInChildren<T>(this Component obj) where T : Component {
-            return obj.GetComponentsOnlyInChildren<T>(false);
-        }
-
-        public static T[] GetComponentsOnlyInChildren<T>(this Component obj, bool includeInactive) where T : Component {
-            List<T> objList = new List<T>();
-            foreach (T componentsInChild in obj.GetComponentsInChildren<T>(includeInactive))
-            {
-                if (componentsInChild.gameObject != obj.gameObject)
-                    objList.Add(componentsInChild);
+            var objList = new List<T>();
+            for (int i = 0; i < obj.transform.childCount; ++i) {
+                var child = obj.transform.GetChild(i).GetComponent<T>();
+                if (child != null)
+                    objList.Add(child);
             }
             return objList.ToArray();
         }
