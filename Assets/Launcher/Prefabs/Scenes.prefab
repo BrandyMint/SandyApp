@@ -46,6 +46,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a3b7a8e13fc493baba365c668c0675c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _sceneProjectorParamsPath: Assets/DepthSensorCalibration/Scenes/ProjectorParams.unity
+  _sceneCalibrationPath: Assets/DepthSensorCalibration/Scenes/DepthSensorCalibration.unity
 --- !u!114 &-8017239747588144962
 MonoBehaviour:
   m_ObjectHideFlags: 0

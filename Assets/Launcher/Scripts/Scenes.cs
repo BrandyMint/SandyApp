@@ -8,6 +8,9 @@ namespace Launcher {
     public class Scenes : MonoBehaviour {
         private const string _TXT_NO_MONITORS_TITTLE = "Проектор подключен?";
         private const string _TXT_NO_MONITORS = "Убедитесь, что проектор подключен как расширенный экран, монитор компьютера активен и является главным. Перезапустите приложение.";
+
+        [SerializeField] private string _sceneProjectorParamsPath;
+        [SerializeField] private string _sceneCalibrationPath;
         
         private static Scenes _instance;
         
@@ -22,11 +25,13 @@ namespace Launcher {
             SceneManager.sceneLoaded += OnSceneLoaded;
 
             MultiMonitor.OnNotEnoughMonitors += OnNotEnoughMonitors;
+            KeyMapper.OnSceneProjectorParams += OpenProjectorParams;
         }
         
         private void OnDestroy() {
             SceneManager.sceneLoaded -= OnSceneLoaded;
             MultiMonitor.OnNotEnoughMonitors -= OnNotEnoughMonitors;
+            KeyMapper.OnSceneProjectorParams -= OpenProjectorParams;
         }
 
         private void OnNotEnoughMonitors() {
@@ -53,6 +58,10 @@ namespace Launcher {
             _scenes.Pop();
             var scene = _scenes.Peek();
             SceneManager.LoadScene(scene);
+        }
+
+        private void OpenProjectorParams() {
+            SceneManager.LoadScene(_sceneProjectorParamsPath);
         }
     }
 }

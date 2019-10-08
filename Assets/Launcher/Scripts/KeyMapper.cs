@@ -5,7 +5,11 @@ using UnityEngine;
 namespace Launcher {
     public class KeyMapper : MonoBehaviour {
         public static event Action OnFlipDisplay;
-            
+        public static event Action OnSceneProjectorParams;
+        public static event Action OnSceneCalibration;
+        public static event Action OnResetSettings;
+        public static event Action OnSaveSettings;
+
         private static KeyMapper _instance;
 
         public class KeyBind {
@@ -28,6 +32,10 @@ namespace Launcher {
         }
 
         private void InitMapper() {
+            _bindsDown.Add(new KeyBind(KeyCode.F2, () => OnSaveSettings?.Invoke()));
+            _bindsDown.Add(new KeyBind(KeyCode.F5, () => OnResetSettings?.Invoke()));
+            _bindsDown.Add(new KeyBind(KeyCode.F10, () => OnSceneCalibration?.Invoke()));
+            _bindsDown.Add(new KeyBind(KeyCode.F11, () => OnSceneProjectorParams?.Invoke()));
             _bindsDown.Add(new KeyBind(KeyCode.F12, () => OnFlipDisplay?.Invoke()));
         }
 
@@ -47,4 +55,6 @@ namespace Launcher {
             }
         }
     }
+
+    internal class OnSaveSettings { }
 }

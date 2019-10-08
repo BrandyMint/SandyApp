@@ -1,10 +1,13 @@
-using UnityEditor;
+﻿using UnityEditor;
 
 namespace Launcher.UI.Editor {
-    [CustomEditor(typeof(BtnGoTo), true)]
-    public class BtnGoToEditor : UnityEditor.Editor {
+    [CustomEditor(typeof(Scenes), true)]
+    public class ScenesEditor : UnityEditor.Editor {
         SceneAssetInspector scenes = new SceneAssetInspector {
-            sceneNames = {""}
+            sceneNames = {
+                "ProjectorParams",
+                "Calibration"
+            }
         };
         
         public override void OnInspectorGUI() {
