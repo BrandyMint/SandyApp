@@ -5,6 +5,8 @@
 Проектор должен быть подключен как второй расширенный экран.
 Монитор компьютера должен быть главным экраном.
 
+Инструкция - https://docs.google.com/document/d/1ShcHV4ls16ITBUpDKy0Cgma3YZSuzhwF_RsRUBFBALs/edit#heading=h.5l6922wptpom
+
 ### Windows
 
 Для работы sandbox с Kinect 2 требуется одно из:
