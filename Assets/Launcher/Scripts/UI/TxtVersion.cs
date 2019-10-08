@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Launcher {
+namespace Launcher.UI {
     [RequireComponent(typeof(Text))]
     public class TxtVersion : MonoBehaviour {
         private void Awake() {

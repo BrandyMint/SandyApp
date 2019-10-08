@@ -1,6 +1,6 @@
 using UnityEditor;
 
-namespace Launcher.Editor {
+namespace Launcher.UI.Editor {
     [CustomEditor(typeof(BtnGoTo), true)]
     public class BtnGoToEditor : UnityEditor.Editor {
         public override void OnInspectorGUI() {

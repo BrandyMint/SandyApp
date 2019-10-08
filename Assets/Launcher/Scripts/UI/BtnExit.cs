@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Launcher {
+namespace Launcher.UI {
     [RequireComponent(typeof(Button))]
     public class BtnExit : MonoBehaviour {
         private void Awake() {
