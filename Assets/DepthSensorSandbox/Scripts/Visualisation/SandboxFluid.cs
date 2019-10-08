@@ -1,4 +1,5 @@
 using System;
+using Launcher;
 using UnityEngine;
 using UnityEngine.Rendering;
 using Utilities;
@@ -25,6 +26,7 @@ namespace DepthSensorSandbox.Visualisation {
             if (_instantiateMaterial)
                 _matFluidCalc = new Material(_matFluidCalc);
             SetEnable(true);
+            KeyMapper.OnFlipDisplay += ClearFluidFlows;
         }
 
         protected override void OnDestroy() {
@@ -35,6 +37,7 @@ namespace DepthSensorSandbox.Visualisation {
             foreach (var t in _texFluxBuffers) {
                 if (t != null) t.Release();
             }
+            KeyMapper.OnFlipDisplay -= ClearFluidFlows;
         }
 
         public override void SetEnable(bool enable) {

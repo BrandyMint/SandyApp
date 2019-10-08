@@ -57,6 +57,7 @@ GameObject:
   - component: {fileID: 6145052358333956586}
   - component: {fileID: 6145052358333956587}
   - component: {fileID: 6145052358333956596}
+  - component: {fileID: 8439469266882919059}
   m_Layer: 0
   m_Name: SandboxMesh
   m_TagString: Untagged
@@ -138,6 +139,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _updateMeshOnGPU: 1
+--- !u!114 &8439469266882919059
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6145052358333956597}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 972546a81f5f1824a850e9a849d1c457, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &6145052358850914147
 GameObject:
   m_ObjectHideFlags: 0

@@ -12,4 +12,18 @@ public static partial class Prefs {
             Notify.Show(Style.FAIL, _TXT_SAVE_FAIL);
         }
     }
+    
+    public static readonly AppParams App = new AppParams();
+    
+    public class AppParams : SerializableParams {
+        public bool FlipHorizontal {
+            get => Get(nameof(FlipHorizontal), false);
+            set => Set(nameof(FlipHorizontal), value);
+        }
+        
+        public bool FlipVertical {
+            get => Get(nameof(FlipVertical), false);
+            set => Set(nameof(FlipVertical), value);
+        }
+    }
 }
