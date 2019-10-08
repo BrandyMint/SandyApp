@@ -104,6 +104,11 @@ namespace DepthSensorCalibration {
             StopCalibration();
         }
 
+        private void Update() {
+            if (Input.GetKeyUp(KeyCode.Escape))
+                OnBtnCancel();
+        }
+
         public void StartCalibration() {
             StopCalibration();
             StartCoroutine(Calibrating());

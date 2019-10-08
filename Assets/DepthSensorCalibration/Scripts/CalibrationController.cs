@@ -13,7 +13,10 @@ namespace DepthSensorCalibration {
 
         public WallController Wall;
         public Camera SandboxCam;
-        
+
+        [SerializeField] private Camera _camMonitor;
+        [SerializeField] private Camera _camWall;
+        [SerializeField] private Canvas _uiCanvas;
         [Header("UI")]
         [SerializeField] private GameObject _calibrationImg;
         [SerializeField] private GameObject _settingsAndBtns;
@@ -71,6 +74,7 @@ namespace DepthSensorCalibration {
             _btnReset.onClick.AddListener(OnBtnReset);
             _btnAutomatic.onClick.AddListener(OnBtnStartAutomatic);
             _tglTest.onValueChanged.AddListener(OnTglTest);
+            _tglTest.gameObject.SetActive(MultiMonitor.MonitorsCount > 1);
             
             UnityHelper.SetPropsByGameObjects(_projectorFields, _pnlProjectorParams);
             InitField(_projectorFields.Dist, val => _projector.Distance = val);
@@ -100,6 +104,8 @@ namespace DepthSensorCalibration {
             _imgColor.gameObject.SetActive(mode == CalibrationMode.TEST);
             _settingsAndBtns.SetActive(mode != CalibrationMode.AUTOMATIC);
             MultiMonitor.SetTargetDisplay(SandboxCam, mode == CalibrationMode.TEST ? 1 : 0);
+            _camMonitor.gameObject.SetActive(mode != CalibrationMode.AUTOMATIC || MultiMonitor.MonitorsCount > 1);
+            _camWall.gameObject.SetActive(mode == CalibrationMode.AUTOMATIC || MultiMonitor.MonitorsCount > 1);
             
             _sandboxMesh.GetComponent<SandboxVisualizerBase>().SetEnable(mode == CalibrationMode.TEST);
             _sandboxMesh.GetComponent<SandboxVisualizerColor>().SetEnable(mode != CalibrationMode.TEST);
@@ -151,6 +157,48 @@ namespace DepthSensorCalibration {
             _projector.Load();
             Prefs.Calibration.Load();
             Scenes.GoBack();
+        }
+
+        private void Update() {
+            if (Input.GetKeyUp(KeyCode.U)) {
+                _uiCanvas.gameObject.SetActive(!_uiCanvas.gameObject.activeSelf);
+            }
+            if (Input.GetKeyUp(KeyCode.S)) {
+                OnBtnSave();
+            }
+            if (Input.GetKeyUp(KeyCode.R)) {
+                OnBtnReset();
+            }
+            if (Input.GetKeyUp(KeyCode.C)) {
+                OnBtnCancel();
+            }
+            if (!Input.anyKey)
+                return;
+            
+            if (Input.GetKey(KeyCode.LeftArrow)) {
+                _calibrationFields.PosX.btnDec.onClick.Invoke();
+            }
+            if (Input.GetKey(KeyCode.RightArrow)) {
+                _calibrationFields.PosX.btnInc.onClick.Invoke();
+            }
+            if (Input.GetKey(KeyCode.DownArrow)) {
+                _calibrationFields.PosY.btnDec.onClick.Invoke();
+            }
+            if (Input.GetKey(KeyCode.UpArrow)) {
+                _calibrationFields.PosY.btnInc.onClick.Invoke();
+            }
+            if (Input.GetKey(KeyCode.Minus) || Input.GetKey(KeyCode.KeypadMinus)) {
+                _calibrationFields.PosZ.btnDec.onClick.Invoke();
+            }
+            if (Input.GetKey(KeyCode.Plus) || Input.GetKey(KeyCode.Equals) || Input.GetKey(KeyCode.KeypadPlus)) {
+                _calibrationFields.PosZ.btnInc.onClick.Invoke();
+            }
+            if (Input.GetKey(KeyCode.LeftBracket) || Input.GetKey(KeyCode.LeftCurlyBracket)) {
+                _calibrationFields.ZeroDepth.btnDec.onClick.Invoke();
+            }
+            if (Input.GetKey(KeyCode.RightBracket) || Input.GetKey(KeyCode.RightBracket)) {
+                _calibrationFields.ZeroDepth.btnInc.onClick.Invoke();
+            }
         }
 
         private void OnBtnStartAutomatic() {

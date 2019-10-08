@@ -1067,7 +1067,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 1}
+  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 1}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -1377,11 +1377,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1214897666}
     m_Modifications:
-    - target: {fileID: 8116435456924038854, guid: 3fe683c098f53d044afd7988fc2e057f,
-        type: 3}
-      propertyPath: m_Name
-      value: SensorIndicator
-      objectReference: {fileID: 0}
     - target: {fileID: 8116435456924038853, guid: 3fe683c098f53d044afd7988fc2e057f,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -1486,6 +1481,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8116435456924038854, guid: 3fe683c098f53d044afd7988fc2e057f,
+        type: 3}
+      propertyPath: m_Name
+      value: SensorIndicator
       objectReference: {fileID: 0}
     - target: {fileID: 8116435458316632893, guid: 3fe683c098f53d044afd7988fc2e057f,
         type: 3}

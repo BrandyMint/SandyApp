@@ -11,6 +11,7 @@ namespace Games.Landscape {
         private const float _INC_DEC_STEP = 1.0f;
         private const float _INC_DEC_STEPS_COUNT = 15;
 
+        [SerializeField] private Canvas _uiCanvas;
         [SerializeField] private Button _btnBack;
         [SerializeField] private Button _btnReset;
         [SerializeField] private Button _btnSave;
@@ -88,6 +89,12 @@ namespace Games.Landscape {
         
         private void OnBtnResetWater() {
             _landscape.ClearFluidFlows();
+        }
+
+        private void Update() {
+            if (Input.GetKeyUp(KeyCode.U)) {
+                _uiCanvas.gameObject.SetActive(!_uiCanvas.gameObject.activeSelf);
+            }
         }
 
         private static void OnTglWater(bool enable) {
