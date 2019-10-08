@@ -29,7 +29,7 @@ public abstract class SerializableParams {
             var json = File.ReadAllText(GetFullPath());
             JsonConvert.PopulateObject(json, this);
         } catch (Exception e) {
-            Debug.LogException(e);
+            Debug.LogWarning(e);
             return;
         } finally {
             _invokeChangedOnSetting = true;
