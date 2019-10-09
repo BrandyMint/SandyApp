@@ -11,6 +11,9 @@ namespace Launcher.MultiMonitorSupport {
         [SerializeField] private bool _useMultiMonitorFix = true;
         [SerializeField] private bool _revertDefaultScreenSettingsOnExit = true;
         [SerializeField, Range(1, 8)] private int _useMonitors = 2;
+#if UNITY_EDITOR
+        [SerializeField, Range(1, 8)] private int _testMonitorsInEditor = 1;
+#endif
         
         public static MultiMonitor Instance { get; private set; }
 
@@ -26,7 +29,13 @@ namespace Launcher.MultiMonitorSupport {
                 _useMultiMonitorFix = false;
             }
 
-            MonitorsCount = Math.Min(Display.displays.Length, _useMonitors);
+            
+#if UNITY_EDITOR
+            var avalaible = _testMonitorsInEditor;
+#else
+            var avalaible = Display.displays.Length;
+#endif
+            MonitorsCount = Math.Min(avalaible, _useMonitors);
             _systemApi.UseMonitors = MonitorsCount;
             Instance = this;
         }
