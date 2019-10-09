@@ -63,6 +63,7 @@ MonoBehaviour:
   _useMultiMonitorFix: 0
   _revertDefaultScreenSettingsOnExit: 1
   _useMonitors: 2
+  _testMonitorsInEditor: 1
 --- !u!114 &6917613083910844641
 MonoBehaviour:
   m_ObjectHideFlags: 0

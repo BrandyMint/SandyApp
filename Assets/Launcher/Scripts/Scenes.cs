@@ -25,12 +25,18 @@ namespace Launcher {
             SceneManager.sceneLoaded += OnSceneLoaded;
 
             MultiMonitor.OnNotEnoughMonitors += OnNotEnoughMonitors;
+            
             KeyMapper.OnSceneProjectorParams += OpenProjectorParams;
+            KeyMapper.OnSceneCalibration += OpenCalibration;
+            KeyMapper.OnGoBack += GoBack;
         }
         
         private void OnDestroy() {
             SceneManager.sceneLoaded -= OnSceneLoaded;
             MultiMonitor.OnNotEnoughMonitors -= OnNotEnoughMonitors;
+            
+            KeyMapper.OnGoBack -= GoBack;
+            KeyMapper.OnSceneCalibration -= OpenCalibration;
             KeyMapper.OnSceneProjectorParams -= OpenProjectorParams;
         }
 
@@ -62,6 +68,10 @@ namespace Launcher {
 
         private void OpenProjectorParams() {
             SceneManager.LoadScene(_sceneProjectorParamsPath);
+        }
+        
+        private void OpenCalibration() {
+            SceneManager.LoadScene(_sceneCalibrationPath);
         }
     }
 }

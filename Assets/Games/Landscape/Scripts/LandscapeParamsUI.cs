@@ -68,6 +68,12 @@ namespace Games.Landscape {
             InitSlider(_params.FluidCellSize, nameof(Prefs.Landscape.FluidCellSize));
             InitSlider(_params.FluidAcceleration, nameof(Prefs.Landscape.FluidAcceleration));
             InitSlider(_params.FluidFading, nameof(Prefs.Landscape.FluidFading));
+
+            KeyMapper.OnSwitchUI += SwitchUI;
+        }
+
+        private void OnDestroy() {
+            KeyMapper.OnSwitchUI -= SwitchUI;
         }
 
         private static void OnBtnSave() {
@@ -91,10 +97,8 @@ namespace Games.Landscape {
             _landscape.ClearFluidFlows();
         }
 
-        private void Update() {
-            if (Input.GetKeyUp(KeyCode.U)) {
-                _uiCanvas.gameObject.SetActive(!_uiCanvas.gameObject.activeSelf);
-            }
+        private void SwitchUI() {
+            _uiCanvas.gameObject.SetActive(!_uiCanvas.gameObject.activeSelf);
         }
 
         private static void OnTglWater(bool enable) {
