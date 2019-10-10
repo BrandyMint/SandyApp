@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Launcher;
 using Launcher.KeyMapping;
 using UnityEngine;
 using UnityEngine.Events;
@@ -81,8 +80,17 @@ namespace Games.Landscape {
             KeyMapper.RemoveListener(KeyEvent.SHOW_UI, SwitchUI);
         }
 
-        private static void OnBtnSave() {
-            Prefs.NotifySaved(Prefs.Landscape.Save());
+        private void OnBtnSave() {
+            if (IsSaveAllowed())
+                Prefs.NotifySaved(Prefs.Landscape.Save());
+        }
+        
+        private void FixedUpdate() {
+            _btnSave.interactable = IsSaveAllowed();
+        }
+
+        private bool IsSaveAllowed() {
+            return Prefs.Landscape.HasChanges || !Prefs.Landscape.HasFile;
         }
 
         private void OnBtnReset() {

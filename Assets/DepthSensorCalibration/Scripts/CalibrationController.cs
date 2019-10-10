@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using DepthSensorCalibration.HalfVisualization;
+﻿using DepthSensorCalibration.HalfVisualization;
 using DepthSensorSandbox.Visualisation;
 using Launcher;
 using Launcher.KeyMapping;
@@ -17,7 +16,6 @@ namespace DepthSensorCalibration {
         public Camera SandboxCam;
 
         [SerializeField] private Camera _camMonitor;
-        [SerializeField] private Camera _camWall;
         
         [Header("UI")]
         [SerializeField] private Text _txtTittleShortCuts;
@@ -71,19 +69,23 @@ namespace DepthSensorCalibration {
 
 #region Buttons
         private void OnBtnSave() {
-            Prefs.NotifySaved(Prefs.Calibration.Save());
-            Scenes.GoBack();
+            if (IsSaveAllowed()) {
+                Prefs.NotifySaved(Prefs.Calibration.Save());
+                Scenes.GoBack();
+            }
+        }
+        
+        private void FixedUpdate() {
+            _btnSave.interactable = IsSaveAllowed();
+        }
+
+        private bool IsSaveAllowed() {
+            return Prefs.Calibration.HasChanges || !Prefs.Calibration.HasFile;
         }
 
         private void OnBtnReset() {
             _projector.Load();
             Prefs.Calibration.Reset();
-        }
-
-        private void OnBtnCancel() {
-            _projector.Load();
-            Prefs.Calibration.Load();
-            Scenes.GoBack();
         }
         
         private void SubscribeKeys() {

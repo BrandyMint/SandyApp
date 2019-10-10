@@ -70,10 +70,18 @@ namespace DepthSensorCalibration {
         private void OnBtnSave() {
             if (_errors.Any()) {
                 Prefs.NotifyIncorrectData();
-            } else {
+            } else if (IsSaveAllowed()) {
                 Prefs.NotifySaved(_projector.Save());
                 Scenes.GoBack();
             }
+        }
+
+        private void FixedUpdate() {
+            _btnSave.interactable = IsSaveAllowed();
+        }
+
+        private bool IsSaveAllowed() {
+            return !_errors.Any() && (_projector.HasChanges || !_projector.HasFile);
         }
 
         private void OnBtnReset() {
@@ -92,8 +100,6 @@ namespace DepthSensorCalibration {
                     fld.image.color = _colorError;
                     _errors.Add(fld);
                 }
-
-                _btnSave.interactable = !_errors.Any();
             });
         }
 
