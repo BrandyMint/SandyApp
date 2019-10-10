@@ -52,6 +52,8 @@ namespace Launcher {
             KeyMapper.AddListener(KeyEvent.OPEN_PROJECTOR_PARAMS, OpenProjectorParams);
             KeyMapper.AddListener(KeyEvent.OPEN_CALIBRATION, OpenCalibration);
             KeyMapper.AddListener(KeyEvent.BACK, GoBack);
+            
+            GoCalibrationBefore(SceneManager.GetActiveScene().path);
         }
         
         private void OnDestroy() {
