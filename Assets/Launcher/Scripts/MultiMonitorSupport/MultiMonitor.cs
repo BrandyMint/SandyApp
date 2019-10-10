@@ -66,7 +66,7 @@ namespace Launcher.MultiMonitorSupport {
                     StartCoroutine(ActivatingDisplays(multiRect));
                 }
             } else if (Display.displays.Length >= MonitorsCount) {
-                var fullscreen = Application.platform == RuntimePlatform.LinuxPlayer;
+                var fullscreen = Application.platform == RuntimePlatform.LinuxPlayer || MonitorsCount == 1;
                 for (int i = 0; i < MonitorsCount; ++i) {
                     var disp = Display.displays[i];
                     if (!disp.active)

@@ -74,9 +74,6 @@ namespace Launcher.KeyMapping {
         public static void RemoveListener(KeyEvent ev, UnityAction act) {
             if (_actions.TryGetValue(ev, out var unityEvent)) {
                 unityEvent.RemoveListener(act);
-                if (unityEvent.GetPersistentEventCount() < 1) {
-                    _actions.Remove(ev);
-                }
             }
         }
 

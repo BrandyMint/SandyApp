@@ -47,7 +47,7 @@ public abstract class SerializableParams {
             JsonConvert.PopulateObject(json, this);
             HasFile = true;
         } catch (Exception e) {
-            Debug.LogWarning(e);
+            //Debug.LogWarning(e);
             return false;
         } finally {
             _invokeChangedOnSetting = true;
