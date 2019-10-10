@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace Launcher.UI {
@@ -13,7 +12,7 @@ namespace Launcher.UI {
         }
 
         private void OnBtn() {
-            SceneManager.LoadScene(_scenePath);
+            Scenes.GoToWithCheckCalibration(_scenePath);
         }
     }
 }

@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using DepthSensorCalibration;
+using DepthSensorSandbox;
 using Launcher.KeyMapping;
 using Launcher.MultiMonitorSupport;
 using UINotify;
@@ -17,10 +19,30 @@ namespace Launcher {
         
         private readonly Stack<int> _scenes = new Stack<int>();
         private Notify.Control _notifyNoMonitors;
+        private CalibrationStep[] _calibrationSteps;
+
+        private class CalibrationStep {
+            public string scenePath;
+            private SerializableParams _params;
+            
+            public bool CheckIsCompleted() {
+                return _params.Load(false);
+            }
+
+            public CalibrationStep(SerializableParams p, string scenePath) {
+                this.scenePath = scenePath;
+                _params = p;
+            }
+        }
 
         private void Awake() {
             _instance = this;
             DontDestroyOnLoad(gameObject);
+            
+            _calibrationSteps = new[] {
+                new CalibrationStep(new ProjectorParams(), _sceneProjectorParamsPath),
+                new CalibrationStep(new CalibrationParams(), _sceneCalibrationPath)
+            };
             
             _scenes.Push(SceneManager.GetActiveScene().buildIndex);
             SceneManager.sceneLoaded += OnSceneLoaded;
@@ -59,20 +81,46 @@ namespace Launcher {
                 _instance.GoBackInternal();
         }
 
+        private static bool GoCalibrationBefore(string scenePath) {
+            if (_instance == null)
+                return false;
+            foreach (var step in _instance._calibrationSteps) {
+                if (!step.CheckIsCompleted()) {
+                    if (scenePath != step.scenePath) {
+                        Debug.Log($"Before {scenePath} GoTo calibration: {step.scenePath}");
+                        SceneManager.LoadScene(step.scenePath);
+                        return true;
+                    }
+                    return false;
+                }
+            }
+            return false;
+        }
+
+        public static void GoToWithCheckCalibration(int sceneId) {
+            if (!GoCalibrationBefore(SceneManager.GetSceneAt(sceneId).path))
+                SceneManager.LoadScene(sceneId);
+        }
+        
+        public static void GoToWithCheckCalibration(string scenePath) {
+            if (!GoCalibrationBefore(scenePath))
+                SceneManager.LoadScene(scenePath);
+        }
+
         private void GoBackInternal() {
             if (_scenes.Count < 2)
                 return;
             _scenes.Pop();
-            var scene = _scenes.Peek();
-            SceneManager.LoadScene(scene);
+            var sceneId = _scenes.Peek();
+            GoToWithCheckCalibration(sceneId);
         }
 
         private void OpenProjectorParams() {
-            SceneManager.LoadScene(_sceneProjectorParamsPath);
+            GoToWithCheckCalibration(_sceneProjectorParamsPath);
         }
         
         private void OpenCalibration() {
-            SceneManager.LoadScene(_sceneCalibrationPath);
+            GoToWithCheckCalibration(_sceneCalibrationPath);
         }
     }
 }

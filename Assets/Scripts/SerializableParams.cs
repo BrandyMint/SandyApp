@@ -22,7 +22,7 @@ public abstract class SerializableParams {
         return Path.Combine(_path, GetFileName());
     }
 
-    public void Load(bool invokeChanged = true) {
+    public bool Load(bool invokeChanged = true) {
         _isLoaded = true;
         try {
             _invokeChangedOnSetting = false;
@@ -30,13 +30,14 @@ public abstract class SerializableParams {
             JsonConvert.PopulateObject(json, this);
         } catch (Exception e) {
             Debug.LogWarning(e);
-            return;
+            return false;
         } finally {
             _invokeChangedOnSetting = true;
         }
         
         if (invokeChanged)
             InvokeChanged();
+        return true;
     }
 
     public bool Save() {
