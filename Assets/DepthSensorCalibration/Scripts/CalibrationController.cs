@@ -19,7 +19,7 @@ namespace DepthSensorCalibration {
         
         [Header("UI")]
         [SerializeField] private Text _txtTittleShortCuts;
-        [SerializeField] private HalfBase _ui;
+        [SerializeField] private GameObject _ui;
         [SerializeField] private GameObject _calibrationImg;
         [SerializeField] private GameObject _settingsAndBtns;
         [SerializeField] private Transform _pnlCalibrationSettings;
@@ -58,6 +58,7 @@ namespace DepthSensorCalibration {
             InitUI();
             SwitchMode(CalibrationMode.MANUAL);
             SubscribeKeys();
+            SwithcUI();
         }
 
         private void OnDestroy() {
@@ -119,7 +120,7 @@ namespace DepthSensorCalibration {
         }
 
         private void SwithcUI() {
-            _ui.Hide = !_ui.Hide;
+            _ui.gameObject.SetActive(!_ui.gameObject.activeSelf);
         }
 #endregion
 

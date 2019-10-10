@@ -72,6 +72,8 @@ namespace Games.Landscape {
             InitSlider(_params.FluidCellSize, nameof(Prefs.Landscape.FluidCellSize));
             InitSlider(_params.FluidAcceleration, nameof(Prefs.Landscape.FluidAcceleration));
             InitSlider(_params.FluidFading, nameof(Prefs.Landscape.FluidFading));
+            
+            SwitchUI();
         }
 
         private void OnDestroy() {
