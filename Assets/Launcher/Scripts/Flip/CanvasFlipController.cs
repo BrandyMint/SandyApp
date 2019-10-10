@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Launcher.KeyMapping;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace Launcher.Flip {
@@ -7,12 +8,12 @@ namespace Launcher.Flip {
             DontDestroyOnLoad(gameObject);
             AddCanvasFlippersFor(SceneManager.GetActiveScene());
             SceneManager.sceneLoaded += OnSceneLoaded;
-            KeyMapper.OnFlipDisplay += OnFlipDisplay;
+            KeyMapper.AddListener(KeyEvent.FLIP_DISPLAY, OnFlipDisplay);
         }
         
         private void OnDestroy() {
             SceneManager.sceneLoaded -= OnSceneLoaded;
-            KeyMapper.OnFlipDisplay -= OnFlipDisplay;
+            KeyMapper.RemoveListener(KeyEvent.FLIP_DISPLAY, OnFlipDisplay);
         }
         
         private static void OnSceneLoaded(Scene scene, LoadSceneMode mode) {

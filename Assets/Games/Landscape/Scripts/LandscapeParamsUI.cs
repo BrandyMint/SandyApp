@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Launcher;
+using Launcher.KeyMapping;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -69,11 +70,11 @@ namespace Games.Landscape {
             InitSlider(_params.FluidAcceleration, nameof(Prefs.Landscape.FluidAcceleration));
             InitSlider(_params.FluidFading, nameof(Prefs.Landscape.FluidFading));
 
-            KeyMapper.OnSwitchUI += SwitchUI;
+            KeyMapper.AddListener(KeyEvent.SHOW_UI, SwitchUI);
         }
 
         private void OnDestroy() {
-            KeyMapper.OnSwitchUI -= SwitchUI;
+            KeyMapper.RemoveListener(KeyEvent.SHOW_UI, SwitchUI);
         }
 
         private static void OnBtnSave() {

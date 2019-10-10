@@ -1,5 +1,5 @@
 using System;
-using Launcher;
+using Launcher.KeyMapping;
 using UnityEngine;
 using UnityEngine.Rendering;
 using Utilities;
@@ -26,7 +26,7 @@ namespace DepthSensorSandbox.Visualisation {
             if (_instantiateMaterial)
                 _matFluidCalc = new Material(_matFluidCalc);
             SetEnable(true);
-            KeyMapper.OnFlipDisplay += ClearFluidFlows;
+            KeyMapper.AddListener(KeyEvent.FLIP_DISPLAY, ClearFluidFlows);
         }
 
         protected override void OnDestroy() {
@@ -37,7 +37,7 @@ namespace DepthSensorSandbox.Visualisation {
             foreach (var t in _texFluxBuffers) {
                 if (t != null) t.Release();
             }
-            KeyMapper.OnFlipDisplay -= ClearFluidFlows;
+            KeyMapper.RemoveListener(KeyEvent.FLIP_DISPLAY, ClearFluidFlows);
         }
 
         public override void SetEnable(bool enable) {

@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Linq;
 using Launcher;
+using Launcher.KeyMapping;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -37,8 +38,8 @@ namespace DepthSensorCalibration {
             _btnSave.onClick.AddListener(OnBtnSave);
             _btnCancel.onClick.AddListener(OnBtnCancel);
             _btnReset.onClick.AddListener(OnBtnReset);
-            KeyMapper.OnSaveSettings += OnBtnSave;
-            KeyMapper.OnResetSettings += OnBtnReset;
+            KeyMapper.AddListener(KeyEvent.SAVE, OnBtnSave);
+            KeyMapper.AddListener(KeyEvent.RESET, OnBtnReset);
             
             UnityHelper.SetPropsByGameObjects(_projectorFields, _pnlProjectorParams);
             InitField(_projectorFields.Dist, val => _projector.Distance = val);
@@ -61,8 +62,8 @@ namespace DepthSensorCalibration {
         }
 
         private void OnDestroy() {
-            KeyMapper.OnSaveSettings -= OnBtnSave;
-            KeyMapper.OnResetSettings -= OnBtnReset;
+            KeyMapper.RemoveListener(KeyEvent.SAVE, OnBtnSave);
+            KeyMapper.RemoveListener(KeyEvent.RESET, OnBtnReset);
             _projector.OnChanged -= OnProjectorChanged;
         }
 

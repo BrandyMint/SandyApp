@@ -1,6 +1,7 @@
 ﻿using DepthSensorCalibration.HalfVisualization;
 using DepthSensorSandbox.Visualisation;
 using Launcher;
+using Launcher.KeyMapping;
 using Launcher.MultiMonitorSupport;
 using UnityEngine;
 using UnityEngine.Events;
@@ -84,15 +85,15 @@ namespace DepthSensorCalibration {
         }
         
         private void SubscribeKeys() {
-            KeyMapper.OnSaveSettings += OnBtnSave;
-            KeyMapper.OnResetSettings += OnBtnReset;
-            KeyMapper.OnSwitchUI += SwithcUI;
-            KeyMapper.OnLeft += _calibrationFields.PosX.btnDec.onClick.Invoke;
-            KeyMapper.OnRight += _calibrationFields.PosX.btnInc.onClick.Invoke;
-            KeyMapper.OnDown += _calibrationFields.PosY.btnDec.onClick.Invoke;
-            KeyMapper.OnUp += _calibrationFields.PosY.btnInc.onClick.Invoke;
-            KeyMapper.OnZoomIn += _calibrationFields.PosZ.btnInc.onClick.Invoke;
-            KeyMapper.OnZoomOut += _calibrationFields.PosZ.btnDec.onClick.Invoke;
+            KeyMapper.AddListener(KeyEvent.SAVE, OnBtnSave);
+            KeyMapper.AddListener(KeyEvent.RESET, OnBtnReset);
+            KeyMapper.AddListener(KeyEvent.SHOW_UI, SwithcUI);
+            KeyMapper.AddListener(KeyEvent.LEFT, _calibrationFields.PosX.btnDec.onClick.Invoke);
+            KeyMapper.AddListener(KeyEvent.RIGHT, _calibrationFields.PosX.btnInc.onClick.Invoke);
+            KeyMapper.AddListener(KeyEvent.DOWN, _calibrationFields.PosY.btnDec.onClick.Invoke);
+            KeyMapper.AddListener(KeyEvent.UP, _calibrationFields.PosY.btnInc.onClick.Invoke);
+            KeyMapper.AddListener(KeyEvent.ZOOM_IN, _calibrationFields.PosZ.btnInc.onClick.Invoke);
+            KeyMapper.AddListener(KeyEvent.ZOOM_OUT, _calibrationFields.PosZ.btnDec.onClick.Invoke);
             /*if (Input.GetKey(KeyCode.LeftBracket) || Input.GetKey(KeyCode.LeftCurlyBracket)) {
                 _calibrationFields.ZeroDepth.btnDec.onClick.Invoke();
             }
@@ -102,15 +103,15 @@ namespace DepthSensorCalibration {
         }
 
         private void UnSubscribeKeys() {
-            KeyMapper.OnSaveSettings -= OnBtnSave;
-            KeyMapper.OnResetSettings -= OnBtnReset;
-            KeyMapper.OnSwitchUI -= SwithcUI;
-            KeyMapper.OnLeft -= _calibrationFields.PosX.btnDec.onClick.Invoke;
-            KeyMapper.OnRight -= _calibrationFields.PosX.btnInc.onClick.Invoke;
-            KeyMapper.OnDown -= _calibrationFields.PosY.btnDec.onClick.Invoke;
-            KeyMapper.OnUp -= _calibrationFields.PosY.btnInc.onClick.Invoke;
-            KeyMapper.OnZoomIn -= _calibrationFields.PosZ.btnInc.onClick.Invoke;
-            KeyMapper.OnZoomOut -= _calibrationFields.PosZ.btnDec.onClick.Invoke;
+            KeyMapper.RemoveListener(KeyEvent.SAVE, OnBtnSave);
+            KeyMapper.RemoveListener(KeyEvent.RESET, OnBtnReset);
+            KeyMapper.RemoveListener(KeyEvent.SHOW_UI, SwithcUI);
+            KeyMapper.RemoveListener(KeyEvent.LEFT, _calibrationFields.PosX.btnDec.onClick.Invoke);
+            KeyMapper.RemoveListener(KeyEvent.RIGHT, _calibrationFields.PosX.btnInc.onClick.Invoke);
+            KeyMapper.RemoveListener(KeyEvent.DOWN, _calibrationFields.PosY.btnDec.onClick.Invoke);
+            KeyMapper.RemoveListener(KeyEvent.UP, _calibrationFields.PosY.btnInc.onClick.Invoke);
+            KeyMapper.RemoveListener(KeyEvent.ZOOM_IN, _calibrationFields.PosZ.btnInc.onClick.Invoke);
+            KeyMapper.RemoveListener(KeyEvent.ZOOM_OUT, _calibrationFields.PosZ.btnDec.onClick.Invoke);
         }
 
         private void SwithcUI() {

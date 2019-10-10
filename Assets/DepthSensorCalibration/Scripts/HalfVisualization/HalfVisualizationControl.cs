@@ -1,4 +1,4 @@
-﻿using Launcher;
+﻿using Launcher.KeyMapping;
 using Launcher.MultiMonitorSupport;
 using UnityEngine;
 
@@ -18,14 +18,14 @@ namespace DepthSensorCalibration.HalfVisualization {
         private void Start() {
             if (MultiMonitor.MonitorsCount == 1) {
                 SwitchMode();
-                KeyMapper.OnSwitchMode += SwitchMode;
+                KeyMapper.AddListener(KeyEvent.SWITCH_MODE, SwitchMode);
             } else {
                 Fill = FillType.FULL;
             }
         }
 
         private void OnDestroy() {
-            KeyMapper.OnSwitchMode -= SwitchMode;
+            KeyMapper.RemoveListener(KeyEvent.SWITCH_MODE, SwitchMode);
         }
 
         private void SwitchMode() {

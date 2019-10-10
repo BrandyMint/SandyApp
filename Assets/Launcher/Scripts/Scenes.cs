@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Launcher.KeyMapping;
 using Launcher.MultiMonitorSupport;
 using UINotify;
 using UnityEngine;
@@ -26,18 +27,18 @@ namespace Launcher {
 
             MultiMonitor.OnNotEnoughMonitors += OnNotEnoughMonitors;
             
-            KeyMapper.OnSceneProjectorParams += OpenProjectorParams;
-            KeyMapper.OnSceneCalibration += OpenCalibration;
-            KeyMapper.OnGoBack += GoBack;
+            KeyMapper.AddListener(KeyEvent.OPEN_PROJECTOR_PARAMS, OpenProjectorParams);
+            KeyMapper.AddListener(KeyEvent.OPEN_CALIBRATION, OpenCalibration);
+            KeyMapper.AddListener(KeyEvent.BACK, GoBack);
         }
         
         private void OnDestroy() {
             SceneManager.sceneLoaded -= OnSceneLoaded;
             MultiMonitor.OnNotEnoughMonitors -= OnNotEnoughMonitors;
             
-            KeyMapper.OnGoBack -= GoBack;
-            KeyMapper.OnSceneCalibration -= OpenCalibration;
-            KeyMapper.OnSceneProjectorParams -= OpenProjectorParams;
+            KeyMapper.RemoveListener(KeyEvent.BACK, GoBack);
+            KeyMapper.RemoveListener(KeyEvent.OPEN_CALIBRATION, OpenCalibration);
+            KeyMapper.RemoveListener(KeyEvent.OPEN_PROJECTOR_PARAMS, OpenProjectorParams);
         }
 
         private void OnNotEnoughMonitors() {
