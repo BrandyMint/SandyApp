@@ -1,4 +1,5 @@
-﻿using DepthSensorCalibration.HalfVisualization;
+﻿using System.Collections.Generic;
+using DepthSensorCalibration.HalfVisualization;
 using DepthSensorSandbox.Visualisation;
 using Launcher;
 using Launcher.KeyMapping;
@@ -18,7 +19,8 @@ namespace DepthSensorCalibration {
         [SerializeField] private Camera _camMonitor;
         [SerializeField] private Camera _camWall;
         
-        [Header("UI")] 
+        [Header("UI")]
+        [SerializeField] private Text _txtTittleShortCuts;
         [SerializeField] private HalfBase _ui;
         [SerializeField] private GameObject _calibrationImg;
         [SerializeField] private GameObject _settingsAndBtns;
@@ -153,9 +155,11 @@ namespace DepthSensorCalibration {
 
 #region UI
         private void InitUI() {
-            _btnSave.onClick.AddListener(OnBtnSave);
-            _btnCancel.onClick.AddListener(OnBtnCancel);
-            _btnReset.onClick.AddListener(OnBtnReset);
+            _txtTittleShortCuts.text = GetShortCuts(KeyEvent.LEFT, KeyEvent.RIGHT, KeyEvent.UP, KeyEvent.DOWN,
+                KeyEvent.ZOOM_IN, KeyEvent.ZOOM_OUT, KeyEvent.SWITCH_MODE);
+            BtnKeyBind.ShortCut(_btnCancel, KeyEvent.BACK);
+            BtnKeyBind.ShortCut(_btnReset, KeyEvent.RESET);
+            BtnKeyBind.ShortCut(_btnSave, KeyEvent.SAVE);
             _btnAutomatic.onClick.AddListener(OnBtnStartAutomatic);
             _tglTest.onValueChanged.AddListener(OnTglTest);
             _tglTest.gameObject.SetActive(MultiMonitor.MonitorsCount > 1);
@@ -183,6 +187,22 @@ namespace DepthSensorCalibration {
             fld.sl.onValueChanged.AddListener(val => { UpdatePrefFromUI(val, act); });
             fld.btnInc.onClick.AddListener(CreateOnBtnIncDec(fld.sl, 1.0f));
             fld.btnDec.onClick.AddListener(CreateOnBtnIncDec(fld.sl, -1.0f));
+        }
+        
+        private static string GetShortCuts(params KeyEvent[] events) {
+            var str = "";
+            foreach (var keyEvent in events) {
+                var key = KeyMapper.FindFirstKey(keyEvent);
+                if (key != null) {
+                    var shortCut = key.ShortCut;
+                    if (key.ShortCut.Length < 2)
+                        str += shortCut;
+                    else
+                        str += $" [{shortCut}]";
+                }
+            }
+
+            return str;
         }
 
         private static UnityAction CreateOnBtnIncDec(Slider sl, float mult) {

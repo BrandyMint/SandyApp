@@ -35,9 +35,9 @@ namespace DepthSensorCalibration {
         }
 
         private void InitUI() {
-            _btnSave.onClick.AddListener(OnBtnSave);
-            _btnCancel.onClick.AddListener(OnBtnCancel);
-            _btnReset.onClick.AddListener(OnBtnReset);
+            BtnKeyBind.ShortCut(_btnSave, KeyEvent.SAVE);
+            BtnKeyBind.ShortCut(_btnCancel, KeyEvent.BACK);
+            BtnKeyBind.ShortCut(_btnReset, KeyEvent.RESET);
             KeyMapper.AddListener(KeyEvent.SAVE, OnBtnSave);
             KeyMapper.AddListener(KeyEvent.RESET, OnBtnReset);
             
@@ -78,11 +78,6 @@ namespace DepthSensorCalibration {
 
         private void OnBtnReset() {
             _projector.Reset();
-        }
-
-        private void OnBtnCancel() {
-            _projector.Load();
-            Scenes.GoBack();
         }
 
         private void InitField(InputField fld, UnityAction<float> act) {

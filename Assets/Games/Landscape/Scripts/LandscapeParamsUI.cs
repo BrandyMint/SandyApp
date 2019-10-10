@@ -50,10 +50,14 @@ namespace Games.Landscape {
         private readonly List<Action> _onParamsReset = new List<Action>();
 
         private void Start() {
-            _btnBack.onClick.AddListener(OnBtnBack);
-            _btnReset.onClick.AddListener(OnBtnReset);
-            _btnSave.onClick.AddListener(OnBtnSave);
             _btnResetWater.onClick.AddListener(OnBtnResetWater);
+            BtnKeyBind.ShortCut(_btnBack, KeyEvent.BACK);
+            BtnKeyBind.ShortCut(_btnReset, KeyEvent.RESET);
+            BtnKeyBind.ShortCut(_btnSave, KeyEvent.SAVE);
+            
+            KeyMapper.AddListener(KeyEvent.RESET, OnBtnReset);
+            KeyMapper.AddListener(KeyEvent.SAVE, OnBtnSave);
+            KeyMapper.AddListener(KeyEvent.SHOW_UI, SwitchUI);
 
             _tglWater.isOn = Prefs.Landscape.EnableWaterSimulation;
             _tglWater.onValueChanged.AddListener(OnTglWater);
@@ -69,11 +73,11 @@ namespace Games.Landscape {
             InitSlider(_params.FluidCellSize, nameof(Prefs.Landscape.FluidCellSize));
             InitSlider(_params.FluidAcceleration, nameof(Prefs.Landscape.FluidAcceleration));
             InitSlider(_params.FluidFading, nameof(Prefs.Landscape.FluidFading));
-
-            KeyMapper.AddListener(KeyEvent.SHOW_UI, SwitchUI);
         }
 
         private void OnDestroy() {
+            KeyMapper.RemoveListener(KeyEvent.RESET, OnBtnReset);
+            KeyMapper.RemoveListener(KeyEvent.SAVE, OnBtnSave);
             KeyMapper.RemoveListener(KeyEvent.SHOW_UI, SwitchUI);
         }
 
@@ -88,10 +92,6 @@ namespace Games.Landscape {
                 action();
             }
             _invokeChagedUI = true;
-        }
-
-        private static void OnBtnBack() {
-            Scenes.GoBack();
         }
         
         private void OnBtnResetWater() {

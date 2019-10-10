@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -10,10 +11,14 @@ namespace Launcher.KeyMapping {
         public class KeyBind {
             public KeyCode key;
             public KeyEvent ev;
+            public string ShortCut => _shortCut ?? key.ToString().ToUpper();
+            
+            private string _shortCut; 
 
-            public KeyBind(KeyCode key, KeyEvent ev) {
+            public KeyBind(KeyCode key, KeyEvent ev, string shortCut = null) {
                 this.key = key;
                 this.ev = ev;
+                this._shortCut = shortCut;
             }
         }
 
@@ -34,7 +39,7 @@ namespace Launcher.KeyMapping {
 
         private void InitMapper() {
             _bindsDown.Add(new KeyBind(KeyCode.Tab, KeyEvent.SWITCH_MODE));
-            _bindsDown.Add(new KeyBind(KeyCode.Escape, KeyEvent.BACK));
+            _bindsDown.Add(new KeyBind(KeyCode.Escape, KeyEvent.BACK, "ESC"));
             
             _bindsDown.Add(new KeyBind(KeyCode.F2, KeyEvent.SAVE));
             _bindsDown.Add(new KeyBind(KeyCode.F3, KeyEvent.SHOW_UI));
@@ -43,17 +48,17 @@ namespace Launcher.KeyMapping {
             _bindsDown.Add(new KeyBind(KeyCode.F11, KeyEvent.OPEN_PROJECTOR_PARAMS));
             _bindsDown.Add(new KeyBind(KeyCode.F12, KeyEvent.FLIP_DISPLAY));
             
-            _binds.Add(new KeyBind(KeyCode.UpArrow, KeyEvent.UP));
-            _binds.Add(new KeyBind(KeyCode.DownArrow, KeyEvent.DOWN));
-            _binds.Add(new KeyBind(KeyCode.LeftArrow, KeyEvent.LEFT));
-            _binds.Add(new KeyBind(KeyCode.RightArrow, KeyEvent.RIGHT));
+            _binds.Add(new KeyBind(KeyCode.UpArrow, KeyEvent.UP, "↑"));
+            _binds.Add(new KeyBind(KeyCode.DownArrow, KeyEvent.DOWN, "↓"));
+            _binds.Add(new KeyBind(KeyCode.LeftArrow, KeyEvent.LEFT, "←"));
+            _binds.Add(new KeyBind(KeyCode.RightArrow, KeyEvent.RIGHT, "→"));
             
-            _binds.Add(new KeyBind(KeyCode.Plus, KeyEvent.ZOOM_IN));
-            _binds.Add(new KeyBind(KeyCode.Equals, KeyEvent.ZOOM_IN));
-            _binds.Add(new KeyBind(KeyCode.KeypadPlus, KeyEvent.ZOOM_IN));
+            _binds.Add(new KeyBind(KeyCode.Plus, KeyEvent.ZOOM_IN, "+"));
+            _binds.Add(new KeyBind(KeyCode.Equals, KeyEvent.ZOOM_IN, "="));
+            _binds.Add(new KeyBind(KeyCode.KeypadPlus, KeyEvent.ZOOM_IN, "+"));
             
-            _binds.Add(new KeyBind(KeyCode.Minus, KeyEvent.ZOOM_OUT));
-            _binds.Add(new KeyBind(KeyCode.KeypadMinus, KeyEvent.ZOOM_OUT));
+            _binds.Add(new KeyBind(KeyCode.Minus, KeyEvent.ZOOM_OUT, "-"));
+            _binds.Add(new KeyBind(KeyCode.KeypadMinus, KeyEvent.ZOOM_OUT, "-"));
         }
         
         public static void AddListener(KeyEvent ev, UnityAction act) {
@@ -75,6 +80,18 @@ namespace Launcher.KeyMapping {
             }
         }
 
+        public static KeyBind FindFirstKey(KeyEvent ev) {
+            if (_instance == null)
+                return null;
+            return _instance._bindsDown.FirstOrDefault(b => b.ev == ev) ??
+                   _instance._binds.FirstOrDefault(b => b.ev == ev);
+        }
+
+        public static void FireEvent(KeyEvent ev) {
+            if (_actions.TryGetValue(ev, out var action))
+                action?.Invoke();
+        }
+
         private void Update() {
             if (Input.anyKey) {
                 ProcessInput(_binds, Input.GetKey);
@@ -87,8 +104,7 @@ namespace Launcher.KeyMapping {
         private static void ProcessInput(IEnumerable<KeyBind> binds, Func<KeyCode, bool> checkKey) {
             foreach (var bind in binds) {
                 if (checkKey(bind.key)) {
-                    if (_actions.TryGetValue(bind.ev, out var action))
-                        action?.Invoke();
+                    FireEvent(bind.ev);
                 }
             }
         }
