@@ -13,6 +13,11 @@
 * Kinect for Windows Runtime 2.0 (https://www.microsoft.com/en-us/download/details.aspx?id=44559 или https://www.microsoft.com/en-us/download/details.aspx?id=44561)
 * UsbDk или libusbK для работы через OpenNI2 + libfreenect2. Инструкция по установке: https://github.com/OpenKinect/libfreenect2/blob/master/README.md#windows--visual-studio
 
+### Логи
+
+* Под Windows - C:\Users\[user]\AppData\LocalLow\Darkkon\sandbox\Player.log
+* Под Linux - ~/.config/unity3d/Darkkon/sandbox/Player.log 
+
 ### Linux
 
 * Чтобы использовать встроенные библиотеки OpenNI2 с драйверами, сборку следует запускать через `run.sh`
