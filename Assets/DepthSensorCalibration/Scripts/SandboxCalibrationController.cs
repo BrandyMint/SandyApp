@@ -63,11 +63,11 @@ namespace DepthSensorCalibration {
                 _sandbox.SetEnable(false);
             }
             UnSubscribeKeys();
-            Prefs.Sandbox.Load();
+            Save();
         }
 
 #region Buttons
-        private void OnBtnSave() {
+        private void Save() {
             if (IsSaveAllowed()) {
                 Prefs.NotifySaved(_toSave.Save());
                 //Scenes.GoBack();
@@ -87,7 +87,7 @@ namespace DepthSensorCalibration {
         }
         
         private void SubscribeKeys() {
-            KeyMapper.AddListener(KeyEvent.SAVE, OnBtnSave);
+            //KeyMapper.AddListener(KeyEvent.SAVE, Save);
             KeyMapper.AddListener(KeyEvent.RESET, OnBtnReset);
             KeyMapper.AddListener(KeyEvent.SHOW_UI, SwithcUI);
             KeyMapper.AddListener(KeyEvent.SET_DEPTH_MAX, SetDepthMax);
@@ -96,7 +96,7 @@ namespace DepthSensorCalibration {
         }
 
         private void UnSubscribeKeys() {
-            KeyMapper.RemoveListener(KeyEvent.SAVE, OnBtnSave);
+            //KeyMapper.RemoveListener(KeyEvent.SAVE, Save);
             KeyMapper.RemoveListener(KeyEvent.RESET, OnBtnReset);
             KeyMapper.RemoveListener(KeyEvent.SHOW_UI, SwithcUI);
             KeyMapper.RemoveListener(KeyEvent.SET_DEPTH_MAX, SetDepthMax);

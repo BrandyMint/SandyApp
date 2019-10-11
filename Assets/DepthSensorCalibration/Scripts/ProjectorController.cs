@@ -34,10 +34,10 @@ namespace DepthSensorCalibration {
         }
 
         private void InitUI() {
-            BtnKeyBind.ShortCut(_btnSave, KeyEvent.SAVE);
+            //BtnKeyBind.ShortCut(_btnSave, KeyEvent.SAVE);
             BtnKeyBind.ShortCut(_btnCancel, KeyEvent.BACK);
             BtnKeyBind.ShortCut(_btnReset, KeyEvent.RESET);
-            KeyMapper.AddListener(KeyEvent.SAVE, OnBtnSave);
+            //KeyMapper.AddListener(KeyEvent.SAVE, Save);
             KeyMapper.AddListener(KeyEvent.RESET, OnBtnReset);
             
             UnityHelper.SetPropsByGameObjects(_projectorFields, _pnlProjectorParams);
@@ -61,12 +61,13 @@ namespace DepthSensorCalibration {
         }
 
         private void OnDestroy() {
-            KeyMapper.RemoveListener(KeyEvent.SAVE, OnBtnSave);
+            //KeyMapper.RemoveListener(KeyEvent.SAVE, Save);
             KeyMapper.RemoveListener(KeyEvent.RESET, OnBtnReset);
             _projector.OnChanged -= OnProjectorChanged;
+            Save();
         }
 
-        private void OnBtnSave() {
+        private void Save() {
             if (_errors.Any()) {
                 Prefs.NotifyIncorrectData();
             } else if (IsSaveAllowed()) {

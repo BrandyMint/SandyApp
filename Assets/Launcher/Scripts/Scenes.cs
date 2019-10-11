@@ -103,11 +103,13 @@ namespace Launcher {
 
         public static void GoToWithCheckCalibration(int sceneId) {
             //if (!GoCalibrationBefore(SceneManager.GetSceneAt(sceneId).path))
+            if (SceneManager.GetActiveScene().buildIndex != sceneId)
                 SceneManager.LoadScene(sceneId);
         }
         
         public static void GoToWithCheckCalibration(string scenePath) {
             //if (!GoCalibrationBefore(scenePath))
+            if (SceneManager.GetActiveScene().path != scenePath)
                 SceneManager.LoadScene(scenePath);
         }
 

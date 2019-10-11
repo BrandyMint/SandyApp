@@ -17,6 +17,7 @@ namespace DepthSensorCalibration {
         
         [Header("UI")]
         [SerializeField] private Text _txtTittleShortCuts;
+        [SerializeField] private Text _txtZValue;
         [SerializeField] private GameObject _ui;
         [SerializeField] private GameObject _calibrationImg;
         [SerializeField] private GameObject _settingsAndBtns;
@@ -62,11 +63,12 @@ namespace DepthSensorCalibration {
             UnSubscribeKeys();
             _projector.OnChanged -= OnProjectorChanged;
             Prefs.Calibration.OnChanged -= OnCalibrationChanged;
-            Prefs.Calibration.Load();
+            Save();
+            //Prefs.Calibration.Load();
         }
 
 #region Buttons
-        private void OnBtnSave() {
+        private void Save() {
             if (IsSaveAllowed()) {
                 Prefs.NotifySaved(Prefs.Calibration.Save());
                 //Scenes.GoBack();
@@ -87,7 +89,7 @@ namespace DepthSensorCalibration {
         }
         
         private void SubscribeKeys() {
-            KeyMapper.AddListener(KeyEvent.SAVE, OnBtnSave);
+            //KeyMapper.AddListener(KeyEvent.SAVE, Save);
             KeyMapper.AddListener(KeyEvent.RESET, OnBtnReset);
             KeyMapper.AddListener(KeyEvent.SHOW_UI, SwithcUI);
             KeyMapper.AddListener(KeyEvent.LEFT, _calibrationFields.PosX.btnDec.onClick.Invoke);
@@ -99,7 +101,7 @@ namespace DepthSensorCalibration {
         }
 
         private void UnSubscribeKeys() {
-            KeyMapper.RemoveListener(KeyEvent.SAVE, OnBtnSave);
+            //KeyMapper.RemoveListener(KeyEvent.SAVE, Save);
             KeyMapper.RemoveListener(KeyEvent.RESET, OnBtnReset);
             KeyMapper.RemoveListener(KeyEvent.SHOW_UI, SwithcUI);
             KeyMapper.RemoveListener(KeyEvent.LEFT, _calibrationFields.PosX.btnDec.onClick.Invoke);
@@ -150,10 +152,10 @@ namespace DepthSensorCalibration {
 #region UI
         private void InitUI() {
             _txtTittleShortCuts.text = GetShortCuts(KeyEvent.LEFT, KeyEvent.RIGHT, KeyEvent.UP, KeyEvent.DOWN,
-                KeyEvent.ZOOM_IN, KeyEvent.ZOOM_OUT, KeyEvent.SWITCH_MODE);
+                KeyEvent.ZOOM_IN, KeyEvent.ZOOM_OUT, KeyEvent.SWITCH_MODE, KeyEvent.RESET);
             BtnKeyBind.ShortCut(_btnCancel, KeyEvent.BACK);
             BtnKeyBind.ShortCut(_btnReset, KeyEvent.RESET);
-            BtnKeyBind.ShortCut(_btnSave, KeyEvent.SAVE);
+            //BtnKeyBind.ShortCut(_btnSave, KeyEvent.SAVE);
             _btnAutomatic.onClick.AddListener(OnBtnStartAutomatic);
             _tglTest.onValueChanged.AddListener(OnTglTest);
             _tglTest.gameObject.SetActive(MultiMonitor.MonitorsCount > 1);
@@ -190,8 +192,12 @@ namespace DepthSensorCalibration {
                     var shortCut = key.ShortCut;
                     if (key.ShortCut.Length < 2)
                         str += shortCut;
-                    else
-                        str += $" [{shortCut}]";
+                    else {
+                        if (keyEvent == KeyEvent.RESET)
+                            str += $" [{shortCut}-СБРОС]";
+                        else
+                            str += $" [{shortCut}]";
+                    }
                 }
             }
 
@@ -244,6 +250,7 @@ namespace DepthSensorCalibration {
                 _calibrationFields.PosZ.sl.value = Prefs.Calibration.Position.z * 1000f;
                 _updatePrefFromUI = true;
             }
+            _txtZValue.text = (Prefs.Calibration.Position.z * 1000f).ToString("F0");
         }
 #endregion
     }

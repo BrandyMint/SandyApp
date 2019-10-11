@@ -52,10 +52,10 @@ namespace Games.Landscape {
             _btnResetWater.onClick.AddListener(OnBtnResetWater);
             BtnKeyBind.ShortCut(_btnBack, KeyEvent.BACK);
             BtnKeyBind.ShortCut(_btnReset, KeyEvent.RESET);
-            BtnKeyBind.ShortCut(_btnSave, KeyEvent.SAVE);
+            //BtnKeyBind.ShortCut(_btnSave, KeyEvent.SAVE);
             
             KeyMapper.AddListener(KeyEvent.RESET, OnBtnReset);
-            KeyMapper.AddListener(KeyEvent.SAVE, OnBtnSave);
+            //KeyMapper.AddListener(KeyEvent.SAVE, Save);
             KeyMapper.AddListener(KeyEvent.SHOW_UI, SwitchUI);
 
             _tglWater.isOn = Prefs.Landscape.EnableWaterSimulation;
@@ -78,11 +78,12 @@ namespace Games.Landscape {
 
         private void OnDestroy() {
             KeyMapper.RemoveListener(KeyEvent.RESET, OnBtnReset);
-            KeyMapper.RemoveListener(KeyEvent.SAVE, OnBtnSave);
+            //KeyMapper.RemoveListener(KeyEvent.SAVE, Save);
             KeyMapper.RemoveListener(KeyEvent.SHOW_UI, SwitchUI);
+            Save();
         }
 
-        private void OnBtnSave() {
+        private void Save() {
             if (IsSaveAllowed())
                 Prefs.NotifySaved(Prefs.Landscape.Save());
         }
