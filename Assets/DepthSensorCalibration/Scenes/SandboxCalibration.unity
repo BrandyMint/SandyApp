@@ -1062,7 +1062,7 @@ PrefabInstance:
     - target: {fileID: 4115853844328034573, guid: 47b88d1c91880224898db2e6f7840296,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 109.385666
+      value: 109.38568
       objectReference: {fileID: 0}
     - target: {fileID: 4115853844328034573, guid: 47b88d1c91880224898db2e6f7840296,
         type: 3}
@@ -1953,7 +1953,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _uiHide:
   - {fileID: 1687568186}
-  - {fileID: 1737706090}
   _pnlSandboxSettings: {fileID: 1687568187}
   _btnSave: {fileID: 402746056}
   _btnCancel: {fileID: 1567314969}

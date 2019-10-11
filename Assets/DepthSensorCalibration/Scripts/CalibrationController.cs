@@ -125,7 +125,7 @@ namespace DepthSensorCalibration {
             
             _calibrationImg.SetActive(mode != CalibrationMode.TEST);
             _imgColor.gameObject.SetActive(mode == CalibrationMode.TEST);
-            _settingsAndBtns.SetActive(mode != CalibrationMode.AUTOMATIC);
+            //_settingsAndBtns.SetActive(mode != CalibrationMode.AUTOMATIC);
             MultiMonitor.SetTargetDisplay(SandboxCam, mode == CalibrationMode.TEST ? 1 : 0);
             _camMonitor.gameObject.SetActive(mode != CalibrationMode.AUTOMATIC || MultiMonitor.MonitorsCount > 1);
             
