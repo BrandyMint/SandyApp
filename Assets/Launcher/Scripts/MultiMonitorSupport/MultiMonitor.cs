@@ -133,7 +133,7 @@ namespace Launcher.MultiMonitorSupport {
                 store.depth = cam.depth;
             }
             var needModify = Instance._useMonitors > MonitorsCount && dispNum < MonitorsCount;
-            cam.clearFlags = needModify ? CameraClearFlags.Nothing : store.clearFlags;
+            cam.clearFlags = needModify ? CameraClearFlags.Depth : store.clearFlags;
             cam.depth = needModify ? store.depth + MonitorsCount - realNum : store.depth;
             store.targetDisplay = dispNum;
             

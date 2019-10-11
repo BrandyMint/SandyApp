@@ -95,8 +95,6 @@ namespace DepthSensorCalibration {
             KeyMapper.AddListener(KeyEvent.SET_DEPTH_MIN, SetDepthMin);
         }
 
-       
-
         private void UnSubscribeKeys() {
             KeyMapper.RemoveListener(KeyEvent.SAVE, OnBtnSave);
             KeyMapper.RemoveListener(KeyEvent.RESET, OnBtnReset);
@@ -136,17 +134,25 @@ namespace DepthSensorCalibration {
             var min = float.MaxValue;
             var max = float.MinValue;
             var mid = 0f;
-            foreach (var d in depth) {
-                mid += (float)d / depth.Length;
+            var minClip = _sandboxCam.nearClipPlane + 0.01f;
+            var maxClip = _sandboxCam.farClipPlane - 0.01f;
+            var count = 0;
+            foreach (var ushortDepth in depth) {
+                var d = (float)ushortDepth / 1000f;
+                if (d < minClip) continue;
+                
+                Mathf.Clamp(d, minClip, maxClip);
+                mid += d;
                 if (d < min)
                     min = d;
                 if (d > max)
                     max = d;
+                ++count;
             }
-
-            Prefs.Sandbox.OffsetMaxDepth = (mid - min) / 1000f;
-            Prefs.Sandbox.ZeroDepth = mid / 1000f;
-            Prefs.Sandbox.OffsetMinDepth = (max - mid) / 1000f;
+            mid /= count;
+            Prefs.Sandbox.OffsetMaxDepth = mid - min;
+            Prefs.Sandbox.ZeroDepth = mid;
+            Prefs.Sandbox.OffsetMinDepth = max - mid;
         }
         
         private void SetDepthMax() {
