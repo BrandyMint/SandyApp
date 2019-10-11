@@ -44,9 +44,14 @@ namespace Launcher.KeyMapping {
             _bindsDown.Add(new KeyBind(KeyCode.F2, KeyEvent.SAVE));
             _bindsDown.Add(new KeyBind(KeyCode.F3, KeyEvent.SHOW_UI));
             _bindsDown.Add(new KeyBind(KeyCode.F5, KeyEvent.RESET));
+            _bindsDown.Add(new KeyBind(KeyCode.F9, KeyEvent.OPEN_SANDBOX_CALIBRATION));
             _bindsDown.Add(new KeyBind(KeyCode.F10, KeyEvent.OPEN_CALIBRATION));
             _bindsDown.Add(new KeyBind(KeyCode.F11, KeyEvent.OPEN_PROJECTOR_PARAMS));
             _bindsDown.Add(new KeyBind(KeyCode.F12, KeyEvent.FLIP_DISPLAY));
+            
+            _bindsDown.Add(new KeyBind(KeyCode.Y, KeyEvent.SET_DEPTH_MAX));
+            _bindsDown.Add(new KeyBind(KeyCode.H, KeyEvent.SET_DEPTH_ZERO));
+            _bindsDown.Add(new KeyBind(KeyCode.N, KeyEvent.SET_DEPTH_MIN));
             
             _binds.Add(new KeyBind(KeyCode.UpArrow, KeyEvent.UP, "↑"));
             _binds.Add(new KeyBind(KeyCode.DownArrow, KeyEvent.DOWN, "↓"));

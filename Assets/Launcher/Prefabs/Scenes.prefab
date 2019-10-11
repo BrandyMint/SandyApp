@@ -48,6 +48,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _sceneProjectorParamsPath: Assets/DepthSensorCalibration/Scenes/ProjectorParams.unity
   _sceneCalibrationPath: Assets/DepthSensorCalibration/Scenes/DepthSensorCalibration.unity
+  _sceneSandboxCalibrationPath: Assets/DepthSensorCalibration/Scenes/SandboxCalibration.unity
 --- !u!114 &-8017239747588144962
 MonoBehaviour:
   m_ObjectHideFlags: 0

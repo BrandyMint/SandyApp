@@ -12,6 +12,7 @@ namespace Launcher {
 
         [SerializeField] private string _sceneProjectorParamsPath;
         [SerializeField] private string _sceneCalibrationPath;
+        [SerializeField] private string _sceneSandboxCalibrationPath;
         
         private static Scenes _instance;
         
@@ -49,11 +50,12 @@ namespace Launcher {
             
             KeyMapper.AddListener(KeyEvent.OPEN_PROJECTOR_PARAMS, OpenProjectorParams);
             KeyMapper.AddListener(KeyEvent.OPEN_CALIBRATION, OpenCalibration);
+            KeyMapper.AddListener(KeyEvent.OPEN_SANDBOX_CALIBRATION, OpenSandboxCalibration);
             KeyMapper.AddListener(KeyEvent.BACK, GoBack);
             
             //GoCalibrationBefore(SceneManager.GetActiveScene().path);
         }
-        
+
         private void OnDestroy() {
             SceneManager.sceneLoaded -= OnSceneLoaded;
             MultiMonitor.OnNotEnoughMonitors -= OnNotEnoughMonitors;
@@ -61,6 +63,7 @@ namespace Launcher {
             KeyMapper.RemoveListener(KeyEvent.BACK, GoBack);
             KeyMapper.RemoveListener(KeyEvent.OPEN_CALIBRATION, OpenCalibration);
             KeyMapper.RemoveListener(KeyEvent.OPEN_PROJECTOR_PARAMS, OpenProjectorParams);
+            KeyMapper.RemoveListener(KeyEvent.OPEN_SANDBOX_CALIBRATION, OpenSandboxCalibration);
         }
 
         private void OnNotEnoughMonitors() {
@@ -121,6 +124,10 @@ namespace Launcher {
         
         private void OpenCalibration() {
             GoToWithCheckCalibration(_sceneCalibrationPath);
+        }
+        
+        private void OpenSandboxCalibration() {
+            GoToWithCheckCalibration(_sceneSandboxCalibrationPath);
         }
     }
 }
