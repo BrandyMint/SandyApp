@@ -1,5 +1,4 @@
-﻿using DepthSensorCalibration.HalfVisualization;
-using DepthSensorSandbox.Visualisation;
+﻿using DepthSensorSandbox.Visualisation;
 using Launcher;
 using Launcher.KeyMapping;
 using Launcher.MultiMonitorSupport;
@@ -47,7 +46,6 @@ namespace DepthSensorCalibration {
             public SliderField PosX { get; set; }
             public SliderField PosY { get; set; }
             public SliderField PosZ { get; set; }
-            public SliderField ZeroDepth { get; set; }
         }
         private readonly CalibrationFields _calibrationFields = new CalibrationFields();
         private readonly ProjectorParams _projector = new ProjectorParams();
@@ -85,8 +83,8 @@ namespace DepthSensorCalibration {
         }
 
         private void OnBtnReset() {
-            _projector.Load();
             Prefs.Calibration.Reset();
+            _projector.Load();
         }
         
         private void SubscribeKeys() {
@@ -99,12 +97,6 @@ namespace DepthSensorCalibration {
             KeyMapper.AddListener(KeyEvent.UP, _calibrationFields.PosY.btnInc.onClick.Invoke);
             KeyMapper.AddListener(KeyEvent.ZOOM_IN, _calibrationFields.PosZ.btnInc.onClick.Invoke);
             KeyMapper.AddListener(KeyEvent.ZOOM_OUT, _calibrationFields.PosZ.btnDec.onClick.Invoke);
-            /*if (Input.GetKey(KeyCode.LeftBracket) || Input.GetKey(KeyCode.LeftCurlyBracket)) {
-                _calibrationFields.ZeroDepth.btnDec.onClick.Invoke();
-            }
-            if (Input.GetKey(KeyCode.RightBracket) || Input.GetKey(KeyCode.RightBracket)) {
-                _calibrationFields.ZeroDepth.btnInc.onClick.Invoke();
-            }*/
         }
 
         private void UnSubscribeKeys() {
@@ -174,7 +166,6 @@ namespace DepthSensorCalibration {
             InitSlider(_calibrationFields.PosX, val => UpdatePosFromUI());
             InitSlider(_calibrationFields.PosY, val => UpdatePosFromUI());
             InitSlider(_calibrationFields.PosZ, val => UpdatePosFromUI());
-            InitSlider(_calibrationFields.ZeroDepth, val => Prefs.Calibration.ZeroDepth = val / 1000f);
             Prefs.Calibration.OnChanged += OnCalibrationChanged;
             OnCalibrationChanged();
         }
@@ -252,7 +243,6 @@ namespace DepthSensorCalibration {
                 _calibrationFields.PosX.sl.value = Prefs.Calibration.Position.x * 1000f;
                 _calibrationFields.PosY.sl.value = Prefs.Calibration.Position.y * 1000f;
                 _calibrationFields.PosZ.sl.value = Prefs.Calibration.Position.z * 1000f;
-                _calibrationFields.ZeroDepth.sl.value = Prefs.Calibration.ZeroDepth * 1000f;
                 _updatePrefFromUI = true;
             }
         }

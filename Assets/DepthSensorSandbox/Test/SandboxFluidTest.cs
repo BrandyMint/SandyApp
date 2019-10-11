@@ -30,7 +30,7 @@ namespace DepthSensorSandbox.Test {
             _btnResetFluid.onClick.AddListener(ClearFluidFlows);
         }
 
-        protected override void OnCalibrationChange() { }
+        protected override void OnSandboxParamsChange() { }
 
         protected override void Update() {
             base.Update();

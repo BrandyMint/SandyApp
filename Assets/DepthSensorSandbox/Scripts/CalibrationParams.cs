@@ -25,10 +25,5 @@ namespace DepthSensorSandbox {
             get => Get(nameof(Fov), 60f);
             set => Set(nameof(Fov), value);
         }
-
-        public float ZeroDepth {
-            get => Get(nameof(ZeroDepth), 4f);
-            set => Set(nameof(ZeroDepth), value);
-        }
     }
 }
