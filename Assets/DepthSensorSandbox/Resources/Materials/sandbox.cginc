@@ -24,6 +24,8 @@ struct v2f {
         float2 p = tex2Dlod(_MapToCameraTex, float4(uv, 0, 0)).rg;
         float d = tex2Dlod(_DepthTex, float4(uv, 0, 0)).r * 65.535;
         return float4(p.xy * d, d, 0);
+        if (d < 0.1)
+            d = 5;
     }
 #endif
 
@@ -36,9 +38,18 @@ v2f vert (appdata v) {
     float4 vertex = v.vertex;
 #endif
     float3 pos = UnityObjectToViewPos(vertex);
+    
+    //fix over near clip
     if (pos.z > -_ProjectionParams.y) pos.z = -_ProjectionParams.y - 0.01;
+    
     o.clip = mul(UNITY_MATRIX_P, float4(pos, 1.0));
     o.screenPos = ComputeScreenPos(o.clip);
+    
+    //
+    //if (o.uv.x < 0.001) {
+    //    o.clip.x = 20;
+    //}
+    
     o.pos = float3(pos.xy, -pos.z);
     return o;
 }
