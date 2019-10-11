@@ -16,6 +16,8 @@ namespace DepthSensorCalibration {
         private RenderTargetIdentifier _renderSrc;
         private CameraEvent _cameraEvent;
 
+        public int MaxResolution = 2048;
+
         private void Awake() {
             _cam = GetComponent<Camera>();
             enabled = false;
@@ -66,7 +68,9 @@ namespace DepthSensorCalibration {
         }
 
         private bool UpdateRenderTarget() {
-            return TexturesHelper.ReCreateIfNeed(ref _renderTarget, _cam.pixelWidth, _cam.pixelHeight, 0, _format);
+            int height = Mathf.Min(_cam.pixelHeight, MaxResolution);
+            int width = Mathf.Min(_cam.pixelWidth, (int) (_cam.aspect * MaxResolution));
+            return TexturesHelper.ReCreateIfNeed(ref _renderTarget, width, height, 0, _format);
         }
 
         public void Enable(
