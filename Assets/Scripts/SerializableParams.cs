@@ -48,6 +48,7 @@ public abstract class SerializableParams {
             HasFile = true;
         } catch (Exception e) {
             //Debug.LogWarning(e);
+            Reset();
             return false;
         } finally {
             _invokeChangedOnSetting = true;
