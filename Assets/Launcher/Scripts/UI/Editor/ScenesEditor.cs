@@ -5,6 +5,7 @@ namespace Launcher.UI.Editor {
     public class ScenesEditor : UnityEditor.Editor {
         SceneAssetInspector scenes = new SceneAssetInspector {
             sceneNames = {
+                "Main",
                 "ProjectorParams",
                 "Calibration",
                 "SandboxCalibration"

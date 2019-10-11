@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using Launcher;
 using Launcher.KeyMapping;
 using UnityEngine;
 using UnityEngine.Events;
@@ -72,7 +71,7 @@ namespace DepthSensorCalibration {
                 Prefs.NotifyIncorrectData();
             } else if (IsSaveAllowed()) {
                 Prefs.NotifySaved(_projector.Save());
-                Scenes.GoBack();
+                //Scenes.GoBack();
             }
         }
 

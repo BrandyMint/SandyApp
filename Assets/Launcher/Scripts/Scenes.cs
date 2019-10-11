@@ -10,6 +10,7 @@ namespace Launcher {
         private const string _TXT_NO_MONITORS_TITTLE = "Проектор подключен?";
         private const string _TXT_NO_MONITORS = "Убедитесь, что проектор подключен как расширенный экран, монитор компьютера активен и является главным. Перезапустите приложение.";
 
+        [SerializeField] private string _sceneMainPath;
         [SerializeField] private string _sceneProjectorParamsPath;
         [SerializeField] private string _sceneCalibrationPath;
         [SerializeField] private string _sceneSandboxCalibrationPath;
@@ -115,7 +116,10 @@ namespace Launcher {
                 return;
             _scenes.Pop();
             var sceneId = _scenes.Peek();
-            GoToWithCheckCalibration(sceneId);
+            
+            //GoToWithCheckCalibration(sceneId);
+            //for now, just go to main scene
+            GoToWithCheckCalibration(_sceneMainPath);
         }
 
         private void OpenProjectorParams() {

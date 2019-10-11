@@ -1,5 +1,4 @@
 ﻿using DepthSensorSandbox.Visualisation;
-using Launcher;
 using Launcher.KeyMapping;
 using Launcher.MultiMonitorSupport;
 using UnityEngine;
@@ -70,7 +69,7 @@ namespace DepthSensorCalibration {
         private void OnBtnSave() {
             if (IsSaveAllowed()) {
                 Prefs.NotifySaved(Prefs.Calibration.Save());
-                Scenes.GoBack();
+                //Scenes.GoBack();
             }
         }
         
