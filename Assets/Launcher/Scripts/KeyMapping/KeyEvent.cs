@@ -1,6 +1,7 @@
 ﻿namespace Launcher.KeyMapping {
     public enum KeyEvent {
         FLIP_DISPLAY,
+        FLIP_SANDBOX,
         OPEN_PROJECTOR_PARAMS,
         OPEN_CALIBRATION,
         OPEN_SANDBOX_CALIBRATION,

@@ -20,8 +20,8 @@ namespace Launcher.Flip {
         }
 
         private void OnAppParamChanged() {
-            horizontal = Prefs.App.FlipHorizontal;
-            vertical = Prefs.App.FlipVertical;
+            horizontal = Prefs.App.FlipHorizontalSandbox;
+            vertical = Prefs.App.FlipVerticalSandbox;
         }
 
         private void OnPreCull() {

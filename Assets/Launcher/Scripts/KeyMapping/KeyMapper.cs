@@ -10,15 +10,24 @@ namespace Launcher.KeyMapping {
 
         public class KeyBind {
             public KeyCode key;
+            public KeyCode[] addKeys = new KeyCode[0];
             public KeyEvent ev;
-            public string ShortCut => _shortCut ?? key.ToString().ToUpper();
+            public string ShortCut => _shortCut 
+                ?? string.Join("+", addKeys.Append(key).Select(k => k.ToString().ToUpper()));
             
-            private string _shortCut; 
+            private string _shortCut;
+
+            public bool IsAddKeysPressed => addKeys.All(Input.GetKey);
 
             public KeyBind(KeyCode key, KeyEvent ev, string shortCut = null) {
                 this.key = key;
                 this.ev = ev;
                 this._shortCut = shortCut;
+            }
+            
+            public KeyBind(KeyCode addKey, KeyCode key, KeyEvent ev, string shortCut = null)
+                : this(key, ev, shortCut) {
+                addKeys = new[] {addKey};
             }
         }
 
@@ -47,6 +56,8 @@ namespace Launcher.KeyMapping {
             _bindsDown.Add(new KeyBind(KeyCode.F9, KeyEvent.OPEN_SANDBOX_CALIBRATION));
             _bindsDown.Add(new KeyBind(KeyCode.F10, KeyEvent.OPEN_CALIBRATION));
             _bindsDown.Add(new KeyBind(KeyCode.F11, KeyEvent.OPEN_PROJECTOR_PARAMS));
+            _bindsDown.Add(new KeyBind(KeyCode.LeftAlt,KeyCode.F12, KeyEvent.FLIP_SANDBOX, "ALT-F12"));
+            _bindsDown.Add(new KeyBind(KeyCode.RightAlt,KeyCode.F12, KeyEvent.FLIP_SANDBOX));
             _bindsDown.Add(new KeyBind(KeyCode.F12, KeyEvent.FLIP_DISPLAY));
             
             _bindsDown.Add(new KeyBind(KeyCode.Y, KeyEvent.SET_DEPTH_MAX));
@@ -105,8 +116,9 @@ namespace Launcher.KeyMapping {
 
         private static void ProcessInput(IEnumerable<KeyBind> binds, Func<KeyCode, bool> checkKey) {
             foreach (var bind in binds) {
-                if (checkKey(bind.key)) {
+                if (checkKey(bind.key) && bind.IsAddKeysPressed) {
                     FireEvent(bind.ev);
+                    break;
                 }
             }
         }

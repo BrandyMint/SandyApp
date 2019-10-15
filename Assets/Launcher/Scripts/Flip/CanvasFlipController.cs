@@ -9,17 +9,19 @@ namespace Launcher.Flip {
             AddCanvasFlippersFor(SceneManager.GetActiveScene());
             SceneManager.sceneLoaded += OnSceneLoaded;
             KeyMapper.AddListener(KeyEvent.FLIP_DISPLAY, OnFlipDisplay);
+            KeyMapper.AddListener(KeyEvent.FLIP_SANDBOX, OnFlipSandbox);
         }
         
         private void OnDestroy() {
             SceneManager.sceneLoaded -= OnSceneLoaded;
             KeyMapper.RemoveListener(KeyEvent.FLIP_DISPLAY, OnFlipDisplay);
+            KeyMapper.RemoveListener(KeyEvent.FLIP_SANDBOX, OnFlipSandbox);
         }
-        
+
         private static void OnSceneLoaded(Scene scene, LoadSceneMode mode) {
             AddCanvasFlippersFor(scene);
         }
-        
+
         private static void AddCanvasFlippersFor(Scene scene) {
             foreach (var rootObj in scene.GetRootGameObjects()) {
                 AddCanvasFlippersFor(rootObj);
@@ -32,17 +34,33 @@ namespace Launcher.Flip {
                     canvas.gameObject.AddComponent<TransformFlipper>();
             }
         }
-        
-        private static void OnFlipDisplay() {
+
+        private static void Flip(ref bool vertical, ref bool horizontal) {
             const int vertFlag = 1 << 1;
             const int horFlag = 1;
             int code = 0;
-            if (Prefs.App.FlipVertical) code |= vertFlag;
-            if (Prefs.App.FlipHorizontal) code |= horFlag;
+            if (vertical) code |= vertFlag;
+            if (horizontal) code |= horFlag;
             code = (code + 1) % 4;
-            Prefs.App.FlipVertical = (code & vertFlag) == vertFlag;
-            Prefs.App.FlipHorizontal = (code & horFlag) == horFlag;
+            vertical = (code & vertFlag) == vertFlag;
+            horizontal = (code & horFlag) == horFlag;
             Prefs.App.Save();
+        }
+
+        private static void OnFlipDisplay() {
+            var horizontal = Prefs.App.FlipHorizontal;
+            var vertical = Prefs.App.FlipVertical;
+            Flip(ref vertical, ref horizontal);
+            Prefs.App.FlipHorizontal = horizontal;
+            Prefs.App.FlipVertical = vertical;
+        }
+
+        private static void OnFlipSandbox() {
+            var horizontal = Prefs.App.FlipHorizontalSandbox;
+            var vertical = Prefs.App.FlipVerticalSandbox;
+            Flip(ref vertical, ref horizontal);
+            Prefs.App.FlipHorizontalSandbox = horizontal;
+            Prefs.App.FlipVerticalSandbox = vertical;
         }
     }
 }

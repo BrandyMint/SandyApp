@@ -30,5 +30,15 @@ public static partial class Prefs {
             get => Get(nameof(FlipVertical), false);
             set => Set(nameof(FlipVertical), value);
         }
+        
+        public bool FlipHorizontalSandbox {
+            get => Get(nameof(FlipHorizontalSandbox), false);
+            set => Set(nameof(FlipHorizontalSandbox), value);
+        }
+        
+        public bool FlipVerticalSandbox {
+            get => Get(nameof(FlipVerticalSandbox), false);
+            set => Set(nameof(FlipVerticalSandbox), value);
+        }
     }
 }
