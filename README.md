@@ -32,3 +32,5 @@
 Тестирование в редакторе пока омрачется следующими проблемами - https://github.com/BrandyMint/sandbox/issues?q=is%3Aissue+is%3Aopen+label%3A%22editor+bug%22.
 
 Эти проблемы не воспроизводятся в сборках.
+
+Версионирование согласно [Semantic Versioning 2.0](https://semver.org)
