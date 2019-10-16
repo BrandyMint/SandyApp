@@ -44,7 +44,6 @@ namespace Launcher.Flip {
             code = (code + 1) % 4;
             vertical = (code & vertFlag) == vertFlag;
             horizontal = (code & horFlag) == horFlag;
-            Prefs.App.Save();
         }
 
         private static void OnFlipDisplay() {
@@ -53,6 +52,7 @@ namespace Launcher.Flip {
             Flip(ref vertical, ref horizontal);
             Prefs.App.FlipHorizontal = horizontal;
             Prefs.App.FlipVertical = vertical;
+            Prefs.App.Save();
         }
 
         private static void OnFlipSandbox() {
@@ -61,6 +61,7 @@ namespace Launcher.Flip {
             Flip(ref vertical, ref horizontal);
             Prefs.App.FlipHorizontalSandbox = horizontal;
             Prefs.App.FlipVerticalSandbox = vertical;
+            Prefs.App.Save();
         }
     }
 }
