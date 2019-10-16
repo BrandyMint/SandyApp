@@ -21,10 +21,7 @@
             #include "UnityCG.cginc"
             #include "utils.cginc"
             #include "sandbox.cginc"
-
-            float _DepthZero;
-            float _DepthMaxOffset;
-            float _DepthMinOffset;
+            
             sampler2D _ScaleTex;
 
             fixed4 frag (v2f i) : SV_Target {

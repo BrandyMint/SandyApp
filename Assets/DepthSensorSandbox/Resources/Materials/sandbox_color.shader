@@ -18,8 +18,6 @@ Shader "Sandbox/Color" {
             #include "UnityCG.cginc"
             #include "sandbox.cginc"
 
-            //fixed4 _ColorZero;
-            float _DepthZero;
             sampler2D _DepthToColorTex;
             sampler2D _ColorTex; float4 _ColorTex_TexelSize;
 

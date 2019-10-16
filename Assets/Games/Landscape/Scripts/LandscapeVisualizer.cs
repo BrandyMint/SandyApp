@@ -31,15 +31,14 @@ namespace Games.Landscape {
         private readonly Dictionary<int, Vector2> _detailSizeTexScaleDefaults = new Dictionary<int, Vector2>();
         private bool _prevWaterEnabled;
 
-        protected override void Start() {
-            base.Start();
+        protected override void Awake() {
+            base.Awake();
             foreach (var propId in _DetailSizeFloats) {
                 _detailSizeFloatDefaults.Add(propId, _material.GetFloat(propId));
             }
             foreach (var propId in _DetailSizeTexScales) {
                 _detailSizeTexScaleDefaults.Add(propId, _material.GetTextureScale(propId));
             }
-            SetEnable(true);
         }
 
         public override void SetEnable(bool enable) {

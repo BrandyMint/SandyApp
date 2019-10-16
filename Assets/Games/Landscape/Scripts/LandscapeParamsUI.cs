@@ -8,7 +8,7 @@ using Utilities;
 
 namespace Games.Landscape {
     public class LandscapeParamsUI : MonoBehaviour {
-        private const float _INC_DEC_STEP = 1.0f;
+        private const float _INC_DEC_STEP = 5.0f;
         private const float _INC_DEC_STEPS_COUNT = 15;
 
         [SerializeField] private Canvas _uiCanvas;

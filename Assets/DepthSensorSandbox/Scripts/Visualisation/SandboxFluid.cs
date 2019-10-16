@@ -29,6 +29,7 @@ namespace DepthSensorSandbox.Visualisation {
                 _matFluidCalc = new Material(_matFluidCalc);
             KeyMapper.AddListener(KeyEvent.FLIP_SANDBOX, ClearFluidFlows);
             DepthSensorSandboxProcessor.OnNewFrame += OnNewFrame;
+            SetEnable(true);
         }
 
         private void OnNewFrame(DepthBuffer depth, MapDepthToCameraBuffer map) {
