@@ -312,7 +312,7 @@ PrefabInstance:
     - target: {fileID: 4115853844328034573, guid: 47b88d1c91880224898db2e6f7840296,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 944.5733
+      value: 944.5743
       objectReference: {fileID: 0}
     - target: {fileID: 4115853844328034573, guid: 47b88d1c91880224898db2e6f7840296,
         type: 3}
@@ -665,7 +665,7 @@ PrefabInstance:
     - target: {fileID: 4115853844328034573, guid: 47b88d1c91880224898db2e6f7840296,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 400.68262
+      value: 400.6836
       objectReference: {fileID: 0}
     - target: {fileID: 4115853844328034573, guid: 47b88d1c91880224898db2e6f7840296,
         type: 3}
@@ -2289,6 +2289,11 @@ PrefabInstance:
       propertyPath: m_SizeDelta.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 114597855578119426, guid: bd4fd8fb631c5164b893c32d79a8265f,
+        type: 3}
+      propertyPath: m_WholeNumbers
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bd4fd8fb631c5164b893c32d79a8265f, type: 3}
 --- !u!224 &992960000 stripped
@@ -2832,6 +2837,11 @@ PrefabInstance:
     - target: {fileID: 224357731190354336, guid: bd4fd8fb631c5164b893c32d79a8265f,
         type: 3}
       propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114597855578119426, guid: bd4fd8fb631c5164b893c32d79a8265f,
+        type: 3}
+      propertyPath: m_WholeNumbers
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -3771,7 +3781,7 @@ PrefabInstance:
     - target: {fileID: 4115853844328034573, guid: 47b88d1c91880224898db2e6f7840296,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 109.38568
+      value: 109.384766
       objectReference: {fileID: 0}
     - target: {fileID: 4115853844328034573, guid: 47b88d1c91880224898db2e6f7840296,
         type: 3}
@@ -4846,6 +4856,11 @@ PrefabInstance:
       propertyPath: m_SizeDelta.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 114597855578119426, guid: bd4fd8fb631c5164b893c32d79a8265f,
+        type: 3}
+      propertyPath: m_WholeNumbers
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bd4fd8fb631c5164b893c32d79a8265f, type: 3}
 --- !u!224 &2140734878 stripped
@@ -4861,6 +4876,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 872991716}
     m_Modifications:
+    - target: {fileID: 1041073166399765453, guid: cfca811c3531f4e469db93a284cb8286,
+        type: 3}
+      propertyPath: m_Name
+      value: TittleBg
+      objectReference: {fileID: 0}
     - target: {fileID: 1041073166399765452, guid: cfca811c3531f4e469db93a284cb8286,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -4965,11 +4985,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1041073166399765453, guid: cfca811c3531f4e469db93a284cb8286,
-        type: 3}
-      propertyPath: m_Name
-      value: TittleBg
       objectReference: {fileID: 0}
     - target: {fileID: 6287223994065219192, guid: cfca811c3531f4e469db93a284cb8286,
         type: 3}
@@ -5128,16 +5143,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1737706091}
     m_Modifications:
-    - target: {fileID: 6342622537574132720, guid: c338537c04fbc9b48a36224a7a771b99,
-        type: 3}
-      propertyPath: m_Name
-      value: TglTest
-      objectReference: {fileID: 0}
-    - target: {fileID: 6342622537574132720, guid: c338537c04fbc9b48a36224a7a771b99,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 6342622537574132727, guid: c338537c04fbc9b48a36224a7a771b99,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -5242,6 +5247,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6342622537574132720, guid: c338537c04fbc9b48a36224a7a771b99,
+        type: 3}
+      propertyPath: m_Name
+      value: TglTest
+      objectReference: {fileID: 0}
+    - target: {fileID: 6342622537574132720, guid: c338537c04fbc9b48a36224a7a771b99,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6342622537418645534, guid: c338537c04fbc9b48a36224a7a771b99,
         type: 3}

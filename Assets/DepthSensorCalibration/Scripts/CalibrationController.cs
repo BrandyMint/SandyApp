@@ -8,6 +8,7 @@ using Utilities;
 
 namespace DepthSensorCalibration {
     public class CalibrationController : MonoBehaviour {
+        public const float CAMERA_SPEED = 0.5f;
         private const float COUNT_INC_DEC_STEPS = 200.0f;
 
         public WallController Wall;
@@ -208,7 +209,7 @@ namespace DepthSensorCalibration {
             return () => {
                 var val = (sl.wholeNumbers) ?
                     1 :
-                    (sl.maxValue - sl.minValue) / COUNT_INC_DEC_STEPS;
+                    (sl.maxValue - sl.minValue) / COUNT_INC_DEC_STEPS * Time.deltaTime * CAMERA_SPEED;
                 sl.value += val * mult;
             };
         }

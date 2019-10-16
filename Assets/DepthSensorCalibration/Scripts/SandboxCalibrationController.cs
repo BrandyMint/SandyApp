@@ -12,7 +12,7 @@ using Utilities;
 
 namespace DepthSensorCalibration {
     public class SandboxCalibrationController : MonoBehaviour {
-        private const float COUNT_INC_DEC_STEPS = 0.01f;
+        private const float COUNT_INC_DEC_STEPS = 0.02f;
         
         [Header("UI")]
         [SerializeField] private Text _txtZValue;
@@ -130,7 +130,7 @@ namespace DepthSensorCalibration {
 
         private void MovePosition(int direct, float k) {
             var pos = Prefs.Calibration.Position;
-            pos[direct] += k * COUNT_INC_DEC_STEPS;
+            pos[direct] += k * COUNT_INC_DEC_STEPS * Time.deltaTime * CalibrationController.CAMERA_SPEED;
             Prefs.Calibration.Position = pos;
         }
         
