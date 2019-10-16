@@ -8,7 +8,7 @@ public static partial class Prefs {
 
     public static void NotifySaved(bool success) {
         if (success) {
-            Notify.Show(Style.SUCCESS, _TXT_SAVED);
+            //Notify.Show(Style.SUCCESS, _TXT_SAVED);
         } else {
             Notify.Show(Style.FAIL, _TXT_SAVE_FAIL);
         }
