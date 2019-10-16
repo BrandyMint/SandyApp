@@ -12,7 +12,10 @@ using Utilities;
 
 namespace DepthSensorCalibration {
     public class SandboxCalibrationController : MonoBehaviour {
+        private const float COUNT_INC_DEC_STEPS = 0.01f;
+        
         [Header("UI")]
+        [SerializeField] private Text _txtZValue;
         [SerializeField] private GameObject[] _uiHide;
         [SerializeField] private Transform _pnlSandboxSettings;
         [SerializeField] private Button _btnSave;
@@ -43,6 +46,7 @@ namespace DepthSensorCalibration {
         private Texture2D _depthTex;
         
         private readonly SandboxParams _toSave = new SandboxParams();
+        private readonly ProjectorParams _projector = new ProjectorParams();
 
 
         private void Start() {
@@ -53,6 +57,11 @@ namespace DepthSensorCalibration {
             _renderDepth.MaxResolution = 64;
             _renderDepth.Enable(_matDepth, RenderTextureFormat.R16, OnNewDepthFrame);
             _sandbox.SetEnable(true);
+            
+            _projector.OnChanged += OnProjectorChanged;
+            Prefs.Calibration.OnChanged += OnCalibrationChanged;
+            OnProjectorChanged();
+            OnCalibrationChanged();
         }
 
         private void OnDestroy() {
@@ -62,6 +71,8 @@ namespace DepthSensorCalibration {
             if (_sandbox != null) {
                 _sandbox.SetEnable(false);
             }
+            _projector.OnChanged -= OnProjectorChanged;
+            Prefs.Calibration.OnChanged -= OnCalibrationChanged;
             UnSubscribeKeys();
             Save();
         }
@@ -69,7 +80,7 @@ namespace DepthSensorCalibration {
 #region Buttons
         private void Save() {
             if (IsSaveAllowed()) {
-                Prefs.NotifySaved(_toSave.Save());
+                Prefs.NotifySaved(_toSave.Save() && Prefs.Calibration.Save());
                 //Scenes.GoBack();
             }
         }
@@ -79,11 +90,12 @@ namespace DepthSensorCalibration {
         }
 
         private bool IsSaveAllowed() {
-            return _toSave.HasChanges || !_toSave.HasFile;
+            return _toSave.HasChanges || !_toSave.HasFile || Prefs.Calibration.HasChanges || !Prefs.Calibration.HasFile;
         }
 
         private void OnBtnReset() {
             _toSave.Reset();
+            Prefs.Calibration.Reset();
         }
         
         private void SubscribeKeys() {
@@ -93,6 +105,12 @@ namespace DepthSensorCalibration {
             KeyMapper.AddListener(KeyEvent.SET_DEPTH_MAX, SetDepthMax);
             KeyMapper.AddListener(KeyEvent.SET_DEPTH_ZERO, SetDepthZero);
             KeyMapper.AddListener(KeyEvent.SET_DEPTH_MIN, SetDepthMin);
+            KeyMapper.AddListener(KeyEvent.LEFT, MoveLeft);
+            KeyMapper.AddListener(KeyEvent.RIGHT, MoveRight);
+            KeyMapper.AddListener(KeyEvent.DOWN, MoveDown);
+            KeyMapper.AddListener(KeyEvent.UP, MoveUp);
+            KeyMapper.AddListener(KeyEvent.ZOOM_IN, MoveForward);
+            KeyMapper.AddListener(KeyEvent.ZOOM_OUT, MoveBackward);
         }
 
         private void UnSubscribeKeys() {
@@ -102,6 +120,42 @@ namespace DepthSensorCalibration {
             KeyMapper.RemoveListener(KeyEvent.SET_DEPTH_MAX, SetDepthMax);
             KeyMapper.RemoveListener(KeyEvent.SET_DEPTH_ZERO, SetDepthZero);
             KeyMapper.RemoveListener(KeyEvent.SET_DEPTH_MIN, SetDepthMin);
+            KeyMapper.RemoveListener(KeyEvent.LEFT, MoveLeft);
+            KeyMapper.RemoveListener(KeyEvent.RIGHT, MoveRight);
+            KeyMapper.RemoveListener(KeyEvent.DOWN, MoveDown);
+            KeyMapper.RemoveListener(KeyEvent.UP, MoveUp);
+            KeyMapper.RemoveListener(KeyEvent.ZOOM_IN, MoveForward);
+            KeyMapper.RemoveListener(KeyEvent.ZOOM_OUT, MoveBackward);
+        }
+
+        private void MovePosition(int direct, float k) {
+            var pos = Prefs.Calibration.Position;
+            pos[direct] += k * COUNT_INC_DEC_STEPS;
+            Prefs.Calibration.Position = pos;
+        }
+        
+        private void MoveLeft() {
+            MovePosition(0, -1f);
+        }
+        
+        private void MoveRight() {
+            MovePosition(0, 1f);
+        }
+        
+        private void MoveDown() {
+            MovePosition(1, -1f);
+        }
+        
+        private void MoveUp() {
+            MovePosition(1, 1f);
+        }
+        
+        private void MoveForward() {
+            MovePosition(2, 1f);
+        }
+        
+        private void MoveBackward() {
+            MovePosition(2, -1f);
         }
         
         private void SwithcUI() {
@@ -196,6 +250,14 @@ namespace DepthSensorCalibration {
 
         private void OnSandboxSettingChanged() {
             _updateUIValues?.Invoke();
+        }
+        
+        private void OnProjectorChanged() {
+            CalibrationController.UpdateCalibrationFov(_projector);
+        }
+        
+        private void OnCalibrationChanged() {
+            _txtZValue.text = (Prefs.Calibration.Position.z * 1000f).ToString("F0");
         }
 #endregion
     }
