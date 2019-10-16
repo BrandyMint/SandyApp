@@ -18,6 +18,7 @@
         ZOOM_OUT,
         SET_DEPTH_ZERO,
         SET_DEPTH_MIN,
-        SET_DEPTH_MAX
+        SET_DEPTH_MAX,
+        EXIT
     }
 }

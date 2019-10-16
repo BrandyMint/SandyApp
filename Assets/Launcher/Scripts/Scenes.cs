@@ -53,6 +53,7 @@ namespace Launcher {
             KeyMapper.AddListener(KeyEvent.OPEN_CALIBRATION, OpenCalibration);
             KeyMapper.AddListener(KeyEvent.OPEN_SANDBOX_CALIBRATION, OpenSandboxCalibration);
             KeyMapper.AddListener(KeyEvent.BACK, GoBack);
+            KeyMapper.AddListener(KeyEvent.EXIT, Application.Quit);
             
             //GoCalibrationBefore(SceneManager.GetActiveScene().path);
         }
@@ -61,6 +62,7 @@ namespace Launcher {
             SceneManager.sceneLoaded -= OnSceneLoaded;
             MultiMonitor.OnNotEnoughMonitors -= OnNotEnoughMonitors;
             
+            KeyMapper.RemoveListener(KeyEvent.EXIT, Application.Quit);
             KeyMapper.RemoveListener(KeyEvent.BACK, GoBack);
             KeyMapper.RemoveListener(KeyEvent.OPEN_CALIBRATION, OpenCalibration);
             KeyMapper.RemoveListener(KeyEvent.OPEN_PROJECTOR_PARAMS, OpenProjectorParams);

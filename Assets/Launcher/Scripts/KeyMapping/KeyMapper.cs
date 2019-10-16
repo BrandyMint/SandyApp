@@ -64,6 +64,11 @@ namespace Launcher.KeyMapping {
             _bindsDown.Add(new KeyBind(KeyCode.H, KeyEvent.SET_DEPTH_ZERO));
             _bindsDown.Add(new KeyBind(KeyCode.N, KeyEvent.SET_DEPTH_MIN));
             
+            _bindsDown.Add(new KeyBind(KeyCode.LeftControl,KeyCode.Q, KeyEvent.EXIT, "CTRL-Q"));
+            _bindsDown.Add(new KeyBind(KeyCode.RightControl,KeyCode.Q, KeyEvent.EXIT));
+            _bindsDown.Add(new KeyBind(KeyCode.LeftControl,KeyCode.C, KeyEvent.EXIT));
+            _bindsDown.Add(new KeyBind(KeyCode.RightControl,KeyCode.C, KeyEvent.EXIT));
+            
             _binds.Add(new KeyBind(KeyCode.UpArrow, KeyEvent.UP, "↑"));
             _binds.Add(new KeyBind(KeyCode.DownArrow, KeyEvent.DOWN, "↓"));
             _binds.Add(new KeyBind(KeyCode.LeftArrow, KeyEvent.LEFT, "←"));
