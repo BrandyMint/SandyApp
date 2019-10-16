@@ -12,6 +12,11 @@ namespace DepthSensor.Buffer {
         protected internal override object[] GetArgsForCreateSome() {
             return new object[] {width, height};
         }
+
+        public bool IsDepthValid() {
+            var middle = data.Length / 2;
+            return data[middle] != 0;
+        }
     }
 
     public class IndexBuffer : Buffer2D<byte> {
