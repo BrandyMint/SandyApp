@@ -46,7 +46,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a3b7a8e13fc493baba365c668c0675c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _sceneMainPath: Assets/Scenes/GameLandscape.unity
+  _sceneMainPath: Assets/Scenes/Launcher.unity
   _sceneProjectorParamsPath: Assets/DepthSensorCalibration/Scenes/ProjectorParams.unity
   _sceneCalibrationPath: Assets/DepthSensorCalibration/Scenes/DepthSensorCalibration.unity
   _sceneSandboxCalibrationPath: Assets/DepthSensorCalibration/Scenes/SandboxCalibration.unity

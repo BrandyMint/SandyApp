@@ -12,7 +12,7 @@ namespace Launcher.UI {
         }
 
         private void OnBtn() {
-            Scenes.GoToWithCheckCalibration(_scenePath);
+            Scenes.GoToWithChecking(_scenePath);
         }
     }
 }

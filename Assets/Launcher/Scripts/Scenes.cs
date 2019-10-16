@@ -17,8 +17,9 @@ namespace Launcher {
         
         private static Scenes _instance;
         
-        private readonly Stack<int> _scenes = new Stack<int>();
+        //private readonly Stack<int> _scenes = new Stack<int>();
         private Notify.Control _notifyNoMonitors;
+        private string _currentGameScenePath;
         /*private CalibrationStep[] _calibrationSteps;
 
         private class CalibrationStep {
@@ -44,7 +45,7 @@ namespace Launcher {
                 new CalibrationStep(new CalibrationParams(), _sceneCalibrationPath)
             };*/
             
-            _scenes.Push(SceneManager.GetActiveScene().buildIndex);
+            OnSceneLoaded(SceneManager.GetActiveScene(), LoadSceneMode.Single);
             SceneManager.sceneLoaded += OnSceneLoaded;
 
             MultiMonitor.OnNotEnoughMonitors += OnNotEnoughMonitors;
@@ -78,8 +79,11 @@ namespace Launcher {
         }
 
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode) {
-            if (!_scenes.Contains(scene.buildIndex))
-                _scenes.Push(scene.buildIndex);
+            /*if (!_scenes.Contains(scene.buildIndex))
+                _scenes.Push(scene.buildIndex);*/
+            if (IsGameScene(scene)) {
+                _currentGameScenePath = scene.path;
+            }
         }
 
         public static void GoBack() {
@@ -103,39 +107,54 @@ namespace Launcher {
             return false;
         }*/
 
-        public static void GoToWithCheckCalibration(int sceneId) {
-            //if (!GoCalibrationBefore(SceneManager.GetSceneAt(sceneId).path))
-            if (SceneManager.GetActiveScene().buildIndex != sceneId)
-                SceneManager.LoadScene(sceneId);
-        }
-        
-        public static void GoToWithCheckCalibration(string scenePath) {
+        public static void GoToWithChecking(string scenePath) {
             //if (!GoCalibrationBefore(scenePath))
             if (SceneManager.GetActiveScene().path != scenePath)
                 SceneManager.LoadScene(scenePath);
         }
 
         private void GoBackInternal() {
-            if (_scenes.Count < 2)
+            /*if (_scenes.Count < 2)
                 return;
             _scenes.Pop();
-            var sceneId = _scenes.Peek();
+            var sceneId = _scenes.Peek();*/
             
             //GoToWithCheckCalibration(sceneId);
             //for now, just go to main scene
-            GoToWithCheckCalibration(_sceneMainPath);
+            if (IsCalibrationScene(SceneManager.GetActiveScene()) && _currentGameScenePath != null)
+                GoToWithChecking(_currentGameScenePath);
+            else
+                GoToWithChecking(_sceneMainPath);
+        }
+        
+        private bool IsCalibrationScene(Scene scene) {
+            return IsCalibrationScene(scene.path);
+        }
+
+        private bool IsCalibrationScene(string scenePath) {
+            return scenePath == _sceneSandboxCalibrationPath
+               || scenePath == _sceneCalibrationPath
+               || scenePath == _sceneProjectorParamsPath;
+        }
+        
+        private bool IsGameScene(Scene scene) {
+            return IsGameScene(scene.path);
+        }
+        
+        private bool IsGameScene(string scenePath) {
+            return scenePath != _sceneMainPath && !IsCalibrationScene(scenePath);
         }
 
         private void OpenProjectorParams() {
-            GoToWithCheckCalibration(_sceneProjectorParamsPath);
+            GoToWithChecking(_sceneProjectorParamsPath);
         }
         
         private void OpenCalibration() {
-            GoToWithCheckCalibration(_sceneCalibrationPath);
+            GoToWithChecking(_sceneCalibrationPath);
         }
         
         private void OpenSandboxCalibration() {
-            GoToWithCheckCalibration(_sceneSandboxCalibrationPath);
+            GoToWithChecking(_sceneSandboxCalibrationPath);
         }
     }
 }
