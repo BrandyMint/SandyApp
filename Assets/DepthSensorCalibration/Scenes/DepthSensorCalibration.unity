@@ -1569,6 +1569,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 159431041}
     m_Modifications:
+    - target: {fileID: 6427224280832922162, guid: 2541ef62fdda8414dad1b798203fcaa6,
+        type: 3}
+      propertyPath: m_Name
+      value: txtZValuePrefix
+      objectReference: {fileID: 0}
     - target: {fileID: 6427224280832922163, guid: 2541ef62fdda8414dad1b798203fcaa6,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -1688,11 +1693,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalScale.z
       value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6427224280832922162, guid: 2541ef62fdda8414dad1b798203fcaa6,
-        type: 3}
-      propertyPath: m_Name
-      value: txtZValuePrefix
       objectReference: {fileID: 0}
     - target: {fileID: 6427224280832922172, guid: 2541ef62fdda8414dad1b798203fcaa6,
         type: 3}
@@ -2859,6 +2859,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 159431041}
     m_Modifications:
+    - target: {fileID: 6427224280832922162, guid: 2541ef62fdda8414dad1b798203fcaa6,
+        type: 3}
+      propertyPath: m_Name
+      value: txtZValue
+      objectReference: {fileID: 0}
     - target: {fileID: 6427224280832922163, guid: 2541ef62fdda8414dad1b798203fcaa6,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -2978,11 +2983,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalScale.z
       value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6427224280832922162, guid: 2541ef62fdda8414dad1b798203fcaa6,
-        type: 3}
-      propertyPath: m_Name
-      value: txtZValue
       objectReference: {fileID: 0}
     - target: {fileID: 6427224280832922172, guid: 2541ef62fdda8414dad1b798203fcaa6,
         type: 3}
@@ -4035,6 +4035,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 159431041}
     m_Modifications:
+    - target: {fileID: 6427224280832922162, guid: 2541ef62fdda8414dad1b798203fcaa6,
+        type: 3}
+      propertyPath: m_Name
+      value: TxtShortCuts
+      objectReference: {fileID: 0}
     - target: {fileID: 6427224280832922163, guid: 2541ef62fdda8414dad1b798203fcaa6,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -4155,11 +4160,6 @@ PrefabInstance:
       propertyPath: m_LocalScale.z
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 6427224280832922162, guid: 2541ef62fdda8414dad1b798203fcaa6,
-        type: 3}
-      propertyPath: m_Name
-      value: TxtShortCuts
-      objectReference: {fileID: 0}
     - target: {fileID: 6427224280832922172, guid: 2541ef62fdda8414dad1b798203fcaa6,
         type: 3}
       propertyPath: m_Text
@@ -4263,6 +4263,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 159431041}
     m_Modifications:
+    - target: {fileID: 6427224280832922162, guid: 2541ef62fdda8414dad1b798203fcaa6,
+        type: 3}
+      propertyPath: m_Name
+      value: txtZValueSuffix
+      objectReference: {fileID: 0}
     - target: {fileID: 6427224280832922163, guid: 2541ef62fdda8414dad1b798203fcaa6,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -4382,11 +4387,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalScale.z
       value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6427224280832922162, guid: 2541ef62fdda8414dad1b798203fcaa6,
-        type: 3}
-      propertyPath: m_Name
-      value: txtZValueSuffix
       objectReference: {fileID: 0}
     - target: {fileID: 6427224280832922172, guid: 2541ef62fdda8414dad1b798203fcaa6,
         type: 3}
@@ -4876,11 +4876,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 872991716}
     m_Modifications:
-    - target: {fileID: 1041073166399765453, guid: cfca811c3531f4e469db93a284cb8286,
-        type: 3}
-      propertyPath: m_Name
-      value: TittleBg
-      objectReference: {fileID: 0}
     - target: {fileID: 1041073166399765452, guid: cfca811c3531f4e469db93a284cb8286,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -4985,6 +4980,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1041073166399765453, guid: cfca811c3531f4e469db93a284cb8286,
+        type: 3}
+      propertyPath: m_Name
+      value: TittleBg
       objectReference: {fileID: 0}
     - target: {fileID: 6287223994065219192, guid: cfca811c3531f4e469db93a284cb8286,
         type: 3}
@@ -5122,6 +5122,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _material: {fileID: 2100000, guid: 555a97bd4b858645f94b71790dafd5f8, type: 2}
   _instantiateMaterial: 1
+  _enableOnStart: 1
 --- !u!114 &6145052357072468318
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5136,6 +5137,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _material: {fileID: 2100000, guid: ab4e8b63f00aec845ae9023cd3272b63, type: 2}
   _instantiateMaterial: 1
+  _enableOnStart: 0
 --- !u!1001 &6342622536386603987
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5143,6 +5145,16 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1737706091}
     m_Modifications:
+    - target: {fileID: 6342622537574132720, guid: c338537c04fbc9b48a36224a7a771b99,
+        type: 3}
+      propertyPath: m_Name
+      value: TglTest
+      objectReference: {fileID: 0}
+    - target: {fileID: 6342622537574132720, guid: c338537c04fbc9b48a36224a7a771b99,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6342622537574132727, guid: c338537c04fbc9b48a36224a7a771b99,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -5247,16 +5259,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 6342622537574132720, guid: c338537c04fbc9b48a36224a7a771b99,
-        type: 3}
-      propertyPath: m_Name
-      value: TglTest
-      objectReference: {fileID: 0}
-    - target: {fileID: 6342622537574132720, guid: c338537c04fbc9b48a36224a7a771b99,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6342622537418645534, guid: c338537c04fbc9b48a36224a7a771b99,
         type: 3}

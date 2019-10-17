@@ -11,7 +11,6 @@ namespace Games.Landscape {
         private const float _INC_DEC_STEP = 5.0f;
         private const float _INC_DEC_STEPS_COUNT = 15;
 
-        [SerializeField] private Canvas _uiCanvas;
         [SerializeField] private Button _btnBack;
         [SerializeField] private Button _btnReset;
         [SerializeField] private Button _btnSave;
@@ -56,7 +55,6 @@ namespace Games.Landscape {
             
             KeyMapper.AddListener(KeyEvent.RESET, OnBtnReset);
             //KeyMapper.AddListener(KeyEvent.SAVE, Save);
-            KeyMapper.AddListener(KeyEvent.SHOW_UI, SwitchUI);
 
             _tglWater.isOn = Prefs.Landscape.EnableWaterSimulation;
             _tglWater.onValueChanged.AddListener(OnTglWater);
@@ -72,14 +70,11 @@ namespace Games.Landscape {
             InitSlider(_params.FluidCellSize, nameof(Prefs.Landscape.FluidCellSize));
             InitSlider(_params.FluidAcceleration, nameof(Prefs.Landscape.FluidAcceleration));
             InitSlider(_params.FluidFading, nameof(Prefs.Landscape.FluidFading));
-            
-            SwitchUI();
         }
 
         private void OnDestroy() {
             KeyMapper.RemoveListener(KeyEvent.RESET, OnBtnReset);
             //KeyMapper.RemoveListener(KeyEvent.SAVE, Save);
-            KeyMapper.RemoveListener(KeyEvent.SHOW_UI, SwitchUI);
             Save();
         }
 
@@ -107,10 +102,6 @@ namespace Games.Landscape {
         
         private void OnBtnResetWater() {
             _landscape.ClearFluidFlows();
-        }
-
-        private void SwitchUI() {
-            _uiCanvas.gameObject.SetActive(!_uiCanvas.gameObject.activeSelf);
         }
 
         private static void OnTglWater(bool enable) {

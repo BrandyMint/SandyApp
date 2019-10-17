@@ -9,6 +9,7 @@ namespace DepthSensorSandbox.Visualisation {
         
         [SerializeField] protected Material _material;
         [SerializeField] protected bool _instantiateMaterial = true;
+        [SerializeField] protected bool _enableOnStart = true;
 
         protected SandboxMesh _sandbox;
         
@@ -17,6 +18,13 @@ namespace DepthSensorSandbox.Visualisation {
                 _material = new Material(_material);
             _sandbox = GetComponent<SandboxMesh>();
         }
+
+        private void Start() {
+            Init();
+            SetEnable(_enableOnStart);
+        }
+
+        protected virtual void Init() { }
 
         protected virtual void OnDestroy() {
             SetEnable(false);

@@ -940,11 +940,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1178147654}
     m_Modifications:
-    - target: {fileID: 3120845377177840296, guid: e72c6be99fa1e5c49a2e349891908465,
-        type: 3}
-      propertyPath: m_Name
-      value: FluidResolution
-      objectReference: {fileID: 0}
     - target: {fileID: 2905509831076925814, guid: e72c6be99fa1e5c49a2e349891908465,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -1049,6 +1044,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3120845377177840296, guid: e72c6be99fa1e5c49a2e349891908465,
+        type: 3}
+      propertyPath: m_Name
+      value: FluidResolution
       objectReference: {fileID: 0}
     - target: {fileID: 4627998613562072059, guid: e72c6be99fa1e5c49a2e349891908465,
         type: 3}
@@ -1269,6 +1269,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 6145052358850914144, guid: 47cbe1775872baf289a77a580245e6e6,
+        type: 3}
+      propertyPath: m_TargetDisplay
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6145052356739669657, guid: 47cbe1775872baf289a77a580245e6e6,
         type: 3}
       propertyPath: m_Name
@@ -1329,11 +1334,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6145052358850914144, guid: 47cbe1775872baf289a77a580245e6e6,
-        type: 3}
-      propertyPath: m_TargetDisplay
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 47cbe1775872baf289a77a580245e6e6, type: 3}
 --- !u!1 &507380211 stripped
@@ -1372,11 +1372,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1178147654}
     m_Modifications:
-    - target: {fileID: 3120845377177840296, guid: e72c6be99fa1e5c49a2e349891908465,
-        type: 3}
-      propertyPath: m_Name
-      value: DepthGround
-      objectReference: {fileID: 0}
     - target: {fileID: 2905509831076925814, guid: e72c6be99fa1e5c49a2e349891908465,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -1481,6 +1476,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3120845377177840296, guid: e72c6be99fa1e5c49a2e349891908465,
+        type: 3}
+      propertyPath: m_Name
+      value: DepthGround
       objectReference: {fileID: 0}
     - target: {fileID: 4627998613562072059, guid: e72c6be99fa1e5c49a2e349891908465,
         type: 3}
@@ -1697,11 +1697,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 678713458}
     m_Modifications:
-    - target: {fileID: 1041073166399765453, guid: cfca811c3531f4e469db93a284cb8286,
-        type: 3}
-      propertyPath: m_Name
-      value: TittleBg
-      objectReference: {fileID: 0}
     - target: {fileID: 1041073166399765452, guid: cfca811c3531f4e469db93a284cb8286,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -1807,6 +1802,11 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1041073166399765453, guid: cfca811c3531f4e469db93a284cb8286,
+        type: 3}
+      propertyPath: m_Name
+      value: TittleBg
+      objectReference: {fileID: 0}
     - target: {fileID: 6287223994065219192, guid: cfca811c3531f4e469db93a284cb8286,
         type: 3}
       propertyPath: m_AnchorMin.y
@@ -1862,11 +1862,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1178147654}
     m_Modifications:
-    - target: {fileID: 3120845377177840296, guid: e72c6be99fa1e5c49a2e349891908465,
-        type: 3}
-      propertyPath: m_Name
-      value: DepthIce
-      objectReference: {fileID: 0}
     - target: {fileID: 2905509831076925814, guid: e72c6be99fa1e5c49a2e349891908465,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -1971,6 +1966,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3120845377177840296, guid: e72c6be99fa1e5c49a2e349891908465,
+        type: 3}
+      propertyPath: m_Name
+      value: DepthIce
       objectReference: {fileID: 0}
     - target: {fileID: 4627998613562072059, guid: e72c6be99fa1e5c49a2e349891908465,
         type: 3}
@@ -2343,11 +2343,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1178147654}
     m_Modifications:
-    - target: {fileID: 3120845377177840296, guid: e72c6be99fa1e5c49a2e349891908465,
-        type: 3}
-      propertyPath: m_Name
-      value: DetailsSize
-      objectReference: {fileID: 0}
     - target: {fileID: 2905509831076925814, guid: e72c6be99fa1e5c49a2e349891908465,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -2452,6 +2447,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3120845377177840296, guid: e72c6be99fa1e5c49a2e349891908465,
+        type: 3}
+      propertyPath: m_Name
+      value: DetailsSize
       objectReference: {fileID: 0}
     - target: {fileID: 4627998613562072059, guid: e72c6be99fa1e5c49a2e349891908465,
         type: 3}
@@ -3574,11 +3574,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1178147654}
     m_Modifications:
-    - target: {fileID: 3120845377177840296, guid: e72c6be99fa1e5c49a2e349891908465,
-        type: 3}
-      propertyPath: m_Name
-      value: DepthMountains
-      objectReference: {fileID: 0}
     - target: {fileID: 2905509831076925814, guid: e72c6be99fa1e5c49a2e349891908465,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -3683,6 +3678,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3120845377177840296, guid: e72c6be99fa1e5c49a2e349891908465,
+        type: 3}
+      propertyPath: m_Name
+      value: DepthMountains
       objectReference: {fileID: 0}
     - target: {fileID: 4627998613562072059, guid: e72c6be99fa1e5c49a2e349891908465,
         type: 3}
@@ -3899,11 +3899,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1178147654}
     m_Modifications:
-    - target: {fileID: 3120845377177840296, guid: e72c6be99fa1e5c49a2e349891908465,
-        type: 3}
-      propertyPath: m_Name
-      value: FluidAcceleration
-      objectReference: {fileID: 0}
     - target: {fileID: 2905509831076925814, guid: e72c6be99fa1e5c49a2e349891908465,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -4008,6 +4003,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3120845377177840296, guid: e72c6be99fa1e5c49a2e349891908465,
+        type: 3}
+      propertyPath: m_Name
+      value: FluidAcceleration
       objectReference: {fileID: 0}
     - target: {fileID: 4627998613562072059, guid: e72c6be99fa1e5c49a2e349891908465,
         type: 3}
@@ -4372,11 +4372,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1178147654}
     m_Modifications:
-    - target: {fileID: 3120845377177840296, guid: e72c6be99fa1e5c49a2e349891908465,
-        type: 3}
-      propertyPath: m_Name
-      value: FluidFading
-      objectReference: {fileID: 0}
     - target: {fileID: 2905509831076925814, guid: e72c6be99fa1e5c49a2e349891908465,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -4481,6 +4476,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3120845377177840296, guid: e72c6be99fa1e5c49a2e349891908465,
+        type: 3}
+      propertyPath: m_Name
+      value: FluidFading
       objectReference: {fileID: 0}
     - target: {fileID: 4627998613562072059, guid: e72c6be99fa1e5c49a2e349891908465,
         type: 3}
@@ -5197,11 +5197,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1178147654}
     m_Modifications:
-    - target: {fileID: 3120845377177840296, guid: e72c6be99fa1e5c49a2e349891908465,
-        type: 3}
-      propertyPath: m_Name
-      value: DepthSeaBottom
-      objectReference: {fileID: 0}
     - target: {fileID: 2905509831076925814, guid: e72c6be99fa1e5c49a2e349891908465,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -5306,6 +5301,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3120845377177840296, guid: e72c6be99fa1e5c49a2e349891908465,
+        type: 3}
+      propertyPath: m_Name
+      value: DepthSeaBottom
       objectReference: {fileID: 0}
     - target: {fileID: 4627998613562072059, guid: e72c6be99fa1e5c49a2e349891908465,
         type: 3}
@@ -6182,11 +6182,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1178147654}
     m_Modifications:
-    - target: {fileID: 3120845377177840296, guid: e72c6be99fa1e5c49a2e349891908465,
-        type: 3}
-      propertyPath: m_Name
-      value: FluidCellSize
-      objectReference: {fileID: 0}
     - target: {fileID: 2905509831076925814, guid: e72c6be99fa1e5c49a2e349891908465,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -6291,6 +6286,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3120845377177840296, guid: e72c6be99fa1e5c49a2e349891908465,
+        type: 3}
+      propertyPath: m_Name
+      value: FluidCellSize
       objectReference: {fileID: 0}
     - target: {fileID: 4627998613562072059, guid: e72c6be99fa1e5c49a2e349891908465,
         type: 3}
@@ -6654,6 +6654,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2078943090}
   - component: {fileID: 2078943091}
+  - component: {fileID: 2078943092}
   m_Layer: 0
   m_Name: Game
   m_TagString: Untagged
@@ -6687,7 +6688,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5637ddca90484b2f822f49f70d5caf94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _uiCanvas: {fileID: 678713457}
   _btnBack: {fileID: 191446212}
   _btnReset: {fileID: 301736888}
   _btnSave: {fileID: 1960778919}
@@ -6695,6 +6695,19 @@ MonoBehaviour:
   _tglWater: {fileID: 1911661071}
   _landscape: {fileID: 507380212}
   _pnlParams: {fileID: 1178147654}
+--- !u!114 &2078943092
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2078943089}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5a6ad697cd04d70911e5fa9af21e84b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _uiCanvas: {fileID: 678713457}
 --- !u!224 &3793052994098723804 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 5506004120098998, guid: 90891424b76abbad5b55ff313ac789ee,
@@ -6812,11 +6825,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1178147654}
     m_Modifications:
-    - target: {fileID: 3120845377177840296, guid: e72c6be99fa1e5c49a2e349891908465,
-        type: 3}
-      propertyPath: m_Name
-      value: DepthSea
-      objectReference: {fileID: 0}
     - target: {fileID: 2905509831076925814, guid: e72c6be99fa1e5c49a2e349891908465,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -6921,6 +6929,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3120845377177840296, guid: e72c6be99fa1e5c49a2e349891908465,
+        type: 3}
+      propertyPath: m_Name
+      value: DepthSea
       objectReference: {fileID: 0}
     - target: {fileID: 4627998613562072059, guid: e72c6be99fa1e5c49a2e349891908465,
         type: 3}

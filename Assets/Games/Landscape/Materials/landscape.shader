@@ -1,4 +1,4 @@
-﻿Shader "Sandbox/Landscape" {
+﻿Shader "Sandbox/Game/Landscape" {
     Properties {
         _MixDepth ("Mix Depth", Float) = 0.01
         _MixNoiseSize ("Perlin Size", Float) = 1

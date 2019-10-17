@@ -23,8 +23,8 @@ namespace DepthSensorSandbox.Test {
         [SerializeField] private float _cellWidth = 1;
         [SerializeField] private float _cellHeight = 1;
 
-        protected override void Awake() {
-            base.Awake();
+        protected override void Init() {
+            base.Init();
             _material.EnableKeyword(_DYNAMIC_FLUID);
             _material.EnableKeyword(_DRAW_LANDSCAPE);
             _btnResetFluid.onClick.AddListener(ClearFluidFlows);

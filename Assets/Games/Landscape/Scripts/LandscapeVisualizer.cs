@@ -31,8 +31,8 @@ namespace Games.Landscape {
         private readonly Dictionary<int, Vector2> _detailSizeTexScaleDefaults = new Dictionary<int, Vector2>();
         private bool _prevWaterEnabled;
 
-        protected override void Awake() {
-            base.Awake();
+        protected override void Init() {
+            base.Init();
             foreach (var propId in _DetailSizeFloats) {
                 _detailSizeFloatDefaults.Add(propId, _material.GetFloat(propId));
             }

@@ -24,12 +24,12 @@ namespace DepthSensorSandbox.Visualisation {
         private int _clearStep;
         private bool _wasFirstFrame;
 
-        protected virtual void Start() {
+        protected override void Init() {
+            base.Init();
             if (_instantiateMaterial)
                 _matFluidCalc = new Material(_matFluidCalc);
             KeyMapper.AddListener(KeyEvent.FLIP_SANDBOX, ClearFluidFlows);
             DepthSensorSandboxProcessor.OnNewFrame += OnNewFrame;
-            SetEnable(true);
         }
 
         private void OnNewFrame(DepthBuffer depth, MapDepthToCameraBuffer map) {
