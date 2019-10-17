@@ -16,6 +16,8 @@
         RIGHT,
         ZOOM_IN,
         ZOOM_OUT,
+        WIDE_PLUS,
+        WIDE_MINUS,
         SET_DEPTH_ZERO,
         SET_DEPTH_MIN,
         SET_DEPTH_MAX,

@@ -58,6 +58,8 @@ namespace DepthSensorCalibration {
             KeyMapper.AddListener(KeyEvent.UP, MoveUp);
             KeyMapper.AddListener(KeyEvent.ZOOM_IN, MoveForward);
             KeyMapper.AddListener(KeyEvent.ZOOM_OUT, MoveBackward);
+            KeyMapper.AddListener(KeyEvent.WIDE_PLUS, WidePlus);
+            KeyMapper.AddListener(KeyEvent.WIDE_MINUS, WideMinus);
         }
 
         private void UnSubscribeKeys() {
@@ -69,6 +71,8 @@ namespace DepthSensorCalibration {
             KeyMapper.RemoveListener(KeyEvent.UP, MoveUp);
             KeyMapper.RemoveListener(KeyEvent.ZOOM_IN, MoveForward);
             KeyMapper.RemoveListener(KeyEvent.ZOOM_OUT, MoveBackward);
+            KeyMapper.RemoveListener(KeyEvent.WIDE_PLUS, WidePlus);
+            KeyMapper.RemoveListener(KeyEvent.WIDE_MINUS, WideMinus);
         }
 
         private void MovePosition(Direct direct, float k) {
@@ -79,6 +83,10 @@ namespace DepthSensorCalibration {
             pos[(int) direct] += step;
 
             Prefs.Calibration.Position = pos;
+        }
+
+        private void ModifyWide(float k) {
+            Prefs.Calibration.WideMultiply += k * _INC_DEC_STEPS * Time.deltaTime;
         }
 
         private void MoveLeft() {
@@ -103,6 +111,14 @@ namespace DepthSensorCalibration {
 
         private void MoveBackward() {
             MovePosition(Direct.Z, -1f);
+        }
+        
+        private void WideMinus() {
+            ModifyWide(-1f);
+        }
+
+        private void WidePlus() {
+            ModifyWide(1f);
         }
 
 #endregion 

@@ -1,5 +1,4 @@
-﻿
-using UINotify;
+﻿using UINotify;
 
 public static partial class Prefs {
     private const string _TXT_SAVED = "Сохранено";
@@ -32,7 +31,7 @@ public static partial class Prefs {
         }
         
         public bool FlipHorizontalSandbox {
-            get => Get(nameof(FlipHorizontalSandbox), false);
+            get => Get(nameof(FlipHorizontalSandbox), true);
             set => Set(nameof(FlipHorizontalSandbox), value);
         }
         
