@@ -25,3 +25,7 @@ inline fixed4 adjust(fixed4 c, fixed3 modHSV) {
 inline float smooth(float dmin, float dmax, float z) {
     return smoothstep(0, 1, (z - dmin) / (dmax - dmin));
 }
+
+float inverseLerp(float a, float b, float k) {
+    return (k - a) / (b - a);
+}

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Launcher {
+namespace Launcher.UI {
     public class InDevelopStamp : MonoBehaviour {
         private void Awake() {
 #if !IN_DEVELOP

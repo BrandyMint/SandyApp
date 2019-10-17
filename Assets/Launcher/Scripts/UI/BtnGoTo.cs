@@ -1,16 +1,18 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Launcher {
+namespace Launcher.UI {
     [RequireComponent(typeof(Button))]
-    public class BtnExit : MonoBehaviour {
+    public class BtnGoTo : MonoBehaviour {
+        [SerializeField] private string _scenePath;
+        
         private void Awake() {
             var btn = GetComponent<Button>();
             btn.onClick.AddListener(OnBtn);
         }
 
-        private static void OnBtn() {
-            Application.Quit();
+        private void OnBtn() {
+            Scenes.GoToWithChecking(_scenePath);
         }
     }
 }

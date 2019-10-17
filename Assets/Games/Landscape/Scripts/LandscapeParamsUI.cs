@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Launcher;
+using Launcher.KeyMapping;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -8,7 +8,7 @@ using Utilities;
 
 namespace Games.Landscape {
     public class LandscapeParamsUI : MonoBehaviour {
-        private const float _INC_DEC_STEP = 1.0f;
+        private const float _INC_DEC_STEP = 5.0f;
         private const float _INC_DEC_STEPS_COUNT = 15;
 
         [SerializeField] private Button _btnBack;
@@ -48,10 +48,13 @@ namespace Games.Landscape {
         private readonly List<Action> _onParamsReset = new List<Action>();
 
         private void Start() {
-            _btnBack.onClick.AddListener(OnBtnBack);
-            _btnReset.onClick.AddListener(OnBtnReset);
-            _btnSave.onClick.AddListener(OnBtnSave);
             _btnResetWater.onClick.AddListener(OnBtnResetWater);
+            BtnKeyBind.ShortCut(_btnBack, KeyEvent.BACK);
+            BtnKeyBind.ShortCut(_btnReset, KeyEvent.RESET);
+            //BtnKeyBind.ShortCut(_btnSave, KeyEvent.SAVE);
+            
+            KeyMapper.AddListener(KeyEvent.RESET, OnBtnReset);
+            //KeyMapper.AddListener(KeyEvent.SAVE, Save);
 
             _tglWater.isOn = Prefs.Landscape.EnableWaterSimulation;
             _tglWater.onValueChanged.AddListener(OnTglWater);
@@ -69,8 +72,23 @@ namespace Games.Landscape {
             InitSlider(_params.FluidFading, nameof(Prefs.Landscape.FluidFading));
         }
 
-        private static void OnBtnSave() {
-            Prefs.NotifySaved(Prefs.Landscape.Save());
+        private void OnDestroy() {
+            KeyMapper.RemoveListener(KeyEvent.RESET, OnBtnReset);
+            //KeyMapper.RemoveListener(KeyEvent.SAVE, Save);
+            Save();
+        }
+
+        private void Save() {
+            if (IsSaveAllowed())
+                Prefs.NotifySaved(Prefs.Landscape.Save());
+        }
+        
+        private void FixedUpdate() {
+            _btnSave.interactable = IsSaveAllowed();
+        }
+
+        private bool IsSaveAllowed() {
+            return Prefs.Landscape.HasChanges || !Prefs.Landscape.HasFile;
         }
 
         private void OnBtnReset() {
@@ -80,10 +98,6 @@ namespace Games.Landscape {
                 action();
             }
             _invokeChagedUI = true;
-        }
-
-        private static void OnBtnBack() {
-            Scenes.GoBack();
         }
         
         private void OnBtnResetWater() {

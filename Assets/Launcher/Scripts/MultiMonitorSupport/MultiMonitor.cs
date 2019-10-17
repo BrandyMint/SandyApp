@@ -11,8 +11,13 @@ namespace Launcher.MultiMonitorSupport {
         [SerializeField] private bool _useMultiMonitorFix = true;
         [SerializeField] private bool _revertDefaultScreenSettingsOnExit = true;
         [SerializeField, Range(1, 8)] private int _useMonitors = 2;
+#if UNITY_EDITOR
+        [SerializeField, Range(1, 8)] private int _testMonitorsInEditor = 1;
+#endif
         
         public static MultiMonitor Instance { get; private set; }
+
+        public static int MonitorsCount { get; private set; }
 
         private MultiMonitorSystemApiBase _systemApi;
 
@@ -23,8 +28,15 @@ namespace Launcher.MultiMonitorSupport {
                 Debug.Log("Unsupported system for MultiMonitor, turn off MultiMonitorFix");
                 _useMultiMonitorFix = false;
             }
-            _systemApi.UseMonitors = _useMonitors;
+
             
+#if UNITY_EDITOR
+            var avalaible = _testMonitorsInEditor;
+#else
+            var avalaible = Display.displays.Length;
+#endif
+            MonitorsCount = Math.Min(avalaible, _useMonitors);
+            _systemApi.UseMonitors = MonitorsCount;
             Instance = this;
         }
 
@@ -35,6 +47,7 @@ namespace Launcher.MultiMonitorSupport {
                 PlayerPrefs.DeleteKey("Screenmanager Resolution Height");
             }
             _systemApi?.Dispose();
+            SceneManager.sceneLoaded -= OnSceneLoaded;
         }
 
         private void Start() {
@@ -52,9 +65,9 @@ namespace Launcher.MultiMonitorSupport {
                 if (GetMultiMonitorRect(out var multiRect)) {
                     StartCoroutine(ActivatingDisplays(multiRect));
                 }
-            } else if (Display.displays.Length >= _useMonitors) {
-                var fullscreen = Application.platform == RuntimePlatform.LinuxPlayer;
-                for (int i = 0; i < Math.Min(Display.displays.Length, _useMonitors); ++i) {
+            } else if (Display.displays.Length >= MonitorsCount) {
+                var fullscreen = Application.platform == RuntimePlatform.LinuxPlayer || MonitorsCount == 1;
+                for (int i = 0; i < MonitorsCount; ++i) {
                     var disp = Display.displays[i];
                     if (!disp.active)
                         disp.Activate();
@@ -64,7 +77,7 @@ namespace Launcher.MultiMonitorSupport {
                     Debug.Log($"Activated display {i} {disp.systemWidth}x{disp.systemHeight}");
                 }
             } else {
-                NotEnoughMonitors(_useMonitors);
+                NotEnoughMonitors(MonitorsCount);
             }
         }
 
@@ -88,22 +101,20 @@ namespace Launcher.MultiMonitorSupport {
         }
 
         private static void FixCamerasIn(Scene scene) {
-            if (!UseMultiMonitorFix())
-                return;
             foreach (var rootObj in scene.GetRootGameObjects()) {
                 FixCamerasIn(rootObj);
             }
         }
 
         public static void FixCamerasIn(GameObject obj) {
+            foreach (var cam in obj.GetComponentsInChildren<Camera>(true)) {
+                if (cam.targetTexture == null)
+                    SetTargetDisplay(cam, cam.targetDisplay);
+            }
             if (!UseMultiMonitorFix())
                 return;
             foreach (var canvas in obj.GetComponentsInChildren<Canvas>(true)) {
                 canvas.gameObject.AddComponent<MultiMonitorCanvasFix>();
-            }
-            foreach (var cam in obj.GetComponentsInChildren<Camera>(true)) {
-                if (cam.targetTexture == null)
-                    SetTargetDisplay(cam, cam.targetDisplay);
             }
         }
 
@@ -114,11 +125,21 @@ namespace Launcher.MultiMonitorSupport {
             return false;
         }
 
-        public static void SetTargetDisplay(Camera cam, int dispNum) {
+        public static void SetTargetDisplay(Camera cam, int dispNum, bool updateClearAndDepth = false) {
+            var realNum = Mathf.Min(dispNum, MonitorsCount - 1);
+            var isNew = CameraVirtualTargetDisplayStore.CreateOrGet(cam, out var store);
+            if (isNew || updateClearAndDepth) {
+                store.clearFlags = cam.clearFlags;
+                store.depth = cam.depth;
+            }
+            var needModify = Instance._useMonitors > MonitorsCount && dispNum < MonitorsCount;
+            cam.clearFlags = needModify ? CameraClearFlags.Depth : store.clearFlags;
+            cam.depth = needModify ? store.depth + MonitorsCount - realNum : store.depth;
+            store.targetDisplay = dispNum;
+            
             if (UseMultiMonitorFix()) {
-                CameraVirtualTargetDisplayStore.Store(cam, dispNum);
                 cam.targetDisplay = 0;
-                var rect = GetDisplayRect(dispNum);
+                var rect = GetDisplayRect(realNum);
                 Debug.Log($"Set cam target {dispNum}, {rect}");
                 if (GetMultiMonitorRect(out var multiRect)) {
                     var multiRectSize = multiRect.size;
@@ -127,15 +148,12 @@ namespace Launcher.MultiMonitorSupport {
                     cam.rect = rect;
                 }
             } else {
-                cam.targetDisplay = dispNum;
+                cam.targetDisplay = realNum;
             }
         }
 
         public static int GetTargetDisplay(Camera cam) {
-            if (UseMultiMonitorFix())
-                return CameraVirtualTargetDisplayStore.Get(cam);
-            else
-                return cam.targetDisplay;
+            return CameraVirtualTargetDisplayStore.GetTargetDisplay(cam);
         }
 
         public static Rect GetDisplayRect(int dispNum) {

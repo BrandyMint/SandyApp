@@ -3,7 +3,7 @@ using DepthSensor;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Launcher {
+namespace Launcher.UI {
     public class SensorIndicator : MonoBehaviour {
         [SerializeField] private StateBind[] _indicators;
         [SerializeField] private Text _txtDeviceName;

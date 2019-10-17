@@ -98,7 +98,8 @@ namespace Utilities {
         public static void Copy(RenderTexture src, Texture2D dst) {
             var prevRend = RenderTexture.active;
             RenderTexture.active = src;
-            dst.ReadPixels(new UnityEngine.Rect(0, 0, src.width, src.height), 0, 0);
+            dst.ReadPixels(new Rect(0, 0, src.width, src.height), 0, 0);
+            dst.Apply();
             RenderTexture.active = prevRend;
         }
     }

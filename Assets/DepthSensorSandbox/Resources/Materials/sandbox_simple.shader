@@ -26,7 +26,6 @@
             fixed4 _Color1;
             float _Depth1;
             fixed4 _ColorZero;
-            float _DepthZero;
 
             fixed4 frag (v2f i) : SV_Target {
                 float d = i.pos.z;

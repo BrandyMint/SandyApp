@@ -3,7 +3,7 @@ using UINotify;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Launcher {
+namespace Launcher.UI {
     public class SensorConnectionMonitor : MonoBehaviour {
         private const string _TXT_CONNECTING = "Подключение сенсора...";
         private const string _TXT_CONNECT_FAIL = "Сенсор не подключен!";

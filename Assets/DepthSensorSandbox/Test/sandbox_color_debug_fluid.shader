@@ -20,6 +20,7 @@
             #pragma fragment frag
 
             #include "UnityCG.cginc"
+            #include "Assets/DepthSensorSandbox/Resources/Materials/utils.cginc"
             #include "Assets/DepthSensorSandbox/Resources/Materials/sandbox.cginc"
             #include "Assets/DepthSensorSandbox/Resources/Materials/fluid.cginc"
             
@@ -29,10 +30,6 @@
             float _WaterMax;
             float _ColorBright;
             float _FluxBright;
-            
-            float inverseLerp(float a, float b, float k) {
-                return (k - a) / (b - a);
-            }
 
             fixed4 frag (v2f i) : SV_Target {
                 TYPE_HEIGHT h = HEIGHT_SAMPLE(CURR);

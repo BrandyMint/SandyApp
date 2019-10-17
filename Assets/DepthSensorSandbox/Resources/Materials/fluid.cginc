@@ -15,7 +15,6 @@ float4 _FluxPrevTex_TexelSize;
 float4 _HeightPrevTex_TexelSize;
 
 float _DepthSea;
-float _DepthZero;
 float _FluxAcceleration;
 float _FluxFading;
 float _CellArea;
@@ -55,7 +54,7 @@ float _CellHeight;
 
 float2 fragHeightClear (v2f i) : SV_Target {
     float d = i.pos.z;
-    float dSea = _DepthZero - _DepthSea;
+    float dSea = percentToDepth(_DepthSea);
     float water = max(0, d - dSea);
     float2 h;
     TERRAIN_H(h) = d;

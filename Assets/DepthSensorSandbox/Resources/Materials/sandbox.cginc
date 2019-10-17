@@ -2,6 +2,10 @@
 #   define EXTENSION_V2F
 #endif
 
+float _DepthZero;
+float _DepthMaxOffset;
+float _DepthMinOffset;
+
 struct appdata {
     float4 vertex : POSITION;
     float2 uv : TEXCOORD0;
@@ -37,10 +41,28 @@ v2f vert (appdata v) {
 #else
     float4 vertex = v.vertex;
 #endif
-    o.clip = UnityObjectToClipPos(vertex);
-    o.screenPos = ComputeScreenPos(o.clip);
     float3 pos = UnityObjectToViewPos(vertex);
+    
+    //fix over near clip
+    if (pos.z > -_ProjectionParams.y) pos.z = -_ProjectionParams.y - 0.01;
+    
+    o.clip = mul(UNITY_MATRIX_P, float4(pos, 1.0));
+    o.screenPos = ComputeScreenPos(o.clip);
+    
+    //
+    //if (o.uv.x < 0.001) {
+    //    o.clip.x = 20;
+    //}
+    
     o.pos = float3(pos.xy, -pos.z);
     return o;
+}
+
+float percentToDepth(float p) {
+    if (p < 0) {
+        return lerp(_DepthZero + _DepthMinOffset, _DepthZero, 1 + p);
+    } else {
+        return lerp(_DepthZero, _DepthZero - _DepthMaxOffset, p);
+    }
 }
 

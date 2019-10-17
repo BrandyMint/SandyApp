@@ -29,15 +29,16 @@ namespace Games.Landscape {
         };
         private readonly Dictionary<int, float> _detailSizeFloatDefaults = new Dictionary<int, float>();
         private readonly Dictionary<int, Vector2> _detailSizeTexScaleDefaults = new Dictionary<int, Vector2>();
+        private bool _prevWaterEnabled;
 
-        private void Start() {
+        protected override void Init() {
+            base.Init();
             foreach (var propId in _DetailSizeFloats) {
                 _detailSizeFloatDefaults.Add(propId, _material.GetFloat(propId));
             }
             foreach (var propId in _DetailSizeTexScales) {
                 _detailSizeTexScaleDefaults.Add(propId, _material.GetTextureScale(propId));
             }
-            SetEnable(true);
         }
 
         public override void SetEnable(bool enable) {
@@ -82,9 +83,12 @@ namespace Games.Landscape {
             //water
             if (Prefs.Landscape.EnableWaterSimulation) {
                 _material.EnableKeyword(_DYNAMIC_FLUID);
+                if (_prevWaterEnabled != Prefs.Landscape.EnableWaterSimulation)
+                    ClearFluidFlows();
             } else {
                 _material.DisableKeyword(_DYNAMIC_FLUID);
             }
+            _prevWaterEnabled = Prefs.Landscape.EnableWaterSimulation;
             
             _matFluidCalc.SetFloat(_FLUX_ACCELERATION, Prefs.Landscape.FluidAcceleration);
             _matFluidCalc.SetFloat(_FLUX_FADING, Prefs.Landscape.FluidFading);
