@@ -27,7 +27,7 @@ namespace DepthSensorSandbox {
         }
         
         public float SensorSwitchingViewTimer {
-            get => Get(nameof(SensorSwitchingViewTimer), 0.5f);
+            get => Get(nameof(SensorSwitchingViewTimer), 1f);
             set => Set(nameof(SensorSwitchingViewTimer), value);
         }
     }
