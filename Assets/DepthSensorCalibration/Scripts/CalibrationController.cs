@@ -86,7 +86,7 @@ namespace DepthSensorCalibration {
 
         private void OnBtnReset() {
             Prefs.Calibration.Reset();
-            _projector.Load();
+            OnProjectorChanged();
         }
         
         private void SubscribeKeys() {
@@ -214,15 +214,6 @@ namespace DepthSensorCalibration {
             };
         }
 
-        public static void UpdateCalibrationFov(ProjectorParams projector) {        
-            var aspect = projector.Width / projector.Height;
-            var s = projector.Diagonal;
-            var d = projector.Distance;
-            var h = s / Mathf.Sqrt((aspect * aspect + 1f));
-            var fov = MathHelper.IsoscelesTriangleAngle(h, d);
-            Prefs.Calibration.Fov = fov;
-        }
-
         private void UpdatePrefFromUI(float val, UnityAction<float> act) {
             if (_updatePrefFromUI) {
                 _setUIOnChange = false;
@@ -240,7 +231,7 @@ namespace DepthSensorCalibration {
         }
         
         private void OnProjectorChanged() {
-            UpdateCalibrationFov(_projector);
+            CameraMoverCalibration.UpdateCalibrationFov(_projector);
         }
 
         private void OnCalibrationChanged() {

@@ -4,7 +4,7 @@ using Utilities;
 
 namespace DepthSensorCalibration {
     [RequireComponent(typeof(RawImage))]
-    public class ImageFromCamera : MonoBehaviour {
+    public class StreamingFromCamera : MonoBehaviour {
         [SerializeField] private Camera _source;
 
         private RawImage _img;
@@ -36,7 +36,8 @@ namespace DepthSensorCalibration {
         }
 
         private void OnDestroy() {
-            _renderTexture.Release();
+            if (_renderTexture != null && _renderTexture.IsCreated())
+                _renderTexture.Release();
         }
     }
 }

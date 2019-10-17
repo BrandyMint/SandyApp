@@ -1,3 +1,4 @@
+using System;
 using DepthSensor.Buffer;
 using UnityEngine;
 
@@ -6,6 +7,10 @@ namespace DepthSensorSandbox.Visualisation {
     public class SandboxVisualizerColor : SandboxVisualizerBase {
         private static readonly int _DEPTH_TO_COLOR_TEX = Shader.PropertyToID("_DepthToColorTex");
         private static readonly int _COLOR_TEX = Shader.PropertyToID("_ColorTex");
+
+        private void Start() {
+            SetEnable(true);
+        }
 
         public override void SetEnable(bool enable) {
             base.SetEnable(enable);
