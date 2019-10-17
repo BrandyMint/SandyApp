@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Games.Landscape;
 using Launcher.KeyMapping;
 using UnityEngine;
 using UnityEngine.Events;
@@ -9,6 +10,8 @@ using Utilities;
 
 namespace DepthSensorCalibration {
     public class ProjectorController : MonoBehaviour {
+        private const float _TRANSLATE_VALUES = 100f;
+
         [Header("UI")]
         [SerializeField] private Transform _pnlProjectorParams;
         [SerializeField] private Color _colorError = Color.red;
@@ -16,16 +19,21 @@ namespace DepthSensorCalibration {
         [SerializeField] private Button _btnCancel;
         [SerializeField] private Button _btnReset;
 
+        private class Field {
+            public InputField fld { get; set; }
+            public ConvertValueUI convert { get; set; }
+        }
+
         private class ProjectorFields {
-            public InputField Dist { get; set; }
-            public InputField Diag { get; set; }
-            public InputField Width { get; set; }
-            public InputField Height { get; set; }
+            public Field Dist { get; set; }
+            public Field Diag { get; set; }
+            public Field Width { get; set; }
+            public Field Height { get; set; }
         }
 
         private readonly ProjectorFields _projectorFields = new ProjectorFields();
         private readonly ProjectorParams _projector = new ProjectorParams();
-        private readonly ISet<InputField> _errors = new HashSet<InputField>();
+        private readonly ISet<Field> _errors = new HashSet<Field>();
         private bool _setUIOnChange = true;
         private bool _updatePrefFromUI = true;
 
@@ -52,12 +60,16 @@ namespace DepthSensorCalibration {
         private void OnProjectorChanged() {
             if (_setUIOnChange) {
                 _updatePrefFromUI = false;
-                _projectorFields.Dist.text = _projector.Distance.ToString(CultureInfo.InvariantCulture);
-                _projectorFields.Diag.text = _projector.Diagonal.ToString(CultureInfo.InvariantCulture);
-                _projectorFields.Width.text = _projector.Width.ToString(CultureInfo.InvariantCulture);
-                _projectorFields.Height.text = _projector.Height.ToString(CultureInfo.InvariantCulture);
+                SetUIFromPrefs(_projectorFields.Dist, _projector.Distance);
+                SetUIFromPrefs(_projectorFields.Diag, _projector.Diagonal);
+                SetUIFromPrefs(_projectorFields.Width, _projector.Width);
+                SetUIFromPrefs(_projectorFields.Height, _projector.Height);
                 _updatePrefFromUI = true;
             }
+        }
+
+        private void SetUIFromPrefs(Field field, float val) {
+            field.fld.text = field.convert.Set(val).ToString(CultureInfo.InvariantCulture);
         }
 
         private void OnDestroy() {
@@ -88,25 +100,25 @@ namespace DepthSensorCalibration {
             _projector.Reset();
         }
 
-        private void InitField(InputField fld, UnityAction<float> act) {
-            fld.onValueChanged.AddListener(strVal => {
-                fld.image.color = Color.white;
+        private void InitField(Field fld, UnityAction<float> set) {
+            fld.fld.onValueChanged.AddListener(strVal => {
+                fld.fld.image.color = Color.white;
                 if (float.TryParse(strVal, NumberStyles.Float, CultureInfo.InvariantCulture, out var val)
                     && val > 0f) 
                 {
-                    UpdatePrefFromUI(val, act);
+                    UpdatePrefFromUI(fld.convert.Get(val), set);
                     _errors.Remove(fld);
                 } else {
-                    fld.image.color = _colorError;
+                    fld.fld.image.color = _colorError;
                     _errors.Add(fld);
                 }
             });
         }
 
-        private void UpdatePrefFromUI(float val, UnityAction<float> act) {
+        private void UpdatePrefFromUI(float val, UnityAction<float> set) {
             if (_updatePrefFromUI) {
                 _setUIOnChange = false;
-                act.Invoke(val);
+                set.Invoke(val);
                 _setUIOnChange = true;
             }
         }
