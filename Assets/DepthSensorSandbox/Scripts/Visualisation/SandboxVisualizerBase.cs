@@ -42,6 +42,8 @@ namespace DepthSensorSandbox.Visualisation {
         }
         
         protected virtual void OnSandboxParamsChange() {
+            if (_sandbox == null)
+                return;
             var props = _sandbox.PropertyBlock;
             props.SetFloat(_DEPTH_ZERO, Prefs.Sandbox.ZeroDepth);
             props.SetFloat(_DEPTH_MIN_OFFSET, Prefs.Sandbox.OffsetMinDepth);
