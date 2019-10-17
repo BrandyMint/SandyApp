@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Launcher.KeyMapping;
 using Launcher.MultiMonitorSupport;
 using UINotify;
