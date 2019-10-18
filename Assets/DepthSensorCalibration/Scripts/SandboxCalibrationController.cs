@@ -1,4 +1,4 @@
-﻿#if USE_MAT_ASYNC_SET
+#if USE_MAT_ASYNC_SET
     using AsyncGPUReadbackPluginNs;
 #endif
 using System;
@@ -44,7 +44,8 @@ namespace DepthSensorCalibration {
         private Texture2D _depthTex;
         
         private readonly SandboxParams _toSave = new SandboxParams();
-
+        private float _minClip = float.MinValue;
+        private float _maxClip = float.MaxValue;
 
         private void Start() {
             InitUI();
@@ -81,6 +82,10 @@ namespace DepthSensorCalibration {
         
         private void FixedUpdate() {
             _btnSave.interactable = IsSaveAllowed();
+            if (_sandboxCam != null) {
+                _minClip = _sandboxCam.nearClipPlane + 0.01f;
+                _maxClip = _sandboxCam.farClipPlane - 0.01f;
+            }
         }
 
         private bool IsSaveAllowed() {
@@ -139,14 +144,12 @@ namespace DepthSensorCalibration {
             var min = float.MaxValue;
             var max = float.MinValue;
             var mid = 0f;
-            var minClip = _sandboxCam.nearClipPlane + 0.01f;
-            var maxClip = _sandboxCam.farClipPlane - 0.01f;
             var count = 0;
             foreach (var ushortDepth in depth) {
                 var d = (float)ushortDepth / 1000f;
-                if (d < minClip) continue;
+                if (d < _minClip) continue;
                 
-                Mathf.Clamp(d, minClip, maxClip);
+                Mathf.Clamp(d, _minClip, _maxClip);
                 mid += d;
                 if (d < min)
                     min = d;
