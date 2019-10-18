@@ -122,6 +122,8 @@ namespace DepthSensorCalibration {
 #endregion 
 
         public static void UpdateCalibrationFov(ProjectorParams projector) {
+            return;
+            //TODO: No need with ProjectorCalibration2
             var aspect = projector.Width / projector.Height;
             var s = projector.Diagonal;
             var d = projector.Distance;

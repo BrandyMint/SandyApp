@@ -3,11 +3,13 @@ using UnityEngine;
 
 namespace Games.Common {
     public class UIScwitcher : MonoBehaviour {
-        [SerializeField] private Canvas _uiCanvas;
+        [SerializeField] private GameObject _ui;
+        [SerializeField] private bool _hideOnStart = true;
 
         private void Start() {
             KeyMapper.AddListener(KeyEvent.SHOW_UI, SwitchUI);
-            SwitchUI();
+            if (_hideOnStart)
+                SwitchUI();
         }
 
         private void OnDestroy() {
@@ -15,7 +17,7 @@ namespace Games.Common {
         }
 
         private void SwitchUI() {
-            _uiCanvas.gameObject.SetActive(!_uiCanvas.gameObject.activeSelf);
+            _ui.SetActive(!_ui.activeSelf);
         }
     }
 }

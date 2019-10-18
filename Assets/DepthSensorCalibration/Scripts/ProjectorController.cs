@@ -10,8 +10,6 @@ using Utilities;
 
 namespace DepthSensorCalibration {
     public class ProjectorController : MonoBehaviour {
-        private const float _TRANSLATE_VALUES = 100f;
-
         [Header("UI")]
         [SerializeField] private Transform _pnlProjectorParams;
         [SerializeField] private Color _colorError = Color.red;

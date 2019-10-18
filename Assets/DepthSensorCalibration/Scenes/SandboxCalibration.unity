@@ -657,6 +657,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 6145052358850914144, guid: 47cbe1775872baf289a77a580245e6e6,
+        type: 3}
+      propertyPath: m_TargetDisplay
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6145052356739669657, guid: 47cbe1775872baf289a77a580245e6e6,
         type: 3}
       propertyPath: m_Name
@@ -717,11 +722,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6145052358850914144, guid: 47cbe1775872baf289a77a580245e6e6,
-        type: 3}
-      propertyPath: m_TargetDisplay
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 6145052358333956587, guid: 47cbe1775872baf289a77a580245e6e6,
         type: 3}
       propertyPath: m_Materials.Array.data[0]
@@ -754,6 +754,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _material: {fileID: 2100000, guid: c1ef00e6166e62d45b4ab54bceccb6df, type: 2}
   _instantiateMaterial: 1
+  _enableOnStart: 1
 --- !u!20 &507380213 stripped
 Camera:
   m_CorrespondingSourceObject: {fileID: 6145052358850914144, guid: 47cbe1775872baf289a77a580245e6e6,
@@ -767,11 +768,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 319655142}
     m_Modifications:
-    - target: {fileID: 1041073166399765453, guid: cfca811c3531f4e469db93a284cb8286,
-        type: 3}
-      propertyPath: m_Name
-      value: TittleBg
-      objectReference: {fileID: 0}
     - target: {fileID: 1041073166399765452, guid: cfca811c3531f4e469db93a284cb8286,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -877,6 +873,11 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1041073166399765453, guid: cfca811c3531f4e469db93a284cb8286,
+        type: 3}
+      propertyPath: m_Name
+      value: TittleBg
+      objectReference: {fileID: 0}
     - target: {fileID: 6287223994065219192, guid: cfca811c3531f4e469db93a284cb8286,
         type: 3}
       propertyPath: m_AnchorMin.y
@@ -933,11 +934,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 508014594}
     m_Modifications:
-    - target: {fileID: 6427224280832922162, guid: 2541ef62fdda8414dad1b798203fcaa6,
-        type: 3}
-      propertyPath: m_Name
-      value: txtZValue
-      objectReference: {fileID: 0}
     - target: {fileID: 6427224280832922163, guid: 2541ef62fdda8414dad1b798203fcaa6,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -1057,6 +1053,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalScale.z
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6427224280832922162, guid: 2541ef62fdda8414dad1b798203fcaa6,
+        type: 3}
+      propertyPath: m_Name
+      value: txtZValue
       objectReference: {fileID: 0}
     - target: {fileID: 6427224280832922172, guid: 2541ef62fdda8414dad1b798203fcaa6,
         type: 3}
@@ -1836,7 +1837,7 @@ GameObject:
   - component: {fileID: 1687568189}
   - component: {fileID: 1687568188}
   m_Layer: 5
-  m_Name: PnlProjectorParams
+  m_Name: PnlSandboxParams
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2025,11 +2026,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 508014594}
     m_Modifications:
-    - target: {fileID: 6427224280832922162, guid: 2541ef62fdda8414dad1b798203fcaa6,
-        type: 3}
-      propertyPath: m_Name
-      value: txtZValueSuffix
-      objectReference: {fileID: 0}
     - target: {fileID: 6427224280832922163, guid: 2541ef62fdda8414dad1b798203fcaa6,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -2149,6 +2145,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalScale.z
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6427224280832922162, guid: 2541ef62fdda8414dad1b798203fcaa6,
+        type: 3}
+      propertyPath: m_Name
+      value: txtZValueSuffix
       objectReference: {fileID: 0}
     - target: {fileID: 6427224280832922172, guid: 2541ef62fdda8414dad1b798203fcaa6,
         type: 3}
