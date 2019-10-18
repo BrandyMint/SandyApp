@@ -1,4 +1,4 @@
-#if USE_MAT_ASYNC_SET
+﻿#if USE_MAT_ASYNC_SET
     using AsyncGPUReadbackPluginNs;
 #endif
 using System;
@@ -76,6 +76,7 @@ namespace DepthSensorCalibration {
         private void Save() {
             if (IsSaveAllowed()) {
                 Prefs.NotifySaved(_toSave.Save());
+                Prefs.Sandbox.Load();
                 //Scenes.GoBack();
             }
         }
