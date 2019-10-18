@@ -709,4 +709,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5a6ad697cd04d70911e5fa9af21e84b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _uiCanvas: {fileID: 678713457}
+  _ui: {fileID: 678713454}
+  _hideOnStart: 1

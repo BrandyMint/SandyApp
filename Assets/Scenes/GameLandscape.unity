@@ -1356,6 +1356,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _material: {fileID: 2100000, guid: d2447d1c73e0465b786087af1a74bb94, type: 2}
   _instantiateMaterial: 1
+  _enableOnStart: 1
   _cam: {fileID: 507380213}
   _matFluidCalc: {fileID: 2100000, guid: 5f86662afe628e4328f1050f818ccbf9, type: 2}
   _fluidMapHeight: 256
@@ -6707,7 +6708,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5a6ad697cd04d70911e5fa9af21e84b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _uiCanvas: {fileID: 678713457}
+  _ui: {fileID: 678713454}
+  _hideOnStart: 1
 --- !u!224 &3793052994098723804 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 5506004120098998, guid: 90891424b76abbad5b55ff313ac789ee,
