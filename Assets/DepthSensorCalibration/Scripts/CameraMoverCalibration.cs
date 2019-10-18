@@ -50,7 +50,6 @@ namespace DepthSensorCalibration {
         }
 
         private void SubscribeKeys() {
-            //KeyMapper.AddListener(KeyEvent.SAVE, Save);
             KeyMapper.AddListener(KeyEvent.RESET, OnBtnReset);
             KeyMapper.AddListener(KeyEvent.LEFT, MoveLeft);
             KeyMapper.AddListener(KeyEvent.RIGHT, MoveRight);
@@ -63,7 +62,6 @@ namespace DepthSensorCalibration {
         }
 
         private void UnSubscribeKeys() {
-            //KeyMapper.RemoveListener(KeyEvent.SAVE, Save);
             KeyMapper.RemoveListener(KeyEvent.RESET, OnBtnReset);
             KeyMapper.RemoveListener(KeyEvent.LEFT, MoveLeft);
             KeyMapper.RemoveListener(KeyEvent.RIGHT, MoveRight);

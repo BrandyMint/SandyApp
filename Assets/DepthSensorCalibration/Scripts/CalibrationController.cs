@@ -90,7 +90,6 @@ namespace DepthSensorCalibration {
         }
         
         private void SubscribeKeys() {
-            //KeyMapper.AddListener(KeyEvent.SAVE, Save);
             KeyMapper.AddListener(KeyEvent.RESET, OnBtnReset);
             KeyMapper.AddListener(KeyEvent.SHOW_UI, SwithcUI);
             KeyMapper.AddListener(KeyEvent.LEFT, _calibrationFields.PosX.btnDec.onClick.Invoke);
@@ -102,7 +101,6 @@ namespace DepthSensorCalibration {
         }
 
         private void UnSubscribeKeys() {
-            //KeyMapper.RemoveListener(KeyEvent.SAVE, Save);
             KeyMapper.RemoveListener(KeyEvent.RESET, OnBtnReset);
             KeyMapper.RemoveListener(KeyEvent.SHOW_UI, SwithcUI);
             KeyMapper.RemoveListener(KeyEvent.LEFT, _calibrationFields.PosX.btnDec.onClick.Invoke);
@@ -156,7 +154,6 @@ namespace DepthSensorCalibration {
                 KeyEvent.ZOOM_IN, KeyEvent.ZOOM_OUT, KeyEvent.SWITCH_MODE, KeyEvent.RESET);
             BtnKeyBind.ShortCut(_btnCancel, KeyEvent.BACK);
             BtnKeyBind.ShortCut(_btnReset, KeyEvent.RESET);
-            //BtnKeyBind.ShortCut(_btnSave, KeyEvent.SAVE);
             _btnAutomatic.onClick.AddListener(OnBtnStartAutomatic);
             _tglTest.onValueChanged.AddListener(OnTglTest);
             _tglTest.gameObject.SetActive(MultiMonitor.MonitorsCount > 1);

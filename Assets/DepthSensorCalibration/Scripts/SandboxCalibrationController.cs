@@ -98,7 +98,6 @@ namespace DepthSensorCalibration {
         }
 
         private void SubscribeKeys() {
-            //KeyMapper.AddListener(KeyEvent.SAVE, Save);
             KeyMapper.AddListener(KeyEvent.RESET, OnBtnReset);
             KeyMapper.AddListener(KeyEvent.SHOW_UI, SwithcUI);
             KeyMapper.AddListener(KeyEvent.SET_DEPTH_MAX, SetDepthMax);
@@ -107,7 +106,6 @@ namespace DepthSensorCalibration {
         }
 
         private void UnSubscribeKeys() {
-            //KeyMapper.RemoveListener(KeyEvent.SAVE, Save);
             KeyMapper.RemoveListener(KeyEvent.RESET, OnBtnReset);
             KeyMapper.RemoveListener(KeyEvent.SHOW_UI, SwithcUI);
             KeyMapper.RemoveListener(KeyEvent.SET_DEPTH_MAX, SetDepthMax);
@@ -184,7 +182,6 @@ namespace DepthSensorCalibration {
         private void InitUI() {
             BtnKeyBind.ShortCut(_btnCancel, KeyEvent.BACK);
             BtnKeyBind.ShortCut(_btnReset, KeyEvent.RESET);
-            BtnKeyBind.ShortCut(_btnSave, KeyEvent.SAVE);
             
             UnityHelper.SetPropsByGameObjects(_sandboxFields, _pnlSandboxSettings);
             InitShortCutValue(_sandboxFields.OffsetMaxDepth, KeyEvent.SET_DEPTH_MAX, () => _toSave.OffsetMaxDepth);
