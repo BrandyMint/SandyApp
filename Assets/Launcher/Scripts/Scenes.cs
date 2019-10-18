@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Launcher.KeyMapping;
 using Launcher.MultiMonitorSupport;
 using UINotify;
@@ -18,7 +19,8 @@ namespace Launcher {
         
         //private readonly Stack<int> _scenes = new Stack<int>();
         private Notify.Control _notifyNoMonitors;
-        private string _currentGameScenePath;
+        private int _currentGameSceneId;
+        private readonly List<string> _gameScenes = new List<string>(); 
         /*private CalibrationStep[] _calibrationSteps;
 
         private class CalibrationStep {
@@ -43,6 +45,7 @@ namespace Launcher {
                 new CalibrationStep(new ProjectorParams(), _sceneProjectorParamsPath),
                 new CalibrationStep(new CalibrationParams(), _sceneCalibrationPath)
             };*/
+            FindGameScenes();
             
             OnSceneLoaded(SceneManager.GetActiveScene(), LoadSceneMode.Single);
             SceneManager.sceneLoaded += OnSceneLoaded;
@@ -52,6 +55,7 @@ namespace Launcher {
             KeyMapper.AddListener(KeyEvent.OPEN_PROJECTOR_PARAMS, OpenProjectorParams);
             KeyMapper.AddListener(KeyEvent.OPEN_CALIBRATION, OpenCalibration);
             KeyMapper.AddListener(KeyEvent.OPEN_SANDBOX_CALIBRATION, OpenSandboxCalibration);
+            KeyMapper.AddListener(KeyEvent.OPEN_NEXT_GAME, OpenNextGame);
             KeyMapper.AddListener(KeyEvent.BACK, GoBack);
             KeyMapper.AddListener(KeyEvent.EXIT, Application.Quit);
             
@@ -64,9 +68,19 @@ namespace Launcher {
             
             KeyMapper.RemoveListener(KeyEvent.EXIT, Application.Quit);
             KeyMapper.RemoveListener(KeyEvent.BACK, GoBack);
+            KeyMapper.RemoveListener(KeyEvent.OPEN_NEXT_GAME, OpenNextGame);
             KeyMapper.RemoveListener(KeyEvent.OPEN_CALIBRATION, OpenCalibration);
             KeyMapper.RemoveListener(KeyEvent.OPEN_PROJECTOR_PARAMS, OpenProjectorParams);
             KeyMapper.RemoveListener(KeyEvent.OPEN_SANDBOX_CALIBRATION, OpenSandboxCalibration);
+        }
+
+        private void FindGameScenes() {
+            for (int i = 0; i < SceneManager.sceneCountInBuildSettings; i++) {
+                var scenePath = SceneUtility.GetScenePathByBuildIndex(i);
+                if (IsGameScene(scenePath)) {
+                    _gameScenes.Add(scenePath);
+                }
+            }
         }
 
         private void OnNotEnoughMonitors() {
@@ -80,9 +94,6 @@ namespace Launcher {
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode) {
             /*if (!_scenes.Contains(scene.buildIndex))
                 _scenes.Push(scene.buildIndex);*/
-            if (IsGameScene(scene)) {
-                _currentGameScenePath = scene.path;
-            }
         }
 
         public static void GoBack() {
@@ -121,7 +132,7 @@ namespace Launcher {
             //GoToWithCheckCalibration(sceneId);
             //for now, just go to main scene
             if (!IsGameScene(SceneManager.GetActiveScene()))
-                GoToWithChecking(_currentGameScenePath);
+                GoToWithChecking(_gameScenes[_currentGameSceneId]);
             else
                 GoToWithChecking(_sceneMainPath);
         }
@@ -154,6 +165,11 @@ namespace Launcher {
         
         private void OpenSandboxCalibration() {
             GoToWithChecking(_sceneSandboxCalibrationPath);
+        }
+
+        private void OpenNextGame() {
+            _currentGameSceneId = (_currentGameSceneId + 1) % _gameScenes.Count;
+            GoToWithChecking(_gameScenes[_currentGameSceneId]);
         }
     }
 }

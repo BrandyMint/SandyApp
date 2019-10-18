@@ -50,7 +50,7 @@ namespace Launcher.KeyMapping {
             _bindsDown.Add(new KeyBind(KeyCode.Tab, KeyEvent.SWITCH_MODE));
             _bindsDown.Add(new KeyBind(KeyCode.Escape, KeyEvent.BACK, "ESC"));
             
-            _bindsDown.Add(new KeyBind(KeyCode.F2, KeyEvent.SAVE));
+            _bindsDown.Add(new KeyBind(KeyCode.F2, KeyEvent.OPEN_NEXT_GAME));
             _bindsDown.Add(new KeyBind(KeyCode.F3, KeyEvent.SHOW_UI));
             _bindsDown.Add(new KeyBind(KeyCode.F5, KeyEvent.RESET));
             _bindsDown.Add(new KeyBind(KeyCode.F9, KeyEvent.OPEN_SANDBOX_CALIBRATION));
