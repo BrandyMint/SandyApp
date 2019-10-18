@@ -7,6 +7,7 @@ namespace DepthSensorSandbox.Visualisation {
         private void Start() {
             _initialScale = transform.localScale;
             Prefs.Calibration.OnChanged += OnCalibrationChanged;
+            OnCalibrationChanged();
         }
 
         private void OnDestroy() {
