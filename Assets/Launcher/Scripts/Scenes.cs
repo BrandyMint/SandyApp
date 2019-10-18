@@ -120,7 +120,7 @@ namespace Launcher {
             
             //GoToWithCheckCalibration(sceneId);
             //for now, just go to main scene
-            if (IsCalibrationScene(SceneManager.GetActiveScene()) && _currentGameScenePath != null)
+            if (!IsGameScene(SceneManager.GetActiveScene()))
                 GoToWithChecking(_currentGameScenePath);
             else
                 GoToWithChecking(_sceneMainPath);
