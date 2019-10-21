@@ -22,7 +22,7 @@ namespace DepthSensorSandbox {
         }
 
         public float Fov {
-            get => Get(nameof(Fov), 60f);
+            get => Get(nameof(Fov), 25f);
             set => Set(nameof(Fov), value);
         }
         
