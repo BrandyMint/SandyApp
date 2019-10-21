@@ -46,7 +46,8 @@ namespace DepthSensorCalibration {
         
         private void ModifyAngle(float k) {
             var angle = Prefs.Calibration.Fov;
-            angle += k * _INC_DEC_STEPS * Time.deltaTime;
+            var speed = Mathf.Lerp(_INC_DEC_STEPS, _INC_DEC_STEPS * 10, Mathf.InverseLerp(25, 70, angle));
+            angle += k * speed * Time.deltaTime;
             angle = Mathf.Clamp(angle, 5, 170);
             Prefs.Calibration.Fov = angle;
         }
