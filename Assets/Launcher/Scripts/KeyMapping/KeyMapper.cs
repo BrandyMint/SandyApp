@@ -50,6 +50,8 @@ namespace Launcher.KeyMapping {
             _bindsDown.Add(new KeyBind(KeyCode.Tab, KeyEvent.SWITCH_MODE));
             _bindsDown.Add(new KeyBind(KeyCode.Escape, KeyEvent.BACK, "ESC"));
             
+            _bindsDown.Add(new KeyBind(KeyCode.LeftShift, KeyCode.F2, KeyEvent.OPEN_PREV_GAME, "SHIFT-F2"));
+            _bindsDown.Add(new KeyBind(KeyCode.RightShift, KeyCode.F2, KeyEvent.OPEN_PREV_GAME));
             _bindsDown.Add(new KeyBind(KeyCode.F2, KeyEvent.OPEN_NEXT_GAME));
             _bindsDown.Add(new KeyBind(KeyCode.F3, KeyEvent.SHOW_UI));
             _bindsDown.Add(new KeyBind(KeyCode.F5, KeyEvent.RESET));

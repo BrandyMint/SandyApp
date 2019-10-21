@@ -7,6 +7,7 @@
         OPEN_SANDBOX_CALIBRATION,
         RESET,
         OPEN_NEXT_GAME,
+        OPEN_PREV_GAME,
         BACK,
         SWITCH_MODE,
         SHOW_UI,

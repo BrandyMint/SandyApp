@@ -56,6 +56,7 @@ namespace Launcher {
             KeyMapper.AddListener(KeyEvent.OPEN_CALIBRATION, OpenCalibration);
             KeyMapper.AddListener(KeyEvent.OPEN_SANDBOX_CALIBRATION, OpenSandboxCalibration);
             KeyMapper.AddListener(KeyEvent.OPEN_NEXT_GAME, OpenNextGame);
+            KeyMapper.AddListener(KeyEvent.OPEN_PREV_GAME, OpenPrevGame);
             KeyMapper.AddListener(KeyEvent.BACK, GoBack);
             KeyMapper.AddListener(KeyEvent.EXIT, Application.Quit);
             
@@ -68,6 +69,7 @@ namespace Launcher {
             
             KeyMapper.RemoveListener(KeyEvent.EXIT, Application.Quit);
             KeyMapper.RemoveListener(KeyEvent.BACK, GoBack);
+            KeyMapper.RemoveListener(KeyEvent.OPEN_PREV_GAME, OpenPrevGame);
             KeyMapper.RemoveListener(KeyEvent.OPEN_NEXT_GAME, OpenNextGame);
             KeyMapper.RemoveListener(KeyEvent.OPEN_CALIBRATION, OpenCalibration);
             KeyMapper.RemoveListener(KeyEvent.OPEN_PROJECTOR_PARAMS, OpenProjectorParams);
@@ -169,6 +171,11 @@ namespace Launcher {
 
         private void OpenNextGame() {
             _currentGameSceneId = (_currentGameSceneId + 1) % _gameScenes.Count;
+            GoToWithChecking(_gameScenes[_currentGameSceneId]);
+        }
+        
+        private void OpenPrevGame() {
+            _currentGameSceneId = (_gameScenes.Count + _currentGameSceneId - 1) % _gameScenes.Count;
             GoToWithChecking(_gameScenes[_currentGameSceneId]);
         }
     }
