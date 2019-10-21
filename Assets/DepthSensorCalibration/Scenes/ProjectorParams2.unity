@@ -472,7 +472,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 1}
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 1}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -1983,11 +1983,6 @@ PrefabInstance:
       propertyPath: m_Text
       value: "\u041F\u0420\u041E\u0415\u041A\u0422\u041E\u0420"
       objectReference: {fileID: 0}
-    - target: {fileID: 1041073166399765455, guid: cfca811c3531f4e469db93a284cb8286,
-        type: 3}
-      propertyPath: m_HorizontalFit
-      value: 2
-      objectReference: {fileID: 0}
     - target: {fileID: 1041073166399765454, guid: cfca811c3531f4e469db93a284cb8286,
         type: 3}
       propertyPath: m_ChildForceExpandWidth
@@ -1997,6 +1992,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_ChildAlignment
       value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 1041073166399765455, guid: cfca811c3531f4e469db93a284cb8286,
+        type: 3}
+      propertyPath: m_HorizontalFit
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: cfca811c3531f4e469db93a284cb8286, type: 3}
