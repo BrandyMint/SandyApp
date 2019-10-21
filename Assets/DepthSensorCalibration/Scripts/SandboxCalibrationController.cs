@@ -76,9 +76,9 @@ namespace DepthSensorCalibration {
         private void Save() {
             if (IsSaveAllowed()) {
                 Prefs.NotifySaved(_toSave.Save());
-                Prefs.Sandbox.Load();
                 //Scenes.GoBack();
             }
+            Prefs.Sandbox.Load();
         }
         
         private void FixedUpdate() {
