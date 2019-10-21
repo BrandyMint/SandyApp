@@ -4,11 +4,13 @@ using UnityEngine.UI;
 namespace Launcher.UI {
     [RequireComponent(typeof(Button))]
     public class BtnGoTo : MonoBehaviour {
-        [SerializeField] private string _scenePath;
+        [SerializeField][HideInInspector] protected string _scenePath;
         
-        private void Awake() {
-            var btn = GetComponent<Button>();
-            btn.onClick.AddListener(OnBtn);
+        protected Button _btn;
+
+        protected virtual void Awake() {
+            _btn = GetComponent<Button>();
+            _btn.onClick.AddListener(OnBtn);
         }
 
         private void OnBtn() {
