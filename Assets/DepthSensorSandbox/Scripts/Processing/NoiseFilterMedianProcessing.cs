@@ -23,7 +23,7 @@ namespace DepthSensorSandbox.Processing {
         };
         
         protected override void ProcessInternal() {
-            Parallel.For(0, _inOut.data.Length,
+            Parallel.For(0, _out.data.Length,
                 InitLocalState,
                 FilterBody,
                 FinallyLocalState
@@ -48,29 +48,28 @@ namespace DepthSensorSandbox.Processing {
         }
 
         private ParallelLocalState FilterBody(int i, ParallelLoopState loop, ParallelLocalState local) {
-            var depth = _rawBuffers[0];
-            var actualVal = depth.data[i];
+            var actualVal = _rawBuffer.data[i];
             if (actualVal == INVALID_DEPTH) {
-                _inOut.data[i] = INVALID_DEPTH;
+                _out.data[i] = INVALID_DEPTH;
                 return local;
             }
 
             local.medianArr[0] = actualVal;
             var j = 1;
-            var p = _inOut.GetXYiFrom(i);
+            var p = _out.GetXYiFrom(i);
             for (int k = 0; k < _neighbors.Length; ++k) {
-                var d = SafeGet(depth, p + _neighbors[k]);
+                var d = SafeGet(_rawBuffer, p + _neighbors[k]);
                 Accumulate(local.medianArr, j++, d, actualVal);
             }
 
             var median = MathHelper.GetMedian(local.medianArr);
-            var prevVal = _inOut.data[i];
+            var prevVal = _prev.data[i];
             var error = Mathf.Abs(median - prevVal);
             if (error > MaxError || prevVal == INVALID_DEPTH || median == INVALID_DEPTH) {
-                _inOut.data[i] = median;
+                _out.data[i] = median;
             } else {
                 var k = Smooth * Mathf.Sqrt((float)(MaxError - error) / MaxError);
-                _inOut.data[i] = (ushort) Mathf.Lerp(median, prevVal, k);
+                _out.data[i] = (ushort) Mathf.Lerp(median, prevVal, k);
             }
 
             return local;

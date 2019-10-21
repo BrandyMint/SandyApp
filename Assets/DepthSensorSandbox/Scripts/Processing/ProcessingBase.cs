@@ -5,16 +5,18 @@ namespace DepthSensorSandbox.Processing {
     public abstract class ProcessingBase {
         public const ushort INVALID_DEPTH = 0;
         
-        public bool OnlyRawBuffersIsInput = true;
+        public bool OnlyRawBufferIsInput = true;
         public bool Active = true;
         
-        protected DepthBuffer[] _rawBuffers;
-        protected DepthBuffer _inOut;
+        protected DepthBuffer _rawBuffer;
+        protected DepthBuffer _out;
+        protected DepthBuffer _prev;
 
-        public void Process(DepthBuffer[] rawBuffers, DepthBuffer inOut) {
+        public void Process(DepthBuffer rawBuffer, DepthBuffer outBuffer, DepthBuffer prevBuffer) {
             if (Active) {
-                _rawBuffers = rawBuffers;
-                _inOut = inOut;
+                _rawBuffer = rawBuffer;
+                _out = outBuffer;
+                _prev = prevBuffer;
                 ProcessInternal();
             }
         }

@@ -13,8 +13,8 @@ namespace DepthSensorSandbox.Processing {
         private DepthBuffer _inDepth;
         
         protected override void ProcessInternal() {
-            ReCreateIfNeed(ref _holesSize, _inOut.data.Length);
-            _inDepth = OnlyRawBuffersIsInput ? _rawBuffers[0] : _inOut;
+            ReCreateIfNeed(ref _holesSize, _out.data.Length);
+            _inDepth = OnlyRawBufferIsInput ? _rawBuffer : _out;
             _maxDem = Mathf.Max(_inDepth.width, _inDepth.height);
             Parallel.For(0, _maxDem, FindHolesBody);
             Parallel.For(0, _inDepth.height, FixDepthHolesBody);
@@ -64,9 +64,9 @@ namespace DepthSensorSandbox.Processing {
                     left = SetPriorityToIfInvalid(left, right, up, down);
                     right = SetPriorityToIfInvalid(right, left, up, down);
                     var dd = FixDepthHole(up, down, h.w, h.y) + FixDepthHole(left, right, h.x, h.z);
-                    _inOut.data[i] = (ushort) (dd / 2);
-                } else if (OnlyRawBuffersIsInput) {
-                    _inOut.data[i] = d;
+                    _out.data[i] = (ushort) (dd / 2);
+                } else if (OnlyRawBufferIsInput) {
+                    _out.data[i] = d;
                 }
             }
         }

@@ -27,8 +27,6 @@ struct v2f {
     float4 calcDepth (float2 uv) {
         float2 p = tex2Dlod(_MapToCameraTex, float4(uv, 0, 0)).rg;
         float d = tex2Dlod(_DepthTex, float4(uv, 0, 0)).r * 65.535;
-        if (d < 0.1)
-            d = 5;
         return float4(p.xy * d, d, 0);
     }
 #endif

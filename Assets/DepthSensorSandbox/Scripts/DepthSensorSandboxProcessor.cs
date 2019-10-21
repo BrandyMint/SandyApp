@@ -57,7 +57,8 @@ namespace DepthSensorSandbox {
         private readonly ProcessingBase[] _processings;
 
         private ColorBuffer _bufColor;
-        private DepthBuffer _bufDepth;
+        private SensorDepth _bufDepth;
+        private SensorDepth.Internal _bufDepthInternal;
         private MapDepthToCameraBuffer _bufMapToCamera;
         private DepthToColorBuffer _bufDepthToColor;
 
@@ -92,13 +93,20 @@ namespace DepthSensorSandbox {
                 _dsm.OnInitialized -= OnDepthSensorAvailable;
             RemoveConveyers();
             DisposeBuffer(ref _bufDepthToColor);
-            DisposeBuffer(ref _bufDepth);
+            DisposeSensor(ref _bufDepth);
         }
 
         private static void DisposeBuffer<T>(ref T stream) where T: AbstractBuffer {
             if (stream != null) {
                 stream.Dispose();
                 stream = null;
+            }
+        }
+        
+        private static void DisposeSensor<T>(ref T sensor) where T: AbstractSensor {
+            if (sensor != null) {
+                sensor.Dispose();
+                sensor = null;
             }
         }
 
@@ -141,13 +149,13 @@ namespace DepthSensorSandbox {
                 var activeDepth = _onNewFrame != null || _onDepthDataBackground != null || _onDepthToColor != null;
                 var activeMap = _onNewFrame != null || _onDepthDataBackground != null;
                 _needActivateSensors = false;
-                ActivateSensorIfNeed(device.Color, ref Instance._bufColor, activeColor);
-                ActivateSensorIfNeed(device.Depth, ref Instance._bufDepth, activeDepth);
-                ActivateSensorIfNeed(device.MapDepthToCamera, ref Instance._bufMapToCamera, activeMap);
+                ActivateSensorIfNeed(device.Color, Instance._bufColor, activeColor);
+                ActivateSensorIfNeed(device.Depth, Instance._bufDepth?.GetNewest(), activeDepth);
+                ActivateSensorIfNeed(device.MapDepthToCamera, Instance._bufMapToCamera, activeMap);
             }
         }
 
-        private static void ActivateSensorIfNeed<T>(AbstractSensor sensor, ref T buffer, bool activate) where T: AbstractBuffer {
+        private static void ActivateSensorIfNeed<T>(AbstractSensor sensor, T buffer, bool activate) where T: AbstractBuffer {
             if (!activate && buffer != null) {
                 buffer.SafeUnlock();
                 //buffer = null;
@@ -196,22 +204,22 @@ namespace DepthSensorSandbox {
                 _bufMapToCamera =  sMap.Active ? sMap.GetNewest() : null;
 
                 if (_bufDepth != null) {
-                    var depthBuffers = sDepth.Active ? sDepth.GetFreeBuffersAndLock(200) : null;
-                    if (depthBuffers != null) {
+                    var depthRaw = sDepth.Active ? sDepth.GetNewestAndLock(200) : null;
+                    if (depthRaw != null) {
                         var bufferChanged = false;
+                        var depth = _bufDepth.GetOldest();
+                        var depthPrev = _bufDepth.GetNewest();
                         foreach (var p in _processings) {
-                            p.OnlyRawBuffersIsInput = !bufferChanged;
-                            p.Process(depthBuffers, _bufDepth);
+                            p.OnlyRawBufferIsInput = !bufferChanged;
+                            p.Process(depthRaw, depth, depthPrev);
                             bufferChanged |= p.Active;
                         }
+                        depthRaw.Unlock();
 
-                        foreach (var buffer in depthBuffers) {
-                            buffer.Unlock();
-                        }
-
-                        _onDepthDataBackground?.Invoke(_bufDepth, _bufMapToCamera);
+                        _bufDepthInternal.OnNewFrameBackground();
+                        _onDepthDataBackground?.Invoke(depth, _bufMapToCamera);
                         if (_onDepthToColor != null)
-                            UpdateDepthToColor(_bufDepth);
+                            UpdateDepthToColor(depth);
                     }
                 }
 
@@ -223,14 +231,18 @@ namespace DepthSensorSandbox {
             var sDepth = _dsm.Device.Depth;
             while (true) {
                 if (_bufDepth == null) {
-                    _bufDepth = sDepth.GetNewest().CreateSome<DepthBuffer>();
+                    _bufDepth = new SensorDepth(sDepth.GetNewest().CreateSome<DepthBuffer>()) {
+                        BuffersCount = 2
+                    };
+                    _bufDepthInternal = new Sensor<DepthBuffer>.Internal(_bufDepth);
                 } else {
+                    var depth = _bufDepth.GetNewest();
                     FlushTextureBuffer(_bufColor, _onColor, true);
 
-                    if (CreateDepthToColorIfNeed(_bufDepth))
+                    if (CreateDepthToColorIfNeed(depth))
                         FlushTextureBuffer(_bufDepthToColor, _onDepthToColor);
 
-                    FlushTextureBuffer(_bufDepth, InvokeOnNewFrame);
+                    FlushTextureBuffer(depth, InvokeOnNewFrame);
                 }
 
                 //_evUnlock.Set();
@@ -273,12 +285,6 @@ namespace DepthSensorSandbox {
                     if (dolock)
                         buffer.Unlock();
                 }
-            }
-        }
-
-        private static void UnlockBuffer<T>(T buffer) where T : IBuffer {
-            if (buffer != null) {
-                buffer.Unlock();
             }
         }
 #endregion
