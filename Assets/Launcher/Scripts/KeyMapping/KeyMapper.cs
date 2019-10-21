@@ -83,6 +83,9 @@ namespace Launcher.KeyMapping {
             _binds.Add(new KeyBind(KeyCode.Minus, KeyEvent.ZOOM_OUT, "-"));
             _binds.Add(new KeyBind(KeyCode.KeypadMinus, KeyEvent.ZOOM_OUT, "-"));
             
+            _binds.Add(new KeyBind(KeyCode.Backslash, KeyEvent.ANGLE_INC, "\\"));
+            _binds.Add(new KeyBind(KeyCode.Slash, KeyEvent.ANGLE_DEC, "/"));
+            
             _binds.Add(new KeyBind(KeyCode.LeftBracket, KeyEvent.WIDE_MINUS, "["));
             _binds.Add(new KeyBind(KeyCode.RightBracket, KeyEvent.WIDE_PLUS, "]"));
         }

@@ -6,7 +6,7 @@ namespace Launcher.UI.Editor {
         SceneAssetInspector scenes = new SceneAssetInspector {
             sceneNames = {
                 "Main",
-                "ProjectorParams",
+                //"ProjectorParams",
                 "Calibration",
                 "SandboxCalibration"
             }

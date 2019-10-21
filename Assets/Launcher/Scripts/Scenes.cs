@@ -11,7 +11,7 @@ namespace Launcher {
         private const string _TXT_NO_MONITORS = "Убедитесь, что проектор подключен как расширенный экран, монитор компьютера активен и является главным. Перезапустите приложение.";
 
         [SerializeField] private string _sceneMainPath;
-        [SerializeField] private string _sceneProjectorParamsPath;
+        //[SerializeField] private string _sceneProjectorParamsPath;
         [SerializeField] private string _sceneCalibrationPath;
         [SerializeField] private string _sceneSandboxCalibrationPath;
         
@@ -52,7 +52,7 @@ namespace Launcher {
 
             MultiMonitor.OnNotEnoughMonitors += OnNotEnoughMonitors;
             
-            KeyMapper.AddListener(KeyEvent.OPEN_PROJECTOR_PARAMS, OpenProjectorParams);
+            //KeyMapper.AddListener(KeyEvent.OPEN_PROJECTOR_PARAMS, OpenProjectorParams);
             KeyMapper.AddListener(KeyEvent.OPEN_CALIBRATION, OpenCalibration);
             KeyMapper.AddListener(KeyEvent.OPEN_SANDBOX_CALIBRATION, OpenSandboxCalibration);
             KeyMapper.AddListener(KeyEvent.OPEN_NEXT_GAME, OpenNextGame);
@@ -72,7 +72,7 @@ namespace Launcher {
             KeyMapper.RemoveListener(KeyEvent.OPEN_PREV_GAME, OpenPrevGame);
             KeyMapper.RemoveListener(KeyEvent.OPEN_NEXT_GAME, OpenNextGame);
             KeyMapper.RemoveListener(KeyEvent.OPEN_CALIBRATION, OpenCalibration);
-            KeyMapper.RemoveListener(KeyEvent.OPEN_PROJECTOR_PARAMS, OpenProjectorParams);
+            //KeyMapper.RemoveListener(KeyEvent.OPEN_PROJECTOR_PARAMS, OpenProjectorParams);
             KeyMapper.RemoveListener(KeyEvent.OPEN_SANDBOX_CALIBRATION, OpenSandboxCalibration);
         }
 
@@ -145,8 +145,8 @@ namespace Launcher {
 
         private bool IsCalibrationScene(string scenePath) {
             return scenePath == _sceneSandboxCalibrationPath
-               || scenePath == _sceneCalibrationPath
-               || scenePath == _sceneProjectorParamsPath;
+               || scenePath == _sceneCalibrationPath;
+               //|| scenePath == _sceneProjectorParamsPath;
         }
         
         private bool IsGameScene(Scene scene) {
@@ -157,9 +157,9 @@ namespace Launcher {
             return scenePath != _sceneMainPath && !IsCalibrationScene(scenePath);
         }
 
-        private void OpenProjectorParams() {
+        /*private void OpenProjectorParams() {
             GoToWithChecking(_sceneProjectorParamsPath);
-        }
+        }*/
         
         private void OpenCalibration() {
             GoToWithChecking(_sceneCalibrationPath);

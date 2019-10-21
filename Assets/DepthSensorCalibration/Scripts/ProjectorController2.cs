@@ -27,19 +27,19 @@ namespace DepthSensorCalibration {
 
         private void InitUI() {
             UnityHelper.SetPropsByGameObjects(_projectorFields, _pnlProjectorParams);
-            InitField(_projectorFields.Angel, KeyEvent.ZOOM_IN, KeyEvent.ZOOM_OUT);
+            InitField(_projectorFields.Angel, KeyEvent.ANGLE_DEC, KeyEvent.ANGLE_INC);
             
             KeyMapper.AddListener(KeyEvent.RESET, OnBtnReset);
-            KeyMapper.AddListener(KeyEvent.ZOOM_IN, OnAngleIncrease);
-            KeyMapper.AddListener(KeyEvent.ZOOM_OUT, OnAngleDecrease);
+            KeyMapper.AddListener(KeyEvent.ANGLE_INC, OnAngleIncrease);
+            KeyMapper.AddListener(KeyEvent.ANGLE_DEC, OnAngleDecrease);
             Prefs.Calibration.OnChanged += OnCalibrationChanged;
             OnCalibrationChanged();
         }
 
         private void OnDestroy() {
             KeyMapper.RemoveListener(KeyEvent.RESET, OnBtnReset);
-            KeyMapper.RemoveListener(KeyEvent.ZOOM_IN, OnAngleIncrease);
-            KeyMapper.RemoveListener(KeyEvent.ZOOM_OUT, OnAngleDecrease);
+            KeyMapper.RemoveListener(KeyEvent.ANGLE_INC, OnAngleIncrease);
+            KeyMapper.RemoveListener(KeyEvent.ANGLE_DEC, OnAngleDecrease);
             Prefs.Calibration.OnChanged -= OnCalibrationChanged;
             Save();
         }
