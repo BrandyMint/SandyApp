@@ -44,6 +44,16 @@ namespace Utilities {
             return b / 2f / Mathf.Cos((180f - a) * Mathf.Deg2Rad / 2f);
         }
         
+        //     /a\
+        //    / | \
+        //   /  |  \
+        //  /  h|   \
+        // /____|____\
+        //      b
+        public static float IsoscelesTriangleSize(float h, float a) {
+            return  h * 2f * Mathf.Cos((180f - a) * Mathf.Deg2Rad / 2f);
+        }
+        
         public static bool IsConvex(Vector2[] p) {
             if (p.Length < 3)
                 return false;
