@@ -94,8 +94,8 @@ namespace Launcher {
         }
 
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode) {
-            /*if (!_scenes.Contains(scene.buildIndex))
-                _scenes.Push(scene.buildIndex);*/
+            if (IsGameScene(scene))
+                _currentGameSceneId = _gameScenes.FindIndex(s => s == scene.path);
         }
 
         public static void GoBack() {
