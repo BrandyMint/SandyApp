@@ -40,7 +40,7 @@ namespace Games.Landscape {
             }
             
             public bool EnableWaterSimulation {
-                get => Get(nameof(EnableWaterSimulation), true);
+                get => Get(nameof(EnableWaterSimulation), false);
                 set => Set(nameof(EnableWaterSimulation), value);
             }
             
