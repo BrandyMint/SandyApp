@@ -232,7 +232,7 @@ namespace DepthSensorSandbox {
             while (true) {
                 if (_bufDepth == null) {
                     _bufDepth = new SensorDepth(sDepth.GetNewest().CreateSome<DepthBuffer>()) {
-                        BuffersCount = 2
+                        BuffersCount = _buffersCount
                     };
                     _bufDepthInternal = new Sensor<DepthBuffer>.Internal(_bufDepth);
                 } else {
