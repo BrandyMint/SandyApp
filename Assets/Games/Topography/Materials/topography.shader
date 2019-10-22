@@ -35,20 +35,22 @@
             fixed4 _BorderColor;
             sampler2D _ColorTex;
                         
-            float calcLayerColorIndex(float min, float max, float d, float layers) {
-                float layerId = floor(saturate(inverseLerp(min, max, d)) * layers);
+            float calcLayerColorIndex(float max, float d, float layers) {
+                float layerId = floor(saturate(inverseLerp(0, max, d)) * layers);
                 return saturate(layerId / layers);
             }
             
-            float calcBorder(float min, float max, float d, float layers) {
-                float layer = clamp(inverseLerp(min, max, d) * layers, 0.5, layers + 0.5);
-                float dist = abs(layer - round(layer));
+            float calcBorder(float max, float d, float layers, float3 normal) {
+                float layer = clamp(inverseLerp(0, max, d) * layers, 0, layers + 0.5);
+                float dist = abs(layer - round(layer)) / layers * max;
+                float a = acos(dot(normal, float3(0, 0, 1)));
+                dist /= tan(a);
                 return step(dist, _BorderWidth);
             }
             
-            void getColorAndBorder(float min, float max, float d, float layers, out float color, out float border) {
-                color = calcLayerColorIndex(min, max, d, layers);
-                border = calcBorder(min, max, d, layers);
+            void getColorAndBorder(float max, float d, float layers, float3 normal, out float color, out float border) {
+                color = calcLayerColorIndex(max, d, layers);
+                border = calcBorder(max, d, layers, normal);
             }
             
             fixed4 frag (v2f i) : SV_Target {
@@ -58,63 +60,11 @@
                 float k;
                 float border;
                 if (d < _DepthZero) { //Upper
-                    getColorAndBorder(_DepthZero, max, d, _UpperLayers - 1, k, border);
+                    getColorAndBorder(_DepthMaxOffset, _DepthZero - d, _UpperLayers, i.normal, k, border);
                     k = lerp(_Middle, 1, k);
                 } else { //Lower
-                    getColorAndBorder(min, _DepthZero, d, _LowerLayers, k, border);
-                    k = lerp(0, _Middle, k);
-                }
-                return lerp(tex2D(_ColorTex, k), _BorderColor, border);
-            }
-            ENDCG
-        }
-        
-        Pass {
-            CGPROGRAM
-            #pragma multi_compile _ CALC_DEPTH 
-            #pragma vertex vert
-            #pragma fragment frag
-
-            #include "UnityCG.cginc"         
-
-            #include "Assets/DepthSensorSandbox/Resources/Materials/utils.cginc"
-            #include "Assets/DepthSensorSandbox/Resources/Materials/sandbox.cginc"
-            
-            float _UpperLayers;
-            float _LowerLayers;
-            float _Middle;
-            float _BorderWidth;
-            fixed4 _BorderColor;
-            sampler2D _ColorTex;
-                        
-            float calcLayerColorIndex(float min, float max, float d, float layers) {
-                float layerId = floor(saturate(inverseLerp(min, max, d)) * layers);
-                return saturate(layerId / layers);
-            }
-            
-            float calcBorder(float min, float max, float d, float layers) {
-                float layer = clamp(inverseLerp(min, max, d) * layers, 0.5, layers + 0.5);
-                float dist = abs(layer - round(layer));
-                return step(dist, _BorderWidth);
-            }
-            
-            void getColorAndBorder(float min, float max, float d, float layers, out float color, out float border) {
-                color = calcLayerColorIndex(min, max, d, layers);
-                border = calcBorder(min, max, d, layers);
-            }
-            
-            fixed4 frag (v2f i) : SV_Target {
-                float d = i.pos.z;
-                float max = _DepthZero - _DepthMaxOffset;
-                float min = _DepthZero + _DepthMinOffset;
-                float k;
-                float border;
-                if (d < _DepthZero) { //Upper
-                    getColorAndBorder(_DepthZero, max, d, _UpperLayers - 1, k, border);
-                    k = lerp(_Middle, 1, k);
-                } else { //Lower
-                    getColorAndBorder(min, _DepthZero, d, _LowerLayers, k, border);
-                    k = lerp(0, _Middle, k);
+                    getColorAndBorder(_DepthMinOffset, d - _DepthZero, _LowerLayers, i.normal, k, border);
+                    k = lerp(0, _Middle, 1 - k - 1/(_LowerLayers + 1));
                 }
                 return lerp(tex2D(_ColorTex, k), _BorderColor, border);
             }

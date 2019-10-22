@@ -128,6 +128,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 6145052358850914144, guid: 47cbe1775872baf289a77a580245e6e6,
+        type: 3}
+      propertyPath: orthographic
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6145052356739669657, guid: 47cbe1775872baf289a77a580245e6e6,
         type: 3}
       propertyPath: m_Name
@@ -188,6 +193,16 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6145052358333956587, guid: 47cbe1775872baf289a77a580245e6e6,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 6ac5b86d249fabc4ca34d351764b6761, type: 2}
+    - target: {fileID: 6145052358333956596, guid: 47cbe1775872baf289a77a580245e6e6,
+        type: 3}
+      propertyPath: _updateMeshOnGPU
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6145052358333956585, guid: 47cbe1775872baf289a77a580245e6e6,
         type: 3}
       propertyPath: m_LocalScale.x
@@ -229,16 +244,6 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 9127120572191758296, guid: 14e7c53709255572c81e919f78f100ab,
         type: 3}
-    - target: {fileID: 6145052358333956587, guid: 47cbe1775872baf289a77a580245e6e6,
-        type: 3}
-      propertyPath: m_Materials.Array.data[0]
-      value: 
-      objectReference: {fileID: 2100000, guid: 6ac5b86d249fabc4ca34d351764b6761, type: 2}
-    - target: {fileID: 6145052358333956596, guid: 47cbe1775872baf289a77a580245e6e6,
-        type: 3}
-      propertyPath: _updateMeshOnGPU
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 6145052358850914151, guid: 47cbe1775872baf289a77a580245e6e6, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 47cbe1775872baf289a77a580245e6e6, type: 3}
