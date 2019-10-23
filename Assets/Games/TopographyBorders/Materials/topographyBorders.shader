@@ -41,7 +41,7 @@
                 float a = acos(dot(normal, float3(0, 0, 1)));
                 dist /= tan(a);
                 float width = layer < 0.5 ? _BorderZeroMult * _BorderWidth : _BorderWidth;
-                return step(dist, width);
+                return inverseLerp(width, 0, dist);
             }
             
             fixed4 frag (v2f i) : SV_Target {
