@@ -136,6 +136,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _scenePath: 
+  _currentGameColor: {r: 0.5188679, g: 0.5188679, b: 0.5188679, a: 1}
   _imgDisabled: {fileID: 8110583085378398101}
 --- !u!114 &5553796835108595375
 MonoBehaviour:
@@ -157,11 +158,11 @@ MonoBehaviour:
     m_SelectOnRight: {fileID: 0}
   m_Transition: 1
   m_Colors:
-    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
-    m_HighlightedColor: {r: 1, g: 0.5949937, b: 0, a: 1}
-    m_PressedColor: {r: 1, g: 0, b: 0.48037338, a: 1}
-    m_SelectedColor: {r: 1, g: 0.1348231, b: 0, a: 1}
-    m_DisabledColor: {r: 0.4, g: 0.4, b: 0.4, a: 1}
+    m_NormalColor: {r: 0, g: 0, b: 0, a: 0}
+    m_HighlightedColor: {r: 0, g: 0, b: 0, a: 0}
+    m_PressedColor: {r: 1, g: 1, b: 1, a: 1}
+    m_SelectedColor: {r: 1, g: 1, b: 1, a: 1}
+    m_DisabledColor: {r: 0, g: 0, b: 0, a: 0}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:

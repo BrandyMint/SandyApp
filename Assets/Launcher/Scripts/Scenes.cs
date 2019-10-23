@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Launcher.KeyMapping;
 using Launcher.MultiMonitorSupport;
 using UINotify;
@@ -84,6 +85,14 @@ namespace Launcher {
                 if (IsGameScene(scenePath)) {
                     _gameScenes.Add(scenePath);
                 }
+            }
+        }
+        
+        public static string CurrentGamePath {
+            get {
+                if (_instance == null || _instance._gameScenes == null || !_instance._gameScenes.Any())
+                    return null;
+                return _instance._gameScenes[_instance._currentGameSceneId];
             }
         }
 
