@@ -22,6 +22,7 @@ namespace Launcher {
         private Notify.Control _notifyNoMonitors;
         private int _currentGameSceneId;
         private readonly List<string> _gameScenes = new List<string>(); 
+        private readonly List<Scene> _toUnload = new List<Scene>();
         /*private CalibrationStep[] _calibrationSteps;
 
         private class CalibrationStep {
@@ -52,6 +53,7 @@ namespace Launcher {
             
             OnSceneLoaded(SceneManager.GetActiveScene(), LoadSceneMode.Single);
             SceneManager.sceneLoaded += OnSceneLoaded;
+            SceneManager.sceneUnloaded += OnSceneUnloaded;
 
             MultiMonitor.OnNotEnoughMonitors += OnNotEnoughMonitors;
             
@@ -68,6 +70,7 @@ namespace Launcher {
 
         private void OnDestroy() {
             SceneManager.sceneLoaded -= OnSceneLoaded;
+            SceneManager.sceneUnloaded -= OnSceneUnloaded;
             MultiMonitor.OnNotEnoughMonitors -= OnNotEnoughMonitors;
             
             KeyMapper.RemoveListener(KeyEvent.EXIT, Application.Quit);
@@ -77,6 +80,8 @@ namespace Launcher {
             KeyMapper.RemoveListener(KeyEvent.OPEN_CALIBRATION, OpenCalibration);
             //KeyMapper.RemoveListener(KeyEvent.OPEN_PROJECTOR_PARAMS, OpenProjectorParams);
             KeyMapper.RemoveListener(KeyEvent.OPEN_SANDBOX_CALIBRATION, OpenSandboxCalibration);
+            
+            _instance = null;
         }
 
         private void FindGameScenes() {
@@ -107,6 +112,15 @@ namespace Launcher {
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode) {
             if (IsGameScene(scene))
                 _currentGameSceneId = _gameScenes.FindIndex(s => s == scene.path);
+            foreach (var unloadScene in _toUnload) {
+                SceneManager.UnloadSceneAsync(unloadScene);
+            }
+            _toUnload.Clear();
+        }
+        
+        private void OnSceneUnloaded(Scene scene) {
+            if (!_toUnload.Any())
+                Resources.UnloadUnusedAssets();
         }
 
         public static void GoBack() {
@@ -132,8 +146,12 @@ namespace Launcher {
 
         public static void GoToWithChecking(string scenePath) {
             //if (!GoCalibrationBefore(scenePath))
-            if (SceneManager.GetActiveScene().path != scenePath)
-                SceneManager.LoadScene(scenePath);
+            var currentScene = SceneManager.GetActiveScene();
+            if (currentScene.path != scenePath) {
+                SceneManager.LoadScene(scenePath, LoadSceneMode.Additive);
+                if (_instance != null)
+                    _instance._toUnload.Add(currentScene);
+            }
         }
 
         private void GoBackInternal() {
