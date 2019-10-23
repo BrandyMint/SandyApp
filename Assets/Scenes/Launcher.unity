@@ -1385,6 +1385,7 @@ GameObject:
   - component: {fileID: 1541118025}
   - component: {fileID: 1541118024}
   - component: {fileID: 1541118023}
+  - component: {fileID: 1541118026}
   m_Layer: 0
   m_Name: EventSystem
   m_TagString: Untagged
@@ -1440,6 +1441,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1541118026
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1541118022}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b9577ce3102ae7498b914e47234ca16, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1635048405
 GameObject:
   m_ObjectHideFlags: 0
@@ -1967,11 +1980,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1214897666}
     m_Modifications:
-    - target: {fileID: 8116435456924038854, guid: 3fe683c098f53d044afd7988fc2e057f,
-        type: 3}
-      propertyPath: m_Name
-      value: SensorIndicator
-      objectReference: {fileID: 0}
     - target: {fileID: 8116435456924038853, guid: 3fe683c098f53d044afd7988fc2e057f,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -2076,6 +2084,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8116435456924038854, guid: 3fe683c098f53d044afd7988fc2e057f,
+        type: 3}
+      propertyPath: m_Name
+      value: SensorIndicator
       objectReference: {fileID: 0}
     - target: {fileID: 8116435458316632893, guid: 3fe683c098f53d044afd7988fc2e057f,
         type: 3}
