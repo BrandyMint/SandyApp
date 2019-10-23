@@ -37,6 +37,7 @@ namespace BuildHelper.Editor.Core {
         private const string _SETTINGS_PATH = "ProjectSettings/ProjectSettings.asset";
         private const string _SETTINGS_TEMP_PATH = "ProjectSettings/ProjectSettings.temp";
         private const string _BUILD_HELPER_TEMP_PATH = "BuildHelper_Temp";
+        private const string _VERSION_FILE_PATH = "version";
         private const string _OVERRIDE_ICONS_LOG_PATH = _BUILD_HELPER_TEMP_PATH + "/override_icons_log.txt";
         private static bool _settingsAlreadySaved;
 
@@ -64,6 +65,10 @@ namespace BuildHelper.Editor.Core {
         /// </summary>
         /// <param name="report"></param>
         public void OnPostprocessBuild(BuildReport report) {
+            var path = Directory.Exists(report.summary.outputPath) 
+                ? report.summary.outputPath 
+                : Path.GetDirectoryName(report.summary.outputPath);
+            PlaceVersionFile(path);
             RestoreAll();
         }
 
@@ -156,6 +161,11 @@ namespace BuildHelper.Editor.Core {
                 throw new BuildFailedException("");
             }
 #endif
+        }
+
+        private void PlaceVersionFile(string path) {
+            path = Path.Combine(path, _VERSION_FILE_PATH);
+            File.WriteAllText(path, PlayerSettings.bundleVersion);
         }
 
 #region OverrideIcon
