@@ -52,7 +52,7 @@ namespace BuildHelper.Editor.Core {
             var part = majorMinor.Split('*');
             var pattern = "^v" + Regex.Escape(part[0]) + @"(\d+)" + Regex.Escape(part[1]);
             
-            CreateRequestGit("fetch").Execute();
+            //CreateRequestGit("fetch").Execute();
             var currTag = CreateRequestGit(
                 "tag -l --contains HEAD"
             ).Execute().Trim();
