@@ -120,18 +120,19 @@ namespace Launcher.KeyMapping {
 
         private void Update() {
             if (Input.anyKey) {
-                ProcessInput(_binds, Input.GetKey);
+                ProcessInput(_binds, Input.GetKey, false);
             }
             if (Input.anyKeyDown) {
-                ProcessInput(_bindsDown, Input.GetKeyDown);
+                ProcessInput(_bindsDown, Input.GetKeyDown, true);
             }
         }
 
-        private static void ProcessInput(IEnumerable<KeyBind> binds, Func<KeyCode, bool> checkKey) {
+        private static void ProcessInput(IEnumerable<KeyBind> binds, Func<KeyCode, bool> checkKey, bool onlyOne) {
             foreach (var bind in binds) {
                 if (checkKey(bind.key) && bind.IsAddKeysPressed) {
                     FireEvent(bind.ev);
-                    break;
+                    if (onlyOne)
+                        break;
                 }
             }
         }
