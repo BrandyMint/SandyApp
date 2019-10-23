@@ -17,6 +17,9 @@ namespace DepthSensorCalibration {
 
         private class ProjectorFields {
             public Field Angel { get; set; }
+            public Field Zoom { get; set; }
+            public Field Wide { get; set; }
+            public Field Position { get; set; }
         }
 
         private readonly ProjectorFields _projectorFields = new ProjectorFields();
@@ -28,6 +31,9 @@ namespace DepthSensorCalibration {
         private void InitUI() {
             UnityHelper.SetPropsByGameObjects(_projectorFields, _pnlProjectorParams);
             InitField(_projectorFields.Angel, KeyEvent.ANGLE_DEC, KeyEvent.ANGLE_INC);
+            InitField(_projectorFields.Zoom, KeyEvent.ZOOM_OUT, KeyEvent.ZOOM_IN);
+            InitField(_projectorFields.Wide, KeyEvent.WIDE_MINUS, KeyEvent.WIDE_PLUS);
+            InitField(_projectorFields.Position, KeyEvent.LEFT, KeyEvent.RIGHT, KeyEvent.UP, KeyEvent.DOWN);
             
             KeyMapper.AddListener(KeyEvent.RESET, OnBtnReset);
             KeyMapper.AddListener(KeyEvent.ANGLE_INC, OnAngleIncrease);
@@ -82,11 +88,15 @@ namespace DepthSensorCalibration {
                     shortCut += key.ShortCut;
                 }
             }
-            fld.txtShortCut.text = $"[{shortCut}]";
+            fld.txtShortCut.text = $"({shortCut})";
         }
 
         private void OnCalibrationChanged() {
             _projectorFields.Angel.txtValue.text = Prefs.Calibration.Fov.ToString("F2");
+            _projectorFields.Wide.txtValue.text = Prefs.Calibration.WideMultiply.ToString("F4");
+            _projectorFields.Zoom.txtValue.text = (1000f * Prefs.Calibration.Position.z).ToString("F0");
+            _projectorFields.Position.txtValue.text = 
+                $"x={(1000f * Prefs.Calibration.Position.x):F0} y={(1000f * Prefs.Calibration.Position.y):F0}";
         }
     }
 }
