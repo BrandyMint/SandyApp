@@ -38,6 +38,8 @@ namespace Launcher {
         }*/
 
         private void Awake() {
+            Debug.Log("version: " + Application.version);
+            
             _instance = this;
             DontDestroyOnLoad(gameObject);
             
