@@ -23,7 +23,9 @@
             #pragma vertex vert
             #pragma fragment frag
 
-            #include "UnityCG.cginc"         
+            #include "UnityCG.cginc"
+
+            #define CALC_NORMAL
 
             #include "Assets/DepthSensorSandbox/Resources/Materials/utils.cginc"
             #include "Assets/DepthSensorSandbox/Resources/Materials/sandbox.cginc"
@@ -45,7 +47,7 @@
             }
             
             fixed4 frag (v2f i) : SV_Target {
-                float d = i.pos.z;
+                float d = i.vpos.z;
                 float k;
                 float border;
                 if (d < _DepthZero) { //Upper

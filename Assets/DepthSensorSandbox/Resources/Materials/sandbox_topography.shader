@@ -25,7 +25,7 @@
             sampler2D _ScaleTex;
 
             fixed4 frag (v2f i) : SV_Target {
-                float d = i.pos.z;
+                float d = i.vpos.z;
                 float max = _DepthZero - _DepthMaxOffset;
                 float min = _DepthZero + _DepthMinOffset;
                 float k = inverseLerp(min, max, d);

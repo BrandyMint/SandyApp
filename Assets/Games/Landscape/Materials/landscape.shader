@@ -101,7 +101,7 @@
             }
 
             fixed4 frag (v2f i) : SV_Target {
-                float z = i.pos.z;
+                float z = i.vpos.z;
 #ifdef DYNAMIC_FLUID
                 TYPE_HEIGHT h = HEIGHT_SAMPLE(CURR);
     #ifdef DRAW_LANDSCAPE

@@ -53,7 +53,7 @@ float _CellHeight;
 #define BOUNDARY(type, h) (!(type##_H(h) > 0))
 
 float2 fragHeightClear (v2f i) : SV_Target {
-    float d = i.pos.z;
+    float d = i.vpos.z;
     float dSea = percentToDepth(_DepthSea);
     float water = max(0, d - dSea);
     float2 h;
@@ -95,7 +95,7 @@ TYPE_HEIGHT calcHeight(v2f i, TYPE_HEIGHT h, TYPE_FLUX f, TYPE_FLUX fl, TYPE_FLU
     
     float waterDiff = SUM_C(inFlux) - SUM_C(outFlux);
     
-    TERRAIN_H(h) = i.pos.z;
+    TERRAIN_H(h) = i.vpos.z;
     WATER_H(h) += unity_DeltaTime.x * waterDiff / _CellArea;    
     return h;
 }

@@ -24,7 +24,7 @@ Shader "Sandbox/Color" {
             fixed4 frag (v2f i) : SV_Target {
                 float2 uv = tex2D(_DepthToColorTex, i.uv).rg * _ColorTex_TexelSize.xy;
                 fixed4 col = tex2D(_ColorTex, uv);
-                float d = i.pos.z;
+                float d = i.vpos.z;
                 /*if (d > _DepthZero)
                     col *= _ColorZero;*/
                 return col;

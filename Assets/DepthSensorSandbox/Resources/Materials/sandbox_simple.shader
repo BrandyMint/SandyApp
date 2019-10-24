@@ -28,7 +28,7 @@
             fixed4 _ColorZero;
 
             fixed4 frag (v2f i) : SV_Target {
-                float d = i.pos.z;
+                float d = i.vpos.z;
                 if (d > _DepthZero)
                     return _ColorZero;
                 if (d > _DepthZero - _Depth1)
