@@ -31,6 +31,6 @@ Shader "Sandbox/Color" {
             }
             ENDCG
         }
+        UsePass "Sandbox/ShadowCaster"
     }
-    Fallback "Mobile/VertexLit"
 }

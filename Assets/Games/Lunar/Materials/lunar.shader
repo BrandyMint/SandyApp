@@ -45,7 +45,6 @@
             ENDCG
         }
         
-        UsePass "Legacy Shaders/VertexLit/SHADOWCASTER"
+        UsePass "Sandbox/ShadowCaster"
     }
-    Fallback "Mobile/VertexLit"
 }

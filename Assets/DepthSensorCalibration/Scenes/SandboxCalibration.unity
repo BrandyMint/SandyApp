@@ -727,11 +727,6 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: c1ef00e6166e62d45b4ab54bceccb6df, type: 2}
-    - target: {fileID: 6145052358333956596, guid: 47cbe1775872baf289a77a580245e6e6,
-        type: 3}
-      propertyPath: _updateMeshOnGPU
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 47cbe1775872baf289a77a580245e6e6, type: 3}
 --- !u!1 &507380211 stripped
@@ -934,11 +929,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 508014594}
     m_Modifications:
-    - target: {fileID: 6427224280832922162, guid: 2541ef62fdda8414dad1b798203fcaa6,
-        type: 3}
-      propertyPath: m_Name
-      value: txtZValue
-      objectReference: {fileID: 0}
     - target: {fileID: 6427224280832922163, guid: 2541ef62fdda8414dad1b798203fcaa6,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -1058,6 +1048,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalScale.z
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6427224280832922162, guid: 2541ef62fdda8414dad1b798203fcaa6,
+        type: 3}
+      propertyPath: m_Name
+      value: txtZValue
       objectReference: {fileID: 0}
     - target: {fileID: 6427224280832922172, guid: 2541ef62fdda8414dad1b798203fcaa6,
         type: 3}
@@ -1391,7 +1386,7 @@ PrefabInstance:
     - target: {fileID: 4115853844328034573, guid: 47b88d1c91880224898db2e6f7840296,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 490
+      value: 489.99997
       objectReference: {fileID: 0}
     - target: {fileID: 4115853844328034573, guid: 47b88d1c91880224898db2e6f7840296,
         type: 3}
@@ -2026,11 +2021,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 508014594}
     m_Modifications:
-    - target: {fileID: 6427224280832922162, guid: 2541ef62fdda8414dad1b798203fcaa6,
-        type: 3}
-      propertyPath: m_Name
-      value: txtZValueSuffix
-      objectReference: {fileID: 0}
     - target: {fileID: 6427224280832922163, guid: 2541ef62fdda8414dad1b798203fcaa6,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -2150,6 +2140,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalScale.z
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6427224280832922162, guid: 2541ef62fdda8414dad1b798203fcaa6,
+        type: 3}
+      propertyPath: m_Name
+      value: txtZValueSuffix
       objectReference: {fileID: 0}
     - target: {fileID: 6427224280832922172, guid: 2541ef62fdda8414dad1b798203fcaa6,
         type: 3}

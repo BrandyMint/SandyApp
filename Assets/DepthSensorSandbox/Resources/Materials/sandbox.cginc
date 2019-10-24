@@ -72,19 +72,17 @@ v2f vert (appdata v) {
     v2f o;
     o.uv = v.uv;
 #ifdef CALC_DEPTH
-    float4 vertex = sampleDepth(o.uv, CURR);
+    v.vertex = sampleDepth(o.uv, CURR);
     #ifdef CALC_NORMAL
         v.normal = normalize(
-            cross(vertex.xyz - sampleDepth(o.uv, L), B3) +
-            cross(vertex.xyz - sampleDepth(o.uv, T), R3) +
-            cross(vertex.xyz - sampleDepth(o.uv, R), T3) +
-            cross(vertex.xyz - sampleDepth(o.uv, B), L3)
+            cross(v.vertex.xyz - sampleDepth(o.uv, L), B3) +
+            cross(v.vertex.xyz - sampleDepth(o.uv, T), R3) +
+            cross(v.vertex.xyz - sampleDepth(o.uv, R), T3) +
+            cross(v.vertex.xyz - sampleDepth(o.uv, B), L3)
         );
     #endif
-#else
-    float4 vertex = v.vertex;
 #endif
-    float3 pos = UnityObjectToViewPos(vertex);
+    float3 pos = UnityObjectToViewPos(v.vertex);
     
     //fix over near clip
     if (pos.z > -_ProjectionParams.y) pos.z = -_ProjectionParams.y - 0.01;

@@ -37,6 +37,6 @@
             }
             ENDCG
         }
+        UsePass "Sandbox/ShadowCaster"
     }
-    Fallback "Mobile/VertexLit"
 }
