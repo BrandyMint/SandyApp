@@ -55,8 +55,6 @@
             
             fixed4 frag (v2f i) : SV_Target {
                 float d = i.pos.z;
-                float max = _DepthZero - _DepthMaxOffset;
-                float min = _DepthZero + _DepthMinOffset;
                 float k;
                 float border;
                 if (d < _DepthZero) { //Upper
