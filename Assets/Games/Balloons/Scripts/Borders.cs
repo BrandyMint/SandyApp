@@ -5,7 +5,7 @@ using Utilities;
 
 namespace Games.Balloons {
     public class Borders : MonoBehaviour {
-        [SerializeField] private Transform _exitBorder;
+        [SerializeField] private Collider _exitBorder;
         [SerializeField] private Transform[] _offsetedByWidth;
         [SerializeField] private Transform[] _offsetedByWidthAndSize;
 
@@ -13,13 +13,11 @@ namespace Games.Balloons {
             public readonly Transform transform;
             public readonly float3 startPos;
             public readonly float3 startScale;
-            public readonly Collider collider;
 
             public BorderInfo(Component t) {
                 transform = t.transform;
                 startPos = transform.localPosition;
                 startScale = transform.localScale;
-                collider = t.GetComponent<Collider>();
             }
         }
         private BorderInfo[] _borders;
@@ -33,6 +31,8 @@ namespace Games.Balloons {
                 .Select(c => new BorderInfo(c)).ToArray();
         }
 
+        public Collider ExitBorder => _exitBorder;
+
         public void SetWidth(float w) {
             _width = w;
             UpdateWidth();
@@ -43,7 +43,7 @@ namespace Games.Balloons {
             foreach (var b in _borders) {
                 if (_offsetedByWidthAndSize.Contains(b.transform)) {
                     var pos = scaledWidth * b.startPos;
-                    b.transform.localPosition += (Vector3) pos;
+                    b.transform.localPosition = b.startPos + pos * 1.5f;
                 } else
                 if (_offsetedByWidth.Contains(b.transform)) {
                     var pos = scaledWidth * b.startPos;
@@ -56,6 +56,19 @@ namespace Games.Balloons {
                 spawn.transform.localPosition += (Vector3) pos;
                 spawn.transform.localScale = spawn.startScale * (1 - scaledWidth);
             }
+        }
+
+        public void AlignToCamera(Camera cam, float dist) {
+            transform.rotation = cam.transform.rotation;
+            transform.position = cam.transform.position + cam.transform.forward * dist;
+            var vertical = MathHelper.IsoscelesTriangleSize(dist, cam.fieldOfView);
+            transform.localScale = new Vector3(
+                vertical * cam.aspect,
+                vertical,
+                1f
+            );
+            
+            UpdateWidth();
         }
     }
 }

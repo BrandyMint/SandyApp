@@ -6,8 +6,6 @@ using UnityEngine;
 
 namespace Games.Balloons {
     public class BalloonsGame : MonoBehaviour {
-        
-        
         [SerializeField] private Camera _cam;
         [SerializeField] private Balloon _tplBalloon;
         [SerializeField] private Borders _borders;
@@ -24,9 +22,18 @@ namespace Games.Balloons {
             
             _tplBalloon.gameObject.SetActive(false);
             var size = math.cmax(_tplBalloon.transform.localScale);
+            _borders.AlignToCamera(_cam, 2f);
             _borders.SetWidth(size * 2f);
 
+            Balloon.OnDestroyed += OnBalloonDestroyed;
+            Balloon.OnCollisionEntered += OnBalloonCollisionEnter;
+
             StartCoroutine(Spawning());
+        }
+
+        private void OnDestroy() {
+            Balloon.OnCollisionEntered -= OnBalloonCollisionEnter;
+            Balloon.OnDestroyed -= OnBalloonDestroyed;
         }
 
         private IEnumerator Spawning() {
@@ -40,10 +47,9 @@ namespace Games.Balloons {
 
         private void SpawnBalloon() {
             var stayAway = _balloons.Select(b => b.transform.position).ToArray();
-            var stayAwayDist = math.cmax(_tplBalloon.transform.localScale);
+            var stayAwayDist = math.cmax(_tplBalloon.transform.localScale) * 1.5f;
             if (SpawnArea.AnyGetRandomSpawn(out var worldPos, out var worldRot, stayAway, stayAwayDist)) {
                 var newBalloon = Instantiate(_tplBalloon, worldPos, worldRot, _tplBalloon.transform.parent);
-                newBalloon.OnDestroyed += OnBalloonDestroyed;
                 var rigid = newBalloon.GetComponent<Rigidbody>();
                 newBalloon.gameObject.SetActive(true);
                 var dir = newBalloon.transform.rotation * Vector3.forward;
@@ -55,15 +61,25 @@ namespace Games.Balloons {
         private void OnBalloonDestroyed(Balloon balloon) {
             _balloons.Remove(balloon);
         }
+        
+        private void OnBalloonCollisionEnter(Balloon balloon, Collision collision) {
+            if (collision.collider == _borders.ExitBorder) {
+                balloon.Dead();
+            }
+        }
 
         private void Update() {
             if (Input.GetMouseButtonDown(0)) {
-                var ray = _cam.ScreenPointToRay(Input.mousePosition);
-                if (Physics.Raycast(ray, out var hit, _cam.farClipPlane, _hitMask)) {
-                    var balloon = hit.collider.GetComponent<Balloon>();
-                    if (balloon != null) {
-                        balloon.Bang();
-                    }
+                Fire(Input.mousePosition);
+            }
+        }
+
+        private void Fire(Vector2 screenPos) {
+            var ray = _cam.ScreenPointToRay(screenPos);
+            if (Physics.Raycast(ray, out var hit, _cam.farClipPlane, _hitMask)) {
+                var balloon = hit.collider.GetComponent<Balloon>();
+                if (balloon != null) {
+                    balloon.Bang();
                 }
             }
         }

@@ -5,7 +5,8 @@ using Random = UnityEngine.Random;
 namespace Games.Balloons {
     public class Balloon : MonoBehaviour {
         private static readonly int _COLOR = Shader.PropertyToID("_Color");
-        public event Action<Balloon> OnDestroyed; 
+        public static event Action<Balloon> OnDestroyed;
+        public static event Action<Balloon, Collision> OnCollisionEntered; 
 
         private void Awake() {
             var r = GetComponent<Renderer>();
@@ -27,7 +28,16 @@ namespace Games.Balloons {
 
         public void Bang() {
             gameObject.layer = 0;
+            Dead();
+        }
+
+        public void Dead() {
+            gameObject.layer = 0;
             Destroy(gameObject);
+        }
+
+        private void OnCollisionEnter(Collision other) {
+            OnCollisionEntered?.Invoke(this, other);
         }
     }
 }
