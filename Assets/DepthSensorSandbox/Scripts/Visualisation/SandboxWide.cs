@@ -17,7 +17,7 @@ namespace DepthSensorSandbox.Visualisation {
         private void OnCalibrationChanged() {
             var scale = _initialScale;
             scale.x *= Prefs.Calibration.WideMultiply;
-            scale.y *= 1f / Prefs.Calibration.WideMultiply;
+            //scale.y *= 1f / Prefs.Calibration.WideMultiply;
             transform.localScale = scale;
         }
     }
