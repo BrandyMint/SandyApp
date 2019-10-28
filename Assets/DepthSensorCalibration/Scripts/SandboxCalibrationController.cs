@@ -68,6 +68,12 @@ namespace DepthSensorCalibration {
                 _sandbox.SetEnable(false);
             }
             Prefs.Calibration.OnChanged -= OnCalibrationChanged;
+            if (_depthTex != null) {
+                Destroy(_depthTex);
+            } else if (_depth.IsCreated) {
+                _depth.Dispose();
+            }
+
             UnSubscribeKeys();
             Save();
         }

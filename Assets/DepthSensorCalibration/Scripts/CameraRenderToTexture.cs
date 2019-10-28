@@ -100,6 +100,16 @@ namespace DepthSensorCalibration {
         
         public void Enable(
             Material mat, RenderTextureFormat rtFormat, 
+            CameraEvent cameraEvent, Action<RenderTexture> onNewFrame = null
+        ) {
+            Enable(
+                mat, rtFormat, 
+                BuiltinRenderTextureType.CameraTarget, cameraEvent, onNewFrame
+            );
+        }
+
+        public void Enable(
+            Material mat, RenderTextureFormat rtFormat, 
             Action<RenderTexture> onNewFrame = null
         ) {
             Enable(
@@ -126,7 +136,8 @@ namespace DepthSensorCalibration {
         }
 
         private void OnPostRender() {
-            _onNewFrame?.Invoke(_renderTarget);
+            if (this.enabled)
+                _onNewFrame?.Invoke(_renderTarget);
         }
     }
 }
