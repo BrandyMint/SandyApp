@@ -48,5 +48,5 @@
             ENDCG
         }
     }    
-    Fallback "Mobile/VertexLit"
+    Fallback "Sandbox"
 }

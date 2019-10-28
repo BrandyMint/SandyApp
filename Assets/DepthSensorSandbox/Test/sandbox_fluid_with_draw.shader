@@ -60,5 +60,5 @@ Shader "Sandbox/FluidWithDraw" {
             ENDCG
         }
     }    
-    Fallback "Mobile/VertexLit"
+    Fallback "Sandbox"
 }
