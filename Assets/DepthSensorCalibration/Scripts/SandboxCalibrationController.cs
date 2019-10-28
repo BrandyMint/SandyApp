@@ -51,6 +51,7 @@ namespace DepthSensorCalibration {
             InitUI();
             SubscribeKeys();
             //SwithcUI();
+            _sandboxCam.depthTextureMode = DepthTextureMode.Depth;
             _renderDepth = _sandboxCam.gameObject.AddComponent<CameraRenderToTexture>();
             _renderDepth.MaxResolution = 64;
             _renderDepth.Enable(_matDepth, RenderTextureFormat.R16, OnNewDepthFrame);

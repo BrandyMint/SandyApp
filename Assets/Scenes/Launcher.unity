@@ -1138,6 +1138,11 @@ PrefabInstance:
       propertyPath: m_Text
       value: "5. \u0428\u0410\u0420\u0418\u041A\u0418"
       objectReference: {fileID: 0}
+    - target: {fileID: 6304583455134004123, guid: 40ba87eaa62f72e4d94f7b3e72989c8a,
+        type: 3}
+      propertyPath: _scenePath
+      value: Assets/Scenes/GameBallons.unity
+      objectReference: {fileID: 0}
     - target: {fileID: 8434986622037929018, guid: 40ba87eaa62f72e4d94f7b3e72989c8a,
         type: 3}
       propertyPath: _scenePath
@@ -1985,6 +1990,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1214897666}
     m_Modifications:
+    - target: {fileID: 8116435456924038854, guid: 3fe683c098f53d044afd7988fc2e057f,
+        type: 3}
+      propertyPath: m_Name
+      value: SensorIndicator
+      objectReference: {fileID: 0}
     - target: {fileID: 8116435456924038853, guid: 3fe683c098f53d044afd7988fc2e057f,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -2089,11 +2099,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8116435456924038854, guid: 3fe683c098f53d044afd7988fc2e057f,
-        type: 3}
-      propertyPath: m_Name
-      value: SensorIndicator
       objectReference: {fileID: 0}
     - target: {fileID: 8116435458316632893, guid: 3fe683c098f53d044afd7988fc2e057f,
         type: 3}

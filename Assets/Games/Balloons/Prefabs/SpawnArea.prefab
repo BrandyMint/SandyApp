@@ -476,7 +476,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c70d0f90be7e4296b4b3db6e1cef64d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _randomizeAngle: {x: 0, y: 60, z: 0}
+  _randomizeAngle: {x: 0, y: 40, z: 0}
 --- !u!1 &8273781201779408956
 GameObject:
   m_ObjectHideFlags: 0

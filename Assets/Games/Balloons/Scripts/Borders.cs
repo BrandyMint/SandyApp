@@ -52,7 +52,7 @@ namespace Games.Balloons {
             }
 
             foreach (var spawn in _spawns) {
-                var pos = scaledWidth * spawn.startPos;
+                var pos = scaledWidth * spawn.startPos / 2;
                 spawn.transform.localPosition += (Vector3) pos;
                 spawn.transform.localScale = spawn.startScale * (1 - scaledWidth);
             }

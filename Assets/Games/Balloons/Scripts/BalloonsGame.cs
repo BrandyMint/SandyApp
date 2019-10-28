@@ -1,8 +1,18 @@
-﻿using System.Collections;
+﻿#if USE_MAT_ASYNC_SET
+    using AsyncGPUReadback = AsyncGPUReadbackPluginNs.AsyncGPUReadback;
+#endif
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using DepthSensor.Buffer;
+using DepthSensorCalibration;
+using DepthSensorSandbox;
+using DepthSensorSandbox.Visualisation;
+using Unity.Collections;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.Rendering;
+using Utilities;
 
 namespace Games.Balloons {
     public class BalloonsGame : MonoBehaviour {
@@ -12,28 +22,54 @@ namespace Games.Balloons {
         [SerializeField] private float _maxBallons = 12;
         [SerializeField] private float _timeOffsetSpown = 2f;
         [SerializeField] private float _startForce = 3f;
+        [SerializeField] private int _depthHeight = 64;
+        [SerializeField] private SandboxMesh _sandbox;
+        [SerializeField] private Material _matDepth;
 
         private List<Balloon> _balloons = new List<Balloon>();
         
         private int _hitMask;
+        private CameraRenderToTexture _renderDepth;
+        private NativeArray<byte> _depth;
+        private Texture2D _depthTex;
+        private bool _isNewDepthFrame;
+        private float _initialBallSize;
 
         private void Start() {
             _hitMask = LayerMask.GetMask("interactable");
-            
+
+            _renderDepth = _cam.gameObject.AddComponent<CameraRenderToTexture>();
+            _renderDepth.MaxResolution = _depthHeight;
+            _renderDepth.Enable(_matDepth, RenderTextureFormat.R8, OnNewDepthFrame, CreateCommandBufferDepth);
+
+            _initialBallSize = math.cmax(_tplBalloon.transform.localScale);
             _tplBalloon.gameObject.SetActive(false);
-            var size = math.cmax(_tplBalloon.transform.localScale);
-            _borders.AlignToCamera(_cam, 2f);
-            _borders.SetWidth(size * 2f);
 
             Balloon.OnDestroyed += OnBalloonDestroyed;
             Balloon.OnCollisionEntered += OnBalloonCollisionEnter;
+            DepthSensorSandboxProcessor.OnNewFrame += OnNewFrame;
+            Prefs.Calibration.OnChanged += OnCalibrationChanged;
+            Prefs.Sandbox.OnChanged += OnCalibrationChanged;
+            OnCalibrationChanged();
 
             StartCoroutine(Spawning());
         }
 
         private void OnDestroy() {
+            Prefs.Sandbox.OnChanged -= OnCalibrationChanged;
+            Prefs.Calibration.OnChanged -= OnCalibrationChanged;
             Balloon.OnCollisionEntered -= OnBalloonCollisionEnter;
             Balloon.OnDestroyed -= OnBalloonDestroyed;
+            DepthSensorSandboxProcessor.OnNewFrame -= OnNewFrame;
+            if (_renderDepth != null) {
+                _renderDepth.Disable();
+            }
+            
+            if (_depthTex != null) {
+                Destroy(_depthTex);
+            } else if (_depth.IsCreated) {
+                _depth.Dispose();
+            }
         }
 
         private IEnumerator Spawning() {
@@ -61,7 +97,7 @@ namespace Games.Balloons {
         private void OnBalloonDestroyed(Balloon balloon) {
             _balloons.Remove(balloon);
         }
-        
+
         private void OnBalloonCollisionEnter(Balloon balloon, Collision collision) {
             if (collision.collider == _borders.ExitBorder) {
                 balloon.Dead();
@@ -70,18 +106,76 @@ namespace Games.Balloons {
 
         private void Update() {
             if (Input.GetMouseButtonDown(0)) {
-                Fire(Input.mousePosition);
+                var screen = new float2(_cam.pixelWidth, _cam.pixelHeight);
+                var pos = new float2(Input.mousePosition.x, Input.mousePosition.y);
+                Fire(pos / screen);
             }
         }
 
-        private void Fire(Vector2 screenPos) {
-            var ray = _cam.ScreenPointToRay(screenPos);
+        private void Fire(Vector2 viewPos) {
+            var ray = _cam.ViewportPointToRay(viewPos);
             if (Physics.Raycast(ray, out var hit, _cam.farClipPlane, _hitMask)) {
                 var balloon = hit.collider.GetComponent<Balloon>();
                 if (balloon != null) {
                     balloon.Bang();
                 }
             }
+        }
+
+        private void CreateCommandBufferDepth(CommandBuffer cmb, Material mat, RenderTexture rt, RenderTargetIdentifier src) {
+            cmb.SetRenderTarget(rt);
+            _sandbox.AddDrawToCommandBuffer(cmb, mat);
+        }
+
+        private void OnNewDepthFrame(RenderTexture t) {
+            if (!_isNewDepthFrame) return;
+            _isNewDepthFrame = false;
+#if USE_MAT_ASYNC_SET
+            TexturesHelper.ReCreateIfNeed(ref _depth, t.GetPixelsCount());
+            AsyncGPUReadback.RequestIntoNativeArray(ref _depth, _renderDepth.GetTempCopy(), 0, r => {
+                if (!r.hasError) {
+                    ProcessDepthFrame(_depth, t.width, t.height);
+                }
+            });
+#else
+            TexturesHelper.ReCreateIfNeedCompatible(ref _depthTex, t);
+            TexturesHelper.Copy(t, _depthTex);
+            _depth = _depthTex.GetRawTextureData<byte>();
+            ProcessDepthFrame(_depth, t.width, t.height);
+#endif
+        }
+        
+        private void OnNewFrame(DepthBuffer d, MapDepthToCameraBuffer m) {
+            _isNewDepthFrame = true;
+        }
+        
+        private void ProcessDepthFrame(NativeArray<byte> depth, int width, int height) {
+            var screen = new float2(width, height);
+            for (int x = 0; x < width; ++x) {
+                for (int y = 0; y < height; ++y) {
+                    if (depth[x + y * width] > 0) {
+                        Fire(new float2(x, y) / screen);
+                    }
+                }
+            }
+        }
+
+        private void OnCalibrationChanged() {
+            var cam = _cam.GetComponent<SandboxCamera>();
+            if (cam != null) {
+                cam.OnCalibrationChanged();
+                SetSizes(Prefs.Sandbox.ZeroDepth);
+            } else {
+                SetSizes(2f); //for testing
+            }
+        }
+
+        private void SetSizes(float dist) {
+            var verticalSize = MathHelper.IsoscelesTriangleSize(dist, _cam.fieldOfView);
+            var size = verticalSize * _initialBallSize;
+            _tplBalloon.transform.localScale = Vector3.one * size;
+            _borders.AlignToCamera(_cam, dist);
+            _borders.SetWidth(size * 2f);
         }
     }
 }
