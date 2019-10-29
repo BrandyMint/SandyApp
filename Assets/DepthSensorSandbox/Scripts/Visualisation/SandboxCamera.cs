@@ -15,7 +15,7 @@ namespace DepthSensorSandbox.Visualisation {
             Prefs.Calibration.OnChanged -= OnCalibrationChanged;
         }
 
-        private void OnCalibrationChanged() {
+        public void OnCalibrationChanged() {
             transform.localPosition = Prefs.Calibration.Position;
             transform.localRotation = Prefs.Calibration.Rotation;
             _cam.fieldOfView = Prefs.Calibration.Fov;

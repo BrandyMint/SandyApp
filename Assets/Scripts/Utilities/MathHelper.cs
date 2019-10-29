@@ -31,7 +31,7 @@ namespace Utilities {
         // /____|____\
         //      b
         public static float IsoscelesTriangleAngle(float b, float h) {
-            return 180f - 2 * Mathf.Acos(b / 2f / h) * Mathf.Rad2Deg;
+            return 2f * Mathf.Rad2Deg * Mathf.Atan2(b, h * 2f);
         }
         
         //     /a\
@@ -41,7 +41,7 @@ namespace Utilities {
         // /____|____\
         //      b
         public static float IsoscelesTriangleHeight(float b, float a) {
-            return b / 2f / Mathf.Cos((180f - a) * Mathf.Deg2Rad / 2f);
+            return b / 2f / Mathf.Tan( a / 2f * Mathf.Deg2Rad);
         }
         
         //     /a\
@@ -51,7 +51,7 @@ namespace Utilities {
         // /____|____\
         //      b
         public static float IsoscelesTriangleSize(float h, float a) {
-            return  h * 2f * Mathf.Cos((180f - a) * Mathf.Deg2Rad / 2f);
+            return  2f * h * Mathf.Tan( a / 2f * Mathf.Deg2Rad);
         }
         
         public static bool IsConvex(Vector2[] p) {

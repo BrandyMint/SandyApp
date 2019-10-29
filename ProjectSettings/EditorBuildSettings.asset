@@ -17,6 +17,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/GameLunar.unity
     guid: 95eec2e2e043de543bcafdffeaf582ba
+  - enabled: 1
+    path: Assets/Scenes/GameBallons.unity
+    guid: 1f3f3577ad618c74b97992189f561bd4
   - enabled: 0
     path: Assets/Scenes/GameTopography.unity
     guid: 60b867707e6ca30428af1d97d79da4a1

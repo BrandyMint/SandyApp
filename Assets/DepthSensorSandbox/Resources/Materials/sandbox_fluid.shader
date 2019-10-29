@@ -27,5 +27,5 @@ Shader "Sandbox/Fluid" {
             ENDCG
         }
     }    
-    Fallback "Mobile/VertexLit"
+    Fallback "Sandbox"
 }
