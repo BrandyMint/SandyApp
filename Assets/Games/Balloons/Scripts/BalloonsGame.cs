@@ -34,7 +34,6 @@ namespace Games.Balloons {
         private CameraRenderToTexture _renderDepth;
         private NativeArray<byte> _depth;
         private Texture2D _depthTex;
-        private bool _isNewDepthFrame;
         private float _initialBallSize;
 
         private void Start() {
@@ -49,7 +48,6 @@ namespace Games.Balloons {
 
             Balloon.OnDestroyed += OnBalloonDestroyed;
             Balloon.OnCollisionEntered += OnBalloonCollisionEnter;
-            DepthSensorSandboxProcessor.OnNewFrame += OnNewFrame;
             Prefs.Calibration.OnChanged += OnCalibrationChanged;
             Prefs.Sandbox.OnChanged += OnCalibrationChanged;
             OnCalibrationChanged();
@@ -62,7 +60,6 @@ namespace Games.Balloons {
             Prefs.Calibration.OnChanged -= OnCalibrationChanged;
             Balloon.OnCollisionEntered -= OnBalloonCollisionEnter;
             Balloon.OnDestroyed -= OnBalloonDestroyed;
-            DepthSensorSandboxProcessor.OnNewFrame -= OnNewFrame;
             if (_renderDepth != null) {
                 _renderDepth.Disable();
             }
@@ -138,8 +135,6 @@ namespace Games.Balloons {
         }
 
         private void OnNewDepthFrame(RenderTexture t) {
-            if (!_isNewDepthFrame) return;
-            _isNewDepthFrame = false;
 #if USE_MAT_ASYNC_SET
             TexturesHelper.ReCreateIfNeed(ref _depth, t.GetPixelsCount());
             AsyncGPUReadback.RequestIntoNativeArray(ref _depth, _renderDepth.GetTempCopy(), 0, r => {
@@ -153,10 +148,6 @@ namespace Games.Balloons {
             _depth = _depthTex.GetRawTextureData<byte>();
             ProcessDepthFrame(_depth, t.width, t.height);
 #endif
-        }
-        
-        private void OnNewFrame(DepthBuffer d, MapDepthToCameraBuffer m) {
-            _isNewDepthFrame = true;
         }
         
         private void ProcessDepthFrame(NativeArray<byte> depth, int width, int height) {

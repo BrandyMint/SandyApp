@@ -1,4 +1,6 @@
 using System;
+using DepthSensor.Buffer;
+using DepthSensorSandbox;
 using UnityEngine;
 using UnityEngine.Rendering;
 using Utilities;
@@ -16,10 +18,26 @@ namespace DepthSensorCalibration {
         private CreateCommandBuffer _createCommandBuffer;
         private RenderTargetIdentifier _renderSrc;
         private CameraEvent _cameraEvent;
+        
+        private bool _newProcessedFrame;
+        private bool _invokesOnlyOnProcessedFrame;
 
         public delegate void CreateCommandBuffer(CommandBuffer cmb, Material mat, RenderTexture rt, RenderTargetIdentifier src);
 
         public int MaxResolution = 2048;
+
+        public bool InvokesOnlyOnProcessedFrame {
+            get => _invokesOnlyOnProcessedFrame;
+            set {
+                if (_invokesOnlyOnProcessedFrame != value) {
+                    if (value) 
+                        DepthSensorSandboxProcessor.OnNewFrame += OnNewProcessedFrame;
+                    else
+                        DepthSensorSandboxProcessor.OnNewFrame += OnNewProcessedFrame;
+                }
+                _invokesOnlyOnProcessedFrame = value;
+            }
+        }
 
         private void Awake() {
             _cam = GetComponent<Camera>();
@@ -31,6 +49,7 @@ namespace DepthSensorCalibration {
         }
 
         private void OnDestroy() {
+            InvokesOnlyOnProcessedFrame = false;
             DisposeCommandBuffer(ref _commandBuffer, _cameraEvent);
             if (_renderTarget != null) {
                 Destroy(_renderTarget);
@@ -144,8 +163,15 @@ namespace DepthSensorCalibration {
         }
 
         private void OnPostRender() {
-            if (this.enabled)
+            if (this.enabled) {
+                if (InvokesOnlyOnProcessedFrame && !_newProcessedFrame) return;
+                _newProcessedFrame = false;
                 _onNewFrame?.Invoke(_renderTarget);
+            }
+        }
+
+        private void OnNewProcessedFrame(DepthBuffer depth, MapDepthToCameraBuffer map) {
+            _newProcessedFrame = true;
         }
     }
 }
