@@ -51,6 +51,8 @@ MonoBehaviour:
   _maxBallons: 12
   _timeOffsetSpown: 0.1
   _startForce: 5
+  _explosionForceMult: 3
+  _explosionRadiusMult: 3
   _depthHeight: 64
   _sandbox: {fileID: 0}
   _matDepth: {fileID: 2100000, guid: d046492b8d6dc9f4192f245a7510eafb, type: 2}

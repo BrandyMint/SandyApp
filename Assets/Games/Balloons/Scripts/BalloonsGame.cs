@@ -22,6 +22,8 @@ namespace Games.Balloons {
         [SerializeField] private float _maxBallons = 12;
         [SerializeField] private float _timeOffsetSpown = 2f;
         [SerializeField] private float _startForce = 3f;
+        [SerializeField] private float _explosionForceMult = 2f;
+        [SerializeField] private float _explosionRadiusMult = 3f;
         [SerializeField] private int _depthHeight = 64;
         [SerializeField] private SandboxMesh _sandbox;
         [SerializeField] private Material _matDepth;
@@ -118,6 +120,14 @@ namespace Games.Balloons {
                 var balloon = hit.collider.GetComponent<Balloon>();
                 if (balloon != null) {
                     balloon.Bang();
+                    var force = _startForce * _explosionForceMult;
+                    var radius = math.cmax(balloon.transform.lossyScale) * _explosionRadiusMult;
+                    var pos = balloon.transform.position;
+                    foreach (var b in _balloons) {
+                        if (b != balloon) {
+                            b.GetComponent<Rigidbody>().AddExplosionForce(force, pos, radius);
+                        }
+                    }
                 }
             }
         }
