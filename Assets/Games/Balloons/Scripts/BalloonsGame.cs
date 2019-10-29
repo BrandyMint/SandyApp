@@ -4,9 +4,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using DepthSensor.Buffer;
 using DepthSensorCalibration;
-using DepthSensorSandbox;
 using DepthSensorSandbox.Visualisation;
 using Unity.Collections;
 using Unity.Mathematics;
