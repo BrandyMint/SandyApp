@@ -1,10 +1,10 @@
 using System;
 
 namespace DepthSensor.Sensor {
-    public abstract class AbstractSensor : IDisposable {
+    public abstract class AbstractSensor : ISensor, IDisposable {
         public bool Available { get; protected set; } = true;
-        public event Action<AbstractSensor> OnNewFrame;
-        public event Action<AbstractSensor> OnNewFrameBackground;
+        public event Action<ISensor> OnNewFrame;
+        public event Action<ISensor> OnNewFrameBackground;
         
         public bool Active {
             get { return _active; }

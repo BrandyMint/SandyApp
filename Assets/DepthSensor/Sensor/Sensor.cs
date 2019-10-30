@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Assertions;
 
 namespace DepthSensor.Sensor {
-    public class Sensor<T> : AbstractSensor where T : AbstractBuffer {
+    public class Sensor<T> : AbstractSensor, ISensor<T> where T : AbstractBuffer {
         protected T[] _buffers;
         protected int _first;
         

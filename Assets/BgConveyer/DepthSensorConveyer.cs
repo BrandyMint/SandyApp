@@ -7,7 +7,7 @@ using DepthSensor.Sensor;
 namespace BgConveyer {
     public class DepthSensorConveyer : BgConveyer {
         //private Stopwatch watch = Stopwatch.StartNew();
-        public const string TASK_NAME = "WaitNewFrame";  
+        public const string TASK_NAME = "WaitNewFrame";
         private DepthSensorManager _dsm;
         private readonly AutoResetEvent _newFrameEvent = new AutoResetEvent(false);
         public event Action OnNoFrame;
@@ -37,7 +37,7 @@ namespace BgConveyer {
             _dsm.Device.Depth.OnNewFrameBackground += OnNewFrame;
         }
 
-        private void OnNewFrame(AbstractSensor abstractBuffer) {
+        private void OnNewFrame(ISensor abstractBuffer) {
             _newFrameEvent.Set();
         }
         
