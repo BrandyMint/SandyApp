@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: infrared
+  m_Name: red_to_gray
   m_Shader: {fileID: 4800000, guid: ab127fce8c998194592f9696b8346c15, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
