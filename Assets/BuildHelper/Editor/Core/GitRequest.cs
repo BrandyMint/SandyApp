@@ -70,7 +70,7 @@ namespace BuildHelper.Editor.Core {
             ).Execute();
             
             int patch = startPatch;
-            var m = Regex.Match(tags, pattern);
+            var m = Regex.Match(tags, pattern, RegexOptions.Multiline);
             while (m.Success) {
                 if (int.TryParse(m.Groups[1].Value, out int existPatch) && existPatch >= patch) {
                     patch = existPatch + 1;
