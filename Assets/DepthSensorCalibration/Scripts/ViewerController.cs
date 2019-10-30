@@ -12,6 +12,7 @@ namespace DepthSensorCalibration {
         [SerializeField] private RawImage _view;
         [SerializeField] private GameObject _ui;
         [SerializeField] private Mode[] _modes;
+        [SerializeField] private int _minBuffersCount = 3;
 
         public enum Source {
             COLOR,
@@ -76,6 +77,8 @@ namespace DepthSensorCalibration {
                 if (sensor != null) {
                     if (mode != null && mode.source == source) {
                         _view.gameObject.SetActive(false);
+                        if (sensor.BuffersCount < _minBuffersCount)
+                            sensor.BuffersCount = _minBuffersCount;
                         sensor.OnNewFrame += OnNewFrame;
                         sensor.Active = true;
                         _view.material = mode.material;
@@ -104,8 +107,7 @@ namespace DepthSensorCalibration {
                     case Source.DEPTH:
                         return device.Depth;
                     case Source.INFRARED:
-                        //return device.Index
-                        break;
+                        return device.Infrared;
                 }
             }
 

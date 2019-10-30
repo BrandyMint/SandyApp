@@ -58,14 +58,20 @@ namespace DepthSensor.Device {
                 init.kinect = KinectSensor.GetDefault();
                 init.Depth = new SensorDepth(new DepthBuffer( 
                     init.kinect.DepthFrameSource.FrameDescription.Width,
-                    init.kinect.DepthFrameSource.FrameDescription.Height)
-                );
-                init.SensorIndex = new SensorIndex(new IndexBuffer(
+                    init.kinect.DepthFrameSource.FrameDescription.Height
+                ));
+                init.Infrared = new SensorInfrared(new InfraredBuffer( 
+                    init.kinect.InfraredFrameSource.FrameDescription.Width,
+                    init.kinect.InfraredFrameSource.FrameDescription.Height,
+                    init.kinect.InfraredFrameSource.FrameDescription.BytesPerPixel == 2
+                        ? TextureFormat.R16 : TextureFormat.R8
+                ));
+                init.Index = new SensorIndex(new IndexBuffer(
                     init.kinect.BodyIndexFrameSource.FrameDescription.Width,
                     init.kinect.BodyIndexFrameSource.FrameDescription.Height
                 ));
                 var colorDesc = init.kinect.ColorFrameSource.CreateFrameDescription(_COLOR_FORMAT);
-                init.SensorColor = new SensorColor(new ColorBuffer(
+                init.Color = new SensorColor(new ColorBuffer(
                     colorDesc.Width, colorDesc.Height, TextureFormat.RGBA32
                 ));
                 init.Body = new SensorBody(new BodyBuffer(init.kinect.BodyFrameSource.BodyCount));
@@ -101,10 +107,11 @@ namespace DepthSensor.Device {
 
         private void ReActivateSensors() {
             CloseSensors();
-            if (!Depth.Active && !Index.Active && !Body.Active && !Color.Active) 
+            if (!Depth.Active && !Infrared.Active && !Index.Active && !Body.Active && !Color.Active) 
                 return;
             _multiReader = _kinect.OpenMultiSourceFrameReader(
                 (Depth.Active ? FrameSourceTypes.Depth : 0) |
+                (Infrared.Active ? FrameSourceTypes.Infrared : 0) |
                 (Index.Active ? FrameSourceTypes.BodyIndex : 0) | 
                 (Body.Active ? FrameSourceTypes.Body : 0) |
                 (Color.Active ? FrameSourceTypes.Color : 0));
@@ -130,8 +137,9 @@ namespace DepthSensor.Device {
             
             if (frame != null) {
                 using (var body = frame.BodyFrameReference.AcquireFrame())
-                using (var index = frame.BodyIndexFrameReference.AcquireFrame())
+                using (var index = frame.BodyIndexFrameReference.AcquireFrame())    
                 using (var color = frame.ColorFrameReference.AcquireFrame())
+                using (var infrared = frame.InfraredFrameReference.AcquireFrame())
                 using (var depth = frame.DepthFrameReference.AcquireFrame()) {
                     if (body != null) {
                         UpdateBodies(body);
@@ -155,6 +163,13 @@ namespace DepthSensor.Device {
                             Index.GetOldest().SetBytes(buffer.UnderlyingBuffer, buffer.Length);
                         }
                         _internalIndex.OnNewFrameBackground();
+                    }
+                    
+                    if (infrared != null) {
+                        using (var buffer = infrared.LockImageBuffer()) {
+                            Infrared.GetOldest().SetBytes(buffer.UnderlyingBuffer, buffer.Length);
+                        }
+                        _internalInfrared.OnNewFrameBackground();
                     }
 
                     if (_needUpdateMapDepthToColorSpace ||
@@ -208,6 +223,7 @@ namespace DepthSensor.Device {
             while (_pollFramesLoop) {
                 if (_frameArrivedEvent.WaitOne(0)) {
                     if (Depth.Active) _internalDepth.OnNewFrame();
+                    if (Infrared.Active) _internalInfrared.OnNewFrame();
                     if (Index.Active) _internalIndex.OnNewFrame();
                     if (Color.Active) _internalColor.OnNewFrame();
                     if (Body.Active) _internalBody.OnNewFrame();

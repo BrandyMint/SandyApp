@@ -681,6 +681,8 @@ MonoBehaviour:
     material: {fileID: 0}
   - source: 1
     material: {fileID: 2100000, guid: 2ef764c344ee74f43ac8fa3502cb6096, type: 2}
+  - source: 2
+    material: {fileID: 2100000, guid: 0892d01fbd4df454e94c80252f0a7484, type: 2}
 --- !u!1 &1618057602
 GameObject:
   m_ObjectHideFlags: 0

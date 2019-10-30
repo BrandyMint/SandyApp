@@ -18,6 +18,10 @@ namespace DepthSensor.Buffer {
             return data[middle] != 0;
         }
     }
+    
+    public class InfraredBuffer : TextureBuffer<byte> {
+        public InfraredBuffer(int width, int height, TextureFormat format) : base(width, height, format) { }
+    }
 
     public class IndexBuffer : Buffer2D<byte> {
         public IndexBuffer(int width, int height, bool alloc) : base(width, height, alloc) { }
