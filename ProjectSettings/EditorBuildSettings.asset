@@ -44,4 +44,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/DepthSensorCalibration/Scenes/SandboxCalibration.unity
     guid: 240af4b136ffeb74dadd3c08ddb0e01c
+  - enabled: 1
+    path: Assets/DepthSensorCalibration/Scenes/Viewer.unity
+    guid: 7051ca7824fdb0c4dbe76202fa7e82d0
   m_configObjects: {}

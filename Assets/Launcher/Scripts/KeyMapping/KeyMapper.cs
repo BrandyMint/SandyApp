@@ -57,7 +57,7 @@ namespace Launcher.KeyMapping {
             _bindsDown.Add(new KeyBind(KeyCode.F5, KeyEvent.RESET));
             _bindsDown.Add(new KeyBind(KeyCode.F9, KeyEvent.OPEN_SANDBOX_CALIBRATION));
             _bindsDown.Add(new KeyBind(KeyCode.F10, KeyEvent.OPEN_CALIBRATION));
-            _bindsDown.Add(new KeyBind(KeyCode.F11, KeyEvent.OPEN_PROJECTOR_PARAMS));
+            _bindsDown.Add(new KeyBind(KeyCode.F11, KeyEvent.OPEN_VIEWER));
             _bindsDown.Add(new KeyBind(KeyCode.LeftAlt,KeyCode.F12, KeyEvent.FLIP_SANDBOX, "ALT-F12"));
             _bindsDown.Add(new KeyBind(KeyCode.RightAlt,KeyCode.F12, KeyEvent.FLIP_SANDBOX));
             _bindsDown.Add(new KeyBind(KeyCode.F12, KeyEvent.FLIP_DISPLAY));

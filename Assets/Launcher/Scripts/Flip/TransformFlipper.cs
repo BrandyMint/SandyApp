@@ -4,8 +4,8 @@ using Utilities;
 
 namespace Launcher.Flip {
     public class TransformFlipper : MonoBehaviour {
-        private Transform _flip;
-        private Vector3 _initialScale;
+        protected Transform _flip;
+        protected Vector3 _initialScale;
 
         private void Start() {
             _flip = GetComponent<Canvas>() != null ? InitCanvasFlip() : transform;
@@ -39,7 +39,7 @@ namespace Launcher.Flip {
             return flip;
         }
 
-        private void OnAppParamChanged() {
+        protected virtual void OnAppParamChanged() {
             var scale = new float3 {
                 x = Prefs.App.FlipHorizontal ? -1f : 1f,
                 y = Prefs.App.FlipVertical ? -1f : 1f,

@@ -8,7 +8,8 @@ namespace Launcher.UI.Editor {
                 "Main",
                 //"ProjectorParams",
                 "Calibration",
-                "SandboxCalibration"
+                "SandboxCalibration",
+                "CalibrationView"
             }
         };
         

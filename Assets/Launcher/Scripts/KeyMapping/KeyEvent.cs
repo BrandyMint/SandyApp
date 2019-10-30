@@ -2,7 +2,7 @@
     public enum KeyEvent {
         FLIP_DISPLAY,
         FLIP_SANDBOX,
-        OPEN_PROJECTOR_PARAMS,
+        OPEN_VIEWER,
         OPEN_CALIBRATION,
         OPEN_SANDBOX_CALIBRATION,
         RESET,
