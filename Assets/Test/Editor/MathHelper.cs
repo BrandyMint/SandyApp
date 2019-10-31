@@ -71,5 +71,45 @@ namespace Test.Editor {
             var h2 = Utilities.MathHelper.IsoscelesTriangleHeight(b, a);
             Assert.LessOrEqual(Mathf.Abs(h - h2), _ERR);
         }
+        
+        [TestCase(1, 1)]
+        [TestCase(7, 3)]
+        [TestCase(3, 7)]
+        public static void TestRightTriangleAngle(float b, float h) {
+            var a = Utilities.MathHelper.RightTriangleAngle(b, h);
+            AssertRightTriangle(a, b, h);
+        }
+
+        [TestCase(1, 10)]
+        [TestCase(1, 60)]
+        [TestCase(1, 90)]
+        [TestCase(1, 160)]
+        [TestCase(5, 60)]
+        public static void TestRightTriangleHeight(float b, float a) {
+            var h = Utilities.MathHelper.RightTriangleHeight(b, a);
+            AssertRightTriangle(a, b, h);
+        }
+
+        [TestCase(1, 10)]
+        [TestCase(1, 60)]
+        [TestCase(1, 90)]
+        [TestCase(1, 160)]
+        [TestCase(5, 60)]
+        public static void TestRightTriangleSize(float h, float a) {
+            var b = Utilities.MathHelper.RightTriangleSize(h, a);
+            AssertRightTriangle(a, b, h);
+        }
+        
+        //   |\
+        //   |a\
+        //   |  \
+        //  h|   \
+        //   |____\
+        //     b
+        private static void AssertRightTriangle(float a, float b, float h) {
+            float c = Mathf.Sqrt(b * b + h * h);
+            float a2 = Mathf.Acos(h / c) * Mathf.Rad2Deg;
+            Assert.True(Mathf.Abs(a - a2) < _ERR || Mathf.Abs(a + a2 - 180f) < _ERR, $"angles not equals: {a} and {a2}");
+        }
     }
 }
