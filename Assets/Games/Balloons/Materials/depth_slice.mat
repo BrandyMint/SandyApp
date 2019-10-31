@@ -78,7 +78,7 @@ Material:
     - _DepthMountains: 0.5
     - _DepthSea: 0
     - _DepthSeaBottom: -0.4
-    - _DepthSliceOffset: 0.2
+    - _DepthSliceOffset: 0.05
     - _DepthZero: 1.6
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
