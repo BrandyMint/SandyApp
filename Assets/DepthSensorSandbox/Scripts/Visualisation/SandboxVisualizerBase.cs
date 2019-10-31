@@ -12,7 +12,8 @@ namespace DepthSensorSandbox.Visualisation {
         [SerializeField] protected bool _enableOnStart = true;
 
         protected SandboxMesh _sandbox;
-        
+        private SandboxParams _sandboxParams;
+
         protected virtual void Awake() {
             if (_instantiateMaterial)
                 _material = new Material(_material);
@@ -28,26 +29,47 @@ namespace DepthSensorSandbox.Visualisation {
 
         protected virtual void OnDestroy() {
             SetEnable(false);
+            OverrideParamsSource(null);
         }
 
         public virtual void SetEnable(bool enable) {
+            enabled = enable;
             if (enable) {
-                Prefs.Sandbox.OnChanged += OnSandboxParamsChange;
+                SetDefaultParamsSourceIfNeed();   
                 OnSandboxParamsChange();
                 _sandbox.Material = _material;
-            } else {
-                Prefs.Sandbox.OnChanged -= OnSandboxParamsChange;
             }
-            enabled = enable;
+        }
+
+        private void SetDefaultParamsSourceIfNeed() {
+            if (_sandboxParams == null) {
+                OverrideParamsSource(Prefs.Sandbox);
+            }
+        }
+
+        public void OverrideParamsSource(SandboxParams overrideParams) {
+            if (_sandboxParams != null) {
+                _sandboxParams.OnChanged -= OnSandboxParamsChange;
+            }
+            _sandboxParams = overrideParams;
+            if (_sandboxParams != null) {
+                _sandboxParams.OnChanged += OnSandboxParamsChange;
+                OnSandboxParamsChange();
+            }
+        }
+
+        private void OnSandboxParamsChange() {
+            if (enabled)
+                OnSandboxParamsChange(_sandboxParams);
         }
         
-        protected virtual void OnSandboxParamsChange() {
+        protected virtual void OnSandboxParamsChange(SandboxParams sandboxParams) {
             if (_sandbox == null)
                 return;
             var props = _sandbox.PropertyBlock;
-            props.SetFloat(_DEPTH_ZERO, Prefs.Sandbox.ZeroDepth);
-            props.SetFloat(_DEPTH_MIN_OFFSET, Prefs.Sandbox.OffsetMinDepth);
-            props.SetFloat(_DEPTH_MAX_OFFSET, Prefs.Sandbox.OffsetMaxDepth);
+            props.SetFloat(_DEPTH_ZERO, sandboxParams.ZeroDepth);
+            props.SetFloat(_DEPTH_MIN_OFFSET, sandboxParams.OffsetMinDepth);
+            props.SetFloat(_DEPTH_MAX_OFFSET, sandboxParams.OffsetMaxDepth);
             _sandbox.PropertyBlock = props;
         }
     }

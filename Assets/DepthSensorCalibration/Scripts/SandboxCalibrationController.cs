@@ -17,7 +17,6 @@ namespace DepthSensorCalibration {
         [SerializeField] private GameObject[] _uiHide;
         [SerializeField] private Transform _pnlSandboxSettings;
         [SerializeField] private Button _btnSave;
-        [SerializeField] private Button _btnCancel;
         [SerializeField] private Button _btnReset;
         
         [Header("Sandbox")]
@@ -43,7 +42,7 @@ namespace DepthSensorCalibration {
         private NativeArray<ushort> _depth;
         private Texture2D _depthTex;
         
-        private readonly SandboxParams _toSave = new SandboxParams();
+        private readonly SandboxParams _tempSettings = new SandboxParams();
         private float _minClip = float.MinValue;
         private float _maxClip = float.MaxValue;
 
@@ -56,8 +55,11 @@ namespace DepthSensorCalibration {
             _renderDepth.MaxResolution = 64;
             _renderDepth.InvokesOnlyOnProcessedFrame = true;
             _renderDepth.Enable(_matDepth, RenderTextureFormat.R16, OnNewDepthFrame);
+
+            _sandbox.OverrideParamsSource(_tempSettings);
             _sandbox.SetEnable(true);
             
+            Prefs.Sandbox.OnChanged += OnSandboxSettingChanged;
             Prefs.Calibration.OnChanged += OnCalibrationChanged;
             OnCalibrationChanged();
         }
@@ -70,6 +72,7 @@ namespace DepthSensorCalibration {
                 _sandbox.SetEnable(false);
             }
             Prefs.Calibration.OnChanged -= OnCalibrationChanged;
+            Prefs.Sandbox.OnChanged -= OnSandboxSettingChanged;
             if (_depthTex != null) {
                 Destroy(_depthTex);
             } else if (_depth.IsCreated) {
@@ -83,10 +86,9 @@ namespace DepthSensorCalibration {
 #region Buttons
         private void Save() {
             if (IsSaveAllowed()) {
-                Prefs.NotifySaved(_toSave.Save());
+                Prefs.NotifySaved(Prefs.Sandbox.Save());
                 //Scenes.GoBack();
             }
-            Prefs.Sandbox.Load();
         }
         
         private void FixedUpdate() {
@@ -98,11 +100,11 @@ namespace DepthSensorCalibration {
         }
 
         private bool IsSaveAllowed() {
-            return _toSave.HasChanges || !_toSave.HasFile;
+            return Prefs.Sandbox.HasChanges || !Prefs.Sandbox.HasFile;
         }
 
         private void OnBtnReset() {
-            _toSave.Reset();
+            Prefs.Sandbox.Reset();
         }
 
         private void SubscribeKeys() {
@@ -165,37 +167,35 @@ namespace DepthSensorCalibration {
                 ++count;
             }
             mid /= count;
-            Prefs.Sandbox.OffsetMaxDepth = mid - min;
-            Prefs.Sandbox.ZeroDepth = mid;
-            Prefs.Sandbox.OffsetMinDepth = max - mid;
+            _tempSettings.OffsetMaxDepth = mid - min;
+            _tempSettings.ZeroDepth = mid;
+            _tempSettings.OffsetMinDepth = max - mid;
         }
-        
+
         private void SetDepthMax() {
             if (_depthValid) 
-                _toSave.OffsetMaxDepth = Prefs.Sandbox.OffsetMaxDepth;
+                Prefs.Sandbox.OffsetMaxDepth = _tempSettings.OffsetMaxDepth;
         }
 
         private void SetDepthMin() {
             if (_depthValid) 
-                _toSave.OffsetMinDepth = Prefs.Sandbox.OffsetMinDepth;
+                Prefs.Sandbox.OffsetMinDepth = _tempSettings.OffsetMinDepth;
         }
 
         private void SetDepthZero() {
             if (_depthValid) 
-                _toSave.ZeroDepth = Prefs.Sandbox.ZeroDepth;
+                Prefs.Sandbox.ZeroDepth = _tempSettings.ZeroDepth;
         }
 #endregion
 
 #region UI
         private void InitUI() {
-            BtnKeyBind.ShortCut(_btnCancel, KeyEvent.BACK);
             BtnKeyBind.ShortCut(_btnReset, KeyEvent.RESET);
             
             UnityHelper.SetPropsByGameObjects(_sandboxFields, _pnlSandboxSettings);
-            InitShortCutValue(_sandboxFields.OffsetMaxDepth, KeyEvent.SET_DEPTH_MAX, () => _toSave.OffsetMaxDepth);
-            InitShortCutValue(_sandboxFields.ZeroDepth, KeyEvent.SET_DEPTH_ZERO, () => _toSave.ZeroDepth);
-            InitShortCutValue(_sandboxFields.OffsetMinDepth, KeyEvent.SET_DEPTH_MIN, () => _toSave.OffsetMinDepth);
-            _toSave.OnChanged += OnSandboxSettingChanged;
+            InitShortCutValue(_sandboxFields.OffsetMaxDepth, KeyEvent.SET_DEPTH_MAX, () => Prefs.Sandbox.OffsetMaxDepth);
+            InitShortCutValue(_sandboxFields.ZeroDepth, KeyEvent.SET_DEPTH_ZERO, () => Prefs.Sandbox.ZeroDepth);
+            InitShortCutValue(_sandboxFields.OffsetMinDepth, KeyEvent.SET_DEPTH_MIN, () => Prefs.Sandbox.OffsetMinDepth);
             OnSandboxSettingChanged();
         }
 
