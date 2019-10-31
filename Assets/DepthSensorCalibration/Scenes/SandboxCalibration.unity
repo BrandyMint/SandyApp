@@ -907,7 +907,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Text
       value: "\u041A\u0410\u041B\u0418\u0411\u0420\u041E\u0412\u041A\u0410 \u0423\u0420\u041E\u0412\u041D\u042F
-        \u041F\u0415\u0421\u041A\u0410 "
+        \u041F\u0415\u0421\u041A\u0410. Z: "
       objectReference: {fileID: 0}
     - target: {fileID: 1041073166399765455, guid: cfca811c3531f4e469db93a284cb8286,
         type: 3}
@@ -929,6 +929,21 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 508014594}
     m_Modifications:
+    - target: {fileID: 6427224280832922162, guid: 2541ef62fdda8414dad1b798203fcaa6,
+        type: 3}
+      propertyPath: m_Name
+      value: txtZValue
+      objectReference: {fileID: 0}
+    - target: {fileID: 6427224280832922172, guid: 2541ef62fdda8414dad1b798203fcaa6,
+        type: 3}
+      propertyPath: m_Text
+      value: 111
+      objectReference: {fileID: 0}
+    - target: {fileID: 6427224280832922172, guid: 2541ef62fdda8414dad1b798203fcaa6,
+        type: 3}
+      propertyPath: m_FontData.m_MaxSize
+      value: 46
+      objectReference: {fileID: 0}
     - target: {fileID: 6427224280832922163, guid: 2541ef62fdda8414dad1b798203fcaa6,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -1048,21 +1063,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalScale.z
       value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6427224280832922162, guid: 2541ef62fdda8414dad1b798203fcaa6,
-        type: 3}
-      propertyPath: m_Name
-      value: txtZValue
-      objectReference: {fileID: 0}
-    - target: {fileID: 6427224280832922172, guid: 2541ef62fdda8414dad1b798203fcaa6,
-        type: 3}
-      propertyPath: m_Text
-      value: 111
-      objectReference: {fileID: 0}
-    - target: {fileID: 6427224280832922172, guid: 2541ef62fdda8414dad1b798203fcaa6,
-        type: 3}
-      propertyPath: m_FontData.m_MaxSize
-      value: 46
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2541ef62fdda8414dad1b798203fcaa6, type: 3}
@@ -1386,7 +1386,7 @@ PrefabInstance:
     - target: {fileID: 4115853844328034573, guid: 47b88d1c91880224898db2e6f7840296,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 489.99997
+      value: 490
       objectReference: {fileID: 0}
     - target: {fileID: 4115853844328034573, guid: 47b88d1c91880224898db2e6f7840296,
         type: 3}
@@ -1476,18 +1476,6 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 1567314967}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1567314969 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 4115853844328034563, guid: 47b88d1c91880224898db2e6f7840296,
-    type: 3}
-  m_PrefabInstance: {fileID: 1567314967}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1618057602
 GameObject:
   m_ObjectHideFlags: 0
@@ -2021,6 +2009,21 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 508014594}
     m_Modifications:
+    - target: {fileID: 6427224280832922162, guid: 2541ef62fdda8414dad1b798203fcaa6,
+        type: 3}
+      propertyPath: m_Name
+      value: txtZValueSuffix
+      objectReference: {fileID: 0}
+    - target: {fileID: 6427224280832922172, guid: 2541ef62fdda8414dad1b798203fcaa6,
+        type: 3}
+      propertyPath: m_Text
+      value: "\u043C\u043C"
+      objectReference: {fileID: 0}
+    - target: {fileID: 6427224280832922172, guid: 2541ef62fdda8414dad1b798203fcaa6,
+        type: 3}
+      propertyPath: m_FontData.m_MaxSize
+      value: 46
+      objectReference: {fileID: 0}
     - target: {fileID: 6427224280832922163, guid: 2541ef62fdda8414dad1b798203fcaa6,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -2141,21 +2144,6 @@ PrefabInstance:
       propertyPath: m_LocalScale.z
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 6427224280832922162, guid: 2541ef62fdda8414dad1b798203fcaa6,
-        type: 3}
-      propertyPath: m_Name
-      value: txtZValueSuffix
-      objectReference: {fileID: 0}
-    - target: {fileID: 6427224280832922172, guid: 2541ef62fdda8414dad1b798203fcaa6,
-        type: 3}
-      propertyPath: m_Text
-      value: "\u043C\u043C"
-      objectReference: {fileID: 0}
-    - target: {fileID: 6427224280832922172, guid: 2541ef62fdda8414dad1b798203fcaa6,
-        type: 3}
-      propertyPath: m_FontData.m_MaxSize
-      value: 46
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2541ef62fdda8414dad1b798203fcaa6, type: 3}
 --- !u!1 &1941585166
@@ -2253,7 +2241,6 @@ MonoBehaviour:
   - {fileID: 1687568186}
   _pnlSandboxSettings: {fileID: 1687568187}
   _btnSave: {fileID: 402746056}
-  _btnCancel: {fileID: 1567314969}
   _btnReset: {fileID: 1201539444}
   _sandboxCam: {fileID: 507380213}
   _sandbox: {fileID: 507380212}

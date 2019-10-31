@@ -194,7 +194,7 @@ namespace DepthSensorCalibration {
             
             UnityHelper.SetPropsByGameObjects(_sandboxFields, _pnlSandboxSettings);
             InitShortCutValue(_sandboxFields.OffsetMaxDepth, KeyEvent.SET_DEPTH_MAX, () => Prefs.Sandbox.OffsetMaxDepth);
-            InitShortCutValue(_sandboxFields.ZeroDepth, KeyEvent.SET_DEPTH_ZERO, () => Prefs.Sandbox.ZeroDepth);
+            InitShortCutValue(_sandboxFields.ZeroDepth, KeyEvent.SET_DEPTH_ZERO, () => Prefs.Sandbox.ZeroDepth + Prefs.Calibration.Position.z);
             InitShortCutValue(_sandboxFields.OffsetMinDepth, KeyEvent.SET_DEPTH_MIN, () => Prefs.Sandbox.OffsetMinDepth);
             OnSandboxSettingChanged();
         }
@@ -205,7 +205,7 @@ namespace DepthSensorCalibration {
                 scv.txtShortCut.text = key.ShortCut;
             }
 
-            _updateUIValues += () => scv.txtValue.text = (get() * 100).ToString("0.0");
+            _updateUIValues += () => SetTextDistValue(scv.txtValue, get());
         }
 
         private void OnSandboxSettingChanged() {
@@ -213,7 +213,11 @@ namespace DepthSensorCalibration {
         }
 
         private void OnCalibrationChanged() {
-            _txtZValue.text = (Prefs.Calibration.Position.z * 1000f).ToString("F0");
+            SetTextDistValue(_txtZValue, Prefs.Calibration.Position.z);
+        }
+
+        private void SetTextDistValue(Text t, float val) {
+            t.text = (val * 1000f).ToString("F0");
         }
 #endregion
     }
