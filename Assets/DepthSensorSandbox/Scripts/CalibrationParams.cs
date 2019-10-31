@@ -11,7 +11,7 @@ namespace DepthSensorSandbox {
     public class CalibrationParams : SerializableParams {
         [JsonConverter(typeof(JsonPublicFieldsConverter))]
         public Vector3 Position {
-            get => Get(nameof(Position), Vector3.back * 0.6f);
+            get => Get(nameof(Position), new Vector3(0f, Prefs.Projector.Height / 2f, -0.6f));
             set => Set(nameof(Position), value);
         }
 

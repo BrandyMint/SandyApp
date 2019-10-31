@@ -228,7 +228,16 @@ namespace DepthSensorCalibration {
         }
         
         private void OnProjectorChanged() {
-            CameraMoverCalibration.UpdateCalibrationFov(_projector);
+            UpdateCalibrationFov(_projector);
+        }
+        
+        public void UpdateCalibrationFov(ProjectorParams projector) {
+            /*var aspect = projector.Width / projector.Height;
+            var s = projector.Diagonal;
+            var d = projector.Distance;
+            var h = s / Mathf.Sqrt((aspect * aspect + 1f));
+            var fov = MathHelper.IsoscelesTriangleAngle(h, d);
+            Prefs.Calibration.Fov = fov;*/
         }
 
         private void OnCalibrationChanged() {

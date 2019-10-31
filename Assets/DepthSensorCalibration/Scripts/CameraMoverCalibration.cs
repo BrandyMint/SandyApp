@@ -7,16 +7,16 @@ namespace DepthSensorCalibration {
         private const float _INC_DEC_STEPS = 0.01f;
         private const float _Z_MULTIPLE_STEP = 3f;
 
-        private readonly ProjectorParams _projector = new ProjectorParams();
-
         private enum Direct {
             X = 0,
             Y = 1,
             Z = 2
         }
 
+        private bool _mayUpdateFov = true;
+
         private void Start() {
-            _projector.OnChanged += OnProjectorChanged;
+            Prefs.Projector.OnChanged += OnProjectorChanged;
             Prefs.Calibration.OnChanged += OnCalibrationChanged;
             OnProjectorChanged();
             OnCalibrationChanged();
@@ -25,7 +25,7 @@ namespace DepthSensorCalibration {
         }
 
         private void OnDestroy() {
-            _projector.OnChanged -= OnProjectorChanged;
+            Prefs.Projector.OnChanged -= OnProjectorChanged;
             Prefs.Calibration.OnChanged -= OnCalibrationChanged;
             UnSubscribeKeys();
             Save();
@@ -57,8 +57,8 @@ namespace DepthSensorCalibration {
             KeyMapper.AddListener(KeyEvent.UP, MoveUp);
             KeyMapper.AddListener(KeyEvent.ZOOM_IN, MoveForward);
             KeyMapper.AddListener(KeyEvent.ZOOM_OUT, MoveBackward);
-            KeyMapper.AddListener(KeyEvent.WIDE_PLUS, WidePlus);
-            KeyMapper.AddListener(KeyEvent.WIDE_MINUS, WideMinus);
+            /*KeyMapper.AddListener(KeyEvent.WIDE_PLUS, WidePlus);
+            KeyMapper.AddListener(KeyEvent.WIDE_MINUS, WideMinus);*/
         }
 
         private void UnSubscribeKeys() {
@@ -69,8 +69,8 @@ namespace DepthSensorCalibration {
             KeyMapper.RemoveListener(KeyEvent.UP, MoveUp);
             KeyMapper.RemoveListener(KeyEvent.ZOOM_IN, MoveForward);
             KeyMapper.RemoveListener(KeyEvent.ZOOM_OUT, MoveBackward);
-            KeyMapper.RemoveListener(KeyEvent.WIDE_PLUS, WidePlus);
-            KeyMapper.RemoveListener(KeyEvent.WIDE_MINUS, WideMinus);
+            /*KeyMapper.RemoveListener(KeyEvent.WIDE_PLUS, WidePlus);
+            KeyMapper.RemoveListener(KeyEvent.WIDE_MINUS, WideMinus);*/
         }
 
         private void MovePosition(Direct direct, float k) {
@@ -111,31 +111,33 @@ namespace DepthSensorCalibration {
             MovePosition(Direct.Z, -1f);
         }
         
-        private void WideMinus() {
+        /*private void WideMinus() {
             ModifyWide(-1f);
         }
 
         private void WidePlus() {
             ModifyWide(1f);
-        }
+        }*/
 
 #endregion 
 
-        public static void UpdateCalibrationFov(ProjectorParams projector) {
-            return;
-            //TODO: No need with ProjectorCalibration2
-            var aspect = projector.Width / projector.Height;
-            var s = projector.Diagonal;
-            var d = projector.Distance;
-            var h = s / Mathf.Sqrt((aspect * aspect + 1f));
-            var fov = MathHelper.IsoscelesTriangleAngle(h, d);
-            Prefs.Calibration.Fov = fov;
+        public void UpdateCalibrationFov(ProjectorParams projector) {
+            _mayUpdateFov = false;
+            if (projector.DistanceToSensor > 0f) {
+                var h = projector.DistanceToSensor - Prefs.Calibration.Position.z;
+                Prefs.Calibration.Fov = MathHelper.RightTriangleAngle(projector.Height, h);
+            }
+            _mayUpdateFov = true;
         }
 
         private void OnProjectorChanged() {
-            UpdateCalibrationFov(_projector);
+            if (_mayUpdateFov)
+                UpdateCalibrationFov(Prefs.Projector);
         }
 
-        private void OnCalibrationChanged() { }
+        private void OnCalibrationChanged() {
+            if (_mayUpdateFov)
+                UpdateCalibrationFov(Prefs.Projector);
+        }
     }
 }

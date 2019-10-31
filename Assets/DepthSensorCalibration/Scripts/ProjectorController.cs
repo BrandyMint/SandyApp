@@ -45,8 +45,8 @@ namespace DepthSensorCalibration {
             KeyMapper.AddListener(KeyEvent.RESET, OnBtnReset);
             
             UnityHelper.SetPropsByGameObjects(_projectorFields, _pnlProjectorParams);
-            InitField(_projectorFields.Dist, val => _projector.Distance = val);
-            InitField(_projectorFields.Diag, val => _projector.Diagonal = val);
+            //InitField(_projectorFields.Dist, val => _projector.Distance = val);
+            //InitField(_projectorFields.Diag, val => _projector.Diagonal = val);
             InitField(_projectorFields.Width, val => _projector.Width = val);
             InitField(_projectorFields.Height, val => _projector.Height = val);
             _projector.OnChanged += OnProjectorChanged;
@@ -56,8 +56,8 @@ namespace DepthSensorCalibration {
         private void OnProjectorChanged() {
             if (_setUIOnChange) {
                 _updatePrefFromUI = false;
-                SetUIFromPrefs(_projectorFields.Dist, _projector.Distance);
-                SetUIFromPrefs(_projectorFields.Diag, _projector.Diagonal);
+                //SetUIFromPrefs(_projectorFields.Dist, _projector.Distance);
+                //SetUIFromPrefs(_projectorFields.Diag, _projector.Diagonal);
                 SetUIFromPrefs(_projectorFields.Width, _projector.Width);
                 SetUIFromPrefs(_projectorFields.Height, _projector.Height);
                 _updatePrefFromUI = true;

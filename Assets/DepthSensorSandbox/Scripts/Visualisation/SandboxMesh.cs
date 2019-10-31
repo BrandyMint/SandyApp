@@ -139,11 +139,15 @@ namespace DepthSensorSandbox.Visualisation {
         private void OnDepthDataCPU(DepthBuffer depth, MapDepthToCameraBuffer mapToCamera) {
             ReInitMeshIfNeed(depth.width, depth.height, depth.data.Length);
             Parallel.For(0, depth.data.Length, i => {
-                var xy = mapToCamera.data[i];
-                var ud = depth.data[i];
-                var d = ud != 0 ? (float) ud / 1000f : float.NaN;
-                _vert[i] = new Vector3(xy.x * d, xy.y * d, d);
+                _vert[i] = PointDepthToVector3(depth, mapToCamera, i);
             });
+        }
+
+        public static Vector3 PointDepthToVector3(DepthBuffer depth, MapDepthToCameraBuffer mapToCamera, int i) {
+            var xy = mapToCamera.data[i];
+            var ud = depth.data[i];
+            var d = ud != 0 ? (float) ud / 1000f : float.NaN;
+            return new Vector3(xy.x * d, xy.y * d, d);
         }
 
         private void OnNewFrameCPU(DepthBuffer depth, MapDepthToCameraBuffer mapToCamera) {
