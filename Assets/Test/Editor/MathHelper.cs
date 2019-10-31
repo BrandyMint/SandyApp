@@ -39,7 +39,7 @@ namespace Test.Editor {
             }
         }
 
-        private const float _ERR = 0.00001f;
+        private const float _ERR = 0.0001f;
         [TestCase(1, 1)]
         [TestCase(7, 3)]
         [TestCase(3, 7)]
