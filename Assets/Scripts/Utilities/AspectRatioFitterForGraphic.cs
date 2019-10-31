@@ -11,7 +11,8 @@ namespace Utilities {
 
         public void UpdateFit() {
             var tex = GetComponent<MaskableGraphic>().mainTexture;
-            aspectRatio = (float) tex.width / tex.height;
+            if (tex != null)
+                aspectRatio = (float) tex.width / tex.height;
         }
 
 #if UNITY_EDITOR
