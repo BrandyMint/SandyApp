@@ -1,4 +1,4 @@
-﻿using Games.Common;
+using Games.Common;
 using Launcher.KeyMapping;
 using UnityEngine;
 using UnityEngine.UI;
@@ -50,8 +50,6 @@ namespace DepthSensorCalibration {
             InitField(_projectorFields.Y, KeyEvent.UP, KeyEvent.DOWN);
             
             KeyMapper.AddListener(KeyEvent.RESET, OnBtnReset);
-            /*KeyMapper.AddListener(KeyEvent.ANGLE_INC, OnAngleIncrease);
-            KeyMapper.AddListener(KeyEvent.ANGLE_DEC, OnAngleDecrease);*/
             Prefs.Calibration.OnChanged += OnCalibrationChanged;
             Prefs.Projector.OnChanged += OnCalibrationChanged;
             OnCalibrationChanged();
@@ -64,28 +62,10 @@ namespace DepthSensorCalibration {
                 _sampler.OnDistReceive -= OnDistReceive;
                 _sampler.OnSampleAreaPoints -= ShowSampleArea;
             }
-            /*KeyMapper.RemoveListener(KeyEvent.ANGLE_INC, OnAngleIncrease);
-            KeyMapper.RemoveListener(KeyEvent.ANGLE_DEC, OnAngleDecrease);*/
             Prefs.Calibration.OnChanged -= OnCalibrationChanged;
             Prefs.Projector.OnChanged -= OnCalibrationChanged;
             Save();
         }
-        
-        /*private void ModifyAngle(float k) {
-            var angle = Prefs.Calibration.Fov;
-            var speed = Mathf.Lerp(_INC_DEC_STEPS, _INC_DEC_STEPS * 10, Mathf.InverseLerp(25, 70, angle));
-            angle += k * speed * Time.deltaTime;
-            angle = Mathf.Clamp(angle, 5, 170);
-            Prefs.Calibration.Fov = angle;
-        }
-
-        private void OnAngleIncrease() {
-            ModifyAngle(1f);
-        }
-        
-        private void OnAngleDecrease() {
-            ModifyAngle(-1f);
-        }*/
 
         private void Save() {
             if (IsSaveAllowed()) {
