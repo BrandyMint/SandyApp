@@ -1,11 +1,7 @@
-﻿#if USE_MAT_ASYNC_SET
-    using AsyncGPUReadbackPluginNs;
-#endif
-using System;
+﻿using System;
 using DepthSensorSandbox;
 using DepthSensorSandbox.Visualisation;
 using Launcher.KeyMapping;
-using Unity.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using Utilities;
@@ -17,7 +13,6 @@ namespace DepthSensorCalibration {
         [SerializeField] private GameObject[] _uiHide;
         [SerializeField] private Transform _pnlSandboxSettings;
         [SerializeField] private Button _btnSave;
-        [SerializeField] private Button _btnCancel;
         [SerializeField] private Button _btnReset;
         
         [Header("Sandbox")]
@@ -40,12 +35,12 @@ namespace DepthSensorCalibration {
         
         private CameraRenderToTexture _renderDepth;
         private bool _depthValid;
-        private NativeArray<ushort> _depth;
-        private Texture2D _depthTex;
+        private readonly DelayedDisposeNativeArray<ushort> _depth = new DelayedDisposeNativeArray<ushort>();
         
-        private readonly SandboxParams _toSave = new SandboxParams();
+        private readonly SandboxParams _tempSettings = new SandboxParams();
         private float _minClip = float.MinValue;
         private float _maxClip = float.MaxValue;
+        private bool _onDestroyed;
 
         private void Start() {
             InitUI();
@@ -56,13 +51,17 @@ namespace DepthSensorCalibration {
             _renderDepth.MaxResolution = 64;
             _renderDepth.InvokesOnlyOnProcessedFrame = true;
             _renderDepth.Enable(_matDepth, RenderTextureFormat.R16, OnNewDepthFrame);
+
+            _sandbox.OverrideParamsSource(_tempSettings);
             _sandbox.SetEnable(true);
             
+            Prefs.Sandbox.OnChanged += OnSandboxSettingChanged;
             Prefs.Calibration.OnChanged += OnCalibrationChanged;
             OnCalibrationChanged();
         }
 
         private void OnDestroy() {
+            _onDestroyed = true;
             if (_renderDepth != null) {
                 _renderDepth.Disable();
             }
@@ -70,11 +69,8 @@ namespace DepthSensorCalibration {
                 _sandbox.SetEnable(false);
             }
             Prefs.Calibration.OnChanged -= OnCalibrationChanged;
-            if (_depthTex != null) {
-                Destroy(_depthTex);
-            } else if (_depth.IsCreated) {
-                _depth.Dispose();
-            }
+            Prefs.Sandbox.OnChanged -= OnSandboxSettingChanged;
+            _depth.Dispose();
 
             UnSubscribeKeys();
             Save();
@@ -83,10 +79,9 @@ namespace DepthSensorCalibration {
 #region Buttons
         private void Save() {
             if (IsSaveAllowed()) {
-                Prefs.NotifySaved(_toSave.Save());
+                Prefs.NotifySaved(Prefs.Sandbox.Save());
                 //Scenes.GoBack();
             }
-            Prefs.Sandbox.Load();
         }
         
         private void FixedUpdate() {
@@ -98,11 +93,11 @@ namespace DepthSensorCalibration {
         }
 
         private bool IsSaveAllowed() {
-            return _toSave.HasChanges || !_toSave.HasFile;
+            return Prefs.Sandbox.HasChanges || !Prefs.Sandbox.HasFile;
         }
 
         private void OnBtnReset() {
-            _toSave.Reset();
+            Prefs.Sandbox.Reset();
         }
 
         private void SubscribeKeys() {
@@ -130,29 +125,15 @@ namespace DepthSensorCalibration {
 
 #region Calculate Depth
         private void OnNewDepthFrame(RenderTexture t) {
-#if USE_MAT_ASYNC_SET
-            TexturesHelper.ReCreateIfNeed(ref _depth, t.GetPixelsCount());
-            AsyncGPUReadback.RequestIntoNativeArray(ref _depth, _renderDepth.GetTempCopy(), 0, r => {
-                if (!r.hasError) {
-                    ProcessDepthFrame(_depth);
-                    _depthValid = true;
-                }
-            });
-#else
-            TexturesHelper.ReCreateIfNeedCompatible(ref _depthTex, t);
-            TexturesHelper.Copy(t, _depthTex);
-            _depth = _depthTex.GetRawTextureData<ushort>();
-            ProcessDepthFrame(_depth);
-            _depthValid = true;
-#endif
+            _renderDepth.RequestData(_depth, ProcessDepthFrame);
         }
 
-        private void ProcessDepthFrame(NativeArray<ushort> depth) {
+        private void ProcessDepthFrame() {
             var min = float.MaxValue;
             var max = float.MinValue;
             var mid = 0f;
             var count = 0;
-            foreach (var ushortDepth in depth) {
+            foreach (var ushortDepth in _depth.o) {
                 var d = (float)ushortDepth / 1000f;
                 if (d < _minClip) continue;
                 
@@ -165,37 +146,36 @@ namespace DepthSensorCalibration {
                 ++count;
             }
             mid /= count;
-            Prefs.Sandbox.OffsetMaxDepth = mid - min;
-            Prefs.Sandbox.ZeroDepth = mid;
-            Prefs.Sandbox.OffsetMinDepth = max - mid;
+            _tempSettings.OffsetMaxDepth = mid - min;
+            _tempSettings.ZeroDepth = mid;
+            _tempSettings.OffsetMinDepth = max - mid;
+            _depthValid = true;
         }
-        
+
         private void SetDepthMax() {
             if (_depthValid) 
-                _toSave.OffsetMaxDepth = Prefs.Sandbox.OffsetMaxDepth;
+                Prefs.Sandbox.OffsetMaxDepth = _tempSettings.OffsetMaxDepth;
         }
 
         private void SetDepthMin() {
             if (_depthValid) 
-                _toSave.OffsetMinDepth = Prefs.Sandbox.OffsetMinDepth;
+                Prefs.Sandbox.OffsetMinDepth = _tempSettings.OffsetMinDepth;
         }
 
         private void SetDepthZero() {
             if (_depthValid) 
-                _toSave.ZeroDepth = Prefs.Sandbox.ZeroDepth;
+                Prefs.Sandbox.ZeroDepth = _tempSettings.ZeroDepth;
         }
 #endregion
 
 #region UI
         private void InitUI() {
-            BtnKeyBind.ShortCut(_btnCancel, KeyEvent.BACK);
             BtnKeyBind.ShortCut(_btnReset, KeyEvent.RESET);
             
             UnityHelper.SetPropsByGameObjects(_sandboxFields, _pnlSandboxSettings);
-            InitShortCutValue(_sandboxFields.OffsetMaxDepth, KeyEvent.SET_DEPTH_MAX, () => _toSave.OffsetMaxDepth);
-            InitShortCutValue(_sandboxFields.ZeroDepth, KeyEvent.SET_DEPTH_ZERO, () => _toSave.ZeroDepth);
-            InitShortCutValue(_sandboxFields.OffsetMinDepth, KeyEvent.SET_DEPTH_MIN, () => _toSave.OffsetMinDepth);
-            _toSave.OnChanged += OnSandboxSettingChanged;
+            InitShortCutValue(_sandboxFields.OffsetMaxDepth, KeyEvent.SET_DEPTH_MAX, () => Prefs.Sandbox.OffsetMaxDepth);
+            InitShortCutValue(_sandboxFields.ZeroDepth, KeyEvent.SET_DEPTH_ZERO, () => Prefs.Sandbox.ZeroDepth + Prefs.Calibration.Position.z);
+            InitShortCutValue(_sandboxFields.OffsetMinDepth, KeyEvent.SET_DEPTH_MIN, () => Prefs.Sandbox.OffsetMinDepth);
             OnSandboxSettingChanged();
         }
 
@@ -205,7 +185,7 @@ namespace DepthSensorCalibration {
                 scv.txtShortCut.text = key.ShortCut;
             }
 
-            _updateUIValues += () => scv.txtValue.text = (get() * 100).ToString("0.0");
+            _updateUIValues += () => SetTextDistValue(scv.txtValue, get());
         }
 
         private void OnSandboxSettingChanged() {
@@ -213,7 +193,11 @@ namespace DepthSensorCalibration {
         }
 
         private void OnCalibrationChanged() {
-            _txtZValue.text = (Prefs.Calibration.Position.z * 1000f).ToString("F0");
+            SetTextDistValue(_txtZValue, Prefs.Calibration.Position.z);
+        }
+
+        private void SetTextDistValue(Text t, float val) {
+            t.text = (val * 1000f).ToString("F0");
         }
 #endregion
     }

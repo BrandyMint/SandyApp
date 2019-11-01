@@ -7,7 +7,7 @@ Shader "Unlit/DepthMap"
         Tags { "RenderType"="Opaque" }
         
 		Lighting Off
-		Cull Off ZWrite Off ZTest Always
+		Cull Off ZWrite Off ZTest Off
 		//Blend One OneMinusSrcAlpha
 
         Pass {

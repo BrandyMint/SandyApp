@@ -1,6 +1,6 @@
 ﻿Shader "Sandbox/Game/DepthSlice" {
     Properties {
-        _DepthSliceOffset ("Depth Slice", Float) = 0.2
+        _DepthSliceOffset ("Depth Slice", Float) = 0.05
         
         _DepthZero ("Depth Zero", Float) = 2
         _DepthMinOffset ("Depth Min Offset", Float) = 0.5
