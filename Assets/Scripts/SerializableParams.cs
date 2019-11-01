@@ -77,11 +77,18 @@ public abstract class SerializableParams {
     public void Reset() {
         _forceResetOnGet = true;
         _invokeChangedOnSetting = false;
+        _isLoaded = true;
         var json = JsonConvert.SerializeObject(this, Formatting.None);
         JsonConvert.PopulateObject(json, this);
         _invokeChangedOnSetting = true;
         _forceResetOnGet = false;
         InvokeChanged();
+    }
+
+    public static T Default<T>() where T: SerializableParams, new() {
+        var p = new T();
+        p.Reset();
+        return p;
     }
 
     protected virtual void Set(string paramName, object val) {
