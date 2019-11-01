@@ -26,11 +26,6 @@ namespace DepthSensorSandbox {
             set => Set(nameof(Fov), value);
         }
         
-        public float WideMultiply {
-            get => Get(nameof(WideMultiply), 1f);
-            set => Set(nameof(WideMultiply), value);
-        }
-        
         public float SensorSwitchingViewTimer {
             get => Get(nameof(SensorSwitchingViewTimer), 1f);
             set => Set(nameof(SensorSwitchingViewTimer), value);

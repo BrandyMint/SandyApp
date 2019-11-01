@@ -1,4 +1,4 @@
-using Games.Common;
+﻿using Games.Common;
 using Launcher.KeyMapping;
 using UnityEngine;
 using UnityEngine.UI;
@@ -23,7 +23,6 @@ namespace DepthSensorCalibration {
         private class ProjectorFields {
             public Field Angel { get; set; }
             public Field SensorDist { get; set; }
-            public Field Wide { get; set; }
             public Field Z { get; set; }
             public Field X { get; set; }
             public Field Y { get; set; }
@@ -44,7 +43,6 @@ namespace DepthSensorCalibration {
             UnityHelper.SetPropsByGameObjects(_projectorFields, _pnlProjectorParams);
             InitField(_projectorFields.Angel);
             InitField(_projectorFields.SensorDist, KeyEvent.SET_DEPTH_ZERO);
-            InitField(_projectorFields.Wide, KeyEvent.WIDE_MINUS, KeyEvent.WIDE_PLUS);
             InitField(_projectorFields.Z, KeyEvent.ZOOM_OUT, KeyEvent.ZOOM_IN);
             InitField(_projectorFields.X, KeyEvent.LEFT, KeyEvent.RIGHT);
             InitField(_projectorFields.Y, KeyEvent.UP, KeyEvent.DOWN);
@@ -101,7 +99,6 @@ namespace DepthSensorCalibration {
 
         private void OnCalibrationChanged() {
             _projectorFields.Angel.txtValue.text = Prefs.Calibration.Fov.ToString("F2");
-            _projectorFields.Wide.txtValue.text = Prefs.Calibration.WideMultiply.ToString("F4");
             var sensorDist = Prefs.Projector.DistanceToSensor > 0f ? Prefs.Projector.DistanceToSensor : 0f; 
             SetPositionValue(_projectorFields.SensorDist, sensorDist);
             SetPositionValue(_projectorFields.Z, sensorDist - Prefs.Calibration.Position.z);
