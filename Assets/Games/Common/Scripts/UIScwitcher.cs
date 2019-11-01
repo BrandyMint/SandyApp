@@ -5,6 +5,9 @@ namespace Games.Common {
     public class UIScwitcher : MonoBehaviour {
         [SerializeField] private GameObject _ui;
         [SerializeField] private bool _hideOnStart = true;
+        
+        private bool _allowShow = true;
+        private bool _userShow = true;
 
         private void Start() {
             KeyMapper.AddListener(KeyEvent.SHOW_UI, SwitchUI);
@@ -17,7 +20,20 @@ namespace Games.Common {
         }
 
         private void SwitchUI() {
-            _ui.SetActive(!_ui.activeSelf);
+            _userShow = !_userShow;
+            UpdateShowUI();
+        }
+
+        private void UpdateShowUI() {
+            _ui.SetActive(_allowShow && _userShow);
+        }
+
+        public bool AllowShow {
+            get => _allowShow;
+            set {
+                _allowShow = value;
+                UpdateShowUI();
+            }
         }
     }
 }

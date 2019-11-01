@@ -193,7 +193,8 @@ namespace DepthSensorCalibration {
         }
 
         private void OnCalibrationChanged() {
-            SetTextDistValue(_txtZValue, Prefs.Calibration.Position.z);
+            var sensorDist = Prefs.Projector.DistanceToSensor > 0f ? Prefs.Projector.DistanceToSensor : 0f; 
+            SetTextDistValue(_txtZValue, sensorDist - Prefs.Calibration.Position.z);
         }
 
         private void SetTextDistValue(Text t, float val) {

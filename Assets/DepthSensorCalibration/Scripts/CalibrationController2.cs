@@ -1,54 +1,44 @@
 ﻿using System.Collections;
-using Launcher.KeyMapping;
+using DepthSensorSandbox.Visualisation;
 using UnityEngine;
 
 namespace DepthSensorCalibration {
     public class CalibrationController2 : MonoBehaviour {
         [SerializeField] private FrameFromCamera _imgSandbox;
-        [SerializeField] private SensorDistSampler _sampler;
-        [SerializeField] private LineRenderer _lineArea;
+        [SerializeField] private SandboxVisualizerColor _sandbox;
 
         private float _timer = 0.5f;
 
         private void Start() {
-            _imgSandbox.gameObject.SetActive(false);
             _timer = Prefs.Calibration.SensorSwitchingViewTimer;
-            StartCoroutine(SwitchingView());
-            
-            _lineArea.gameObject.SetActive(false);
-            _sampler.OnDistReceive += OnDistReceive;
-            _sampler.OnSampleAreaPoints += ShowSampleArea;
-            KeyMapper.AddListener(KeyEvent.SET_DEPTH_ZERO, SampleSensorDist);
+            _imgSandbox.AutoTakeFrame = true;
+            Resume();
         }
 
         private void OnDestroy() {
             StopAllCoroutines();
-
-            KeyMapper.RemoveListener(KeyEvent.SET_DEPTH_ZERO, SampleSensorDist);
-            if (_sampler != null) {
-                _sampler.OnDistReceive -= OnDistReceive;
-                _sampler.OnSampleAreaPoints -= ShowSampleArea;
-            }
         }
 
         private IEnumerator SwitchingView() {
             while (true) {
                 yield return new WaitForSecondsRealtime(_timer);
-                _imgSandbox.gameObject.SetActive(!_imgSandbox.gameObject.activeSelf);
-                _imgSandbox.TakeFrame();
+                ShowSandbox(!_imgSandbox.gameObject.activeSelf);
             }
         }
-        
-        private void SampleSensorDist() {
-            
+
+        private void ShowSandbox(bool show) {
+            show = _sandbox.FreezeColor = show;
+            _imgSandbox.gameObject.SetActive(show);
         }
-        
-        private void OnDistReceive(float obj) {
-            
+
+        public void Pause() {
+            StopCoroutine(nameof(SwitchingView));
+            ShowSandbox(true);
         }
-        
-        private void ShowSampleArea(Vector3[] obj) {
-            
+
+        public void Resume() {
+            ShowSandbox(false);
+            StartCoroutine(nameof(SwitchingView));
         }
     }
 }

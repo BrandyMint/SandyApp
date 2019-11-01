@@ -1,4 +1,5 @@
-﻿using Launcher.KeyMapping;
+﻿using DepthSensorSandbox;
+using Launcher.KeyMapping;
 using UnityEngine;
 using Utilities;
 
@@ -46,7 +47,6 @@ namespace DepthSensorCalibration {
 
         private void OnBtnReset() {
             Prefs.Calibration.Reset();
-            OnProjectorChanged();
         }
 
         private void SubscribeKeys() {
@@ -57,8 +57,8 @@ namespace DepthSensorCalibration {
             KeyMapper.AddListener(KeyEvent.UP, MoveUp);
             KeyMapper.AddListener(KeyEvent.ZOOM_IN, MoveForward);
             KeyMapper.AddListener(KeyEvent.ZOOM_OUT, MoveBackward);
-            /*KeyMapper.AddListener(KeyEvent.WIDE_PLUS, WidePlus);
-            KeyMapper.AddListener(KeyEvent.WIDE_MINUS, WideMinus);*/
+            KeyMapper.AddListener(KeyEvent.WIDE_PLUS, WidePlus);
+            KeyMapper.AddListener(KeyEvent.WIDE_MINUS, WideMinus);
         }
 
         private void UnSubscribeKeys() {
@@ -69,8 +69,8 @@ namespace DepthSensorCalibration {
             KeyMapper.RemoveListener(KeyEvent.UP, MoveUp);
             KeyMapper.RemoveListener(KeyEvent.ZOOM_IN, MoveForward);
             KeyMapper.RemoveListener(KeyEvent.ZOOM_OUT, MoveBackward);
-            /*KeyMapper.RemoveListener(KeyEvent.WIDE_PLUS, WidePlus);
-            KeyMapper.RemoveListener(KeyEvent.WIDE_MINUS, WideMinus);*/
+            KeyMapper.RemoveListener(KeyEvent.WIDE_PLUS, WidePlus);
+            KeyMapper.RemoveListener(KeyEvent.WIDE_MINUS, WideMinus);
         }
 
         private void MovePosition(Direct direct, float k) {
@@ -111,13 +111,13 @@ namespace DepthSensorCalibration {
             MovePosition(Direct.Z, -1f);
         }
         
-        /*private void WideMinus() {
+        private void WideMinus() {
             ModifyWide(-1f);
         }
 
         private void WidePlus() {
             ModifyWide(1f);
-        }*/
+        }
 
 #endregion 
 
@@ -125,7 +125,9 @@ namespace DepthSensorCalibration {
             _mayUpdateFov = false;
             if (projector.DistanceToSensor > 0f) {
                 var h = projector.DistanceToSensor - Prefs.Calibration.Position.z;
-                Prefs.Calibration.Fov = MathHelper.RightTriangleAngle(projector.Height, h);
+                Prefs.Calibration.Fov = MathHelper.IsoscelesTriangleAngle(projector.Height, h);
+            } else {
+                Prefs.Calibration.Fov = SerializableParams.Default<CalibrationParams>().Fov;
             }
             _mayUpdateFov = true;
         }
