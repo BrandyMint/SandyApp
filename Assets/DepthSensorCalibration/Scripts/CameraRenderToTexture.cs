@@ -1,6 +1,10 @@
+#if USE_MAT_ASYNC_SET
+    using AsyncGPUReadback = AsyncGPUReadbackPluginNs.AsyncGPUReadback;
+#endif
 using System;
 using DepthSensor.Buffer;
 using DepthSensorSandbox;
+using Unity.Collections;
 using UnityEngine;
 using UnityEngine.Rendering;
 using Utilities;
@@ -9,8 +13,6 @@ namespace DepthSensorCalibration {
     [RequireComponent(typeof(Camera))]
     public class CameraRenderToTexture : MonoBehaviour {
         private Camera _cam;
-        private RenderTexture _renderTarget;
-        private RenderTexture _tempCopy;
         private CommandBuffer _commandBuffer;
         private Material _mat;
         private RenderTextureFormat _format;
@@ -18,9 +20,12 @@ namespace DepthSensorCalibration {
         private CreateCommandBuffer _createCommandBuffer;
         private RenderTargetIdentifier _renderSrc;
         private CameraEvent _cameraEvent;
+        private Texture2D _tempTex;
+        private readonly DelayedDisposeRenderTexture _renderTarget = new DelayedDisposeRenderTexture();
         
         private bool _newProcessedFrame;
         private bool _invokesOnlyOnProcessedFrame;
+        private bool _cmdBufferAdded;
 
         public delegate void CreateCommandBuffer(CommandBuffer cmb, Material mat, RenderTexture rt, RenderTargetIdentifier src);
 
@@ -44,19 +49,12 @@ namespace DepthSensorCalibration {
             enabled = false;
         }
 
-        private void Start() {
-            //_cam.depthTextureMode = DepthTextureMode.Depth;
-        }
-
         private void OnDestroy() {
             InvokesOnlyOnProcessedFrame = false;
-            DisposeCommandBuffer(ref _commandBuffer, _cameraEvent);
-            if (_renderTarget != null) {
-                Destroy(_renderTarget);
-            }
-            if (_tempCopy != null) {
-                Destroy(_tempCopy);
-            }
+            DisposeCommandBuffer();
+            _renderTarget.Dispose();
+            if (_tempTex != null)
+                Destroy(_tempTex);
         }
 
         private static void CreateCommandBufferBlit(
@@ -69,26 +67,45 @@ namespace DepthSensorCalibration {
             }
         }
 
-        private void DisposeCommandBuffer(ref CommandBuffer cmb, CameraEvent ev) {
-            if (cmb != null) {
-                _cam.RemoveCommandBuffer(ev, cmb);
-                cmb.Dispose();
-                cmb = null;
+        private void DisposeCommandBuffer() {
+            RemoveCommandBuffer();
+            if (_commandBuffer != null) {
+                _commandBuffer.Dispose();
+                _commandBuffer = null;
+            }
+        }
+        
+        private void AddCommandBuffer() {
+            if (!_cmdBufferAdded) {
+                _cam.AddCommandBuffer(_cameraEvent, _commandBuffer);
+                _cmdBufferAdded = true;
+            }
+        }
+
+        private void RemoveCommandBuffer() {
+            if (_cmdBufferAdded) {
+                if (_cam != null && _commandBuffer != null)
+                    _cam.RemoveCommandBuffer(_cameraEvent, _commandBuffer);
+                _cmdBufferAdded = false;
             }
         }
 
         private void UpdateCommandBuffer() {
-            DisposeCommandBuffer(ref _commandBuffer, _cameraEvent);
+            var cmdWasAdded = _cmdBufferAdded;
+            DisposeCommandBuffer();
             var cmdName = $"{nameof(CameraRenderToTexture)}_{_mat.shader.name}";
-            _commandBuffer = new CommandBuffer {name = name};
-            _createCommandBuffer(_commandBuffer, _mat, _renderTarget, _renderSrc);
-            _cam.AddCommandBuffer(_cameraEvent, _commandBuffer);
+            _commandBuffer = new CommandBuffer {name = cmdName};
+            _createCommandBuffer(_commandBuffer, _mat, _renderTarget.o, _renderSrc);
+            if (cmdWasAdded)
+                AddCommandBuffer();
         }
 
         private bool UpdateRenderTarget() {
+            if (!_renderTarget.Unlocked()) return false;
+
             int height = Mathf.Min(_cam.pixelHeight, MaxResolution);
             int width = Mathf.Min(_cam.pixelWidth, (int) (_cam.aspect * MaxResolution));
-            return TexturesHelper.ReCreateIfNeed(ref _renderTarget, width, height, 0, _format);
+            return TexturesHelper.ReCreateIfNeed(ref _renderTarget.o, width, height, 0, _format);
         }
 
         public void Enable(
@@ -106,6 +123,7 @@ namespace DepthSensorCalibration {
             UpdateRenderTarget();
             UpdateCommandBuffer();
             this.enabled = true;
+            AddCommandBuffer();
         }
         
         public void Enable(
@@ -144,17 +162,44 @@ namespace DepthSensorCalibration {
             );
         }
 
-        public void Disable() {
-            this.enabled = false;
-            DisposeCommandBuffer(ref _commandBuffer, _cameraEvent);
-            _createCommandBuffer = null;
-            _onNewFrame = null;
+        public bool RequestData<T>(DelayedDisposeNativeObject<NativeArray<T>> array, Action OnData) where T : struct {
+            if (_renderTarget == null || !_renderTarget.Unlocked() || array == null || !array.Unlocked())
+                return false;
+            _renderTarget.LockDispose();
+            array.LockDispose();
+#if USE_MAT_ASYNC_SET
+            array.DontDisposeObject = false;
+            TexturesHelper.ReCreateIfNeed(ref array.o, _renderTarget.o.GetPixelsCount());
+            AsyncGPUReadback.RequestIntoNativeArray(ref array.o, _renderTarget.o, 0, r => {
+                OnDataReceived(!r.hasError, array, OnData);
+            });
+            if (!_renderTarget.Unlocked())
+                RemoveCommandBuffer();
+#else
+            array.DontDisposeObject = true;
+            TexturesHelper.ReCreateIfNeedCompatible(ref _tempTex, _renderTarget.o);
+            TexturesHelper.Copy(_renderTarget.o, _tempTex);
+            array.o = _tempTex.GetRawTextureData<T>();
+            OnDataReceived(true, array, OnData);
+#endif
+            return true;
         }
 
-        public RenderTexture GetTempCopy() {
-            TexturesHelper.ReCreateIfNeedCompatible(ref _tempCopy, _renderTarget);
-            Graphics.Blit(_renderTarget, _tempCopy);
-            return _tempCopy;
+        private void OnDataReceived<T>(bool success, DelayedDisposeNativeObject<NativeArray<T>> array, Action OnData) where T : struct {
+            _renderTarget.UnLockDispose();
+            array.UnLockDispose();
+            if (success && array != null) {
+                OnData?.Invoke();
+            }
+            if (_renderTarget != null)
+                AddCommandBuffer();
+        }
+
+        public void Disable() {
+            this.enabled = false;
+            DisposeCommandBuffer();
+            _createCommandBuffer = null;
+            _onNewFrame = null;
         }
 
         private void Update() {
@@ -163,10 +208,11 @@ namespace DepthSensorCalibration {
         }
 
         private void OnPostRender() {
-            if (this.enabled) {
+            if (this.enabled && _cmdBufferAdded) {
                 if (InvokesOnlyOnProcessedFrame && !_newProcessedFrame) return;
                 _newProcessedFrame = false;
-                _onNewFrame?.Invoke(_renderTarget);
+                if (_renderTarget != null)
+                    _onNewFrame?.Invoke(_renderTarget.o);
             }
         }
 

@@ -1,11 +1,7 @@
-﻿#if USE_MAT_ASYNC_SET
-    using AsyncGPUReadbackPluginNs;
-#endif
-using System;
+﻿using System;
 using DepthSensorSandbox;
 using DepthSensorSandbox.Visualisation;
 using Launcher.KeyMapping;
-using Unity.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using Utilities;
@@ -39,12 +35,12 @@ namespace DepthSensorCalibration {
         
         private CameraRenderToTexture _renderDepth;
         private bool _depthValid;
-        private NativeArray<ushort> _depth;
-        private Texture2D _depthTex;
+        private readonly DelayedDisposeNativeArray<ushort> _depth = new DelayedDisposeNativeArray<ushort>();
         
         private readonly SandboxParams _tempSettings = new SandboxParams();
         private float _minClip = float.MinValue;
         private float _maxClip = float.MaxValue;
+        private bool _onDestroyed;
 
         private void Start() {
             InitUI();
@@ -65,6 +61,7 @@ namespace DepthSensorCalibration {
         }
 
         private void OnDestroy() {
+            _onDestroyed = true;
             if (_renderDepth != null) {
                 _renderDepth.Disable();
             }
@@ -73,11 +70,7 @@ namespace DepthSensorCalibration {
             }
             Prefs.Calibration.OnChanged -= OnCalibrationChanged;
             Prefs.Sandbox.OnChanged -= OnSandboxSettingChanged;
-            if (_depthTex != null) {
-                Destroy(_depthTex);
-            } else if (_depth.IsCreated) {
-                _depth.Dispose();
-            }
+            _depth.Dispose();
 
             UnSubscribeKeys();
             Save();
@@ -132,29 +125,15 @@ namespace DepthSensorCalibration {
 
 #region Calculate Depth
         private void OnNewDepthFrame(RenderTexture t) {
-#if USE_MAT_ASYNC_SET
-            TexturesHelper.ReCreateIfNeed(ref _depth, t.GetPixelsCount());
-            AsyncGPUReadback.RequestIntoNativeArray(ref _depth, _renderDepth.GetTempCopy(), 0, r => {
-                if (!r.hasError) {
-                    ProcessDepthFrame(_depth);
-                    _depthValid = true;
-                }
-            });
-#else
-            TexturesHelper.ReCreateIfNeedCompatible(ref _depthTex, t);
-            TexturesHelper.Copy(t, _depthTex);
-            _depth = _depthTex.GetRawTextureData<ushort>();
-            ProcessDepthFrame(_depth);
-            _depthValid = true;
-#endif
+            _renderDepth.RequestData(_depth, ProcessDepthFrame);
         }
 
-        private void ProcessDepthFrame(NativeArray<ushort> depth) {
+        private void ProcessDepthFrame() {
             var min = float.MaxValue;
             var max = float.MinValue;
             var mid = 0f;
             var count = 0;
-            foreach (var ushortDepth in depth) {
+            foreach (var ushortDepth in _depth.o) {
                 var d = (float)ushortDepth / 1000f;
                 if (d < _minClip) continue;
                 
@@ -170,6 +149,7 @@ namespace DepthSensorCalibration {
             _tempSettings.OffsetMaxDepth = mid - min;
             _tempSettings.ZeroDepth = mid;
             _tempSettings.OffsetMinDepth = max - mid;
+            _depthValid = true;
         }
 
         private void SetDepthMax() {

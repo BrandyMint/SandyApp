@@ -1,12 +1,8 @@
-﻿#if USE_MAT_ASYNC_SET
-    using AsyncGPUReadback = AsyncGPUReadbackPluginNs.AsyncGPUReadback;
-#endif
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using DepthSensorCalibration;
 using DepthSensorSandbox.Visualisation;
-using Unity.Collections;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -30,8 +26,8 @@ namespace Games.Balloons {
         
         private int _hitMask;
         private CameraRenderToTexture _renderDepth;
-        private NativeArray<byte> _depth;
-        private Texture2D _depthTex;
+        private readonly DelayedDisposeNativeArray<byte> _depth = new DelayedDisposeNativeArray<byte>();
+        private int2 _depthSize; 
         private float _initialBallSize;
 
         private void Start() {
@@ -61,12 +57,7 @@ namespace Games.Balloons {
             if (_renderDepth != null) {
                 _renderDepth.Disable();
             }
-            
-            if (_depthTex != null) {
-                Destroy(_depthTex);
-            } else if (_depth.IsCreated) {
-                _depth.Dispose();
-            }
+            _depth.Dispose();
         }
 
         private IEnumerator Spawning() {
@@ -133,27 +124,15 @@ namespace Games.Balloons {
         }
 
         private void OnNewDepthFrame(RenderTexture t) {
-#if USE_MAT_ASYNC_SET
-            TexturesHelper.ReCreateIfNeed(ref _depth, t.GetPixelsCount());
-            AsyncGPUReadback.RequestIntoNativeArray(ref _depth, _renderDepth.GetTempCopy(), 0, r => {
-                if (!r.hasError) {
-                    ProcessDepthFrame(_depth, t.width, t.height);
-                }
-            });
-#else
-            TexturesHelper.ReCreateIfNeedCompatible(ref _depthTex, t);
-            TexturesHelper.Copy(t, _depthTex);
-            _depth = _depthTex.GetRawTextureData<byte>();
-            ProcessDepthFrame(_depth, t.width, t.height);
-#endif
+            _depthSize = new int2(t.width, t.height);
+            _renderDepth.RequestData(_depth, ProcessDepthFrame);
         }
         
-        private void ProcessDepthFrame(NativeArray<byte> depth, int width, int height) {
-            var screen = new float2(width, height);
-            for (int x = 0; x < width; ++x) {
-                for (int y = 0; y < height; ++y) {
-                    if (depth[x + y * width] > 0) {
-                        Fire(new float2(x, y) / screen);
+        private void ProcessDepthFrame() {
+            for (int x = 0; x < _depthSize.x; ++x) {
+                for (int y = 0; y < _depthSize.y; ++y) {
+                    if (_depth.o[x + y * _depthSize.x] > 0) {
+                        Fire(new float2(x, y) / _depthSize);
                     }
                 }
             }
