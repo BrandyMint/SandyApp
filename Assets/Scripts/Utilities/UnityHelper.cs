@@ -102,7 +102,9 @@ namespace Utilities {
                 var row = root.FindChildRecursively(propInfo.Name);
                 Assert.IsNotNull(row, $"Not found {propInfo.Name} in {root.name}");
                 object prop;
-                if (propInfo.PropertyType.IsSubclassOf(typeof(Component))) {
+                if (typeof(GameObject).IsAssignableFrom(propInfo.PropertyType)) {
+                    prop = row.gameObject;
+                } else if (typeof(Component).IsAssignableFrom(propInfo.PropertyType)) {
                     prop = row.GetComponent(propInfo.PropertyType) ?? row.GetComponentInChildren(propInfo.PropertyType);
                 } else {
                     prop = Activator.CreateInstance(propInfo.PropertyType);
