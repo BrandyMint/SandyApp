@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.Events;
 
 namespace Launcher.KeyMapping {
@@ -31,19 +32,32 @@ namespace Launcher.KeyMapping {
             }
         }
 
+        public class Layer {
+            public int id;
+            public readonly Dictionary<KeyEvent, UnityEvent> actions = new Dictionary<KeyEvent, UnityEvent>();
+
+            public Layer(int id) {
+                this.id = id;
+            }
+        }
+
         private readonly List<KeyBind> _bindsDown = new List<KeyBind>();
         private readonly List<KeyBind> _binds = new List<KeyBind>();
         
-        private static readonly Dictionary<KeyEvent, UnityEvent> _actions = new Dictionary<KeyEvent, UnityEvent>();
+        private static readonly List<Layer> _layers = new List<Layer> {
+            new Layer(EventLayer.GLOBAL),
+            new Layer(EventLayer.LOCAL)
+        };
 
         private void Awake() {
             _instance = this;
             DontDestroyOnLoad(gameObject);
+            
             InitMapper();
         }
 
         private void OnDestroy() {
-            _actions.Clear();
+            _layers.Clear();
         }
 
         private void InitMapper() {
@@ -65,7 +79,9 @@ namespace Launcher.KeyMapping {
             _bindsDown.Add(new KeyBind(KeyCode.Y, KeyEvent.SET_DEPTH_MAX));
             _bindsDown.Add(new KeyBind(KeyCode.H, KeyEvent.SET_DEPTH_ZERO));
             _bindsDown.Add(new KeyBind(KeyCode.N, KeyEvent.SET_DEPTH_MIN));
-            
+            _bindsDown.Add(new KeyBind(KeyCode.P, KeyEvent.CHANGE_PROJECTOR_SIZE));
+            _bindsDown.Add(new KeyBind(KeyCode.Return,KeyEvent.ENTER, "ENTER"));
+
             _bindsDown.Add(new KeyBind(KeyCode.LeftControl,KeyCode.Q, KeyEvent.EXIT, "CTRL-Q"));
             _bindsDown.Add(new KeyBind(KeyCode.RightControl,KeyCode.Q, KeyEvent.EXIT));
             _bindsDown.Add(new KeyBind(KeyCode.LeftControl,KeyCode.C, KeyEvent.EXIT));
@@ -84,20 +100,68 @@ namespace Launcher.KeyMapping {
             _binds.Add(new KeyBind(KeyCode.KeypadMinus, KeyEvent.ZOOM_OUT, "-"));
         }
         
-        public static void AddListener(KeyEvent ev, UnityAction act) {
-            if (_actions.TryGetValue(ev, out var unityEvent)) {
+        public static void AddListener(KeyEvent ev, UnityAction act, int layerId = EventLayer.LOCAL) {
+            var layer = FindLayer(layerId);
+            AddListener(layer, ev, act);
+        }
+
+        public static void RemoveListener(KeyEvent ev, UnityAction act, int layerId = EventLayer.LOCAL) {
+            var layer = FindLayer(layerId, false);
+            if (layer != null)
+                RemoveListener(layer, ev, act);
+        }
+
+        public static IEnumerable<KeyEvent> GetListenedEvents(int layerId) {
+            var layer = FindLayer(layerId);
+            return GetListenedEvents(layer);
+        }
+
+        private static Layer FindLayer(int layerId, bool checkNull = true) {
+            var layer = _layers.FirstOrDefault(l => l.id == layerId);
+            if (checkNull)
+                Assert.IsNotNull(layer, $"KayMapper: layer {layerId} is not exist");
+            return layer;
+        }
+
+        private static void AddListener(Layer layer, KeyEvent ev, UnityAction act) {
+            if (layer.actions.TryGetValue(ev, out var unityEvent)) {
                 unityEvent.AddListener(act);
             } else {
                 unityEvent = new UnityEvent();
                 unityEvent.AddListener(act);
-                _actions[ev] = unityEvent;
+                layer.actions[ev] = unityEvent;
             }
         }
 
-        public static void RemoveListener(KeyEvent ev, UnityAction act) {
-            if (_actions.TryGetValue(ev, out var unityEvent)) {
+        private static void RemoveListener(Layer layer, KeyEvent ev, UnityAction act) {
+            if (layer.actions.TryGetValue(ev, out var unityEvent)) {
                 unityEvent.RemoveListener(act);
             }
+        }
+
+        private static IEnumerable<KeyEvent> GetListenedEvents(Layer layer) {
+            foreach (var act in layer.actions) {
+                if (act.Value != null) {
+                    yield return act.Key;
+                }
+            }
+        }
+
+        public static int PushOverrideLayer() {
+            int id = 1;
+            while (_layers.Any(l => l.id == id)) {
+                ++id;
+            }
+            _layers.Add(new Layer(id));
+            return id;
+        }
+
+        public static int PopOverrideLayer() {
+            Assert.IsTrue(_layers.Count > 1, $"KayMapper: there is no override layers");
+            var i = _layers.Count - 1;
+            var layer = _layers[i];
+            _layers.RemoveAt(i);
+            return layer.id;
         }
 
         public static KeyBind FindFirstKey(KeyEvent ev) {
@@ -107,9 +171,21 @@ namespace Launcher.KeyMapping {
                    _instance._binds.FirstOrDefault(b => b.ev == ev);
         }
 
-        public static void FireEvent(KeyEvent ev) {
-            if (_actions.TryGetValue(ev, out var action))
-                action?.Invoke();
+        private static IEnumerable<Layer> EnumerateLayersByPriority() {
+            return Enumerable.Reverse(_layers);
+        } 
+
+        public static bool FireEvent(KeyEvent ev) {
+            foreach (var layer in EnumerateLayersByPriority()) {
+                if (layer.actions.TryGetValue(ev, out var action)) {
+                    if (action != null) {
+                        action.Invoke();
+                        return true;
+                    }
+                }
+            }
+            
+            return false;
         }
 
         private void Update() {
@@ -124,7 +200,8 @@ namespace Launcher.KeyMapping {
         private static void ProcessInput(IEnumerable<KeyBind> binds, Func<KeyCode, bool> checkKey, bool onlyOne) {
             foreach (var bind in binds) {
                 if (checkKey(bind.key) && bind.IsAddKeysPressed) {
-                    FireEvent(bind.ev);
+                    if (!FireEvent(bind.ev))
+                        continue;
                     if (onlyOne)
                         break;
                 }

@@ -58,14 +58,13 @@ namespace Launcher {
 
             MultiMonitor.OnNotEnoughMonitors += OnNotEnoughMonitors;
             
-            KeyMapper.AddListener(KeyEvent.OPEN_VIEWER, OpenViewer);
-            KeyMapper.AddListener(KeyEvent.OPEN_CALIBRATION, OpenCalibration);
-            KeyMapper.AddListener(KeyEvent.OPEN_SANDBOX_CALIBRATION, OpenSandboxCalibration);
-            KeyMapper.AddListener(KeyEvent.OPEN_NEXT_GAME, OpenNextGame);
-            KeyMapper.AddListener(KeyEvent.OPEN_PREV_GAME, OpenPrevGame);
-            KeyMapper.AddListener(KeyEvent.BACK, GoBack);
-            KeyMapper.AddListener(KeyEvent.EXIT, Application.Quit);
-            
+            KeyMapper.AddListener(KeyEvent.OPEN_VIEWER, OpenViewer, EventLayer.GLOBAL);
+            KeyMapper.AddListener(KeyEvent.OPEN_CALIBRATION, OpenCalibration, EventLayer.GLOBAL);
+            KeyMapper.AddListener(KeyEvent.OPEN_SANDBOX_CALIBRATION, OpenSandboxCalibration, EventLayer.GLOBAL);
+            KeyMapper.AddListener(KeyEvent.OPEN_NEXT_GAME, OpenNextGame, EventLayer.GLOBAL);
+            KeyMapper.AddListener(KeyEvent.OPEN_PREV_GAME, OpenPrevGame, EventLayer.GLOBAL);
+            KeyMapper.AddListener(KeyEvent.BACK, GoBack, EventLayer.GLOBAL);
+            KeyMapper.AddListener(KeyEvent.EXIT, Application.Quit, EventLayer.GLOBAL);
             //GoCalibrationBefore(SceneManager.GetActiveScene().path);
         }
 
@@ -74,13 +73,13 @@ namespace Launcher {
             SceneManager.sceneUnloaded -= OnSceneUnloaded;
             MultiMonitor.OnNotEnoughMonitors -= OnNotEnoughMonitors;
             
-            KeyMapper.RemoveListener(KeyEvent.EXIT, Application.Quit);
-            KeyMapper.RemoveListener(KeyEvent.BACK, GoBack);
-            KeyMapper.RemoveListener(KeyEvent.OPEN_PREV_GAME, OpenPrevGame);
-            KeyMapper.RemoveListener(KeyEvent.OPEN_NEXT_GAME, OpenNextGame);
-            KeyMapper.RemoveListener(KeyEvent.OPEN_CALIBRATION, OpenCalibration);
-            KeyMapper.RemoveListener(KeyEvent.OPEN_VIEWER, OpenViewer);
-            KeyMapper.RemoveListener(KeyEvent.OPEN_SANDBOX_CALIBRATION, OpenSandboxCalibration);
+            KeyMapper.RemoveListener(KeyEvent.EXIT, Application.Quit, EventLayer.GLOBAL);
+            KeyMapper.RemoveListener(KeyEvent.BACK, GoBack, EventLayer.GLOBAL);
+            KeyMapper.RemoveListener(KeyEvent.OPEN_PREV_GAME, OpenPrevGame, EventLayer.GLOBAL);
+            KeyMapper.RemoveListener(KeyEvent.OPEN_NEXT_GAME, OpenNextGame, EventLayer.GLOBAL);
+            KeyMapper.RemoveListener(KeyEvent.OPEN_CALIBRATION, OpenCalibration, EventLayer.GLOBAL);
+            KeyMapper.RemoveListener(KeyEvent.OPEN_VIEWER, OpenViewer, EventLayer.GLOBAL);
+            KeyMapper.RemoveListener(KeyEvent.OPEN_SANDBOX_CALIBRATION, OpenSandboxCalibration, EventLayer.GLOBAL);
             
             _instance = null;
         }
