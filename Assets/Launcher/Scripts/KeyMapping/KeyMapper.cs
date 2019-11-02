@@ -80,6 +80,7 @@ namespace Launcher.KeyMapping {
             _bindsDown.Add(new KeyBind(KeyCode.H, KeyEvent.SET_DEPTH_ZERO));
             _bindsDown.Add(new KeyBind(KeyCode.N, KeyEvent.SET_DEPTH_MIN));
             _bindsDown.Add(new KeyBind(KeyCode.P, KeyEvent.CHANGE_PROJECTOR_SIZE));
+            _bindsDown.Add(new KeyBind(KeyCode.A, KeyEvent.SWITCH_OBLIQUE));
             _bindsDown.Add(new KeyBind(KeyCode.Return,KeyEvent.ENTER, "ENTER"));
 
             _bindsDown.Add(new KeyBind(KeyCode.LeftControl,KeyCode.Q, KeyEvent.EXIT, "CTRL-Q"));

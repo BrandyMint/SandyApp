@@ -1,5 +1,6 @@
 ﻿namespace Launcher.KeyMapping {
     public enum KeyEvent {
+        SWITCH_OBLIQUE,
         FLIP_DISPLAY,
         FLIP_SANDBOX,
         OPEN_VIEWER,

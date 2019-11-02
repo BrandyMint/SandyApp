@@ -26,6 +26,11 @@ namespace DepthSensorSandbox {
             set => Set(nameof(Fov), value);
         }
         
+        public float Oblique {
+            get => Get(nameof(Oblique), 0f);
+            set => Set(nameof(Oblique), value);
+        }
+        
         public float SensorSwitchingViewTimer {
             get => Get(nameof(SensorSwitchingViewTimer), 1f);
             set => Set(nameof(SensorSwitchingViewTimer), value);

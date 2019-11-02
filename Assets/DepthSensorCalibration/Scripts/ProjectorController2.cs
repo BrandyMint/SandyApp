@@ -1,4 +1,5 @@
-﻿using Games.Common;
+﻿using System;
+using Games.Common;
 using Launcher.KeyMapping;
 using UnityEngine;
 using UnityEngine.UI;
@@ -20,17 +21,34 @@ namespace DepthSensorCalibration {
             public Text txtValue { get; set; }
             public Text txtShortCut { get; set; }
         }
+        
+        private class ObliqueField : Field {
+            public GameObject Oblique0 { get; set; }
+            public GameObject Oblique_1 { get; set; }
+            public GameObject Oblique1 { get; set; }
+        }
 
         private class ProjectorFields {
             public Field Angel { get; set; }
+            public ObliqueField Oblique { get; set; }
             public Field ProjectorSize { get; set; }
             public Field SensorDist { get; set; }
             public Field Z { get; set; }
             public Field X { get; set; }
             public Field Y { get; set; }
         }
+        
+        private class ObliqueChangeInfo {
+            public float val;
+            public float changeY;
+        }
 
         private readonly ProjectorFields _projectorFields = new ProjectorFields();
+        private readonly ObliqueChangeInfo[] _obliques = {
+            new ObliqueChangeInfo {val = 0f, changeY = 0.5f},
+            new ObliqueChangeInfo {val = -1f, changeY = 0.5f},
+            new ObliqueChangeInfo {val = 1f, changeY = -1f}
+        };
 
         private void Start() {
             InitUI();
@@ -42,11 +60,13 @@ namespace DepthSensorCalibration {
             KeyMapper.AddListener(KeyEvent.RESET, OnBtnReset);
             KeyMapper.AddListener(KeyEvent.SET_DEPTH_ZERO, SampleSensorDist);
             KeyMapper.AddListener(KeyEvent.CHANGE_PROJECTOR_SIZE, OnChangeProjectorSize);
+            KeyMapper.AddListener(KeyEvent.SWITCH_OBLIQUE, OnChangeOblique);
         }
 
         private void InitUI() {
             UnityHelper.SetPropsByGameObjects(_projectorFields, _pnlProjectorParams);
             InitField(_projectorFields.Angel);
+            InitField(_projectorFields.Oblique, KeyEvent.SWITCH_OBLIQUE);
             InitField(_projectorFields.ProjectorSize, KeyEvent.CHANGE_PROJECTOR_SIZE);
             InitField(_projectorFields.SensorDist, KeyEvent.SET_DEPTH_ZERO);
             InitField(_projectorFields.Z, KeyEvent.ZOOM_OUT, KeyEvent.ZOOM_IN);
@@ -62,6 +82,7 @@ namespace DepthSensorCalibration {
             KeyMapper.RemoveListener(KeyEvent.RESET, OnBtnReset);
             KeyMapper.RemoveListener(KeyEvent.SET_DEPTH_ZERO, SampleSensorDist);
             KeyMapper.RemoveListener(KeyEvent.CHANGE_PROJECTOR_SIZE, OnChangeProjectorSize);
+            KeyMapper.RemoveListener(KeyEvent.SWITCH_OBLIQUE, OnChangeOblique);
             if (_sampler != null) {
                 _sampler.OnDistReceive -= OnDistReceive;
                 _sampler.OnSampleAreaPoints -= ShowSampleArea;
@@ -108,6 +129,11 @@ namespace DepthSensorCalibration {
             SetPositionValue(_projectorFields.Z, sensorDist - Prefs.Calibration.Position.z);
             SetPositionValue(_projectorFields.X, Prefs.Calibration.Position.x);
             SetPositionValue(_projectorFields.Y, Prefs.Calibration.Position.y);
+            
+            _projectorFields.Oblique.txtValue.text = Prefs.Calibration.Oblique.ToString();
+            _projectorFields.Oblique.Oblique0.SetActive(Mathf.Approximately(Prefs.Calibration.Oblique, 0f));
+            _projectorFields.Oblique.Oblique_1.SetActive(Mathf.Approximately(Prefs.Calibration.Oblique, -1f));
+            _projectorFields.Oblique.Oblique1.SetActive(Mathf.Approximately(Prefs.Calibration.Oblique, 1f));
         }
 
         private void SetPositionValue(Field f, float val) {
@@ -139,6 +165,18 @@ namespace DepthSensorCalibration {
 
         private void OnChangeProjectorSize() {
             _projectorSizePnl.SetActive(true);
+        }
+
+        private void OnChangeOblique() {
+            var i = Array.FindIndex(_obliques, 
+                o => Mathf.Approximately(o.val, Prefs.Calibration.Oblique));
+            var oblique = _obliques[(i + 1) % _obliques.Length];
+            
+            var pos = Prefs.Calibration.Position;
+            pos.y += Prefs.Projector.Height * oblique.changeY;
+            Prefs.Calibration.Position = pos;
+            
+            Prefs.Calibration.Oblique = oblique.val;
         }
     }
 }

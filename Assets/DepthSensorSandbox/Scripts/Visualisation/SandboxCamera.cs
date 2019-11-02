@@ -29,7 +29,6 @@ namespace DepthSensorSandbox.Visualisation {
             } else {
                 _cam.ResetAspect();
             }
-            
             _cam.fieldOfView = Prefs.Calibration.Fov;
         }
 

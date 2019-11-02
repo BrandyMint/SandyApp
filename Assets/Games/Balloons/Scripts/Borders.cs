@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Unity.Mathematics;
 using UnityEngine;
 using Utilities;
@@ -60,8 +61,13 @@ namespace Games.Balloons {
 
         public void AlignToCamera(Camera cam, float dist) {
             transform.rotation = cam.transform.rotation;
-            transform.position = cam.transform.position + cam.transform.forward * dist;
-            var vertical = MathHelper.IsoscelesTriangleSize(dist, cam.fieldOfView);
+            var dir = cam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 1.0f)).direction;
+            var pos = cam.transform.position + dir * dist;
+            var vertical = Math.Abs(Prefs.Calibration.Oblique) < 0.5f 
+                ? MathHelper.IsoscelesTriangleSize(dist, cam.fieldOfView)
+                : MathHelper.RightTriangleSize(dist, cam.fieldOfView);
+            pos.y += vertical * Prefs.Calibration.Oblique / 2f;
+            transform.position = pos;
             transform.localScale = new Vector3(
                 vertical * cam.aspect,
                 vertical,

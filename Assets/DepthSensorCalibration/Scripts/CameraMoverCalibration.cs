@@ -1,4 +1,5 @@
-﻿using DepthSensorSandbox;
+﻿using System;
+using DepthSensorSandbox;
 using Launcher.KeyMapping;
 using UnityEngine;
 using Utilities;
@@ -108,7 +109,9 @@ namespace DepthSensorCalibration {
             _mayUpdateFov = false;
             if (projector.DistanceToSensor > 0f) {
                 var h = projector.DistanceToSensor - Prefs.Calibration.Position.z;
-                Prefs.Calibration.Fov = MathHelper.IsoscelesTriangleAngle(projector.Height, h);
+                Prefs.Calibration.Fov = Math.Abs(Prefs.Calibration.Oblique) < 0.5f 
+                    ? MathHelper.IsoscelesTriangleAngle(projector.Height, h)
+                    : MathHelper.RightTriangleAngle(projector.Height, h);
             } else {
                 Prefs.Calibration.Fov = SerializableParams.Default<CalibrationParams>().Fov;
             }
