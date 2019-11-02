@@ -1,7 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using Launcher.KeyMapping;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Utilities;
 
@@ -44,10 +47,16 @@ namespace DepthSensorCalibration {
             KeyMapper.AddListener(KeyEvent.BACK, OnCancel, _overrideLayerId);
             KeyMapper.AddListener(KeyEvent.ENTER, OnNextStep, _overrideLayerId);
             Step(0);
+            StartCoroutine(StepOnNextFrame());
         }
 
         public void OnDisable() {
             KeyMapper.PopOverrideLayer();
+        }
+
+        public IEnumerator StepOnNextFrame() {
+            yield return null;
+            Step(0);
         }
 
         private static void DoNothing() {}
@@ -76,10 +85,12 @@ namespace DepthSensorCalibration {
                 f.fld.transform.parent.gameObject.SetActive(f == field);
             }
             field.fld.text = (val * 1000f).ToString("F0");
-            field.fld.ActivateInputField();
             field.fld.Select();
+            field.fld.ActivateInputField();
             ValidateField(field);
         }
+
+        private GameObject _lastSelected;
 
         private void FinishAndSave() {
             Prefs.Projector.Width = float.Parse(_fields.Width.fld.text) / 1000f;
