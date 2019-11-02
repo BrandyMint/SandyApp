@@ -30,9 +30,6 @@ EditorBuildSettings:
     path: Assets/Scenes/Launcher.unity
     guid: 0f96224a9eff60021a72ce64e9b41f75
   - enabled: 0
-    path: Assets/DepthSensorCalibration/Scenes/ProjectorParams2.unity
-    guid: 4778ba854c4921a46a4f4097d45c6a6e
-  - enabled: 0
     path: Assets/DepthSensorCalibration/Scenes/ProjectorParams.unity
     guid: 957eb4911928b13498378b02783bb6b6
   - enabled: 1
