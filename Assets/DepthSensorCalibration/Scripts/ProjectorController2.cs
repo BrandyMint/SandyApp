@@ -10,6 +10,7 @@ namespace DepthSensorCalibration {
         [Header("UI")]
         [SerializeField] private Transform _pnlProjectorParams;
         [SerializeField] private UIScwitcher _ui;
+        [SerializeField] private GameObject _projectorSizePnl;
         [Header("Sampler")]
         [SerializeField] private SensorDistSampler _sampler;
         [SerializeField] private float _lineWidth = 0.05f;
@@ -22,6 +23,7 @@ namespace DepthSensorCalibration {
 
         private class ProjectorFields {
             public Field Angel { get; set; }
+            public Field ProjectorSize { get; set; }
             public Field SensorDist { get; set; }
             public Field Z { get; set; }
             public Field X { get; set; }
@@ -36,18 +38,21 @@ namespace DepthSensorCalibration {
             _lineArea.gameObject.SetActive(false);
             _sampler.OnDistReceive += OnDistReceive;
             _sampler.OnSampleAreaPoints += ShowSampleArea;
+            
+            KeyMapper.AddListener(KeyEvent.RESET, OnBtnReset);
             KeyMapper.AddListener(KeyEvent.SET_DEPTH_ZERO, SampleSensorDist);
+            KeyMapper.AddListener(KeyEvent.CHANGE_PROJECTOR_SIZE, OnChangeProjectorSize);
         }
 
         private void InitUI() {
             UnityHelper.SetPropsByGameObjects(_projectorFields, _pnlProjectorParams);
             InitField(_projectorFields.Angel);
+            InitField(_projectorFields.ProjectorSize, KeyEvent.CHANGE_PROJECTOR_SIZE);
             InitField(_projectorFields.SensorDist, KeyEvent.SET_DEPTH_ZERO);
             InitField(_projectorFields.Z, KeyEvent.ZOOM_OUT, KeyEvent.ZOOM_IN);
             InitField(_projectorFields.X, KeyEvent.LEFT, KeyEvent.RIGHT);
             InitField(_projectorFields.Y, KeyEvent.UP, KeyEvent.DOWN);
             
-            KeyMapper.AddListener(KeyEvent.RESET, OnBtnReset);
             Prefs.Calibration.OnChanged += OnCalibrationChanged;
             Prefs.Projector.OnChanged += OnCalibrationChanged;
             OnCalibrationChanged();
@@ -56,6 +61,7 @@ namespace DepthSensorCalibration {
         private void OnDestroy() {
             KeyMapper.RemoveListener(KeyEvent.RESET, OnBtnReset);
             KeyMapper.RemoveListener(KeyEvent.SET_DEPTH_ZERO, SampleSensorDist);
+            KeyMapper.RemoveListener(KeyEvent.CHANGE_PROJECTOR_SIZE, OnChangeProjectorSize);
             if (_sampler != null) {
                 _sampler.OnDistReceive -= OnDistReceive;
                 _sampler.OnSampleAreaPoints -= ShowSampleArea;
@@ -76,11 +82,7 @@ namespace DepthSensorCalibration {
         }
 
         private void OnBtnReset() {
-            var def = SerializableParams.Default<ProjectorParams>();
-            Prefs.Projector.DistanceToSensor = def.DistanceToSensor;
-            Debug.Log(Prefs.Projector.DistanceToSensor);
             Prefs.Projector.Reset();
-            Debug.Log(def.DistanceToSensor);
         }
 
         private void InitField(Field fld, params KeyEvent[] keys) {
@@ -99,6 +101,8 @@ namespace DepthSensorCalibration {
 
         private void OnCalibrationChanged() {
             _projectorFields.Angel.txtValue.text = Prefs.Calibration.Fov.ToString("F2");
+            _projectorFields.ProjectorSize.txtValue.text =
+                ConvertValueToUI(Prefs.Projector.Width) + "x" + ConvertValueToUI(Prefs.Projector.Height); 
             var sensorDist = Prefs.Projector.DistanceToSensor > 0f ? Prefs.Projector.DistanceToSensor : 0f; 
             SetPositionValue(_projectorFields.SensorDist, sensorDist);
             SetPositionValue(_projectorFields.Z, sensorDist - Prefs.Calibration.Position.z);
@@ -107,7 +111,11 @@ namespace DepthSensorCalibration {
         }
 
         private void SetPositionValue(Field f, float val) {
-            f.txtValue.text = (1000f * val).ToString("F0");
+            f.txtValue.text = ConvertValueToUI(val);
+        }
+
+        private static string ConvertValueToUI(float val) {
+            return (1000f * val).ToString("F0");
         }
         
         private void SampleSensorDist() {
@@ -127,6 +135,10 @@ namespace DepthSensorCalibration {
         private void ShowSampleArea(Vector3[] corners) {
             _lineArea.gameObject.SetActive(true);
             _lineArea.SetPositions(corners);
+        }
+
+        private void OnChangeProjectorSize() {
+            _projectorSizePnl.SetActive(true);
         }
     }
 }
