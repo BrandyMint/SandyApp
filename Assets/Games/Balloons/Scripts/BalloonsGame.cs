@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using DepthSensorCalibration;
@@ -10,6 +11,8 @@ using Utilities;
 
 namespace Games.Balloons {
     public class BalloonsGame : MonoBehaviour {
+        public event Action<int> OnScore;
+
         [SerializeField] private Camera _cam;
         [SerializeField] private Balloon _tplBalloon;
         [SerializeField] private Borders _borders;
@@ -21,6 +24,16 @@ namespace Games.Balloons {
         [SerializeField] private int _depthHeight = 64;
         [SerializeField] private SandboxMesh _sandbox;
         [SerializeField] private Material _matDepth;
+        
+        public int Score {
+            get => _score;
+            private set {
+                if (value != _score) {
+                    _score = value;
+                    OnScore?.Invoke(_score);
+                }
+            }
+        }
 
         private List<Balloon> _balloons = new List<Balloon>();
         
@@ -29,6 +42,8 @@ namespace Games.Balloons {
         private readonly DelayedDisposeNativeArray<byte> _depth = new DelayedDisposeNativeArray<byte>();
         private int2 _depthSize; 
         private float _initialBallSize;
+        private int _score;
+        private bool _isGameStarted;
 
         private void Start() {
             _hitMask = LayerMask.GetMask("interactable");
@@ -46,7 +61,7 @@ namespace Games.Balloons {
             Prefs.Sandbox.OnChanged += OnCalibrationChanged;
             OnCalibrationChanged();
 
-            StartCoroutine(Spawning());
+            StartGame();
         }
 
         private void OnDestroy() {
@@ -101,10 +116,13 @@ namespace Games.Balloons {
         }
 
         private void Fire(Vector2 viewPos) {
+            if (!_isGameStarted) return;
+            
             var ray = _cam.ViewportPointToRay(viewPos);
             if (Physics.Raycast(ray, out var hit, _cam.farClipPlane, _hitMask)) {
                 var balloon = hit.collider.GetComponent<Balloon>();
                 if (balloon != null) {
+                    ++Score;
                     balloon.Bang();
                     var force = _startForce * _explosionForceMult;
                     var radius = math.cmax(balloon.transform.lossyScale) * _explosionRadiusMult;
@@ -154,6 +172,25 @@ namespace Games.Balloons {
             _tplBalloon.transform.localScale = Vector3.one * size;
             _borders.AlignToCamera(_cam, dist);
             _borders.SetWidth(size * 2f);
+        }
+
+        private void ClearBalls() {
+            foreach (var balloon in _balloons) {
+                balloon.Dead();
+            }
+            _balloons.Clear();
+        }
+
+        public void StartGame() {
+            ClearBalls();
+            Score = 0;
+            _isGameStarted = true;
+            StartCoroutine(nameof(Spawning));
+        }
+
+        public void StopGame() {
+            _isGameStarted = false;
+            StopCoroutine(nameof(Spawning));
         }
     }
 }
