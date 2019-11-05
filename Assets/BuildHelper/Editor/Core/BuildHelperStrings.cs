@@ -130,7 +130,7 @@ namespace BuildHelper.Editor.Core {
                 versionPattern = version + PREFIX_DEVELOP + "*";
                 GitRequest.GetNewVersion(versionPattern, out version, 1);
             }
-            GitRequest.SetVersionTag(version);
+            //GitRequest.SetVersionTag(version);
             return version;
         }
 
