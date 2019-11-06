@@ -22,7 +22,7 @@ echo ${VERSION}
 
 ARCHIVE_NAME=sandbox-${PLATFORM}-${VERSION}.zip
 rm ${ARCHIVE_NAME}
-zip -r ${ARCHIVE_NAME} * --exclude *.zip
+zip -r ${ARCHIVE_NAME} * -x *.zip *.Linux64\* *.Win64\*
 
 scp ${ARCHIVE_NAME} konstantin@office.brandymint.ru:/home/konstantin/SandyAppBuilds
 

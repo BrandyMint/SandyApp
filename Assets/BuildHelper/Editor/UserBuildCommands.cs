@@ -20,6 +20,12 @@ using UnityEditor;
         public static void BuildLinux() {
             Build(BuildTarget.StandaloneLinux64);
         }
+        
+        [MenuItem("Build/Build Both")]
+        public static void BuildBoth() {
+            Build(BuildTarget.StandaloneWindows64);
+            Build(BuildTarget.StandaloneLinux64);
+        }
 
         /*[MenuItem("Build/Build all from master branch")]
         public static void BuildAllFromMaster() {
