@@ -4,13 +4,15 @@ using System.Collections.Generic;
 using System.Linq;
 using DepthSensorCalibration;
 using DepthSensorSandbox.Visualisation;
+using Games.Common;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.UI;
 using Utilities;
 
 namespace Games.Balloons {
-    public class BalloonsGame : MonoBehaviour {
+    public class BalloonsGame : MonoBehaviour, IGame {
         public event Action<int> OnScore;
 
         [SerializeField] private Camera _cam;
@@ -24,6 +26,7 @@ namespace Games.Balloons {
         [SerializeField] private int _depthHeight = 64;
         [SerializeField] private SandboxMesh _sandbox;
         [SerializeField] private Material _matDepth;
+        [SerializeField] private Text _txtScore;
         
         public int Score {
             get => _score;
@@ -191,6 +194,7 @@ namespace Games.Balloons {
         public void StopGame() {
             _isGameStarted = false;
             StopCoroutine(nameof(Spawning));
+            _txtScore.text = Score.ToString();
         }
     }
 }

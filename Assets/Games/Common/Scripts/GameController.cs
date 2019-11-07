@@ -1,14 +1,12 @@
 using DepthSensorSandbox.Visualisation;
 using UnityEngine;
-using UnityEngine.UI;
 
-namespace Games.Balloons {
+namespace Games.Common {
     public class GameController : MonoBehaviour {
-        [SerializeField] private BalloonsGame _game;
+        [SerializeField] private IGame _game;
         [SerializeField] private Timer _timerStarting;
         [SerializeField] private Timer _timerGame;
         [SerializeField] private Timer _timerScore;
-        [SerializeField] private Text _txtScore;
         
         [SerializeField] private float _timeStart = 3f; 
         [SerializeField] private float _timeGame = 15f;
@@ -39,7 +37,6 @@ namespace Games.Balloons {
         private void StateScore() {
             _game.StopGame();
             _timerScore.StartTimer(_timeScore, StateStarting);
-            _txtScore.text = _game.Score.ToString();
         }
     }
 }

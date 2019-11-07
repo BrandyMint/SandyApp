@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Games.Balloons {
+namespace Games.Common {
     public class Timer : MonoBehaviour { 
         
         [SerializeField] private Text _text;
