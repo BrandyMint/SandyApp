@@ -4,6 +4,7 @@
 using System;
 using DepthSensor.Buffer;
 using DepthSensorSandbox;
+using Launcher.Flip;
 using Unity.Collections;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -30,6 +31,7 @@ namespace DepthSensorCalibration {
         public delegate void CreateCommandBuffer(CommandBuffer cmb, Material mat, RenderTexture rt, RenderTargetIdentifier src);
 
         public int MaxResolution = 2048;
+        private bool _needUpdateCommandBuffer;
 
         public bool InvokesOnlyOnProcessedFrame {
             get => _invokesOnlyOnProcessedFrame;
@@ -47,14 +49,22 @@ namespace DepthSensorCalibration {
         private void Awake() {
             _cam = GetComponent<Camera>();
             enabled = false;
+            Prefs.App.OnChanged += OnAppParamChanged;
         }
 
         private void OnDestroy() {
+            if (Prefs.App != null)
+                Prefs.App.OnChanged -= OnAppParamChanged;
             InvokesOnlyOnProcessedFrame = false;
             DisposeCommandBuffer();
             _renderTarget.Dispose();
             if (_tempTex != null)
                 Destroy(_tempTex);
+        }
+
+        private void OnAppParamChanged() {
+            //for applying changed camera flip
+            _needUpdateCommandBuffer = true;
         }
 
         private static void CreateCommandBufferBlit(
@@ -95,6 +105,7 @@ namespace DepthSensorCalibration {
             DisposeCommandBuffer();
             var cmdName = $"{nameof(CameraRenderToTexture)}_{_mat.shader.name}";
             _commandBuffer = new CommandBuffer {name = cmdName};
+            _commandBuffer.SetInvertCulling(CameraFlipper.GetInvertCulling(_cam, _cameraEvent));
             _createCommandBuffer(_commandBuffer, _mat, _renderTarget.o, _renderSrc);
             if (cmdWasAdded)
                 AddCommandBuffer();
@@ -203,8 +214,10 @@ namespace DepthSensorCalibration {
         }
 
         private void Update() {
-            if (UpdateRenderTarget())
+            if (UpdateRenderTarget() || _needUpdateCommandBuffer) {
+                _needUpdateCommandBuffer = false;
                 UpdateCommandBuffer();
+            }
         }
 
         private void OnPostRender() {
