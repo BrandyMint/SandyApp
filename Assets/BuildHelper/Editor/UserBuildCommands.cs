@@ -69,6 +69,11 @@ using UnityEditor;
                 var options = GetStandardPlayerOptions(target);
                 options.locationPathName = BuildHelperStrings.GetBuildPath(target, buildVersion, outputPath);
                 customize?.Invoke(target, options);
+
+                if (target == BuildTarget.StandaloneLinux64) {
+                    var buildGroup = BuildPipeline.GetBuildTargetGroup(target);
+                    AddScriptingDefine(buildGroup, "USE_MAT_ASYNC_SET");
+                }
                 BuildTime.Build(options);
             });
         }
