@@ -4,7 +4,6 @@
 using System;
 using DepthSensor.Buffer;
 using DepthSensorSandbox;
-using Launcher.Flip;
 using Unity.Collections;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -103,9 +102,9 @@ namespace DepthSensorCalibration {
         private void UpdateCommandBuffer() {
             var cmdWasAdded = _cmdBufferAdded;
             DisposeCommandBuffer();
-            var cmdName = $"{nameof(CameraRenderToTexture)}_{_mat.shader.name}";
+            var cmdName = $"{nameof(CameraRenderToTexture)}_{_mat?.shader.name}";
             _commandBuffer = new CommandBuffer {name = cmdName};
-            _commandBuffer.SetInvertCulling(CameraFlipper.GetInvertCulling(_cam, _cameraEvent));
+            //_commandBuffer.SetInvertCulling(CameraFlipper.GetInvertCulling(_cam, _cameraEvent));
             _createCommandBuffer(_commandBuffer, _mat, _renderTarget.o, _renderSrc);
             if (cmdWasAdded)
                 AddCommandBuffer();

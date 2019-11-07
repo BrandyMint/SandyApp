@@ -1,6 +1,4 @@
-﻿using System;
-using UnityEngine;
-using UnityEngine.Rendering;
+﻿using UnityEngine;
 
 namespace Launcher.Flip {
     [RequireComponent(typeof(Camera))]
@@ -63,20 +61,20 @@ namespace Launcher.Flip {
         public bool GetInvertCulling() {
             return GetInvertCullingForFlip(horizontal, vertical);
         }
-        
-        public bool GetInvertCulling(CameraEvent ev) {
-            return GetInvertCullingFor(ev, horizontal, vertical);
-        }
 
         public static bool GetInvertCullingForFlip(bool horizontal, bool vertical) {
             return (horizontal || vertical) && !(horizontal && vertical);
         }
 
-        public static bool GetInvertCulling(Camera cam) {
+        /*public static bool GetInvertCulling(Camera cam) {
             if (cam.TryGetComponent(out CameraFlipper flipper)) {
                 return flipper.GetInvertCulling();
             }
             return false;
+        }
+        
+        public bool GetInvertCulling(CameraEvent ev) {
+            return GetInvertCullingFor(ev, horizontal, vertical);
         }
         
         public static bool GetInvertCulling(Camera cam, CameraEvent ev) {
@@ -87,6 +85,7 @@ namespace Launcher.Flip {
         }
 
         public static bool GetInvertCullingFor(CameraEvent ev, bool horizontal, bool vertical) {
+            //TODO: need verify
             var invert = GetInvertCullingForFlip(horizontal, vertical);
             switch (ev) {
                 //OnPreRender
@@ -121,6 +120,6 @@ namespace Launcher.Flip {
                 default:
                     throw new ArgumentOutOfRangeException(nameof(ev), ev, null);
             }
-        }
+        }*/
     }
 }
