@@ -29,6 +29,7 @@ namespace Games.Paint {
         }
 
         private void OnDestroy() {
+            OneMomentBillboard.OnReady -= OnReady;
             if (_renderHands != null) {
                 _renderHands.Disable();
             }
