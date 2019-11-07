@@ -140,6 +140,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 6145052358333956596, guid: 47cbe1775872baf289a77a580245e6e6,
+        type: 3}
+      propertyPath: _updateMeshOnGPU
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6145052358850914144, guid: 47cbe1775872baf289a77a580245e6e6,
         type: 3}
       propertyPath: m_CullingMask.m_Bits
@@ -184,11 +189,6 @@ PrefabInstance:
         type: 3}
       propertyPath: _simulate
       value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6145052358333956596, guid: 47cbe1775872baf289a77a580245e6e6,
-        type: 3}
-      propertyPath: _updateMeshOnGPU
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6145052358333956585, guid: 47cbe1775872baf289a77a580245e6e6,
         type: 3}
@@ -369,7 +369,6 @@ MonoBehaviour:
   _sandbox: {fileID: 109950018}
   _matDepth: {fileID: 2100000, guid: d046492b8d6dc9f4192f245a7510eafb, type: 2}
   _matPaint: {fileID: 2100000, guid: 7539fb22d96fa02e3b39d8f6a705d555, type: 2}
-  _depthHeight: 128
 --- !u!4 &1177902448
 Transform:
   m_ObjectHideFlags: 0

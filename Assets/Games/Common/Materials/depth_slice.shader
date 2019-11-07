@@ -29,7 +29,7 @@
             float frag (v2f i) : SV_Target {
                 float z = i.vpos.z;
                 z = _DepthZero - _DepthMaxOffset - _DepthSliceOffset - z;
-                return step(0, z);
+                return max(0, z);
             }
             ENDCG
         }        

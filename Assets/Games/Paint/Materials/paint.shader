@@ -1,8 +1,9 @@
 ﻿Shader "Sandbox/Game/Paint" {
     Properties {
         _MainTex ("Previus frame", 2D) = "black" {}
-        _ColorTex ("Color", 2D) = "white" {}
+        _ColorsTex ("Color", 2D) = "white" {}
         _ColorScale ("Color Scale", Float) = 1
+        _ColorMix ("Color Mix", Float) = 0.1
     
         _DepthZero ("Depth Zero", Float) = 2
         _DepthMinOffset ("Depth Min Offset", Float) = 0.5
@@ -10,7 +11,7 @@
     }
     
     SubShader {
-        Tags { "RenderType"="Opaque" "Queue" = "Background"}
+        Tags { "RenderType"="Opaque" }
         
 		Lighting Off
 		ZWrite Off
@@ -41,21 +42,21 @@
             sampler2D _HandsTex;
             sampler2D _MainTex; float4 _MainTex_ST;
             float _ColorScale;
+            float _ColorMix;
             
             v2f vert (appdata v) {
                 v2f o;
                 o.vertex = UnityObjectToClipPos(v.vertex);
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
                 return o;
-            }             
+            }
 
             fixed4 frag (v2f i) : SV_Target {
-                float h = tex2D(_HandsTex, i.uv).r;
-                return fixed4(h, 0, 0, 1);
+                float h = tex2D(_HandsTex, i.uv);
                 float k = frac(h * _ColorScale);
                 fixed4 hand = tex2D(_ColorsTex, k);
                 fixed4 c = tex2D(_MainTex, i.uv);
-                return lerp(c, hand, 1 - step(h, 0));
+                return lerp(c, hand, smoothstep(0, _ColorMix, h));
             }
             ENDCG
         }
