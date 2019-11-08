@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44254863, g: 0.49164104, b: 0.57147175, a: 1}
+  m_IndirectSpecularColor: {r: 0.44254863, g: 0.49164075, b: 0.5714713, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -185,26 +185,6 @@ PrefabInstance:
       propertyPath: m_LocalRotation.w
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 3841831935578783718, guid: 47cbe1775872baf289a77a580245e6e6,
-        type: 3}
-      propertyPath: _simulate
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6145052358333956587, guid: 47cbe1775872baf289a77a580245e6e6,
-        type: 3}
-      propertyPath: m_Materials.Array.data[0]
-      value: 
-      objectReference: {fileID: 2100000, guid: 97b5807b67fc65e49b6b552e0adced4e, type: 2}
-    - target: {fileID: 6145052358333956587, guid: 47cbe1775872baf289a77a580245e6e6,
-        type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6145052358333956596, guid: 47cbe1775872baf289a77a580245e6e6,
-        type: 3}
-      propertyPath: _updateMeshOnGPU
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 6145052358333956585, guid: 47cbe1775872baf289a77a580245e6e6,
         type: 3}
       propertyPath: m_LocalScale.x
@@ -246,6 +226,26 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 9127120572191758296, guid: 14e7c53709255572c81e919f78f100ab,
         type: 3}
+    - target: {fileID: 6145052358333956587, guid: 47cbe1775872baf289a77a580245e6e6,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 97b5807b67fc65e49b6b552e0adced4e, type: 2}
+    - target: {fileID: 6145052358333956587, guid: 47cbe1775872baf289a77a580245e6e6,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6145052358333956596, guid: 47cbe1775872baf289a77a580245e6e6,
+        type: 3}
+      propertyPath: _updateMeshOnGPU
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3841831935578783718, guid: 47cbe1775872baf289a77a580245e6e6,
+        type: 3}
+      propertyPath: _simulate
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 6145052358850914151, guid: 47cbe1775872baf289a77a580245e6e6, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 47cbe1775872baf289a77a580245e6e6, type: 3}
@@ -681,6 +681,21 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 585363456}
     m_Modifications:
+    - target: {fileID: 51518868487289394, guid: dada745eaf326414e9d10e4617fbe3d6,
+        type: 3}
+      propertyPath: _cam
+      value: 
+      objectReference: {fileID: 1942316862}
+    - target: {fileID: 51518868487289394, guid: dada745eaf326414e9d10e4617fbe3d6,
+        type: 3}
+      propertyPath: _sandbox
+      value: 
+      objectReference: {fileID: 109950018}
+    - target: {fileID: 51518868487289394, guid: dada745eaf326414e9d10e4617fbe3d6,
+        type: 3}
+      propertyPath: _txtScore
+      value: 
+      objectReference: {fileID: 4522957404093957264}
     - target: {fileID: 51518868487289392, guid: dada745eaf326414e9d10e4617fbe3d6,
         type: 3}
       propertyPath: m_Name
@@ -741,21 +756,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 51518868487289394, guid: dada745eaf326414e9d10e4617fbe3d6,
-        type: 3}
-      propertyPath: _cam
-      value: 
-      objectReference: {fileID: 1942316862}
-    - target: {fileID: 51518868487289394, guid: dada745eaf326414e9d10e4617fbe3d6,
-        type: 3}
-      propertyPath: _sandbox
-      value: 
-      objectReference: {fileID: 109950018}
-    - target: {fileID: 51518868487289394, guid: dada745eaf326414e9d10e4617fbe3d6,
-        type: 3}
-      propertyPath: _txtScore
-      value: 
-      objectReference: {fileID: 4522957404093957264}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: dada745eaf326414e9d10e4617fbe3d6, type: 3}
 --- !u!1001 &4522957404093957262
@@ -765,8 +765,7 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 2045507587}
     m_Modifications:
-    - target: {fileID: 8681046230427105714, guid: 888b1c9fd9c7c585e8569bed34783cbe,
-        type: 3}
+    - target: {fileID: 0}
       propertyPath: _game
       value: 
       objectReference: {fileID: 1499182092}
