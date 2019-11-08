@@ -1,4 +1,4 @@
-﻿Shader "Sandbox/Game/DepthSlice" {
+﻿Shader "Sandbox/Game" {
     Properties {
         _DepthSliceOffset ("Depth Slice", Float) = 0.05        
         _DotSlice("Dot Slice", Float) = 0.7
@@ -17,6 +17,8 @@
 		//Blend One OneMinusSrcAlpha
 
         Pass {
+            Name "DepthSlice"
+
             CGPROGRAM
             #pragma multi_compile _ CALC_DEPTH
             #pragma vertex vert

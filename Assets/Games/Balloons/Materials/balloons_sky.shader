@@ -20,6 +20,9 @@
 		ZWrite Off
 		ZTest Off
 		//Blend One OneMinusSrcAlpha
+		UsePass "Sandbox/Game/DepthSlice"
+		
+		GrabPass { "_HandsTex" }
 
         Pass {
             CGPROGRAM
@@ -34,6 +37,7 @@
             float _NoiseSize;
             float _NoiseStrength;
             float _DepthSliceOffset;
+            sampler2D _HandsTex;
 
             #include "Assets/DepthSensorSandbox/Resources/Materials/utils.cginc"
             #include "Assets/DepthSensorSandbox/Resources/Materials/sandbox.cginc"
@@ -45,8 +49,8 @@
                 
                 float max = _DepthZero - _DepthMaxOffset;
                 float min = _DepthZero + _DepthMinOffset;
-                float hands = max - _DepthSliceOffset;
-                if (hands > z)
+                float hands = tex2D(_HandsTex, i.screenPos.xy / i.screenPos.w).r;
+                if (hands > 0)
                     return fixed4(0, 0, 0, 1);
                 
                 float k = inverseLerp(min, max, z) + noise;                
