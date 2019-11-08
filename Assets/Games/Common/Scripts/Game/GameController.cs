@@ -37,7 +37,7 @@ namespace Games.Common.Game {
                     StartTimer(_timeGame, GameState.STOP);
                     break;
                 case GameState.STOP:
-                    GameEvent.Current = GameState.SCORES;
+                    StartTimer(float.Epsilon, GameState.SCORES);
                     break;
                 case GameState.SCORES:
                     StartTimer(_timeScore, GameState.COUNTDOWN);
