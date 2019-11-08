@@ -22,25 +22,14 @@
             CGPROGRAM
             #pragma multi_compile _ CALC_DEPTH
             #pragma vertex vert
-            #pragma fragment frag
+            #pragma fragment fragSlice
             
             #define CALC_NORMAL
 
             #include "UnityCG.cginc"
-            #include "Assets/DepthSensorSandbox/Resources/Materials/utils.cginc"
+                        
             #include "Assets/DepthSensorSandbox/Resources/Materials/sandbox.cginc"
-            
-            float _DepthSliceOffset;
-            float _DotSlice;
-
-            float frag (v2f i) : SV_Target {
-                float z = i.vpos.z;
-                z = _DepthZero - _DepthMaxOffset - _DepthSliceOffset - z;
-                float d = dot(i.normal, float3(0, 0, 1));
-                if (d < _DotSlice)
-                    return 0;
-                return max(0, z);
-            }
+            #include "depth_slice.cginc"
             ENDCG
         }        
     }
