@@ -23,16 +23,16 @@ namespace Utilities {
         }
     
         public static T Random<T>(this IEnumerable<T> enumerable) {
-            var ret = default(T);
-            if (!TryRandom(enumerable, ref ret))
+            if (!TryRandom(enumerable, out var ret))
                 throw new ArgumentOutOfRangeException();
             return ret;
         }
 
-        public static bool TryRandom<T>(this IEnumerable<T> enumerable, ref T ret) {
+        public static bool TryRandom<T>(this IEnumerable<T> enumerable, out T ret) {
             var array = PrepareToMultipleEnumerate(enumerable);
             var count = array.Count();
             if (count == 0) {
+                ret = default;
                 return false;
             }
             var rand = UnityEngine.Random.Range(0, count);
