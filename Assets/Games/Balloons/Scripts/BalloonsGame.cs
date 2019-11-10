@@ -13,7 +13,7 @@ namespace Games.Balloons {
     public class BalloonsGame : MonoBehaviour {
         [SerializeField] private Camera _cam;
         [SerializeField] private Balloon _tplBalloon;
-        [SerializeField] private Borders _borders;
+        [SerializeField] private BalloonsGameField _gameField;
         [SerializeField] private float _maxBallons = 12;
         [SerializeField] private float _timeOffsetSpown = 2f;
         [SerializeField] private float _startForce = 3f;
@@ -94,7 +94,7 @@ namespace Games.Balloons {
         }
 
         private void OnBalloonCollisionEnter(Balloon balloon, Collision collision) {
-            if (collision.collider == _borders.ExitBorder) {
+            if (collision.collider == _gameField.ExitBorder) {
                 balloon.Dead();
             }
         }
@@ -162,8 +162,8 @@ namespace Games.Balloons {
             var verticalSize = MathHelper.IsoscelesTriangleSize(dist, _cam.fieldOfView);
             var size = verticalSize * _initialBallSize;
             _tplBalloon.transform.localScale = Vector3.one * size;
-            _borders.AlignToCamera(_cam, dist);
-            _borders.SetWidth(size * 2f);
+            _gameField.AlignToCamera(_cam, dist);
+            _gameField.SetWidth(size * 2f);
         }
 
         private void ClearBalls() {

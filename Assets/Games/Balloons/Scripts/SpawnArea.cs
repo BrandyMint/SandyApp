@@ -8,6 +8,8 @@ namespace Games.Balloons {
     public class SpawnArea : MonoBehaviour {
         [SerializeField] private Vector3 _randomizeAngle;
 
+        public static IEnumerable<SpawnArea> Areas => _instances;
+
         private static readonly List<SpawnArea> _instances = new List<SpawnArea>();
 
         private readonly List<Transform> _spawns = new List<Transform>();

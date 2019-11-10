@@ -63,7 +63,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _cam: {fileID: 0}
   _tplBalloon: {fileID: 51518869229216124}
-  _borders: {fileID: 51518868594645806}
+  _gameField: {fileID: 51518868594645806}
   _maxBallons: 12
   _timeOffsetSpown: 0.1
   _startForce: 5
