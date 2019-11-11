@@ -4,7 +4,7 @@ using UnityEngine;
 using Utilities;
 using Random = UnityEngine.Random;
 
-namespace Games.Balloons {
+namespace Games.Common {
     public class SpawnArea : MonoBehaviour {
         [SerializeField] private Vector3 _randomizeAngle;
 
