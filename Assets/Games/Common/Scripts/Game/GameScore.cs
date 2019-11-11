@@ -51,8 +51,11 @@ namespace Games.Common.Game {
         private void UpdateScore() {
             if (_txtScore != null)
                 _txtScore.text = Score.ToString();
+
+            var flipHorizontal = Prefs.App.FlipHorizontal; 
             for (int i = 0; i < _txtPlayerScores.Length; ++i) {
-                _txtPlayerScores[i].text = PlayerScore[i].ToString();
+                var player = flipHorizontal ? _txtPlayerScores.Length - 1 - i : i;
+                _txtPlayerScores[i].text = PlayerScore[player].ToString();
             }
         }
 
