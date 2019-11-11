@@ -44,7 +44,12 @@
                 if (hands > 0)
                     return fixed4(0, 0, 0, 1);
                 
-                return fixed4(1, 1, 1, 1);
+                float z = i.vpos.z;
+                float max = _DepthZero - _DepthMaxOffset;
+                float min = _DepthZero + _DepthMinOffset;
+                float k = inverseLerp(min, max, z);
+                fixed4 c = lerp(_ColorMin, _ColorMax, k);
+                return c;
             }
             
             #include "Assets/Games/Common/Materials/two_players.cginc"
