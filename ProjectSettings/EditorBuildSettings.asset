@@ -24,6 +24,9 @@ EditorBuildSettings:
     path: Assets/Scenes/GamePaint.unity
     guid: e0d978b3d8fe16e2882e9eabdf347e33
   - enabled: 1
+    path: Assets/Scenes/GameMoles.unity
+    guid: 9a17b74f4c06d284ba6973db6239b214
+  - enabled: 1
     path: Assets/Scenes/GameAdaptiveGradient.unity
     guid: eae8d2375f594cc4ea547428ed43a96f
   - enabled: 1

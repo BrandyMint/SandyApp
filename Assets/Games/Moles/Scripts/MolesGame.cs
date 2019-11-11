@@ -137,9 +137,9 @@ namespace Games.Moles {
                 }
             }
 
-            foreach (var mole in _moles) {
+            /*foreach (var mole in _moles) {
                 _gameField.PlaceOnSurface(mole.transform, GetDepth);
-            }
+            }*/
         }
 
         private float GetDepth(Vector2 viewPos) {

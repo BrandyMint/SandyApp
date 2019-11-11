@@ -17,9 +17,11 @@
     }
     
     SubShader {
-        Tags { "RenderType"="Opaque"}
+        Tags { "RenderType"="Opaque" "Queue" = "Background"}
         
 		Lighting Off
+		ZWrite Off
+		ZTest Off
 
         Pass {
             CGPROGRAM

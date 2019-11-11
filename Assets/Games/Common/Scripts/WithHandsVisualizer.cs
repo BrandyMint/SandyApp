@@ -2,7 +2,7 @@
 using UnityEngine;
 
 namespace Games.Balloons {
-    public class BalloonsVisualizer : SandboxVisualizerBase {
+    public class WithHandsVisualizer : SandboxVisualizerBase {
         private static readonly int _DEPTH_SLICE_OFFSET = Shader.PropertyToID("_DepthSliceOffset");
         
         [SerializeField] private float _handsOffset = 0.05f;
