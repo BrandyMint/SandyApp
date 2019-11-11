@@ -69,7 +69,7 @@ MonoBehaviour:
   _timeLife: 1
   _depthHeight: 64
   _sandbox: {fileID: 0}
-  _matDepth: {fileID: 2100000, guid: d046492b8d6dc9f4192f245a7510eafb, type: 2}
+  _matDepth: {fileID: 2100000, guid: c2f67131563e8c6438a6001069cf7499, type: 2}
 --- !u!1 &6648669531403264501
 GameObject:
   m_ObjectHideFlags: 0

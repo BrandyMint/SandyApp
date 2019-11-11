@@ -27,7 +27,7 @@ namespace Games.Moles {
         
         private int _hitMask;
         private CameraRenderToTexture _renderDepth;
-        private readonly DelayedDisposeNativeArray<byte> _depth = new DelayedDisposeNativeArray<byte>();
+        private readonly DelayedDisposeNativeArray<half4> _depth = new DelayedDisposeNativeArray<half4>();
         private int2 _depthSize; 
         private float _initialMoleSize;
         private int _score;
@@ -38,7 +38,7 @@ namespace Games.Moles {
 
             _renderDepth = _cam.gameObject.AddComponent<CameraRenderToTexture>();
             _renderDepth.MaxResolution = _depthHeight;
-            _renderDepth.Enable(_matDepth, RenderTextureFormat.R8, OnNewDepthFrame, CreateCommandBufferDepth);
+            _renderDepth.Enable(_matDepth, RenderTextureFormat.ARGBHalf, OnNewDepthFrame, CreateCommandBufferDepth);
 
             _initialMoleSize = math.cmax(_tplMole.transform.localScale);
             _tplMole.gameObject.SetActive(false);
@@ -131,11 +131,21 @@ namespace Games.Moles {
         private void ProcessDepthFrame() {
             for (int x = 0; x < _depthSize.x; ++x) {
                 for (int y = 0; y < _depthSize.y; ++y) {
-                    if (_depth.o[x + y * _depthSize.x] > 0) {
+                    if (_depth.o[x + y * _depthSize.x].y > 0) {
                         Fire(new float2(x, y) / _depthSize);
                     }
                 }
             }
+
+            foreach (var mole in _moles) {
+                _gameField.PlaceOnSurface(mole.transform, GetDepth);
+            }
+        }
+
+        private float GetDepth(Vector2 viewPos) {
+            var p = (int2)((float2)viewPos * _depthSize);
+            p = math.clamp(p, int2.zero, _depthSize - new int2(1, 1));
+            return _depth.o[p.x + p.y * _depthSize.x].x;
         }
 
         private void OnCalibrationChanged() {
@@ -144,7 +154,7 @@ namespace Games.Moles {
                 cam.OnCalibrationChanged();
                 SetSizes(Prefs.Sandbox.ZeroDepth);
             } else {
-                SetSizes(1f); //for testing
+                SetSizes(1.66f); //for testing
             }
         }
 
