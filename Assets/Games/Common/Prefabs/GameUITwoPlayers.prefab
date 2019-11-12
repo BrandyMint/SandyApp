@@ -828,7 +828,7 @@ PrefabInstance:
     - target: {fileID: 1693099749039047956, guid: 888b1c9fd9c7c585e8569bed34783cbe,
         type: 3}
       propertyPath: _objsSwitch.Array.size
-      value: 3
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 1693099749039047956, guid: 888b1c9fd9c7c585e8569bed34783cbe,
         type: 3}
@@ -840,6 +840,11 @@ PrefabInstance:
       propertyPath: _objsSwitch.Array.data[2]
       value: 
       objectReference: {fileID: 6385226174275735266}
+    - target: {fileID: 1693099749039047956, guid: 888b1c9fd9c7c585e8569bed34783cbe,
+        type: 3}
+      propertyPath: _objsSwitch.Array.data[3]
+      value: 
+      objectReference: {fileID: 2355073824813511724}
     - target: {fileID: 1563357302891030781, guid: 888b1c9fd9c7c585e8569bed34783cbe,
         type: 3}
       propertyPath: _txtPlayerScores.Array.size
@@ -898,11 +903,16 @@ PrefabInstance:
     - target: {fileID: 1154416859542733026, guid: 888b1c9fd9c7c585e8569bed34783cbe,
         type: 3}
       propertyPath: _objsSwitch.Array.size
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 1154416859542733026, guid: 888b1c9fd9c7c585e8569bed34783cbe,
         type: 3}
       propertyPath: _objsSwitch.Array.data[2]
+      value: 
+      objectReference: {fileID: 3009653980502870677}
+    - target: {fileID: 1154416859542733026, guid: 888b1c9fd9c7c585e8569bed34783cbe,
+        type: 3}
+      propertyPath: _objsSwitch.Array.data[1]
       value: 
       objectReference: {fileID: 3009653980502870677}
     - target: {fileID: 5661312488848006579, guid: 888b1c9fd9c7c585e8569bed34783cbe,
