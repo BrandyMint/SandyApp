@@ -4823,7 +4823,7 @@ MonoBehaviour:
   _gameField: {fileID: 3095261393578772298}
   _maxItems: 9
   _minItemTypeFullnes: 0.7
-  _timeOffsetSpown: 1
+  _timeOffsetSpown: 0.5
   _depthHeight: 64
   _sandbox: {fileID: 0}
   _matDepth: {fileID: 2100000, guid: d046492b8d6dc9f4192f245a7510eafb, type: 2}
@@ -5031,7 +5031,7 @@ MonoBehaviour:
   _randomizeAngle: {x: 0, y: 0, z: 0}
   _tplSpawn: {fileID: 885952449950637472}
   _radius: 0.5
-  _randomizePosition: 0.2
+  _randomizePosition: 0.1
   _count: 12
 --- !u!1 &885952451230272612
 GameObject:

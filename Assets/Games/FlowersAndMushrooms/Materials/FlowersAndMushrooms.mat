@@ -47,9 +47,17 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _MaxTex:
+        m_Texture: {fileID: 2800000, guid: b13de5e6cfd59734a922be2a86798444, type: 3}
+        m_Scale: {x: 3, y: 3}
+        m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MinTex:
+        m_Texture: {fileID: 2800000, guid: 10408205ea5677f499a4232e86c5318c, type: 3}
+        m_Scale: {x: 5, y: 5}
         m_Offset: {x: 0, y: 0}
     - _MountainsTex:
         m_Texture: {fileID: 2800000, guid: 5950b77b1844e0830a111d61b902bf8c, type: 3}
@@ -74,7 +82,7 @@ Material:
     - _DepthGround: 0.01
     - _DepthIce: 1
     - _DepthMaxOffset: 0.2
-    - _DepthMinOffset: 0.2
+    - _DepthMinOffset: 0.5
     - _DepthMountains: 0.5
     - _DepthSea: 0
     - _DepthSeaBottom: -0.4
@@ -91,6 +99,7 @@ Material:
     - _MinAlphaSea: 0.2
     - _Mix: 0.5
     - _MixDepth: 0.02
+    - _MixDepthPercent: 0.2
     - _MixNoiseSize: 20
     - _MixNoiseStrength: 0.05
     - _Mode: 0
