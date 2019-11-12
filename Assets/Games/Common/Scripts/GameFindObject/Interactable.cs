@@ -2,7 +2,7 @@
 using System.Collections;
 using UnityEngine;
 
-namespace Games.FlowersAndMushrooms {
+namespace Games.Common.GameFindObject {
     [RequireComponent(typeof(Renderer))]
     public class Interactable : MonoBehaviour {
         [SerializeField] private ParticleSystem _rightBang;
@@ -10,11 +10,11 @@ namespace Games.FlowersAndMushrooms {
 
         public static event Action<Interactable> OnDestroyed;
 
-        private Renderer _r;
+        protected Renderer _r;
 
         public int ItemType;
 
-        private void Awake() {
+        protected virtual void Awake() {
             _r = GetComponent<Renderer>();
         }
 
