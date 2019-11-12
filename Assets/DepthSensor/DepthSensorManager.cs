@@ -30,6 +30,7 @@ namespace DepthSensor {
 		}
 
 		private void Start() {
+			Application.targetFrameRate = 30;
 			TryInit();
 		}
 
