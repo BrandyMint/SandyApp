@@ -24,8 +24,13 @@ namespace Games.Landscape {
                 set => Set(nameof(DepthGround), value);
             }
             
+            public float DepthDirt {
+                get => Get(nameof(DepthDirt), 0.3f);
+                set => Set(nameof(DepthDirt), value);
+            }
+            
             public float DepthMountains {
-                get => Get(nameof(DepthMountains), 0.5f);
+                get => Get(nameof(DepthMountains), 0.7f);
                 set => Set(nameof(DepthMountains), value);
             }
             

@@ -9,7 +9,11 @@
         
         _MountainsTex ("Mountains", 2D) = "white" {}
         _hsvMountains ("HSV Mountains", Vector) = (0, 0, 0, 0)
-        _DepthMountains ("Depth Mountains", Float) = 0.5
+        _DepthMountains ("Depth Mountains", Float) = 0.6
+        
+        _DirtTex ("Dirt", 2D) = "white" {}
+        _hsvDirt ("HSV Dirt", Vector) = (0, 0, 0, 0)
+        _DepthDirt ("Depth Dirt", Float) = 0.3
         
         _GroundTex ("Ground", 2D) = "white" {}
         _hsvGround ("HSV Ground", Vector) = (0, 0, 0, 0)
@@ -47,6 +51,8 @@
             
             sampler2D _MountainsTex; float4 _MountainsTex_ST;
             fixed3 _hsvMountains;
+            sampler2D _DirtTex; float4 _DirtTex_ST;
+            fixed3 _hsvDirt;
             sampler2D _GroundTex; float4 _GroundTex_ST;
             fixed3 _hsvGround;
             sampler2D _SandTex; float4 _SandTex_ST;
@@ -58,6 +64,7 @@
             float _MixNoiseSize;
             float _MixNoiseStrength;
             float _DepthIce;
+            float _DepthDirt;
             float _DepthMountains;
             float _DepthGround;
 #ifndef DYNAMIC_FLUID
@@ -66,7 +73,8 @@
             float _DepthSeaBottom;
             
             #define EXTENSION_V2F \
-                float2 uvMountains : TEXCOORD5; \
+                float2 uvMountains : TEXCOORD6; \
+                float2 uvDirt : TEXCOORD5; \
                 float2 uvGround : TEXCOORD4;\
                 float2 uvSand : TEXCOORD3;                
 
@@ -80,6 +88,7 @@
             v2f vertLandscape (appdata v) {
                 v2f o = vert(v);
                 o.uvMountains = TRANSFORM_TEX(o.uv, _MountainsTex);
+                o.uvDirt = TRANSFORM_TEX(o.uv, _DirtTex);
                 o.uvGround = TRANSFORM_TEX(o.uv, _GroundTex);
                 o.uvSand = TRANSFORM_TEX(o.uv, _SandTex);
                 return o;
@@ -111,12 +120,14 @@
                 float dSeaBottom = percentToDepth(_DepthSeaBottom);
                 float dSea = percentToDepth(_DepthSea);
                 float dGround = percentToDepth(_DepthGround);
+                float dDirt = percentToDepth(_DepthDirt);
                 float dMountains = percentToDepth(_DepthMountains);
-                float dIce = percentToDepth(_DepthIce);
+                float dIce = percentToDepth(_DepthIce * 1.5);
                 float noise = perlin(i.uv * _MixNoiseSize) * _MixNoiseStrength;
                 
                 fixed4 c = adjust(tex2D(_SandTex, i.uvSand), _hsvSand);
                 addSample(c, _GroundTex, _hsvGround, i.uvGround , dGround, z, noise);
+                addSample(c, _DirtTex, _hsvDirt, i.uvDirt, dDirt, z, noise);
                 addSample(c, _MountainsTex, _hsvMountains, i.uvMountains, dMountains, z, noise);
                 c.rgb = lerp(c.rgb, _ColorIce.rgb, _ColorIce.a * smooth(dMountains, dIce, z));
                 

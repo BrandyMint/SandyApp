@@ -31,6 +31,7 @@ namespace Games.Landscape {
             public SliderField DepthSeaBottom { get; set; }
             public SliderField DepthSea { get; set; }
             public SliderField DepthGround { get; set; }
+            public SliderField DepthDirt { get; set; }
             public SliderField DepthMountains { get; set; }
             public SliderField DepthIce { get; set; }
             public SliderField DetailsSize { get; set; }
@@ -61,6 +62,7 @@ namespace Games.Landscape {
             InitSlider(_params.DepthSeaBottom, nameof(Prefs.Landscape.DepthSeaBottom));
             InitSlider(_params.DepthSea, nameof(Prefs.Landscape.DepthSea));
             InitSlider(_params.DepthGround, nameof(Prefs.Landscape.DepthGround));
+            InitSlider(_params.DepthDirt, nameof(Prefs.Landscape.DepthDirt));
             InitSlider(_params.DepthMountains, nameof(Prefs.Landscape.DepthMountains));
             InitSlider(_params.DepthIce, nameof(Prefs.Landscape.DepthIce));
             InitSlider(_params.DetailsSize, nameof(Prefs.Landscape.DetailsSize));
