@@ -14,7 +14,7 @@ namespace Games.Common {
 
         private readonly List<Transform> _spawns = new List<Transform>();
 
-        private void Awake() {
+        protected virtual void Awake() {
             foreach (Transform child in transform) {
                 child.gameObject.SetActive(false);
                 _spawns.Add(child);
@@ -53,7 +53,7 @@ namespace Games.Common {
             Transform spawn = null;
             do {
                 var s = _spawns.Random();
-                var p = s.position;
+                var p = worldPos = GetWorldPosition(s);
                 if (stayAway == null || stayAway.All(a => Vector3.Distance(a, p) > stayAwayDist))
                     spawn = s;
                 --iterations;
@@ -62,14 +62,21 @@ namespace Games.Common {
             if (spawn == null)
                 return false;
             
-            worldPos = spawn.position;
+            worldRot = GetWorldRotation(spawn);
+            return true;
+        }
+
+        protected virtual Vector3 GetWorldPosition(Transform spawn) {
+            return spawn.position;
+        }
+
+        protected virtual Quaternion GetWorldRotation(Transform spawn) {
             var noiseRotation = new Vector3(
                 Random.Range(-_randomizeAngle.x, _randomizeAngle.x),
                 Random.Range(-_randomizeAngle.y, _randomizeAngle.y),
                 Random.Range(-_randomizeAngle.z, _randomizeAngle.z)
             );
-            worldRot = transform.rotation * spawn.localRotation *  Quaternion.Euler(noiseRotation);
-            return true;
+            return transform.rotation * spawn.localRotation *  Quaternion.Euler(noiseRotation);
         }
     }
 }
