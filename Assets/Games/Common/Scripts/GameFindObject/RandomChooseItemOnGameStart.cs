@@ -3,7 +3,7 @@ using Games.Common.Game;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-namespace Games.Common {
+namespace Games.Common.GameFindObject {
     public class RandomChooseItemOnGameStart : MonoBehaviour {
         [Serializable] public class ObjectsList {
             public GameObject[] items = {};

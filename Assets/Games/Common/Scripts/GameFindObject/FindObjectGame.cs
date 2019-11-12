@@ -4,15 +4,14 @@ using System.Linq;
 using DepthSensorCalibration;
 using DepthSensorSandbox.Visualisation;
 using Games.Balloons;
-using Games.Common;
 using Games.Common.Game;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Rendering;
 using Utilities;
 
-namespace Games.FlowersAndMushrooms {
-    public class FlowersAndMushroomsGame : MonoBehaviour {
+namespace Games.Common.GameFindObject {
+    public class FindObjectGame : MonoBehaviour {
         [SerializeField] private Camera _cam;
         [SerializeField] private Interactable[] _tplItems;
         [SerializeField] private GameField _gameField;
