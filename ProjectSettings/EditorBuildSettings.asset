@@ -30,6 +30,9 @@ EditorBuildSettings:
     path: Assets/Scenes/GameFlowersAndMushrooms.unity
     guid: e30ec22dd97256e4a8838a0d1209cfef
   - enabled: 1
+    path: Assets/Scenes/GameGeometry.unity
+    guid: b4831e3ed3f807b44ad51aacce3139b2
+  - enabled: 1
     path: Assets/Scenes/GameAdaptiveGradient.unity
     guid: eae8d2375f594cc4ea547428ed43a96f
   - enabled: 1
