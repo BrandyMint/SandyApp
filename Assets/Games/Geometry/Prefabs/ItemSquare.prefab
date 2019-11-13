@@ -9521,6 +9521,7 @@ GameObject:
   - component: {fileID: 7601172911715664136}
   - component: {fileID: 4356501469039951690}
   - component: {fileID: 8790120874050407680}
+  - component: {fileID: 4124953979186089877}
   m_Layer: 9
   m_Name: ItemSquare
   m_TagString: Untagged
@@ -9614,9 +9615,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 7238552113915210009}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7afd059d36b5e564583832dff2b08361, type: 3}
+  m_Script: {fileID: 11500000, guid: 01ccf52d83495f742829c0729ff7b23d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _rightBang: {fileID: 2531397365778485061}
   _wrongBang: {fileID: 2218022738986160184}
   ItemType: 0
+--- !u!114 &4124953979186089877
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7238552113915210009}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1fd16c6310fc47fe89f04a1d5c7b7464, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
