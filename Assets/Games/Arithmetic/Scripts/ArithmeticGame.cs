@@ -19,6 +19,7 @@ namespace Games.Arithmetic {
             foreach (var item in _items) {
                 item.gameObject.SetActive(true);
             }
+            ShowItems(false);
         }
 
         protected override CameraRenderToTexture CreateRenderDepth() {
