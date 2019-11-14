@@ -76,7 +76,7 @@ namespace Games.Common {
                 Random.Range(-_randomizeAngle.y, _randomizeAngle.y),
                 Random.Range(-_randomizeAngle.z, _randomizeAngle.z)
             );
-            return transform.rotation * spawn.localRotation *  Quaternion.Euler(noiseRotation);
+            return spawn.rotation *  Quaternion.Euler(noiseRotation);
         }
     }
 }

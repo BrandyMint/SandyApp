@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 6648669530852831012}
   - component: {fileID: 6648669530852831014}
   - component: {fileID: 6648669530852831015}
+  - component: {fileID: 2371097461586293975}
   m_Layer: 0
   m_Name: MolesGame
   m_TagString: Untagged
@@ -70,6 +71,18 @@ MonoBehaviour:
   _depthHeight: 64
   _sandbox: {fileID: 0}
   _matDepth: {fileID: 2100000, guid: c2f67131563e8c6438a6001069cf7499, type: 2}
+--- !u!114 &2371097461586293975
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6648669530852831013}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a047a6b6a4b94249b381f15a13aa6497, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &6648669531403264501
 GameObject:
   m_ObjectHideFlags: 0

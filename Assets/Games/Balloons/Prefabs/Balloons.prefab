@@ -66,12 +66,24 @@ MonoBehaviour:
   _gameField: {fileID: 51518868594645806}
   _maxBallons: 12
   _timeOffsetSpown: 0.1
-  _startForce: 5
+  _startForce: 4
   _explosionForceMult: 3
   _explosionRadiusMult: 3
   _depthHeight: 64
   _sandbox: {fileID: 0}
   _matDepth: {fileID: 2100000, guid: d046492b8d6dc9f4192f245a7510eafb, type: 2}
+--- !u!114 &6007544470257752786
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 51518868594645804}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a047a6b6a4b94249b381f15a13aa6497, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &241153194413689403
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -79,6 +91,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 51518868487289395}
     m_Modifications:
+    - target: {fileID: 283647260249215255, guid: fef669776d8b97f4fb9aa0291402b255,
+        type: 3}
+      propertyPath: m_Name
+      value: Borders
+      objectReference: {fileID: 0}
     - target: {fileID: 283647260249215252, guid: fef669776d8b97f4fb9aa0291402b255,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -134,13 +151,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 283647260249215255, guid: fef669776d8b97f4fb9aa0291402b255,
-        type: 3}
-      propertyPath: m_Name
-      value: Borders
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fef669776d8b97f4fb9aa0291402b255, type: 3}
+--- !u!1 &51518868594645804 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 283647260249215255, guid: fef669776d8b97f4fb9aa0291402b255,
+    type: 3}
+  m_PrefabInstance: {fileID: 241153194413689403}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &51518868594645807 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 283647260249215252, guid: fef669776d8b97f4fb9aa0291402b255,
@@ -153,7 +171,7 @@ MonoBehaviour:
     type: 3}
   m_PrefabInstance: {fileID: 241153194413689403}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 51518868594645804}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a3beb61735e24131820638fb83d2c7fa, type: 3}
@@ -166,6 +184,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 51518868487289395}
     m_Modifications:
+    - target: {fileID: 1102575047197044672, guid: 85c84143e593d624a80ba60fb12f2d3d,
+        type: 3}
+      propertyPath: m_Name
+      value: Sphere
+      objectReference: {fileID: 0}
     - target: {fileID: 1102575047197044673, guid: 85c84143e593d624a80ba60fb12f2d3d,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -201,10 +224,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 1102575047197044672, guid: 85c84143e593d624a80ba60fb12f2d3d,
+    - target: {fileID: 7952745026195518109, guid: 85c84143e593d624a80ba60fb12f2d3d,
         type: 3}
-      propertyPath: m_Name
-      value: Sphere
+      propertyPath: m_Force.y
+      value: 0.01
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 85c84143e593d624a80ba60fb12f2d3d, type: 3}

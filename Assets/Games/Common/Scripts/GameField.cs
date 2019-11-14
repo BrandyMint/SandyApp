@@ -23,8 +23,10 @@ namespace Games.Balloons {
         protected BorderInfo[] _borders;
         protected float _width = 1f;
         protected float _distFromCamera;
+        private Vector3 _startScale;
 
         protected virtual void Awake() {
+            _startScale = transform.localScale;
             _borders = transform.GetComponentsOnlyInChildren<Collider>()
                 .Select(c => new BorderInfo(c)).ToArray();
         }
@@ -35,7 +37,7 @@ namespace Games.Balloons {
         }
 
         protected float3 GetScaledWidth() {
-            return _width / 2f / math.float3(transform.localScale);
+            return _width / 2f / math.float3(math.abs(transform.localScale));
         }
 
         protected virtual void UpdateWidth() {
@@ -62,7 +64,7 @@ namespace Games.Balloons {
                 : MathHelper.RightTriangleSize(dist, cam.fieldOfView);
             pos.y += vertical * Prefs.Calibration.Oblique / 2f;
             transform.position = pos;
-            transform.localScale = new Vector3(
+            transform.localScale = _startScale * new float3(
                 vertical * cam.aspect,
                 vertical,
                 1f

@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 885952449257499024}
   - component: {fileID: 885952449257499026}
   - component: {fileID: 8956160778347397640}
+  - component: {fileID: 3621999131515263316}
   m_Layer: 0
   m_Name: FlowersAndMushroomsGame
   m_TagString: Untagged
@@ -73,6 +74,18 @@ MonoBehaviour:
   _depthHeight: 64
   _sandbox: {fileID: 0}
   _matDepth: {fileID: 2100000, guid: d046492b8d6dc9f4192f245a7510eafb, type: 2}
+--- !u!114 &3621999131515263316
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 885952449257499025}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a047a6b6a4b94249b381f15a13aa6497, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &885952449661470381
 GameObject:
   m_ObjectHideFlags: 0

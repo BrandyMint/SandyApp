@@ -82,10 +82,14 @@ namespace Games.Balloons {
             var stayAwayDist = math.cmax(_tplBalloon.transform.localScale) * 1.5f;
             if (SpawnArea.AnyGetRandomSpawn(out var worldPos, out var worldRot, stayAway, stayAwayDist)) {
                 var newBalloon = Instantiate(_tplBalloon, worldPos, worldRot, _tplBalloon.transform.parent);
+                
+                var force = newBalloon.GetComponent<ConstantForce>();
+                force.force *= new float3(_gameField.transform.localScale);
+                    
                 var rigid = newBalloon.GetComponent<Rigidbody>();
                 newBalloon.gameObject.SetActive(true);
                 var dir = newBalloon.transform.rotation * Vector3.forward;
-                rigid.AddForce(dir * _startForce);
+                rigid.AddForce(_startForce * Mathf.Abs(_gameField.transform.localScale.y) * dir);
                 _balloons.Add(newBalloon);
             }
         }
@@ -117,7 +121,7 @@ namespace Games.Balloons {
                 if (balloon != null) {
                     ++GameScore.Score;
                     balloon.Bang();
-                    var force = _startForce * _explosionForceMult;
+                    var force =  Mathf.Abs(_gameField.transform.localScale.y) * _startForce * _explosionForceMult;
                     var radius = math.cmax(balloon.transform.lossyScale) * _explosionRadiusMult;
                     var pos = balloon.transform.position;
                     foreach (var b in _balloons) {
