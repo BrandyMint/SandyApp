@@ -13,16 +13,16 @@ using Utilities;
 namespace Games.Common.GameFindObject {
     public class FindObjectGame : MonoBehaviour {
         [SerializeField] private Camera _cam;
-        [SerializeField] private Interactable[] _tplItems;
+        [SerializeField] protected Interactable[] _tplItems;
         [SerializeField] private GameField _gameField;
         [SerializeField] private int _maxItems = 9;
         [SerializeField] private float _minItemTypeFullnes = 0.7f;
-        [SerializeField] private float _timeOffsetSpown = 1f;
+        [SerializeField] protected float _timeOffsetSpown = 1f;
         [SerializeField] private int _depthHeight = 64;
         [SerializeField] private SandboxMesh _sandbox;
         [SerializeField] private Material _matDepth;
 
-        private List<Interactable> _items = new List<Interactable>();
+        protected List<Interactable> _items = new List<Interactable>();
         
         private int _hitMask;
         private CameraRenderToTexture _renderDepth;
@@ -30,12 +30,12 @@ namespace Games.Common.GameFindObject {
         private int2 _depthSize; 
         private float _initialItemSize;
         private int _score;
-        private bool _isGameStarted;
+        protected bool _isGameStarted;
 
-        private void Start() {
+        protected virtual void Start() {
             _hitMask = LayerMask.GetMask("interactable");
 
-            _renderDepth = _cam.gameObject.AddComponent<CameraRenderToTexture>();
+            _renderDepth = CreateRenderDepth();
             _renderDepth.MaxResolution = _depthHeight;
             _renderDepth.Enable(_matDepth, RenderTextureFormat.R8, OnNewDepthFrame, CreateCommandBufferDepth);
 
@@ -51,6 +51,10 @@ namespace Games.Common.GameFindObject {
 
             GameEvent.OnStart += StartGame;
             GameEvent.OnStop += StopGame;
+        }
+
+        protected virtual CameraRenderToTexture CreateRenderDepth() {
+            return _cam.gameObject.AddComponent<CameraRenderToTexture>();
         }
 
         private void OnDestroy() {
@@ -125,14 +129,18 @@ namespace Games.Common.GameFindObject {
             if (Physics.Raycast(ray, out var hit, _cam.farClipPlane, _hitMask)) {
                 var item = hit.collider.GetComponent<Interactable>();
                 if (item != null) {
-                    var neededType = RandomChooseItemOnGameStart.Instance.ItemId;
-                    if (item.ItemType == neededType) {
-                        ++GameScore.Score;
-                        item.Bang(true);
-                    } else {
-                        item.Bang(false);
-                    }
+                    OnFireItem(item);
                 }
+            }
+        }
+
+        protected virtual void OnFireItem(Interactable item) {
+            var neededType = RandomChooseItemOnGameStart.Instance.ItemId;
+            if (item.ItemType == neededType) {
+                ++GameScore.Score;
+                item.Bang(true);
+            } else {
+                item.Bang(false);
             }
         }
 
@@ -156,7 +164,7 @@ namespace Games.Common.GameFindObject {
             }
         }
 
-        private void OnCalibrationChanged() {
+        protected virtual void OnCalibrationChanged() {
             var cam = _cam.GetComponent<SandboxCamera>();
             if (cam != null) {
                 cam.OnCalibrationChanged();
@@ -176,21 +184,21 @@ namespace Games.Common.GameFindObject {
             _gameField.SetWidth(size);
         }
 
-        private void ClearBalls() {
-            foreach (var balloon in _items) {
-                balloon.Dead();
+        private void ClearItems() {
+            foreach (var item in _items) {
+                item.Dead();
             }
             _items.Clear();
         }
 
-        private void StartGame() {
-            ClearBalls();
+        protected virtual void StartGame() {
+            ClearItems();
             GameScore.Score = 0;
             _isGameStarted = true;
             StartCoroutine(nameof(Spawning));
         }
 
-        private void StopGame() {
+        protected virtual void StopGame() {
             _isGameStarted = false;
             StopCoroutine(nameof(Spawning));
         }
