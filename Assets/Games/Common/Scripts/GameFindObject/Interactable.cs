@@ -7,12 +7,16 @@ namespace Games.Common.GameFindObject {
     public class Interactable : MonoBehaviour {
         [SerializeField] protected ParticleSystem _rightBang;
         [SerializeField] protected ParticleSystem _wrongBang;
+        [SerializeField] protected int _itemType;
 
         public static event Action<Interactable> OnDestroyed;
 
         protected Renderer _r;
 
-        public virtual int ItemType { get; set; }
+        public virtual int ItemType {
+            get => _itemType;
+            set => _itemType = value;
+        }
 
         protected virtual void Awake() {
             _r = GetComponent<Renderer>();

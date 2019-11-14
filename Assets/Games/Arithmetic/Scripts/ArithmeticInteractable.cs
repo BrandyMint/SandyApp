@@ -6,7 +6,6 @@ using UnityEngine.UI;
 namespace Games.Arithmetic {
     public class ArithmeticInteractable : Interactable {
         [SerializeField] private Text _txt;
-        [SerializeField] private int _itemType;
         
         public override int ItemType {
             get => _itemType;

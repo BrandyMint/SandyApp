@@ -7,11 +7,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 7238552113915210009, guid: 157a9914b777d6f4e91fa6d8402664ad,
-        type: 3}
-      propertyPath: m_Name
-      value: ItemTriangle
-      objectReference: {fileID: 0}
     - target: {fileID: 1934791141208301156, guid: 157a9914b777d6f4e91fa6d8402664ad,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -67,15 +62,25 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 7601172911715664136, guid: 157a9914b777d6f4e91fa6d8402664ad,
-        type: 3}
-      propertyPath: m_Materials.Array.data[0]
-      value: 
-      objectReference: {fileID: 2100000, guid: cadf340a95137aa4e91651492c7241b3, type: 2}
     - target: {fileID: 8790120874050407680, guid: 157a9914b777d6f4e91fa6d8402664ad,
         type: 3}
       propertyPath: ItemType
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 8790120874050407680, guid: 157a9914b777d6f4e91fa6d8402664ad,
+        type: 3}
+      propertyPath: _itemType
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7238552113915210009, guid: 157a9914b777d6f4e91fa6d8402664ad,
+        type: 3}
+      propertyPath: m_Name
+      value: ItemTriangle
+      objectReference: {fileID: 0}
+    - target: {fileID: 7601172911715664136, guid: 157a9914b777d6f4e91fa6d8402664ad,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: cadf340a95137aa4e91651492c7241b3, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 157a9914b777d6f4e91fa6d8402664ad, type: 3}
