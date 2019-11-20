@@ -44,7 +44,6 @@ namespace Games.Spray {
             module.startColor = _color;
             var shape = _particle.shape;
             shape.angle = _cam.fieldOfView;
-            
             _cam.SetReplacementShader(_depthMat.shader, "RenderType");
         }
 
@@ -76,6 +75,7 @@ namespace Games.Spray {
         }
 
         public IEnumerator RenderingDepth() {
+            yield break;
             while (true) {
                 RenderDepth();
                 yield return null;

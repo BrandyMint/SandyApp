@@ -46,11 +46,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _color: {r: 1, g: 0, b: 0, a: 1}
   _particle: {fileID: 8214644045462975501}
-  _camera: {fileID: 1076262825799684033}
+  _cam: {fileID: 1076262825799684033}
   _renderer: {fileID: 1076262824542776322}
   _collider: {fileID: 1076262824542776323}
   _objsToHide:
   - {fileID: 1076262825799684039}
+  _depthMapResolution: 0
+  _drawMat: {fileID: 0}
+  _depthMat: {fileID: 0}
 --- !u!1 &1076262824542776321
 GameObject:
   m_ObjectHideFlags: 0
