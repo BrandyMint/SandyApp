@@ -182,8 +182,28 @@ namespace DepthSensor.Device {
                     //for Kinect2 Depth 640x480@30 is invalid
                     if (type == OpenNIWrapper.Device.SensorType.Depth && device.DeviceInfo.Uri.StartsWith("freenect2"))
                         return supportedModes.First(m => m.Fps == 30 && m.Resolution.Width == 512);
+
+                    var def = StreamParams.Default;
+                    switch (type) {
+                        case OpenNIWrapper.Device.SensorType.Ir:
+                            def = Prefs.Sensor.IR;
+                            break;
+                        case OpenNIWrapper.Device.SensorType.Color:
+                            def = Prefs.Sensor.Color;
+                            break;
+                        case OpenNIWrapper.Device.SensorType.Depth:
+                            def = Prefs.Sensor.Depth;
+                            break;
+                    }
                     
                     mode = supportedModes.Aggregate((m1, m2) => {
+                        if (def.use) {
+                            var match1 = MatchDefault(def, m1);
+                            var match2 = MatchDefault(def, m2);
+                            if (Math.Abs(match1 - match2) > 0.01f)
+                                return match1 > match2 ? m1 : m2;
+                        }
+                        
                         if (m1.Fps != m2.Fps) {
                             return Math.Abs(m1.Fps - _FPS) < Math.Abs(m2.Fps - _FPS) ? m1 : m2;
                         }
@@ -208,6 +228,15 @@ namespace DepthSensor.Device {
             
             Debug.Log($"OpenNI2: for {type} selected mode {mode}");
             return mode;
+        }
+
+        private static float MatchDefault(StreamParams def, VideoMode m) {
+            if (m.Resolution.Width > def.width || m.Resolution.Height > def.height)
+                return -1f;
+            var resolutionMatch = (float) m.Resolution.Height / def.height * m.Resolution.Width / def.width;
+            if (m.Fps > def.fps)
+                return resolutionMatch / 2f * def.fps / m.Fps;
+            return resolutionMatch * m.Fps / def.fps;
         }
 
         private static void Close(ref OpenNIWrapper.Device device) {
