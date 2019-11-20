@@ -27,6 +27,8 @@ namespace DepthSensor {
 		private void Awake() {
 			Instance = this;
 			DontDestroyOnLoad(gameObject);
+			if (!Prefs.Sensor.Load())
+				Prefs.Sensor.Save();
 		}
 
 		private void Start() {
@@ -75,7 +77,8 @@ namespace DepthSensor {
 				Device = (DepthSensorDevice) Activator.CreateInstance(type);
 				_internalDevice = new DepthSensorDevice.Internal(Device);
 				return true;
-			} catch (EntryPointNotFoundException e) {
+			}
+			catch (Exception e) {
 				Debug.Log(e.Data);
 				Debug.Log(e.HelpLink);
 				Debug.LogException(e);
