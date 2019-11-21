@@ -178,13 +178,16 @@ namespace DepthSensor.Device {
             if (device.HasSensor(type)) {
                 var stream = device.CreateVideoStream(type);
                 if (stream != null) {
-                    var supportedModes = stream.SensorInfo.GetSupportedVideoModes();
-                    //for Kinect2 Depth 640x480@30 is invalid
-                    if (type == OpenNIWrapper.Device.SensorType.Depth && device.DeviceInfo.Uri.StartsWith("freenect2"))
-                        return supportedModes.First(m => m.Fps == 30 && m.Resolution.Width == 512);
+                    var supportedModes = stream.SensorInfo.GetSupportedVideoModes().ToArray();
 
                     var def = StreamParams.Default;
+                    var isFreenect2 = device.DeviceInfo.Uri.StartsWith("freenect2");
                     switch (type) {
+                        case OpenNIWrapper.Device.SensorType.Ir when isFreenect2:
+                        case OpenNIWrapper.Device.SensorType.Depth when isFreenect2:
+                            //for Kinect2 Depth 640x480@30 is invalid
+                            def = new StreamParams(512, 424, 30, true);
+                            break;
                         case OpenNIWrapper.Device.SensorType.Ir:
                             def = Prefs.Sensor.IR;
                             break;
@@ -195,7 +198,10 @@ namespace DepthSensor.Device {
                             def = Prefs.Sensor.Depth;
                             break;
                     }
-                    
+
+                    foreach (var m in supportedModes) {
+                        Debug.Log("available " + m);
+                    }
                     mode = supportedModes.Aggregate((m1, m2) => {
                         if (def.use) {
                             var match1 = MatchDefault(def, m1);
