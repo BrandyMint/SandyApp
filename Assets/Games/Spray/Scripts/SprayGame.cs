@@ -18,6 +18,7 @@ namespace Games.Spray {
         [SerializeField] private int _depthHeight = 64;
         [SerializeField] private SandboxMesh _sandbox;
         [SerializeField] private Material _matDepth;
+        [SerializeField] private ProjectorDestination _projector;
         
         private HashSet<Spray> _fired = new HashSet<Spray>();
         private int _hitMask;
@@ -78,12 +79,6 @@ namespace Games.Spray {
                 var pos = new float2(Input.mousePosition.x, Input.mousePosition.y);
                 Fire(pos / screen);
             }
-
-            CheckStopFire();
-
-            if (Input.GetMouseButtonUp(0)) {
-                //_fired.Clear();
-            }
         }
 
         private void Fire(Vector2 viewPos) {
@@ -132,7 +127,7 @@ namespace Games.Spray {
             var cam = _cam.GetComponent<SandboxCamera>();
             if (cam != null) {
                 cam.OnCalibrationChanged();
-                SetSizes(Prefs.Sandbox.ZeroDepth);
+                SetSizes(Prefs.Sandbox.ZeroDepth - Prefs.Sandbox.OffsetMaxDepth);
             } else {
                 SetSizes(1.66f - 0.2f); //for testing
             }
@@ -163,6 +158,7 @@ namespace Games.Spray {
             _isGameStarted = false;
             ShowItems(false);
             _fired.Clear();
+            _projector.Clear();
         }
     }
 }

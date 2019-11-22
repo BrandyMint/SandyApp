@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Events;
@@ -124,6 +125,35 @@ namespace Utilities {
                 et.triggers.Add(trigger);
             }
             trigger.callback.AddListener(action);
+        }
+        
+        public static void CopyFrom(this Component comp, Component other) {
+            var type = comp.GetType();
+            var otherType = other.GetType();
+            Assert.IsTrue(otherType.IsAssignableFrom(type), $"type mis-match: {type.Name} and {otherType.Name}"); 
+            const BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Default;
+            var props = type.GetProperties(flags);
+            foreach (var prop in props) {
+                if (prop.CanWrite) {
+                    prop.SetValue(comp, prop.GetValue(other, null), null);
+                }
+            }
+            var fields = type.GetFields(flags);
+            foreach (var field in fields) {
+                field.SetValue(comp, field.GetValue(other));
+            }
+        }
+        
+        public static T AddComponent<T>(this GameObject go, Component toAdd) where T : Component {
+            var c = go.AddComponent<T>();
+            c.CopyFrom(toAdd);
+            return c;
+        }
+        
+        public static Component AddComponent(this GameObject go, Component toAdd) {
+            var c = go.AddComponent(toAdd.GetType());
+            c.CopyFrom(toAdd);
+            return c;
         }
     }
 }

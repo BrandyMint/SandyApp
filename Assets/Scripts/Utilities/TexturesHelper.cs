@@ -102,5 +102,12 @@ namespace Utilities {
             dst.Apply();
             RenderTexture.active = prevRend;
         }
+
+        public static void Clear(RenderTexture dst, Color color = default) {
+            var rt = RenderTexture.active;
+            RenderTexture.active = dst;
+            GL.Clear(true, true, Color.clear);
+            RenderTexture.active = rt;
+        }
     }
 }

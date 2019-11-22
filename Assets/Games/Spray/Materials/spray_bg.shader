@@ -1,5 +1,6 @@
 ﻿﻿Shader "Sandbox/Game/SprayBG" {
-    Properties {        
+    Properties {
+        _ProjectedTex ("Projected", 2D) = "clear" {}
         _ColorMin ("Color Min", Color) = (0, 0, 0, 1)
         _ColorMax ("Color Max", Color) = (0.1, 0.1, 0.1, 1)
         _ColorHands ("Color Hands", Color) = (0.3, 0.3, 0.3, 1)
@@ -15,7 +16,7 @@
     }
     
     SubShader {
-        Tags { "RenderType"="Opaque" "Queue" = "Background"}
+        Tags { "RenderType"="Opaque" "Queue" = "Background" }
         
 		Lighting Off
 		ZWrite Off
@@ -39,6 +40,7 @@
             fixed4 _ColorMax;
             fixed4 _ColorHands;
             float _DotSliceOverride;
+            sampler2D _ProjectedTex;
 
             fixed4 frag (v2f i) : SV_Target {
                 float hands = fragSliceDot(i, _DotSliceOverride);
@@ -50,6 +52,9 @@
                 float min = _DepthZero + _DepthMinOffset;
                 float k = inverseLerp(min, max, z);
                 fixed4 c = lerp(_ColorMin, _ColorMax, k);
+                
+                fixed4 projected = tex2D(_ProjectedTex, i.screenPos.xy / i.screenPos.w);
+                c.rgb = lerp(c.rgb, projected.rgb, projected.a);
                 return c;
             }
             ENDCG

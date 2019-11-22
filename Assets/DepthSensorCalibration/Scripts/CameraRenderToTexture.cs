@@ -45,6 +45,11 @@ namespace DepthSensorCalibration {
             }
         }
 
+        public bool ManualRender {
+            get => !_cam.enabled;
+            set => _cam.enabled = !value;
+        }
+
         private void Awake() {
             _cam = GetComponent<Camera>();
             enabled = false;
@@ -213,10 +218,25 @@ namespace DepthSensorCalibration {
         }
 
         private void Update() {
+            if (!ManualRender) {
+                UpdateAll();
+            }
+        }
+
+        private void UpdateAll() {
             if (UpdateRenderTarget() || _needUpdateCommandBuffer) {
                 _needUpdateCommandBuffer = false;
                 UpdateCommandBuffer();
             }
+        }
+
+        public RenderTexture Render() {
+            ManualRender = true;
+            UpdateAll();
+            if (_renderTarget == null || !_renderTarget.Unlocked())
+                return null;
+            _cam.Render();
+            return _renderTarget.o;
         }
 
         private void OnPostRender() {
