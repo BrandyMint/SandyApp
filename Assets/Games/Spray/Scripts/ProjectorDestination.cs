@@ -1,4 +1,5 @@
 ﻿using DepthSensorCalibration;
+using Launcher.Flip;
 using UnityEngine;
 using UnityEngine.Rendering;
 using Utilities;
@@ -32,8 +33,7 @@ namespace Games.Spray {
             _cam = new GameObject("ProjectingCamera").AddComponent<Camera>();
             _cam.transform.SetParent(_srcCam.transform, false);
             _cam.CopyFrom(_srcCam);
-            /*_cam.gameObject.AddComponent<CameraFlipper>();
-            _cam.gameObject.AddComponent<SandboxCamera>();*/
+            _cam.gameObject.AddComponent<CameraFlipper>();
             _cam.clearFlags = CameraClearFlags.Depth;
             _cam.cullingMask = 1 << _projectLayer;
             _cam.enabled = false;
@@ -66,7 +66,6 @@ namespace Games.Spray {
 
         private void CreateCommandBuffer(CommandBuffer cmb, Material mat, RenderTexture rt, RenderTargetIdentifier src) {
             if (TexturesHelper.ReCreateIfNeedCompatible(ref _newFrame, rt)) {
-                _cam.depth = 16;
                 _cam.targetTexture = _newFrame;
             }
             mat.SetTexture(_MAIN_TEX, _newFrame);
@@ -76,6 +75,7 @@ namespace Games.Spray {
         private void FixedUpdate() {
             _r.GetPropertyBlock(_props);
             _rProject.SetPropertyBlock(_props);
+            _cam.fieldOfView = _srcCam.fieldOfView;
             OnFrame(_cameraRender.Render());
         }
 

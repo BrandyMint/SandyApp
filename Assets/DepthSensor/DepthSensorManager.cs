@@ -32,7 +32,9 @@ namespace DepthSensor {
 		}
 
 		private void Start() {
+#if !UNITY_EDITOR
 			Application.targetFrameRate = 30;
+#endif
 			TryInit();
 		}
 
