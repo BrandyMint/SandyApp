@@ -2,7 +2,7 @@
     Properties {
         _ColorPlayerLeft ("Player Left", Color) = (1, 0, 0, 1)
         _ColorPlayerRight ("Player Right", Color) = (0, 0, 1, 1)
-        _PlayerColorAlpha ("Depth Zero", Float) = 1
+        _PlayerColorAlpha ("Player Color Aplpha", Float) = 1
         
         _ColorMin ("Color Min", Color) = (0, 0, 0, 1)
         _ColorMax ("Color Max", Color) = (1, 1, 1, 1)

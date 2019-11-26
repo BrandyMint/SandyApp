@@ -6,9 +6,10 @@
     }
     SubShader
     {
-        Tags { "RenderType"="Transporent" "RenderType"="Transparent"}
+        Tags { "RenderType"="Transparent" "RenderType"="Transparent"}
         
         Blend SrcAlpha OneMinusSrcAlpha
+        Cull Off
 
         Pass
         {

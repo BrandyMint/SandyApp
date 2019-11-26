@@ -55,7 +55,7 @@ namespace Games.Arithmetic {
             _isGameStarted = true;
         }
 
-        protected override void OnFireItem(Interactable item) {
+        protected override void OnFireItem(Interactable item, Vector2 viewPos) {
             bool isRight = item.ItemType == _answer;
             if (isRight) {
                 ++GameScore.Score;

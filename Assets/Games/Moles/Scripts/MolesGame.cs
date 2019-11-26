@@ -113,7 +113,8 @@ namespace Games.Moles {
             if (Physics.Raycast(ray, out var hit, _cam.farClipPlane, _hitMask)) {
                 var mole = hit.collider.GetComponent<Mole>();
                 if (mole != null) {
-                    ++GameScore.PlayerScore[mole.Player];
+                    var player = viewPos.x < 0.5f ? 0 : 1;
+                    ++GameScore.PlayerScore[player];
                     mole.Bang();
                 }
             }

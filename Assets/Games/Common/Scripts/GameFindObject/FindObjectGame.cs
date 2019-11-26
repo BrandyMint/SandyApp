@@ -15,7 +15,7 @@ namespace Games.Common.GameFindObject {
         [SerializeField] private Camera _cam;
         [SerializeField] protected Interactable[] _tplItems;
         [SerializeField] private GameField _gameField;
-        [SerializeField] private int _maxItems = 9;
+        [SerializeField] protected int _maxItems = 9;
         [SerializeField] private float _minItemTypeFullnes = 0.7f;
         [SerializeField] protected float _timeOffsetSpown = 1f;
         [SerializeField] private int _depthHeight = 64;
@@ -70,7 +70,7 @@ namespace Games.Common.GameFindObject {
             _depth.Dispose();
         }
 
-        private IEnumerator Spawning() {
+        protected virtual IEnumerator Spawning() {
             var itemTypes = _tplItems.Select(i => i.ItemType).ToArray();
 
             for (int i = 0; i < _maxItems / 2; ++i) {
@@ -100,14 +100,18 @@ namespace Games.Common.GameFindObject {
             }
         }
 
-        private void SpawnItem(Interactable tpl) {
+        protected Interactable SpawnItem(Interactable tpl) {
             var stayAway = _items.Select(b => b.transform.position).ToArray();
             var stayAwayDist = math.cmax(tpl.transform.localScale);
             if (SpawnArea.AnyGetRandomSpawn(out var worldPos, out var worldRot, stayAway, stayAwayDist)) {
                 var newItem = Instantiate(tpl, worldPos, worldRot, tpl.transform.parent);
                 newItem.gameObject.SetActive(true);
                 _items.Add(newItem);
+                
+                return newItem;
             }
+
+            return null;
         }
 
         private void OnItemDestroyed(Interactable interactable) {
@@ -127,14 +131,14 @@ namespace Games.Common.GameFindObject {
             
             var ray = _cam.ViewportPointToRay(viewPos);
             if (Physics.Raycast(ray, out var hit, _cam.farClipPlane, _hitMask)) {
-                var item = hit.collider.GetComponent<Interactable>();
+                var item = hit.collider.GetComponent<Interactable>() ?? hit.collider.GetComponentInParent<Interactable>();
                 if (item != null) {
-                    OnFireItem(item);
+                    OnFireItem(item, viewPos);
                 }
             }
         }
 
-        protected virtual void OnFireItem(Interactable item) {
+        protected virtual void OnFireItem(Interactable item, Vector2 viewPos) {
             var neededType = RandomChooseItemOnGameStart.Instance.ItemId;
             if (item.ItemType == neededType) {
                 ++GameScore.Score;
