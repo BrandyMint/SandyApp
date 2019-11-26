@@ -12,7 +12,7 @@ using Utilities;
 
 namespace Games.Common.GameFindObject {
     public class FindObjectGame : MonoBehaviour {
-        [SerializeField] private Camera _cam;
+        [SerializeField] protected Camera _cam;
         [SerializeField] protected Interactable[] _tplItems;
         [SerializeField] private GameField _gameField;
         [SerializeField] protected int _maxItems = 9;

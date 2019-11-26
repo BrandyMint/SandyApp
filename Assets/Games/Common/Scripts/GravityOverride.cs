@@ -4,15 +4,20 @@ namespace Games.Common {
     public class GravityOverride : MonoBehaviour {
         [SerializeField] private Vector3 _gravity;
 
-        private Vector3 _defGravity;
+        private static Vector3 _defGravity;
+        private static int _instances;
 
         private void Awake() {
-            _defGravity = Physics.gravity;
+            if (_instances <= 0)
+                _defGravity = Physics.gravity;
             Physics.gravity = _gravity;
+            ++_instances;
         }
 
         private void OnDestroy() {
-            Physics.gravity = _defGravity;
+            --_instances;
+            if (_instances <= 0)
+                Physics.gravity = _defGravity;
         }
     }
 }

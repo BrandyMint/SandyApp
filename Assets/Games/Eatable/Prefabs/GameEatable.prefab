@@ -261,7 +261,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _timeCountdown: 3
-  _timeGame: 15
+  _timeGame: 60
   _timeScore: 3
 --- !u!114 &4893234349622559537
 MonoBehaviour:
@@ -302,7 +302,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 071fde5be3d745ddbfebffcb5cdd9fed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _gravity: {x: 0, y: -2, z: 0}
+  _gravity: {x: 0, y: -1, z: 0}
 --- !u!1 &3066278920936772327
 GameObject:
   m_ObjectHideFlags: 0

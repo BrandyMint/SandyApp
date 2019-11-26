@@ -16,8 +16,9 @@ namespace Games.Common {
 
         protected virtual void Awake() {
             foreach (Transform child in transform) {
+                if (child.gameObject.activeSelf)
+                    _spawns.Add(child);
                 child.gameObject.SetActive(false);
-                _spawns.Add(child);
             }
             _instances.Add(this);
         }

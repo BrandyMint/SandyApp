@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using Games.Common;
 using Games.Common.Game;
 using Games.Common.GameFindObject;
 using Unity.Mathematics;
@@ -25,7 +24,8 @@ namespace Games.Eatable {
                         
                         var rigid = item.GetComponent<Rigidbody>();
                         rigid.mass *= _itemMass;
-                        var force = _addForce * math.cmax(item.transform.lossyScale) * new Vector3(1, 0, 1).normalized;
+                        var force = _addForce * math.cmax(item.transform.lossyScale) 
+                                              * new Vector3(_cam.pixelHeight, 0, _cam.pixelWidth).normalized;
                         rigid.AddForce(item.transform.rotation * force, ForceMode.Impulse);
                     }
                 }
@@ -37,7 +37,8 @@ namespace Games.Eatable {
             var c = _fieldTexture.GetPixel((int) (_fieldTexture.width * viewPos.x), (int) (_fieldTexture.height * viewPos.y));
             if (c.a < 1f) {
                 var player = Mathf.RoundToInt(c.a * GameScore.PlayerScore.Count);
-                GameScore.PlayerScore[player] += item.ItemType;
+                GameScore.PlayerScore[player] = Mathf.Clamp(GameScore.PlayerScore[player] + item.ItemType,
+                    0, int.MaxValue);
                 
                 if (item.ItemType > 0) {
                     item.Bang(true);

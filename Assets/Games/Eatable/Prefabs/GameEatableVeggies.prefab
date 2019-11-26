@@ -1,0 +1,121 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!136 &6687322536945799797
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6532013818992763704}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.5000001
+  m_Height: 2.0000005
+  m_Direction: 1
+  m_Center: {x: 0, y: -0.00000071525574, z: 0}
+--- !u!1001 &6465110872248761199
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 794944916393301642, guid: c4c0fd57e60b13247ba51a0f94a30caf,
+        type: 3}
+      propertyPath: m_Name
+      value: GameEatableVeggies
+      objectReference: {fileID: 0}
+    - target: {fileID: 794944916393301653, guid: c4c0fd57e60b13247ba51a0f94a30caf,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 794944916393301653, guid: c4c0fd57e60b13247ba51a0f94a30caf,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 794944916393301653, guid: c4c0fd57e60b13247ba51a0f94a30caf,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 794944916393301653, guid: c4c0fd57e60b13247ba51a0f94a30caf,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 794944916393301653, guid: c4c0fd57e60b13247ba51a0f94a30caf,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 794944916393301653, guid: c4c0fd57e60b13247ba51a0f94a30caf,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 794944916393301653, guid: c4c0fd57e60b13247ba51a0f94a30caf,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 794944916393301653, guid: c4c0fd57e60b13247ba51a0f94a30caf,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 794944916393301653, guid: c4c0fd57e60b13247ba51a0f94a30caf,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 794944916393301653, guid: c4c0fd57e60b13247ba51a0f94a30caf,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 794944916393301653, guid: c4c0fd57e60b13247ba51a0f94a30caf,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 794944916393301652, guid: c4c0fd57e60b13247ba51a0f94a30caf,
+        type: 3}
+      propertyPath: _timeGame
+      value: 60
+      objectReference: {fileID: 0}
+    - target: {fileID: 4893234349622559537, guid: c4c0fd57e60b13247ba51a0f94a30caf,
+        type: 3}
+      propertyPath: _fieldTexture
+      value: 
+      objectReference: {fileID: 2800000, guid: 20523635fe377504e99590a77b09189b, type: 3}
+    - target: {fileID: 3791977824044679692, guid: c4c0fd57e60b13247ba51a0f94a30caf,
+        type: 3}
+      propertyPath: _randomizeAngle.x
+      value: 70
+      objectReference: {fileID: 0}
+    - target: {fileID: 79849412955237548, guid: c4c0fd57e60b13247ba51a0f94a30caf,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3351459824913393961, guid: c4c0fd57e60b13247ba51a0f94a30caf,
+        type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
+    - target: {fileID: 8199388372361839008, guid: c4c0fd57e60b13247ba51a0f94a30caf,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c4c0fd57e60b13247ba51a0f94a30caf, type: 3}
+--- !u!1 &6532013818992763704 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 224880778795194455, guid: c4c0fd57e60b13247ba51a0f94a30caf,
+    type: 3}
+  m_PrefabInstance: {fileID: 6465110872248761199}
+  m_PrefabAsset: {fileID: 0}

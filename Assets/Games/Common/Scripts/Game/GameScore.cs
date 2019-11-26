@@ -51,16 +51,14 @@ namespace Games.Common.Game {
 
         private void Awake() {
             _sHorizontalPlayers = _horizontalPlayers;
+            PlayerScore.Clear();
+            _score = 0;
             _instances.Add(this);
             UpdateScore();
         }
 
         private void OnDestroy() {
             _instances.Remove(this);
-            if (!_instances.Any()) {
-                PlayerScore.Clear();
-                _score = 0;
-            }
         }
 
         private void UpdateScore() {
