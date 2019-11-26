@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine;
 
 namespace Games.Common.GameFindObject {
-    [RequireComponent(typeof(Renderer))]
+    //[RequireComponent(typeof(Renderer))]
     public class Interactable : MonoBehaviour {
         [SerializeField] protected ParticleSystem _rightBang;
         [SerializeField] protected ParticleSystem _wrongBang;
@@ -34,13 +34,13 @@ namespace Games.Common.GameFindObject {
             StartCoroutine(PlayParticlesAndDead(isRight ? _rightBang : _wrongBang));
         }
 
-        private IEnumerator PlayParticlesAndDead(ParticleSystem particles) {
+        protected IEnumerator PlayParticlesAndDead(ParticleSystem particles) {
             particles.Play();
             yield return new WaitForSeconds(particles.main.duration + particles.main.startLifetime.constant);
             Dead();
         }
 
-        public void Dead() {
+        public virtual void Dead() {
             gameObject.layer = 0;
             Destroy(gameObject);
         }
