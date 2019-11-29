@@ -230,16 +230,6 @@ PrefabInstance:
       propertyPath: m_SizeDelta.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 1693099749039047956, guid: 888b1c9fd9c7c585e8569bed34783cbe,
-        type: 3}
-      propertyPath: _objsSwitch.Array.size
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 1693099749039047956, guid: 888b1c9fd9c7c585e8569bed34783cbe,
-        type: 3}
-      propertyPath: _objsSwitch.Array.data[1]
-      value: 
-      objectReference: {fileID: 6982020068736622630}
     - target: {fileID: 1163826114624920863, guid: 888b1c9fd9c7c585e8569bed34783cbe,
         type: 3}
       propertyPath: m_AnchorMin.y
@@ -270,6 +260,21 @@ PrefabInstance:
       propertyPath: m_SizeDelta.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1693099749039047956, guid: 888b1c9fd9c7c585e8569bed34783cbe,
+        type: 3}
+      propertyPath: _objsSwitch.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1693099749039047956, guid: 888b1c9fd9c7c585e8569bed34783cbe,
+        type: 3}
+      propertyPath: _objsSwitch.Array.data[1]
+      value: 
+      objectReference: {fileID: 2461400665458643678}
+    - target: {fileID: 1693099749039047956, guid: 888b1c9fd9c7c585e8569bed34783cbe,
+        type: 3}
+      propertyPath: _objsSwitch.Array.data[2]
+      value: 
+      objectReference: {fileID: 6982020068736622630}
     - target: {fileID: 993878328037757762, guid: 888b1c9fd9c7c585e8569bed34783cbe,
         type: 3}
       propertyPath: m_AnchorMin.y
@@ -335,11 +340,22 @@ PrefabInstance:
       propertyPath: m_Text
       value: "\u0420\u0435\u0437\u0443\u043B\u044C\u0442\u0430\u0442"
       objectReference: {fileID: 0}
+    - target: {fileID: 5983362623597217058, guid: 888b1c9fd9c7c585e8569bed34783cbe,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 2
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 888b1c9fd9c7c585e8569bed34783cbe, type: 3}
 --- !u!224 &9037492709902271307 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 5661312487980951535, guid: 888b1c9fd9c7c585e8569bed34783cbe,
+    type: 3}
+  m_PrefabInstance: {fileID: 3745475408548471972}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &2461400665458643678 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1284155738203928186, guid: 888b1c9fd9c7c585e8569bed34783cbe,
     type: 3}
   m_PrefabInstance: {fileID: 3745475408548471972}
   m_PrefabAsset: {fileID: 0}
