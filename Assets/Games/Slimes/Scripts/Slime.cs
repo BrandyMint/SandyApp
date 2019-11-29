@@ -18,6 +18,7 @@ namespace Games.Slimes {
         [SerializeField] private Animator _animator;
         
         public static event Action<Slime> OnNeedNewColor;
+        public bool IsSmashed { get; private set; }
         
         private List<Rigidbody> _blobs;
         private int _modelLayer;
@@ -33,6 +34,7 @@ namespace Games.Slimes {
         }
 
         protected override IEnumerator PlayParticlesAndDead(ParticleSystem particles) {
+            IsSmashed = true;
             StopCoroutine(nameof(WaitNewColor));
             _model.layer = 0;
             particles.Play();
@@ -41,6 +43,7 @@ namespace Games.Slimes {
             yield return new WaitForSeconds(_timeToRevived);
             _animator.SetTrigger(_REVIVE);
             _model.layer = _modelLayer;
+            IsSmashed = false;
             OnNeedNewColor?.Invoke(this);
             StartCoroutine(nameof(WaitNewColor));
         }

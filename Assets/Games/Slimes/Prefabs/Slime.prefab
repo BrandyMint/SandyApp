@@ -404,7 +404,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _rightBang: {fileID: 0}
   _wrongBang: {fileID: 0}
-  _itemType: 0
+  _itemType: -1
   _model: {fileID: 327361232806030752}
   _timeToRevived: 4
   _timeToNewColor: 5

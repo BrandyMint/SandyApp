@@ -11,7 +11,8 @@ namespace Games.Slimes {
         [SerializeField] private Text _txtTargetColor;
         [SerializeField] private SlimeColor[] _colors = { };
 
-        private int _targetColor;
+        private int _targetColorType;
+        private Color _targetColor;
 
         protected override void Start() {
             base.Start();
@@ -24,7 +25,8 @@ namespace Games.Slimes {
         }
 
         protected override void StartGame() {
-            GetRandomColor(out var color, out _targetColor);
+            GetRandomColor(out var color, out _targetColorType);
+            _targetColor = color.color;
             _txtTargetColor.text = color.name;
             
             base.StartGame();
@@ -40,7 +42,7 @@ namespace Games.Slimes {
         }
 
         protected override void OnFireItem(Interactable item, Vector2 viewPos) {
-            if (item.ItemType == _targetColor) {
+            if (item.ItemType == _targetColorType) {
                 ++GameScore.Score;
                 item.Bang(true);
             } else {
@@ -50,8 +52,16 @@ namespace Games.Slimes {
         }
 
         private void SetSlimeColor(Slime slime) {
-            GetRandomColor(out var color, out var id);
-            slime.SetColor(color.color);
+            var c = _targetColor;
+            var id = _targetColorType;
+            if (_items.Cast<Slime>().Any(i => !i.IsSmashed && i.ItemType == _targetColorType)) {
+                do {
+                    GetRandomColor(out var color, out id);
+                    c = color.color;
+                } while (slime.ItemType == id);
+            }
+
+            slime.SetColor(c);
             slime.ItemType = id;
         }
 
