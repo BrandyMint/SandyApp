@@ -34,7 +34,7 @@ namespace Games.Common.GameFindObject {
             StartCoroutine(PlayParticlesAndDead(isRight ? _rightBang : _wrongBang));
         }
 
-        protected IEnumerator PlayParticlesAndDead(ParticleSystem particles) {
+        protected virtual IEnumerator PlayParticlesAndDead(ParticleSystem particles) {
             particles.Play();
             yield return new WaitForSeconds(particles.main.duration + particles.main.startLifetime.constant);
             Dead();

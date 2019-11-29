@@ -2,7 +2,7 @@
 
 namespace Games.Common.GameFindObject {
     public class InteractableModel : Interactable {
-        [SerializeField] private GameObject _model;
+        [SerializeField] protected GameObject _model;
 
         protected override void Awake() {
             _r = _model.GetComponent<Renderer>();

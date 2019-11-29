@@ -60,6 +60,16 @@ namespace Games.Common {
                 --iterations;
             } while (spawn == null && iterations > 0);
 
+            if (spawn == null && stayAway != null) {
+                foreach (var s in _spawns) {
+                    var p = worldPos = GetWorldPosition(s);
+                    if (stayAway.All(a => Vector3.Distance(a, p) > stayAwayDist)) {
+                        spawn = s;
+                        break;
+                    }
+                }
+            }
+
             if (spawn == null)
                 return false;
             

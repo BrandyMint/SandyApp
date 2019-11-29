@@ -57,7 +57,7 @@ namespace Games.Common.GameFindObject {
             return _cam.gameObject.AddComponent<CameraRenderToTexture>();
         }
 
-        private void OnDestroy() {
+        protected virtual void OnDestroy() {
             GameEvent.OnStart -= StartGame;
             GameEvent.OnStop -= StopGame;
             
