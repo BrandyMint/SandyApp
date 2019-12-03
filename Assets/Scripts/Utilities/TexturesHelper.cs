@@ -25,8 +25,12 @@ namespace Utilities {
         }
 
         public static bool ReCreateIfNeedCompatible(ref Texture2D t, Texture tRef, TextureFormat fallbackFormat = TextureFormat.RGBA32) {
-            TryGetCompatibleFormat(tRef.graphicsFormat, out var format, fallbackFormat);
-            return ReCreateIfNeed(ref t, tRef.width, tRef.height, format, tRef.mipmapCount > 1);
+            var isFallbackFormat = !TryGetCompatibleFormat(tRef.graphicsFormat, out var format, fallbackFormat);
+            var isCreated = ReCreateIfNeed(ref t, tRef.width, tRef.height, format, tRef.mipmapCount > 1);
+            if (isCreated && isFallbackFormat) {
+                Debug.LogWarning($"No compatible texture format for ${tRef.graphicsFormat}. Fallback to {format}.");
+            }
+            return isCreated;
         }
         
         public static bool ReCreateIfNeed(ref RenderTexture t, int width, int height, int depth = 0,
@@ -42,13 +46,17 @@ namespace Utilities {
         }
         
         public static bool ReCreateIfNeedCompatible(ref RenderTexture t, Texture tRef, RenderTextureFormat fallbackFormat = RenderTextureFormat.ARGB32) {
-            TryGetCompatibleFormat(tRef.graphicsFormat, out var format, fallbackFormat);
+            var isFallbackFormat = !TryGetCompatibleFormat(tRef.graphicsFormat, out var format, fallbackFormat);
             
             var depth = 0;
             var refRend = tRef as RenderTexture;
             if (refRend != null)
                 depth = refRend.depth;
-            return ReCreateIfNeed(ref t, tRef.width, tRef.height, depth, format);
+            var isCreated = ReCreateIfNeed(ref t, tRef.width, tRef.height, depth, format);
+            if (isCreated && isFallbackFormat) {
+                Debug.LogWarning($"No compatible render texture format for ${tRef.graphicsFormat}. Fallback to {format}.");
+            }
+            return isCreated;
         }
         
         public static bool ReCreateIfNeed<T>(ref NativeArray<T> a, int len, 
