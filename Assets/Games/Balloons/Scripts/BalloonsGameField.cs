@@ -21,8 +21,8 @@ namespace Games.Balloons {
             base.UpdateWidth();
             var scaledWidth = GetScaledWidth();
             foreach (var spawn in _spawns) {
-                var pos = scaledWidth * spawn.startPos / 2;
-                spawn.transform.localPosition += (Vector3) pos;
+                var pos = scaledWidth * spawn.startPos;
+                spawn.transform.localPosition = spawn.startPos + pos * 1.5f;
                 spawn.transform.localScale = spawn.startScale * (1 - scaledWidth);
             }
         }
