@@ -9699,7 +9699,7 @@ GameObject:
   - component: {fileID: 5969040670296672380}
   - component: {fileID: 5733445318632603635}
   - component: {fileID: -4692841345123999180}
-  - component: {fileID: 8684637921255975662}
+  - component: {fileID: -4874124373908632695}
   m_Layer: 9
   m_Name: Item
   m_TagString: Untagged
@@ -9825,7 +9825,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _cam: {fileID: 0}
---- !u!114 &8684637921255975662
+--- !u!114 &-4874124373908632695
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -9837,3 +9837,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a047a6b6a4b94249b381f15a13aa6497, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _byUIFlip: 1
+  _bySandboxFlip: 0
+  _method: 1
