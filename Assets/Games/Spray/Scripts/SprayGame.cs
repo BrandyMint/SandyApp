@@ -45,8 +45,6 @@ namespace Games.Spray {
 
             GameEvent.OnStart += StartGame;
             GameEvent.OnStop += StopGame;
-            
-            Spawn();
             ShowItems(false);
         }
 
@@ -127,10 +125,30 @@ namespace Games.Spray {
             var cam = _cam.GetComponent<SandboxCamera>();
             if (cam != null) {
                 cam.OnCalibrationChanged();
-                SetSizes(Prefs.Sandbox.ZeroDepth - Prefs.Sandbox.OffsetMaxDepth);
+                SetSizes(Prefs.Sandbox.ZeroDepth);
             } else {
                 SetSizes(1.66f - 0.2f); //for testing
             }
+
+            CorrectSpraySpawns(SpawnArea.Areas.First().transform, Prefs.Sandbox.OffsetMaxDepth, _gameField.transform, _items.First());
+            Spawn();
+        }
+
+        private void CorrectSpraySpawns(Transform spawnArea, float h, Transform field, Spray spray) {
+            h += math.cmax(spray.transform.lossyScale);
+            var hVec = Vector3.up * h;
+            hVec = field.InverseTransformVector(hVec);
+            
+            var spawnPos = spawnArea.localPosition;
+            spawnPos.z = hVec.z;
+            spawnArea.localPosition = spawnPos;
+
+            var s = 0.5f - spawnPos.y;
+            var sprayAngle = spray.GetSprayAngle();
+            var a = MathHelper.RightTriangleAngle(Mathf.Abs(s), Mathf.Abs(hVec.z)) - sprayAngle / 2f;
+            var spawnRot = spawnArea.localEulerAngles;
+            spawnRot.x = 90f - a;
+            spawnArea.localEulerAngles = spawnRot;
         }
 
         private void SetSizes(float dist) {

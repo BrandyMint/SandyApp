@@ -33,14 +33,18 @@ namespace Games.Spray {
             
             var module = _particle.main;
             module.startColor = _color;
-            var shape = _particle.shape;
 
-            _projector.fieldOfView = shape.angle * 2.5f;
+            _projector.fieldOfView = GetSprayAngle();
             _projector.material = new Material(_projector.material) {
                 color = new Color(_color.r, _color.g, _color.b, _color.a * _projectAlpha)
             };
             
             ChangeFire(false);
+        }
+
+        public float GetSprayAngle() {
+            var shape = _particle.shape;
+            return shape.angle * 2.5f;
         }
 
         private void ChangeFire(bool fire) {
