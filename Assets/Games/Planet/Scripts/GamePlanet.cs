@@ -8,10 +8,18 @@ using UnityEngine;
 namespace Games.Planet {
     public class GamePlanet : FindObjectGame {
         [SerializeField] private Planet _planet;
+        [SerializeField] private int _maxPlanetHP;
+        [SerializeField] private CircleHP _planetHP;
 
         protected override void Start() {
             base.Start();
             Bullet.OnCollide += OnBulletCollide;
+        }
+
+        protected override void StartGame() {
+            base.StartGame();
+            _planetHP.Max = _maxPlanetHP;
+            _planetHP.Val = _maxPlanetHP;
         }
 
         protected override void OnDestroy() {
@@ -25,6 +33,7 @@ namespace Games.Planet {
         }
 
         protected override void OnFireItem(Interactable item, Vector2 viewPos) {
+            ++GameScore.Score;
             item.Bang(true);
         }
 
@@ -58,7 +67,10 @@ namespace Games.Planet {
         }
 
         private void OnBulletCollide(Bullet b, Collision coll) {
-            ++GameScore.Score;
+            --_planetHP.Val;
+            if (_planetHP.Val <= 0) {
+                GameEvent.Current = GameState.STOP;
+            }
         }
     }
 }

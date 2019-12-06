@@ -2702,7 +2702,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _timeCountdown: 3
-  _timeGame: 15
+  _timeGame: -1
   _timeScore: 3
 --- !u!114 &4014565754439908906
 MonoBehaviour:
@@ -2720,13 +2720,15 @@ MonoBehaviour:
   _tplItems:
   - {fileID: 8356937666849563355}
   _gameField: {fileID: 4995940672262205434}
-  _maxItems: 9
+  _maxItems: 7
   _minItemTypeFullnes: 1
   _timeOffsetSpown: 0.5
   _depthHeight: 64
   _sandbox: {fileID: 0}
   _matDepth: {fileID: 2100000, guid: d046492b8d6dc9f4192f245a7510eafb, type: 2}
   _planet: {fileID: 9136389548545251830}
+  _maxPlanetHP: 100
+  _planetHP: {fileID: 0}
 --- !u!1 &8066336003087175065
 GameObject:
   m_ObjectHideFlags: 0
