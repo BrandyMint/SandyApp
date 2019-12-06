@@ -135,7 +135,8 @@ namespace Games.Spray {
         }
 
         private void CorrectSpraySpawns(Transform spawnArea, float h, Transform field, Spray spray) {
-            h += math.cmax(spray.transform.lossyScale);
+            var hSpray = math.cmax(spray.transform.lossyScale);
+            h = Mathf.Min(h + hSpray, hSpray * 3f);
             var hVec = Vector3.up * h;
             hVec = field.InverseTransformVector(hVec);
             
