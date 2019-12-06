@@ -31,6 +31,7 @@ namespace Games.Slimes {
         
         public override void Bang(bool isRight) {
             StartCoroutine(PlayParticlesAndDead(isRight ? _rightBang : _wrongBang));
+            PlayAudioBang(isRight);
         }
 
         protected override IEnumerator PlayParticlesAndDead(ParticleSystem particles) {

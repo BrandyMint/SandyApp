@@ -4911,6 +4911,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d3a0053a06c041e4876d1662fd818ca7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _audioHit:
+  - {fileID: 8300000, guid: ee47ddbe87c9e014aa1a97f4c4b3f437, type: 3}
+  - {fileID: 8300000, guid: 35803eec9ebe87043993be3abc6708e9, type: 3}
+  _audioDamage:
+  - {fileID: 8300000, guid: 766c72e1f3779f64b972fe4f6ee94bf2, type: 3}
+  - {fileID: 8300000, guid: 6aec6cc878d2820438d67720f616a72b, type: 3}
+  - {fileID: 8300000, guid: b5c6ade604705a24c8c696480f81dba4, type: 3}
   Player: 0
 --- !u!95 &6684944690641339198
 Animator:

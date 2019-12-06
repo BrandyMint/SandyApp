@@ -405,6 +405,8 @@ MonoBehaviour:
   _rightBang: {fileID: 0}
   _wrongBang: {fileID: 0}
   _itemType: -1
+  _audioRight: {fileID: 8300000, guid: 823876049e620ce4ea6daee03062659b, type: 3}
+  _audioWrong: {fileID: 8300000, guid: 823876049e620ce4ea6daee03062659b, type: 3}
   _model: {fileID: 327361232806030752}
   _timeToRevived: 4
   _timeToNewColor: 5

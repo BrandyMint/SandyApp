@@ -8,10 +8,13 @@ namespace Games.Common.GameFindObject {
         [SerializeField] protected ParticleSystem _rightBang;
         [SerializeField] protected ParticleSystem _wrongBang;
         [SerializeField] protected int _itemType;
+        [SerializeField] protected AudioClip _audioRight;
+        [SerializeField] protected AudioClip _audioWrong;
 
         public static event Action<Interactable> OnDestroyed;
 
         protected Renderer _r;
+        protected AudioSource _audioSource;
 
         public virtual int ItemType {
             get => _itemType;
@@ -20,6 +23,7 @@ namespace Games.Common.GameFindObject {
 
         protected virtual void Awake() {
             _r = GetComponent<Renderer>();
+            CreateAudioIfNeed();
         }
 
         private void OnDestroy() {
@@ -30,8 +34,24 @@ namespace Games.Common.GameFindObject {
             gameObject.layer = 0;
             _r.enabled = false;
             GetComponent<Collider>().enabled = false;
-            
             StartCoroutine(PlayParticlesAndDead(isRight ? _rightBang : _wrongBang));
+            PlayAudioBang(isRight);
+        }
+        
+        protected void PlayAudioBang(bool isRight) {
+            var clip = isRight ? _audioRight : _audioWrong;
+            if (_audioSource != null && clip != null) {
+                _audioSource.clip = clip;
+                _audioSource.Play();
+            }
+        }
+
+        protected void CreateAudioIfNeed() {
+            if (_audioRight != null || _audioWrong != null) {
+                _audioSource = GetComponent<AudioSource>();
+                if  (_audioSource == null)
+                    _audioSource = gameObject.AddComponent<AudioSource>();
+            }
         }
 
         protected virtual IEnumerator PlayParticlesAndDead(ParticleSystem particles) {

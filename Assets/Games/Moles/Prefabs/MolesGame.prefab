@@ -48,7 +48,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _timeCountdown: 3
-  _timeGame: 15
+  _timeGame: 30
   _timeScore: 3
 --- !u!114 &6648669530852831015
 MonoBehaviour:
@@ -83,6 +83,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a047a6b6a4b94249b381f15a13aa6497, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _byUIFlip: 1
+  _bySandboxFlip: 1
+  _method: 0
 --- !u!1 &6648669531403264501
 GameObject:
   m_ObjectHideFlags: 0
@@ -137,11 +140,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 6648669531403264500}
     m_Modifications:
-    - target: {fileID: 6199553543684462970, guid: 647ab8eb03d081140846f29eb0f48d97,
-        type: 3}
-      propertyPath: m_Name
-      value: SpawnsLeft
-      objectReference: {fileID: 0}
     - target: {fileID: 6199553543684462969, guid: 647ab8eb03d081140846f29eb0f48d97,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -197,6 +195,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6199553543684462970, guid: 647ab8eb03d081140846f29eb0f48d97,
+        type: 3}
+      propertyPath: m_Name
+      value: SpawnsLeft
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 647ab8eb03d081140846f29eb0f48d97, type: 3}
 --- !u!4 &6648669530526991843 stripped
@@ -212,16 +215,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 6648669530852831012}
     m_Modifications:
-    - target: {fileID: 7795949437423083367, guid: e896628dc424e0841a1f01a59c7a777a,
-        type: 3}
-      propertyPath: m_Name
-      value: TplMole
-      objectReference: {fileID: 0}
-    - target: {fileID: 7795949437423083367, guid: e896628dc424e0841a1f01a59c7a777a,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 6189435222290316142, guid: e896628dc424e0841a1f01a59c7a777a,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -241,6 +234,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_RootOrder
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7795949437423083367, guid: e896628dc424e0841a1f01a59c7a777a,
+        type: 3}
+      propertyPath: m_Name
+      value: TplMole
+      objectReference: {fileID: 0}
+    - target: {fileID: 7795949437423083367, guid: e896628dc424e0841a1f01a59c7a777a,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e896628dc424e0841a1f01a59c7a777a, type: 3}
@@ -269,11 +272,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 6648669531403264500}
     m_Modifications:
-    - target: {fileID: 6199553543684462970, guid: 647ab8eb03d081140846f29eb0f48d97,
-        type: 3}
-      propertyPath: m_Name
-      value: SpawnsRight
-      objectReference: {fileID: 0}
     - target: {fileID: 6199553543684462969, guid: 647ab8eb03d081140846f29eb0f48d97,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -333,6 +331,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalScale.x
       value: -0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6199553543684462970, guid: 647ab8eb03d081140846f29eb0f48d97,
+        type: 3}
+      propertyPath: m_Name
+      value: SpawnsRight
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 647ab8eb03d081140846f29eb0f48d97, type: 3}

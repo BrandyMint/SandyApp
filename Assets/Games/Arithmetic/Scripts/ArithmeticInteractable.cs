@@ -25,6 +25,7 @@ namespace Games.Arithmetic {
             GetComponent<Collider>().enabled = false;
             
             StartCoroutine(PlayParticles(isRight ? _rightBang : _wrongBang));
+            PlayAudioBang(isRight);
         }
 
         private IEnumerator PlayParticles(ParticleSystem particles) {

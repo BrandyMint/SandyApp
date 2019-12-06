@@ -49,7 +49,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _timeCountdown: 3
-  _timeGame: 15
+  _timeGame: 30
   _timeScore: 3
 --- !u!114 &8956160778347397640
 MonoBehaviour:
@@ -86,6 +86,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a047a6b6a4b94249b381f15a13aa6497, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _byUIFlip: 1
+  _bySandboxFlip: 1
+  _method: 0
 --- !u!1 &885952449661470381
 GameObject:
   m_ObjectHideFlags: 0
@@ -378,11 +381,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 885952449257499024}
     m_Modifications:
-    - target: {fileID: 7238552113915210009, guid: fa06b26eff24d3e4995482f3d11317c7,
-        type: 3}
-      propertyPath: m_Name
-      value: ItemFlower
-      objectReference: {fileID: 0}
     - target: {fileID: 1934791141208301156, guid: fa06b26eff24d3e4995482f3d11317c7,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -437,6 +435,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7238552113915210009, guid: fa06b26eff24d3e4995482f3d11317c7,
+        type: 3}
+      propertyPath: m_Name
+      value: ItemFlower
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fa06b26eff24d3e4995482f3d11317c7, type: 3}

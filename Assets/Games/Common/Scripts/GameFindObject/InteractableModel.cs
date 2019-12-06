@@ -6,11 +6,13 @@ namespace Games.Common.GameFindObject {
 
         protected override void Awake() {
             _r = _model.GetComponent<Renderer>();
+            CreateAudioIfNeed();
         }
         
         public override void Bang(bool isRight) {
             Show(false);
             StartCoroutine(PlayParticlesAndDead(isRight ? _rightBang : _wrongBang));
+            PlayAudioBang(isRight);
         }
         
         public override void Dead() {
