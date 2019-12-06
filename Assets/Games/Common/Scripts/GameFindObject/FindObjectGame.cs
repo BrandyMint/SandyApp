@@ -14,7 +14,7 @@ namespace Games.Common.GameFindObject {
     public class FindObjectGame : MonoBehaviour {
         [SerializeField] protected Camera _cam;
         [SerializeField] protected Interactable[] _tplItems;
-        [SerializeField] private GameField _gameField;
+        [SerializeField] protected GameField _gameField;
         [SerializeField] protected int _maxItems = 9;
         [SerializeField] private float _minItemTypeFullnes = 0.7f;
         [SerializeField] protected float _timeOffsetSpown = 1f;
@@ -100,7 +100,7 @@ namespace Games.Common.GameFindObject {
             }
         }
 
-        protected Interactable SpawnItem(Interactable tpl) {
+        protected virtual Interactable SpawnItem(Interactable tpl) {
             var stayAway = _items.Select(b => b.transform.position).ToArray();
             var stayAwayDist = math.cmax(tpl.transform.localScale);
             if (SpawnArea.AnyGetRandomSpawn(out var worldPos, out var worldRot, stayAway, stayAwayDist)) {
@@ -178,7 +178,7 @@ namespace Games.Common.GameFindObject {
             }
         }
 
-        private void SetSizes(float dist) {
+        protected virtual void SetSizes(float dist) {
             var verticalSize = MathHelper.IsoscelesTriangleSize(dist, _cam.fieldOfView);
             var size = verticalSize * _initialItemSize;
             foreach (var item in _tplItems.Concat(_items)) {
