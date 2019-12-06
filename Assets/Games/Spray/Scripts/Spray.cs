@@ -25,12 +25,6 @@ namespace Games.Spray {
         }
 
         private void Awake() {
-            _renderer.material.color = _color;
-            var property = new MaterialPropertyBlock();
-            _renderer.GetPropertyBlock(property);
-            property.SetColor(_COLOR, _color);
-            _renderer.SetPropertyBlock(property);
-            
             var module = _particle.main;
             module.startColor = _color;
 
