@@ -9620,3 +9620,5 @@ MonoBehaviour:
   _rightBang: {fileID: 2531397365778485061}
   _wrongBang: {fileID: 2218022738986160184}
   _itemType: 0
+  _audioRight: {fileID: 8300000, guid: ebbbad6c018e0e549811829478c684f9, type: 3}
+  _audioWrong: {fileID: 8300000, guid: 9d7bd52d6b823bb4a8005fec1932a5a2, type: 3}

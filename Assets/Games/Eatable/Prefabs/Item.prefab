@@ -67,6 +67,8 @@ MonoBehaviour:
   _rightBang: {fileID: 947928235343670665}
   _wrongBang: {fileID: 3983847737232171205}
   _itemType: 1
+  _audioRight: {fileID: 8300000, guid: ebbbad6c018e0e549811829478c684f9, type: 3}
+  _audioWrong: {fileID: 8300000, guid: 9d7bd52d6b823bb4a8005fec1932a5a2, type: 3}
   _model: {fileID: 6790332457071323633}
 --- !u!114 &1019810662881158980
 MonoBehaviour:
@@ -266,6 +268,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: ParticlesWrong
       objectReference: {fileID: 0}
+    - target: {fileID: 6190769752472909000, guid: 3bad531e54475e040bee94b73cf7c2d1,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 9110490e239f6bf418dffa0d8ef7528c, type: 2}
     - target: {fileID: 8030209692136285088, guid: 3bad531e54475e040bee94b73cf7c2d1,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -321,11 +328,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6190769752472909000, guid: 3bad531e54475e040bee94b73cf7c2d1,
-        type: 3}
-      propertyPath: m_Materials.Array.data[0]
-      value: 
-      objectReference: {fileID: 2100000, guid: 9110490e239f6bf418dffa0d8ef7528c, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3bad531e54475e040bee94b73cf7c2d1, type: 3}
 --- !u!4 &5262820111964167976 stripped

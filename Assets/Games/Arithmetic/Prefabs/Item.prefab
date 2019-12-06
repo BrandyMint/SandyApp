@@ -9799,6 +9799,8 @@ MonoBehaviour:
   _rightBang: {fileID: 2978716052237361}
   _wrongBang: {fileID: 4462010271782302540}
   _itemType: 0
+  _audioRight: {fileID: 8300000, guid: ebbbad6c018e0e549811829478c684f9, type: 3}
+  _audioWrong: {fileID: 8300000, guid: 9d7bd52d6b823bb4a8005fec1932a5a2, type: 3}
   _txt: {fileID: 6150682852976457754}
 --- !u!114 &5733445318632603635
 MonoBehaviour:
