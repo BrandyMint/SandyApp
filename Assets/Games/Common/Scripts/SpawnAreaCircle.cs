@@ -2,17 +2,17 @@
 
 namespace Games.Common {
     public class SpawnAreaCircle : SpawnArea {
-        [SerializeField] private Transform _tplSpawn;
-        [SerializeField] private float _radius = 0.5f;
+        [SerializeField] protected Transform _tplSpawn;
+        [SerializeField] protected float _radius = 0.5f;
         [SerializeField] private float _randomizePosition = 0.2f;
-        [SerializeField] private int _count = 12;
+        [SerializeField] protected int _count = 12;
         
         protected override void Awake() {
             GenerateSpawns();
             base.Awake();
         }
 
-        private void GenerateSpawns() {
+        protected virtual void GenerateSpawns() {
             var angle = 0f;
             var angleStep = Mathf.PI * 2f / _count;
             for (int i = 0; i < _count; ++i) {
