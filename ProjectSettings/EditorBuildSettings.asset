@@ -54,6 +54,9 @@ EditorBuildSettings:
     path: Assets/Scenes/GamePlanet.unity
     guid: 13a06acafad34104aa9c72b45765cca0
   - enabled: 1
+    path: Assets/Scenes/GameTubes.unity
+    guid: 1ee71661b9b1ab74e9561f009741f834
+  - enabled: 1
     path: Assets/Scenes/GameAdaptiveGradient.unity
     guid: eae8d2375f594cc4ea547428ed43a96f
   - enabled: 1

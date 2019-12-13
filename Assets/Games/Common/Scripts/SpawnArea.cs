@@ -10,7 +10,7 @@ namespace Games.Common {
 
         public static IEnumerable<SpawnArea> Areas => _instances;
 
-        private static readonly List<SpawnArea> _instances = new List<SpawnArea>();
+        protected static readonly List<SpawnArea> _instances = new List<SpawnArea>();
 
         private readonly List<Transform> _spawns = new List<Transform>();
 
@@ -44,7 +44,7 @@ namespace Games.Common {
             return false;
         }
         
-        public bool GetRandomSpawn(out Vector3 worldPos, out Quaternion worldRot, Vector3[] stayAway = null, float stayAwayDist = 1f) {
+        public virtual bool GetRandomSpawn(out Vector3 worldPos, out Quaternion worldRot, Vector3[] stayAway = null, float stayAwayDist = 1f) {
             worldPos = Vector3.zero;
             worldRot = Quaternion.identity;
             if (!_spawns.Any())

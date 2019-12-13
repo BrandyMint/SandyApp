@@ -27,8 +27,8 @@ namespace Games.Common.GameFindObject {
         private int _hitMask;
         private CameraRenderToTexture _renderDepth;
         private readonly DelayedDisposeNativeArray<byte> _depth = new DelayedDisposeNativeArray<byte>();
-        private int2 _depthSize; 
-        private float _initialItemSize;
+        private int2 _depthSize;
+        protected float _initialItemSize;
         private int _score;
         protected bool _isGameStarted;
 
@@ -114,7 +114,7 @@ namespace Games.Common.GameFindObject {
             return null;
         }
 
-        private void OnItemDestroyed(Interactable interactable) {
+        protected virtual void OnItemDestroyed(Interactable interactable) {
             _items.Remove(interactable);
         }
 
@@ -126,7 +126,7 @@ namespace Games.Common.GameFindObject {
             }
         }
 
-        private void Fire(Vector2 viewPos) {
+        protected void Fire(Vector2 viewPos) {
             if (!_isGameStarted) return;
             
             var ray = _cam.ViewportPointToRay(viewPos);
@@ -158,7 +158,7 @@ namespace Games.Common.GameFindObject {
             _renderDepth.RequestData(_depth, ProcessDepthFrame);
         }
         
-        private void ProcessDepthFrame() {
+        protected virtual void ProcessDepthFrame() {
             for (int x = 0; x < _depthSize.x; ++x) {
                 for (int y = 0; y < _depthSize.y; ++y) {
                     if (_depth.o[x + y * _depthSize.x] > 0) {
@@ -188,7 +188,7 @@ namespace Games.Common.GameFindObject {
             _gameField.SetWidth(size);
         }
 
-        private void ClearItems() {
+        protected void ClearItems() {
             foreach (var item in _items) {
                 item.Dead();
             }
