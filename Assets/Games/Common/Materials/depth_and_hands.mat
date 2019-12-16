@@ -58,10 +58,10 @@ Material:
     m_Floats:
     - _BumpScale: 1
     - _Cutoff: 0.5
-    - _DepthMaxOffset: 0.5
-    - _DepthMinOffset: 0.5
+    - _DepthMaxOffset: 0.2
+    - _DepthMinOffset: 0.2
     - _DepthSliceOffset: 0.05
-    - _DepthZero: 2
+    - _DepthZero: 1.6
     - _DetailNormalMapScale: 1
     - _DotSlice: 0.7
     - _DstBlend: 0
