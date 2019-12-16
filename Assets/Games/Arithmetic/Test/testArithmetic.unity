@@ -815,6 +815,16 @@ PrefabInstance:
       propertyPath: m_SizeDelta.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5428262707788964872, guid: 2a46d87cc50f7f34dbbdfe0d84a451d5,
+        type: 3}
+      propertyPath: _operations.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 5428262707788964872, guid: 2a46d87cc50f7f34dbbdfe0d84a451d5,
+        type: 3}
+      propertyPath: _operations.Array.data[2]
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 6970061645007079270, guid: 2a46d87cc50f7f34dbbdfe0d84a451d5,
         type: 3}
       propertyPath: m_AnchorMin.y

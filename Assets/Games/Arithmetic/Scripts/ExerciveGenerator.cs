@@ -17,12 +17,13 @@ namespace Games.Arithmetic {
         [SerializeField] private int _minNumber = 1;
         [SerializeField] private int _maxNumber = 9;
         [SerializeField] private int _maxAnswer = 20;
-        [SerializeField] private OP[] _operations = {OP.PLUS, OP.MINUS}; 
+        [SerializeField] private OP[] _operations = {OP.PLUS, OP.MINUS, OP.MULT}; 
 
         [Serializable]
         public enum OP {
             PLUS,
-            MINUS    
+            MINUS,
+            MULT
         }
 
         public void Generate(int answersCount, out int rightAnswer, out IEnumerable<int> answers) {
@@ -51,6 +52,9 @@ namespace Games.Arithmetic {
                     case OP.MINUS:
                         max = Mathf.Min(max, a1);
                         break;
+                    case OP.MULT:
+                        max = Mathf.Min(max, _maxAnswer / a1);
+                        break;
                 }
                 if (min <= max) {
                     a = a1;
@@ -62,6 +66,9 @@ namespace Games.Arithmetic {
                             break;
                         case OP.MINUS:
                             answer = a - b;
+                            break;
+                        case OP.MULT:
+                            answer = a * b;
                             break;
                     }
                     return;
@@ -100,6 +107,9 @@ namespace Games.Arithmetic {
                     break;
                 case OP.MINUS:
                     txtOp = '-';
+                    break;
+                case OP.MULT:
+                    txtOp = '×';
                     break;
             }
             _txtExercive.text = $"{a} {txtOp} {b} =";
