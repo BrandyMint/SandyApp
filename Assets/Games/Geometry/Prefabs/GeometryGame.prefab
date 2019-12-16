@@ -64,17 +64,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _cam: {fileID: 0}
+  _gameField: {fileID: 3095261393578772298}
+  _depthHeight: 64
+  _sandbox: {fileID: 0}
+  _matDepth: {fileID: 2100000, guid: d046492b8d6dc9f4192f245a7510eafb, type: 2}
   _tplItems:
   - {fileID: 4660340743860056155}
   - {fileID: 3333329850689374500}
   - {fileID: 96216098116298031}
-  _gameField: {fileID: 3095261393578772298}
   _maxItems: 9
   _minItemTypeFullnes: 0.7
   _timeOffsetSpown: 0.5
-  _depthHeight: 64
-  _sandbox: {fileID: 0}
-  _matDepth: {fileID: 2100000, guid: d046492b8d6dc9f4192f245a7510eafb, type: 2}
 --- !u!1 &885952449661470381
 GameObject:
   m_ObjectHideFlags: 0
@@ -276,7 +276,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 937371b0f87141d8a0baa2732eb5ac32, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _randomizeAngle: {x: 0, y: 0, z: 0}
+  _randomizeAngle: {x: 0, y: 0, z: 360}
   _tplSpawn: {fileID: 885952449950637472}
   _radius: 0.75
   _randomizePosition: 0
