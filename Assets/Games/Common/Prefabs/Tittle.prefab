@@ -11,8 +11,9 @@ GameObject:
   - component: {fileID: 6427224280832922163}
   - component: {fileID: 6427224280832922173}
   - component: {fileID: 6427224280832922172}
+  - component: {fileID: 5667889209509476896}
   m_Layer: 5
-  m_Name: Title
+  m_Name: Tittle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -76,4 +77,18 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: "\u041F\u0410\u0420\u0410\u041C\u0415\u0422\u0420\u042B \u041F\u0420\u041E\u0415\u041A\u0422\u041E\u0420\u0410"
+  m_Text: "\u0418\u0413\u0420\u0410"
+--- !u!114 &5667889209509476896
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6427224280832922162}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b30d967d6208a4b479d1ac1f4ffb5fb0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _autoSetCurrent: 1
+  _withNumber: 1

@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a9f5a1d450904b4ba1e791f6e416c9f, type: 3}
+  m_Name: GameTopographyBordersDescription
+  m_EditorClassIdentifier: 
+  _scenePath: Assets/Scenes/GameTopographyBorders.unity
+  _sceneName: "\u0422\u041E\u041F\u041E\u0413\u0420\u0410\u0424\u0418\u042F \n(\u0422\u041E\u041B\u042C\u041A\u041E
+    \u0413\u0420\u0410\u041D\u0418\u0426\u042B)"
+  _icon: {fileID: 21300000, guid: 0d0f654b837a18542acdfa0ea27dcb2d, type: 3}

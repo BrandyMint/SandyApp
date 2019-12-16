@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace Utilities {
     public static class UnityHelper {
@@ -154,6 +155,18 @@ namespace Utilities {
             var c = go.AddComponent(toAdd.GetType());
             c.CopyFrom(toAdd);
             return c;
+        }
+        
+        public static void ScrollTo(this ScrollRect scrollRect, Transform child) {
+            Canvas.ForceUpdateCanvases();
+            Vector2 viewportLocalPosition = scrollRect.viewport.localPosition;
+            Vector2 childLocalPosition = child.localPosition;
+            Vector2 old = scrollRect.content.localPosition;
+            var result = new Vector2(
+                scrollRect.horizontal ? -(viewportLocalPosition.x + childLocalPosition.x) : old.x,
+                scrollRect.vertical ? -(viewportLocalPosition.y + childLocalPosition.y) : old.y
+            );
+            scrollRect.content.localPosition = result;
         }
     }
 }

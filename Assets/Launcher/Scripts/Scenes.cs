@@ -22,7 +22,6 @@ namespace Launcher {
         //private readonly Stack<int> _scenes = new Stack<int>();
         private Notify.Control _notifyNoMonitors;
         private int _currentGameSceneId;
-        private readonly List<string> _gameScenes = new List<string>(); 
         private readonly List<Scene> _toUnload = new List<Scene>();
         /*private CalibrationStep[] _calibrationSteps;
 
@@ -50,7 +49,6 @@ namespace Launcher {
                 new CalibrationStep(new ProjectorParams(), _sceneProjectorParamsPath),
                 new CalibrationStep(new CalibrationParams(), _sceneCalibrationPath)
             };*/
-            FindGameScenes();
             
             OnSceneLoaded(SceneManager.GetActiveScene(), LoadSceneMode.Single);
             SceneManager.sceneLoaded += OnSceneLoaded;
@@ -83,23 +81,8 @@ namespace Launcher {
             
             _instance = null;
         }
-
-        private void FindGameScenes() {
-            for (int i = 0; i < SceneManager.sceneCountInBuildSettings; i++) {
-                var scenePath = SceneUtility.GetScenePathByBuildIndex(i);
-                if (IsGameScene(scenePath)) {
-                    _gameScenes.Add(scenePath);
-                }
-            }
-        }
         
-        public static string CurrentGamePath {
-            get {
-                if (_instance == null || _instance._gameScenes == null || !_instance._gameScenes.Any())
-                    return null;
-                return _instance._gameScenes[_instance._currentGameSceneId];
-            }
-        }
+        public static string CurrentGamePath => GamesList.GetDescription(_instance._currentGameSceneId).ScenePath;
 
         private void OnNotEnoughMonitors() {
             if (_notifyNoMonitors == null)
@@ -111,7 +94,7 @@ namespace Launcher {
 
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode) {
             if (IsGameScene(scene))
-                _currentGameSceneId = _gameScenes.FindIndex(s => s == scene.path);
+                _currentGameSceneId = GamesList.GetId(scene);
             foreach (var unloadScene in _toUnload) {
                 SceneManager.UnloadSceneAsync(unloadScene);
             }
@@ -163,7 +146,7 @@ namespace Launcher {
             //GoToWithCheckCalibration(sceneId);
             //for now, just go to main scene
             if (!IsGameScene(SceneManager.GetActiveScene()))
-                GoToWithChecking(_gameScenes[_currentGameSceneId]);
+                GoToWithChecking(GamesList.GetDescription(_currentGameSceneId).ScenePath);
             else
                 GoToWithChecking(_sceneMainPath);
         }
@@ -184,7 +167,7 @@ namespace Launcher {
         }
         
         private bool IsGameScene(string scenePath) {
-            return scenePath != _sceneMainPath && !IsCalibrationScene(scenePath);
+            return GamesList.IsGame(scenePath);
         }
 
         private void OpenViewer() {
@@ -200,13 +183,13 @@ namespace Launcher {
         }
 
         private void OpenNextGame() {
-            _currentGameSceneId = (_currentGameSceneId + 1) % _gameScenes.Count;
-            GoToWithChecking(_gameScenes[_currentGameSceneId]);
+            _currentGameSceneId = (_currentGameSceneId + 1) % GamesList.Count;
+            GoToWithChecking(GamesList.GetDescription(_currentGameSceneId).ScenePath);
         }
         
         private void OpenPrevGame() {
-            _currentGameSceneId = (_gameScenes.Count + _currentGameSceneId - 1) % _gameScenes.Count;
-            GoToWithChecking(_gameScenes[_currentGameSceneId]);
+            _currentGameSceneId = (GamesList.Count + _currentGameSceneId - 1) % GamesList.Count;
+            GoToWithChecking(GamesList.GetDescription(_currentGameSceneId).ScenePath);
         }
     }
 }
