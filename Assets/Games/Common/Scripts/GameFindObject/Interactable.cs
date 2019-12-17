@@ -38,7 +38,7 @@ namespace Games.Common.GameFindObject {
             PlayAudioBang(isRight);
         }
         
-        protected void PlayAudioBang(bool isRight) {
+        public void PlayAudioBang(bool isRight) {
             var clip = isRight ? _audioRight : _audioWrong;
             if (_audioSource != null && clip != null) {
                 _audioSource.clip = clip;

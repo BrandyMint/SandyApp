@@ -161,8 +161,7 @@ namespace Games.Moles {
         }
 
         private void SetSizes(float dist) {
-            var verticalSize = MathHelper.IsoscelesTriangleSize(dist, _cam.fieldOfView);
-            var size = verticalSize * _initialMoleSize;
+            var size = _gameField.Scale * _initialMoleSize;
             _tplMole.transform.localScale = Vector3.one * size;
             foreach (var mole in _moles) {
                 mole.transform.localScale = Vector3.one * size;

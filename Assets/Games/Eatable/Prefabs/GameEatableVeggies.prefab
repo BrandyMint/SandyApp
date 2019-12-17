@@ -21,10 +21,20 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 79849412955237548, guid: c4c0fd57e60b13247ba51a0f94a30caf,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 794944916393301642, guid: c4c0fd57e60b13247ba51a0f94a30caf,
         type: 3}
       propertyPath: m_Name
       value: GameEatableVeggies
+      objectReference: {fileID: 0}
+    - target: {fileID: 794944916393301652, guid: c4c0fd57e60b13247ba51a0f94a30caf,
+        type: 3}
+      propertyPath: _timeGame
+      value: 60
       objectReference: {fileID: 0}
     - target: {fileID: 794944916393301653, guid: c4c0fd57e60b13247ba51a0f94a30caf,
         type: 3}
@@ -81,31 +91,26 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 794944916393301652, guid: c4c0fd57e60b13247ba51a0f94a30caf,
+    - target: {fileID: 2331584314020393334, guid: c4c0fd57e60b13247ba51a0f94a30caf,
         type: 3}
-      propertyPath: _timeGame
-      value: 60
+      propertyPath: _fieldTexture
+      value: 
+      objectReference: {fileID: 2800000, guid: 20523635fe377504e99590a77b09189b, type: 3}
+    - target: {fileID: 3351459824913393961, guid: c4c0fd57e60b13247ba51a0f94a30caf,
+        type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
+    - target: {fileID: 3791977824044679692, guid: c4c0fd57e60b13247ba51a0f94a30caf,
+        type: 3}
+      propertyPath: _randomizeAngle.x
+      value: 70
       objectReference: {fileID: 0}
     - target: {fileID: 4893234349622559537, guid: c4c0fd57e60b13247ba51a0f94a30caf,
         type: 3}
       propertyPath: _fieldTexture
       value: 
       objectReference: {fileID: 2800000, guid: 20523635fe377504e99590a77b09189b, type: 3}
-    - target: {fileID: 3791977824044679692, guid: c4c0fd57e60b13247ba51a0f94a30caf,
-        type: 3}
-      propertyPath: _randomizeAngle.x
-      value: 70
-      objectReference: {fileID: 0}
-    - target: {fileID: 79849412955237548, guid: c4c0fd57e60b13247ba51a0f94a30caf,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3351459824913393961, guid: c4c0fd57e60b13247ba51a0f94a30caf,
-        type: 3}
-      propertyPath: m_Mesh
-      value: 
-      objectReference: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
     - target: {fileID: 8199388372361839008, guid: c4c0fd57e60b13247ba51a0f94a30caf,
         type: 3}
       propertyPath: m_IsActive

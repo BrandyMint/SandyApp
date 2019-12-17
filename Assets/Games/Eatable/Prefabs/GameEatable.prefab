@@ -276,20 +276,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _cam: {fileID: 0}
-  _tplItems:
-  - {fileID: 6167003250103097206}
-  - {fileID: 6778798593762976476}
   _gameField: {fileID: 2331584314020393334}
-  _maxItems: 9
-  _minItemTypeFullnes: 0.7
-  _timeOffsetSpown: 0.3
   _depthHeight: 64
   _sandbox: {fileID: 0}
   _matDepth: {fileID: 2100000, guid: d046492b8d6dc9f4192f245a7510eafb, type: 2}
+  _tplItems:
+  - {fileID: 6167003250103097206}
+  - {fileID: 6778798593762976476}
+  _maxItems: 9
+  _minItemTypeFullnes: 0.7
+  _timeOffsetSpown: 0.3
   _addForce: 5
   _lifeTime: 2
   _itemMass: 1
-  _fieldTexture: {fileID: 2800000, guid: 38dfe50a7d5acf849911b5e656b7d744, type: 3}
 --- !u!114 &398606163
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -497,6 +496,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _offsetedByWidth: []
   _offsetedByWidthAndSize: []
+  _fieldTexture: {fileID: 2800000, guid: 38dfe50a7d5acf849911b5e656b7d744, type: 3}
 --- !u!1 &5098955879037904717
 GameObject:
   m_ObjectHideFlags: 0
@@ -1056,10 +1056,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 794944916393301653}
     m_Modifications:
-    - target: {fileID: 3648247430777844586, guid: 565da40ec69442a46a162e793b463822,
+    - target: {fileID: 628089749961123536, guid: 565da40ec69442a46a162e793b463822,
         type: 3}
-      propertyPath: m_Name
-      value: TplItemNonEatable
+      propertyPath: _itemType
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 2605067972169994970, guid: 565da40ec69442a46a162e793b463822,
         type: 3}
@@ -1116,10 +1116,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 628089749961123536, guid: 565da40ec69442a46a162e793b463822,
+    - target: {fileID: 3648247430777844586, guid: 565da40ec69442a46a162e793b463822,
         type: 3}
-      propertyPath: _itemType
-      value: -1
+      propertyPath: m_Name
+      value: TplItemNonEatable
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 565da40ec69442a46a162e793b463822, type: 3}
@@ -1154,11 +1154,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 794944916393301653}
     m_Modifications:
-    - target: {fileID: 3648247430777844586, guid: 565da40ec69442a46a162e793b463822,
-        type: 3}
-      propertyPath: m_Name
-      value: TplItemEatable
-      objectReference: {fileID: 0}
     - target: {fileID: 2605067972169994970, guid: 565da40ec69442a46a162e793b463822,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -1213,6 +1208,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3648247430777844586, guid: 565da40ec69442a46a162e793b463822,
+        type: 3}
+      propertyPath: m_Name
+      value: TplItemEatable
       objectReference: {fileID: 0}
     - target: {fileID: 8331714770819913871, guid: 565da40ec69442a46a162e793b463822,
         type: 3}

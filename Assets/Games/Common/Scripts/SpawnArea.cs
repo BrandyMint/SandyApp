@@ -7,18 +7,22 @@ using Random = UnityEngine.Random;
 namespace Games.Common {
     public class SpawnArea : MonoBehaviour {
         [SerializeField] private Vector3 _randomizeAngle;
+        [SerializeField] private List<Transform> _spawns = new List<Transform>();
 
         public static IEnumerable<SpawnArea> Areas => _instances;
 
         protected static readonly List<SpawnArea> _instances = new List<SpawnArea>();
 
-        private readonly List<Transform> _spawns = new List<Transform>();
-
         protected virtual void Awake() {
-            foreach (Transform child in transform) {
-                if (child.gameObject.activeSelf)
-                    _spawns.Add(child);
-                child.gameObject.SetActive(false);
+            if (_spawns == null || !_spawns.Any()) {
+                _spawns = new List<Transform>();
+                foreach (Transform child in transform) {
+                    if (child.gameObject.activeSelf)
+                        _spawns.Add(child);
+                }
+            }
+            foreach (var spawn in _spawns) {
+                spawn.gameObject.SetActive(false);
             }
             _instances.Add(this);
         }
