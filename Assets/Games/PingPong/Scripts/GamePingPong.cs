@@ -142,6 +142,14 @@ namespace Games.PingPong.Scripts {
                 z = 0f
             };
             player.position = _gameField.transform.TransformPoint(fieldPos);
+            
+            var otherPlayer = _players.First(p => p != player);
+            if (Vector3.Dot(player.right, otherPlayer.position - player.position) < 0) {
+                //swap rotations
+                var rot = player.rotation;
+                player.rotation = otherPlayer.rotation;
+                otherPlayer.rotation = rot;
+            }
         }
         
         protected override void Update() {
