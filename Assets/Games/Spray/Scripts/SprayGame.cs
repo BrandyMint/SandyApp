@@ -153,8 +153,7 @@ namespace Games.Spray {
         }
 
         private void SetSizes(float dist) {
-            var verticalSize = MathHelper.IsoscelesTriangleSize(dist, _cam.fieldOfView);
-            var size = verticalSize * _initialItemSize;
+            var size = _gameField.Scale * _initialItemSize;
             foreach (var item in _items) {
                 item.transform.localScale = Vector3.one * size;
             }

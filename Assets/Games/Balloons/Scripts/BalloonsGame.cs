@@ -164,8 +164,7 @@ namespace Games.Balloons {
         }
 
         private void SetSizes(float dist) {
-            var verticalSize = MathHelper.IsoscelesTriangleSize(dist, _cam.fieldOfView);
-            var size = verticalSize * _initialBallSize;
+            var size = _gameField.Scale * _initialBallSize;
             _tplBalloon.transform.localScale = Vector3.one * size;
             _gameField.AlignToCamera(_cam, dist);
             _gameField.SetWidth(size * 2f);

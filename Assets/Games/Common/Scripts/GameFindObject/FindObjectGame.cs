@@ -1,73 +1,37 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using DepthSensorCalibration;
-using DepthSensorSandbox.Visualisation;
-using Games.Balloons;
 using Games.Common.Game;
 using Unity.Mathematics;
 using UnityEngine;
-using UnityEngine.Rendering;
 using Utilities;
 
 namespace Games.Common.GameFindObject {
-    public class FindObjectGame : MonoBehaviour {
-        [SerializeField] protected Camera _cam;
+    public class FindObjectGame : BaseGame {
         [SerializeField] protected Interactable[] _tplItems;
-        [SerializeField] protected GameField _gameField;
         [SerializeField] protected int _maxItems = 9;
         [SerializeField] private float _minItemTypeFullnes = 0.7f;
         [SerializeField] protected float _timeOffsetSpown = 1f;
-        [SerializeField] private int _depthHeight = 64;
-        [SerializeField] private SandboxMesh _sandbox;
-        [SerializeField] private Material _matDepth;
 
         protected List<Interactable> _items = new List<Interactable>();
         
-        private int _hitMask;
-        private CameraRenderToTexture _renderDepth;
-        private readonly DelayedDisposeNativeArray<byte> _depth = new DelayedDisposeNativeArray<byte>();
-        private int2 _depthSize;
         protected float _initialItemSize;
         private int _score;
-        protected bool _isGameStarted;
 
-        protected virtual void Start() {
-            _hitMask = LayerMask.GetMask("interactable");
-
-            _renderDepth = CreateRenderDepth();
-            _renderDepth.MaxResolution = _depthHeight;
-            _renderDepth.Enable(_matDepth, RenderTextureFormat.R8, OnNewDepthFrame, CreateCommandBufferDepth);
-
+        protected override void Start() {
             _initialItemSize = math.cmax(_tplItems.First().transform.localScale);
             foreach (var item in _tplItems) {
                 item.gameObject.SetActive(false);
             }
+            
+            base.Start();
 
             Interactable.OnDestroyed += OnItemDestroyed;
-            Prefs.Calibration.OnChanged += OnCalibrationChanged;
-            Prefs.Sandbox.OnChanged += OnCalibrationChanged;
-            OnCalibrationChanged();
-
-            GameEvent.OnStart += StartGame;
-            GameEvent.OnStop += StopGame;
         }
 
-        protected virtual CameraRenderToTexture CreateRenderDepth() {
-            return _cam.gameObject.AddComponent<CameraRenderToTexture>();
-        }
-
-        protected virtual void OnDestroy() {
-            GameEvent.OnStart -= StartGame;
-            GameEvent.OnStop -= StopGame;
-            
-            Prefs.Sandbox.OnChanged -= OnCalibrationChanged;
-            Prefs.Calibration.OnChanged -= OnCalibrationChanged;
+        protected override void OnDestroy() {
             Interactable.OnDestroyed -= OnItemDestroyed;
-            if (_renderDepth != null) {
-                _renderDepth.Disable();
-            }
-            _depth.Dispose();
+            base.OnDestroy();
         }
 
         protected virtual IEnumerator Spawning() {
@@ -118,27 +82,7 @@ namespace Games.Common.GameFindObject {
             _items.Remove(interactable);
         }
 
-        private void Update() {
-            if (Input.GetMouseButtonDown(0)) {
-                var screen = new float2(_cam.pixelWidth, _cam.pixelHeight);
-                var pos = new float2(Input.mousePosition.x, Input.mousePosition.y);
-                Fire(pos / screen);
-            }
-        }
-
-        protected void Fire(Vector2 viewPos) {
-            if (!_isGameStarted) return;
-            
-            var ray = _cam.ViewportPointToRay(viewPos);
-            if (Physics.Raycast(ray, out var hit, _cam.farClipPlane, _hitMask)) {
-                var item = hit.collider.GetComponent<Interactable>() ?? hit.collider.GetComponentInParent<Interactable>();
-                if (item != null) {
-                    OnFireItem(item, viewPos);
-                }
-            }
-        }
-
-        protected virtual void OnFireItem(Interactable item, Vector2 viewPos) {
+        protected override void OnFireItem(Interactable item, Vector2 viewPos) {
             var neededType = RandomChooseItemOnGameStart.Instance.ItemId;
             if (item.ItemType == neededType) {
                 ++GameScore.Score;
@@ -148,43 +92,12 @@ namespace Games.Common.GameFindObject {
             }
         }
 
-        private void CreateCommandBufferDepth(CommandBuffer cmb, Material mat, RenderTexture rt, RenderTargetIdentifier src) {
-            cmb.SetRenderTarget(rt);
-            _sandbox.AddDrawToCommandBuffer(cmb, mat);
-        }
-
-        private void OnNewDepthFrame(RenderTexture t) {
-            _depthSize = new int2(t.width, t.height);
-            _renderDepth.RequestData(_depth, ProcessDepthFrame);
-        }
-        
-        protected virtual void ProcessDepthFrame() {
-            for (int x = 0; x < _depthSize.x; ++x) {
-                for (int y = 0; y < _depthSize.y; ++y) {
-                    if (_depth.o[x + y * _depthSize.x] > 0) {
-                        Fire(new float2(x, y) / _depthSize);
-                    }
-                }
-            }
-        }
-
-        protected virtual void OnCalibrationChanged() {
-            var cam = _cam.GetComponent<SandboxCamera>();
-            if (cam != null) {
-                cam.OnCalibrationChanged();
-                SetSizes(Prefs.Sandbox.ZeroDepth);
-            } else {
-                SetSizes(1.66f); //for testing
-            }
-        }
-
-        protected virtual void SetSizes(float dist) {
-            var verticalSize = MathHelper.IsoscelesTriangleSize(dist, _cam.fieldOfView);
-            var size = verticalSize * _initialItemSize;
+        protected override void SetSizes(float dist) {
+            base.SetSizes(dist);
+            var size = _gameField.Scale * _initialItemSize;
             foreach (var item in _tplItems.Concat(_items)) {
                 item.transform.localScale = Vector3.one * size;
             }
-            _gameField.AlignToCamera(_cam, dist);
             _gameField.SetWidth(size);
         }
 
@@ -195,15 +108,14 @@ namespace Games.Common.GameFindObject {
             _items.Clear();
         }
 
-        protected virtual void StartGame() {
+        protected override void StartGame() {
             ClearItems();
-            GameScore.Score = 0;
-            _isGameStarted = true;
             StartCoroutine(nameof(Spawning));
+            base.StartGame();
         }
 
-        protected virtual void StopGame() {
-            _isGameStarted = false;
+        protected override void StopGame() {
+            base.StopGame();
             StopCoroutine(nameof(Spawning));
         }
     }

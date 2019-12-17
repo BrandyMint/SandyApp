@@ -11,7 +11,6 @@ namespace Games.Eatable {
         [SerializeField] private float _addForce = 1f;
         [SerializeField] private float _lifeTime = 2f;
         [SerializeField] private float _itemMass = 1f;
-        [SerializeField] private Texture2D _fieldTexture;
 
         protected override IEnumerator Spawning() {
             while (true) {
@@ -34,9 +33,8 @@ namespace Games.Eatable {
         }
 
         protected override void OnFireItem(Interactable item, Vector2 viewPos) {
-            var c = _fieldTexture.GetPixel((int) (_fieldTexture.width * viewPos.x), (int) (_fieldTexture.height * viewPos.y));
-            if (c.a < 1f) {
-                var player = Mathf.RoundToInt(c.a * GameScore.PlayerScore.Count);
+            var player = _gameField.PlayerField(viewPos);
+            if (player >= 0) {
                 GameScore.PlayerScore[player] = Mathf.Clamp(GameScore.PlayerScore[player] + item.ItemType,
                     0, int.MaxValue);
                 
@@ -46,13 +44,6 @@ namespace Games.Eatable {
                     item.Bang(false);
                 }
             }
-        }
-
-        protected override void StartGame() {
-            for (int player = 0; player < GameScore.PlayerScore.Count; ++player) {
-                GameScore.PlayerScore[player] = 0;
-            }
-            base.StartGame();
         }
     }
 }
