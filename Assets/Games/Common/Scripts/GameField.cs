@@ -79,6 +79,7 @@ namespace Games.Common {
         }
         
         public float Scale => transform.localScale.y;
+        public Vector3 WorldSize => transform.TransformVector(new Vector3(1, 1, -1));
 
         public Vector3 WorldFromViewport(Vector2 viewport) {
             if (_lastCam == null)

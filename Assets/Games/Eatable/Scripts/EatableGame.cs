@@ -26,9 +26,9 @@ namespace Games.Eatable {
                         
                         var rigid = item.GetComponent<Rigidbody>();
                         rigid.mass *= _itemMass;
-                        var force = _addForce * math.cmax(item.transform.lossyScale) 
-                                              * new Vector3(_cam.pixelHeight, 0, _cam.pixelWidth).normalized;
-                        rigid.AddForce(item.transform.rotation * force, ForceMode.Impulse);
+                        var force = item.transform.rotation * Vector3.forward;
+                        force *= new float3(_gameField.WorldSize) * _addForce;
+                        rigid.AddForce(force, ForceMode.Impulse);
                         item.transform.rotation = Random.rotation;
                     }
                 }
