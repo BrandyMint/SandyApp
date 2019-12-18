@@ -123,20 +123,22 @@ namespace Games.Spray {
 
         protected virtual void OnCalibrationChanged() {
             var cam = _cam.GetComponent<SandboxCamera>();
+            var spawnArea = SpawnArea.Areas.First().transform;
             if (cam != null) {
                 cam.OnCalibrationChanged();
-                SetSizes(Prefs.Sandbox.ZeroDepth);
+                SetSizes(Prefs.Sandbox.ZeroDepth - Prefs.Sandbox.OffsetMaxDepth);
+                CorrectSpraySpawns(spawnArea, Prefs.Sandbox.OffsetMaxDepth, Prefs.Sandbox.OffsetMinDepth, _gameField.transform, _items.First());
             } else {
                 SetSizes(1.66f - 0.2f); //for testing
+                CorrectSpraySpawns(spawnArea, 0.2f, 0.2f, _gameField.transform, _items.First());
             }
-
-            CorrectSpraySpawns(SpawnArea.Areas.First().transform, Prefs.Sandbox.OffsetMaxDepth, _gameField.transform, _items.First());
+            
             Spawn();
         }
 
-        private void CorrectSpraySpawns(Transform spawnArea, float h, Transform field, Spray spray) {
+        private void CorrectSpraySpawns(Transform spawnArea, float h, float minH, Transform field, Spray spray) {
             var hSpray = math.cmax(spray.transform.lossyScale);
-            h = Mathf.Min(h + hSpray, hSpray * 3f);
+            h = Mathf.Min(h + hSpray, hSpray * 3f) - h;
             var hVec = Vector3.up * h;
             hVec = field.InverseTransformVector(hVec);
             
@@ -146,7 +148,7 @@ namespace Games.Spray {
 
             var s = 0.5f - spawnPos.y;
             var sprayAngle = spray.GetSprayAngle();
-            var a = MathHelper.RightTriangleAngle(Mathf.Abs(s), Mathf.Abs(hVec.z)) - sprayAngle / 2f;
+            var a = MathHelper.RightTriangleAngle(Mathf.Abs(s), Mathf.Abs(hVec.z + minH)) - sprayAngle / 2f;
             var spawnRot = spawnArea.localEulerAngles;
             spawnRot.x = 90f - a;
             spawnArea.localEulerAngles = spawnRot;

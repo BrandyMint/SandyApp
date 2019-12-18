@@ -172,6 +172,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _offsetedByWidth: []
   _offsetedByWidthAndSize: []
+  _fieldTexture: {fileID: 0}
 --- !u!33 &7618649125641345841
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -244,7 +245,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7618649126201781196}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.3, z: 0}
+  m_LocalPosition: {x: 0, y: -0.35, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1403086217161951285}
@@ -268,6 +269,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _randomizeAngle: {x: 0, y: 0, z: 0}
+  _spawns: []
 --- !u!1001 &2843507723050248131
 PrefabInstance:
   m_ObjectHideFlags: 0
