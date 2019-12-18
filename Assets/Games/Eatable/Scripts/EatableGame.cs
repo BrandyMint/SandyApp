@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Linq;
 using Games.Common.Game;
 using Games.Common.GameFindObject;
 using Unity.Mathematics;
@@ -13,9 +14,11 @@ namespace Games.Eatable {
         [SerializeField] private float _itemMass = 1f;
 
         protected override IEnumerator Spawning() {
+            var types = _tplItems.Select(i => i.ItemType).Distinct().ToArray();
             while (true) {
                 if (_items.Count < _maxItems) {
-                    var item = SpawnItem(_tplItems.Random());
+                    var type = types.Random();
+                    var item = SpawnItem(_tplItems.Where(i => i.ItemType == type).Random());
                     if (item != null) {
                         var lifeTime = item.GetComponent<LifeTime>();
                         lifeTime.time = _lifeTime;
@@ -26,6 +29,7 @@ namespace Games.Eatable {
                         var force = _addForce * math.cmax(item.transform.lossyScale) 
                                               * new Vector3(_cam.pixelHeight, 0, _cam.pixelWidth).normalized;
                         rigid.AddForce(item.transform.rotation * force, ForceMode.Impulse);
+                        item.transform.rotation = Random.rotation;
                     }
                 }
                 yield return new WaitForSeconds(Random.Range(0.5f, 1.5f) * _timeOffsetSpown);
@@ -43,6 +47,7 @@ namespace Games.Eatable {
                 } else {
                     item.Bang(false);
                 }
+                item.GetComponent<LifeTime>().enabled = false;
             }
         }
     }
