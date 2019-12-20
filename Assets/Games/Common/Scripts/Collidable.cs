@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace Games.PingPong.Scripts {
+namespace Games.Common {
     public class Collidable : MonoBehaviour {
         public static event Action<Collidable, Collision> OnCollisionEntered;
         public static event Action<Collidable, Collision2D> OnCollisionEntered2D;
@@ -58,6 +58,32 @@ namespace Games.PingPong.Scripts {
                     }
                 }
             }
+        }
+
+        public void MakeAbsoluteBounce(Collision2D collision) {
+            var normal = Vector2.zero;
+            var point = Vector2.zero;
+            foreach (var contact in collision.contacts) {
+                normal += contact.normal / collision.contacts.Length;
+                point += contact.point / collision.contacts.Length;
+            }
+            var velocity = LastFrameVelocity;
+            var dir = point - (Vector2) transform.position;
+            if (Vector2.Dot(velocity, dir) >= 0f)
+                Velocity = Vector3.Reflect(velocity, normal);
+        }
+        
+        public void MakeAbsoluteBounce(Collision collision) {
+            var normal = Vector3.zero;
+            var point = Vector3.zero;
+            foreach (var contact in collision.contacts) {
+                normal += contact.normal / collision.contacts.Length;
+                point += contact.point / collision.contacts.Length;
+            }
+            var velocity = LastFrameVelocity;
+            var dir = point - transform.position;
+            if (Vector3.Dot(velocity, dir) >= 0f)
+                Velocity = Vector3.Reflect(velocity, normal);
         }
     }
 }

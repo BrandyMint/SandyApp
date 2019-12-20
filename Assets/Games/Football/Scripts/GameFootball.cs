@@ -3,7 +3,6 @@ using Games.Common;
 using Games.Common.ColliderGenerator;
 using Games.Common.Game;
 using Games.Common.GameFindObject;
-using Games.PingPong.Scripts;
 using UnityEngine;
 using Random = UnityEngine.Random;
 

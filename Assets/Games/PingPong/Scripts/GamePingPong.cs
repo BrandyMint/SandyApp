@@ -5,7 +5,7 @@ using Games.Common.Game;
 using Games.Common.GameFindObject;
 using UnityEngine;
 
-namespace Games.PingPong.Scripts {
+namespace Games.PingPong {
     public class GamePingPong : BaseGame {
         [SerializeField] protected Interactable _tplBall;
         [SerializeField] protected Transform[] _players;
@@ -79,16 +79,7 @@ namespace Games.PingPong.Scripts {
                 }
             } else {
                 _ball.PlayAudioBang(false);
-                var normal = Vector2.zero;
-                var point = Vector2.zero;
-                foreach (var contact in collision.contacts) {
-                    normal += contact.normal / collision.contacts.Length;
-                    point += contact.point / collision.contacts.Length;
-                }
-                var velocity = collidable.LastFrameVelocity;
-                var dir = point - (Vector2) collidable.transform.position;
-                if (Vector2.Dot(velocity, dir) >= 0f)
-                    collidable.Velocity = Vector3.Reflect(velocity, normal);
+                collidable.MakeAbsoluteBounce(collision);
             }
         }
 
