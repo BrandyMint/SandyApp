@@ -15,7 +15,6 @@ namespace Games.PingPong.Scripts {
         
         
         protected Interactable _ball;
-        private readonly Dictionary<string, Vector3> _initialSizes = new Dictionary<string, Vector3>();
         private List<Vector2>[] _handsPoints;
         private float[] _handsXPos;
         private float[] _playerXPosViewport;
@@ -90,19 +89,6 @@ namespace Games.PingPong.Scripts {
                 var dir = point - (Vector2) collidable.transform.position;
                 if (Vector2.Dot(velocity, dir) >= 0f)
                     collidable.Velocity = Vector3.Reflect(velocity, normal);
-            }
-        }
-
-        private void SaveInitialSizes(IEnumerable<Component> objs) {
-            foreach (var obj in objs) {
-                _initialSizes[obj.name] = obj.transform.localScale;
-            }
-        }
-
-        private void SetSizes(float mult, IEnumerable<Component> objs) {
-            foreach (var obj in objs) {
-                var initial = _initialSizes.FirstOrDefault(kv => kv.Key.Contains(obj.name));
-                obj.transform.localScale = initial.Value * mult;
             }
         }
 

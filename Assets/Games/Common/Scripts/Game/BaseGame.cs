@@ -1,4 +1,6 @@
-﻿using DepthSensorCalibration;
+﻿using System.Collections.Generic;
+using System.Linq;
+using DepthSensorCalibration;
 using DepthSensorSandbox.Visualisation;
 using Games.Common.GameFindObject;
 using Unity.Mathematics;
@@ -16,10 +18,11 @@ namespace Games.Common.Game {
         
         private int _hitMask;
         private CameraRenderToTexture _renderDepth;
-        private readonly DelayedDisposeNativeArray<byte> _depth = new DelayedDisposeNativeArray<byte>();
-        private int2 _depthSize;
+        protected readonly DelayedDisposeNativeArray<byte> _depth = new DelayedDisposeNativeArray<byte>();
+        protected int2 _depthSize;
         protected bool _isGameStarted;
         protected bool _testMouseModeHold;
+        protected readonly Dictionary<string, Vector3> _initialSizes = new Dictionary<string, Vector3>();
 
         protected virtual void Start() {
             _hitMask = LayerMask.GetMask("interactable");
@@ -107,6 +110,19 @@ namespace Games.Common.Game {
 
         protected virtual void SetSizes(float dist) {
             _gameField.AlignToCamera(_cam, dist);
+        }
+        
+        protected void SaveInitialSizes(IEnumerable<Component> objs) {
+            foreach (var obj in objs) {
+                _initialSizes[obj.name] = obj.transform.localScale;
+            }
+        }
+
+        protected void SetSizes(float mult, IEnumerable<Component> objs) {
+            foreach (var obj in objs) {
+                var initial = _initialSizes.FirstOrDefault(kv => kv.Key.Contains(obj.name));
+                obj.transform.localScale = initial.Value * mult;
+            }
         }
 
         protected virtual void StartGame() {
