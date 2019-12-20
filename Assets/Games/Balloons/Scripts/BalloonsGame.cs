@@ -38,6 +38,7 @@ namespace Games.Balloons {
             _hitMask = LayerMask.GetMask("interactable");
 
             _renderDepth = _cam.gameObject.AddComponent<CameraRenderToTexture>();
+            _renderDepth.InvokesOnlyOnProcessedFrame = true;
             _renderDepth.MaxResolution = _depthHeight;
             _renderDepth.Enable(_matDepth, RenderTextureFormat.R8, OnNewDepthFrame, CreateCommandBufferDepth);
 

@@ -35,13 +35,14 @@ namespace DepthSensorCalibration {
         public bool InvokesOnlyOnProcessedFrame {
             get => _invokesOnlyOnProcessedFrame;
             set {
-                if (_invokesOnlyOnProcessedFrame != value) {
+                var val = value && DepthSensorSandboxProcessor.Instance != null;
+                if (_invokesOnlyOnProcessedFrame != val) {
                     if (value) 
                         DepthSensorSandboxProcessor.OnNewFrame += OnNewProcessedFrame;
                     else
                         DepthSensorSandboxProcessor.OnNewFrame += OnNewProcessedFrame;
+                    _invokesOnlyOnProcessedFrame = val;
                 }
-                _invokesOnlyOnProcessedFrame = value;
             }
         }
 

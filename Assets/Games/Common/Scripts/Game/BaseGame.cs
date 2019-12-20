@@ -28,6 +28,7 @@ namespace Games.Common.Game {
             _hitMask = LayerMask.GetMask("interactable");
             
             _renderDepth = CreateRenderDepth();
+            _renderDepth.InvokesOnlyOnProcessedFrame = true;
             _renderDepth.MaxResolution = _depthHeight;
             _renderDepth.Enable(_matDepth, RenderTextureFormat.R8, OnNewDepthFrame, CreateCommandBufferDepth);
             

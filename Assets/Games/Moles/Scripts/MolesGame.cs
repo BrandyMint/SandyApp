@@ -38,6 +38,7 @@ namespace Games.Moles {
             _hitMask = LayerMask.GetMask("interactable");
 
             _renderDepth = _cam.gameObject.AddComponent<CameraRenderToTexture>();
+            _renderDepth.InvokesOnlyOnProcessedFrame = true;
             _renderDepth.MaxResolution = _depthHeight;
             _renderDepth.Enable(_matDepth, RenderTextureFormat.ARGBHalf, OnNewDepthFrame, CreateCommandBufferDepth);
 
