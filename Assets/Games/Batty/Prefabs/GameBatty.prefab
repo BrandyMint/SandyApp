@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 2381728889099170138}
   - component: {fileID: 1475746577064817921}
   m_Layer: 0
-  m_Name: GamePingPong
+  m_Name: GameBatty
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -118,7 +118,7 @@ Transform:
   m_LocalPosition: {x: -1, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 2, z: 1}
   m_Children: []
-  m_Father: {fileID: 6075201050786620194}
+  m_Father: {fileID: 1224417017384621683}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!61 &286013370424425720
@@ -175,7 +175,7 @@ Transform:
   m_LocalPosition: {x: 0, y: -1, z: 0}
   m_LocalScale: {x: 2, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 6075201050786620194}
+  m_Father: {fileID: 1224417017384621683}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!61 &286013370919617997
@@ -232,7 +232,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 1, z: 0}
   m_LocalScale: {x: 2, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 6075201050786620194}
+  m_Father: {fileID: 1224417017384621683}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!61 &286013371558185226
@@ -289,7 +289,7 @@ Transform:
   m_LocalPosition: {x: 1, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 2, z: 1}
   m_Children: []
-  m_Father: {fileID: 6075201050786620194}
+  m_Father: {fileID: 1224417017384621683}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!61 &286013371959365772
@@ -328,9 +328,8 @@ GameObject:
   m_Component:
   - component: {fileID: 6075201050786620194}
   - component: {fileID: 4821571844145437184}
-  - component: {fileID: 8961624579881695314}
   m_Layer: 0
-  m_Name: Flip
+  m_Name: FlipSandbox
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -347,11 +346,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 286013371558185225}
-  - {fileID: 286013370919617996}
-  - {fileID: 286013370424425727}
-  - {fileID: 286013371959365779}
-  - {fileID: 1122850396782072614}
+  - {fileID: 1224417017384621683}
   m_Father: {fileID: 316360110961536988}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -367,18 +362,58 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9dfdc94c27e47f78168f7f8b77e04c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &8961624579881695314
+  _initialScaleSaved: 0
+  _initialScale: {x: 0, y: 0, z: 0}
+--- !u!1 &5336593984207238025
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1224417017384621683}
+  - component: {fileID: 6784402311332095341}
+  m_Layer: 0
+  m_Name: Flip
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1224417017384621683
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5336593984207238025}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 286013371558185225}
+  - {fileID: 286013370919617996}
+  - {fileID: 286013370424425727}
+  - {fileID: 286013371959365779}
+  - {fileID: 1122850396782072614}
+  m_Father: {fileID: 6075201050786620194}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6784402311332095341
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1858068615937510749}
+  m_GameObject: {fileID: 5336593984207238025}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 972546a81f5f1824a850e9a849d1c457, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _initialScaleSaved: 0
+  _initialScale: {x: 0, y: 0, z: 0}
 --- !u!1 &5610951447777072132
 GameObject:
   m_ObjectHideFlags: 0
@@ -568,7 +603,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    m_TransformParent: {fileID: 6075201050786620194}
+    m_TransformParent: {fileID: 1224417017384621683}
     m_Modifications:
     - target: {fileID: 2527583948555959972, guid: 93be92bbdc054224b88ccf0d703d6a53,
         type: 3}

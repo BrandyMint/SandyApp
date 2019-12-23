@@ -5,11 +5,15 @@ using Utilities;
 namespace Launcher.Flip {
     public class TransformFlipper : MonoBehaviour {
         protected Transform _flip;
-        protected Vector3 _initialScale;
+        [HideInInspector] [SerializeField] protected bool _initialScaleSaved;
+        [HideInInspector] [SerializeField] protected Vector3 _initialScale;
 
         private void Start() {
             _flip = GetComponent<Canvas>() != null ? InitCanvasFlip() : transform;
-            _initialScale = _flip.localScale;
+            if (!_initialScaleSaved) {
+                _initialScale = _flip.localScale;
+                _initialScaleSaved = true;
+            }
             
             OnAppParamChanged();
             Prefs.App.OnChanged += OnAppParamChanged;
