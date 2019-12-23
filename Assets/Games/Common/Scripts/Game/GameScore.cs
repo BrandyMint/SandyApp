@@ -43,6 +43,8 @@ namespace Games.Common.Game {
             }
         }
 
+        public static bool Lost;
+
         public static readonly PlayerScores PlayerScore = new PlayerScores();
 
         private static readonly List<GameScore> _instances = new List<GameScore>();
@@ -53,6 +55,7 @@ namespace Games.Common.Game {
             _sHorizontalPlayers = _horizontalPlayers;
             PlayerScore.Clear();
             _score = 0;
+            Lost = false;
             _instances.Add(this);
             UpdateScore();
         }

@@ -66,6 +66,9 @@ EditorBuildSettings:
     path: Assets/Scenes/GameFootball.unity
     guid: 160851ad035cc5b4b875857325c56010
   - enabled: 1
+    path: Assets/Scenes/GameBatty.unity
+    guid: 1feb9f17a031dcd43ba227b4524b4ec1
+  - enabled: 1
     path: Assets/Scenes/GameAdaptiveGradient.unity
     guid: eae8d2375f594cc4ea547428ed43a96f
   - enabled: 1

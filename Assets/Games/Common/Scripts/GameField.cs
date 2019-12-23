@@ -10,6 +10,7 @@ namespace Games.Common {
         [SerializeField] private Transform[] _offsetedByWidth;
         [SerializeField] private Transform[] _offsetedByWidthAndSize;
         [SerializeField] private Texture2D _fieldTexture;
+        [SerializeField] private bool _scaleZ = false;
 
         private Camera _lastCam;
 
@@ -72,7 +73,7 @@ namespace Games.Common {
             transform.localScale = _startScale * new float3(
                 vertical * cam.aspect,
                 vertical,
-                1f
+                _scaleZ ? vertical : 1f
             );
             
             UpdateWidth();
