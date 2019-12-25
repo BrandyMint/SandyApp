@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using DepthSensor.Buffer;
 using UnityEngine;
@@ -5,7 +6,7 @@ using UnityEngine.Rendering;
 
 namespace DepthSensorSandbox.Visualisation {
     [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
-    public class SandboxMesh : MonoBehaviour {
+    public class SandboxMesh : MonoBehaviour, ISandboxBounds {
         private const string _CALC_DEPTH = "CALC_DEPTH";
         private static readonly int _DEPTH_TEX = Shader.PropertyToID("_DepthTex");
         private static readonly int _MAP_TO_CAMERA_TEX = Shader.PropertyToID("_MapToCameraTex");
@@ -37,7 +38,6 @@ namespace DepthSensorSandbox.Visualisation {
             _propBlock = new MaterialPropertyBlock();
             if (_mesh == null || _mesh.vertexCount == 0) {
                 _mesh = new Mesh {name = "depth"};
-                _mesh.indexFormat = IndexFormat.UInt32;
                 _mesh.MarkDynamic();
                 _meshFilter.mesh = _mesh;
             }
@@ -105,39 +105,72 @@ namespace DepthSensorSandbox.Visualisation {
             _updateMeshOnGPU = _prevUpdateMeshOnGPU = onGPU;
         }
 
-        private void ReInitMeshIfNeed(int width, int heigth, int len) {
-            if (_vert == null || _vert.Length != len) {
-                _vert = new Vector3[len];
-                _uv = new Vector2[len];
-                var d = new Vector2(1f / width, 1f / heigth) * 0.5f;
+        public static bool ReInitMeshIfNeed(int width, int height, ref Vector3[] v, ref int[] tr) {
+            if (ReInitVertsIfNeed(width, height, ref v)) {
+                ReInitTrianglesIfNeed(width, height, ref tr);
+                return true;
+            }
+            return false;
+        }
+
+        public static bool ReInitMeshIfNeed(int width, int height, ref Vector3[] v, ref int[] tr, ref Vector2[] uv) {
+            if (ReInitMeshIfNeed(width, height, ref v, ref tr)) {
+                ReInitUVIfNeed(width, height, ref uv);
+                return true;
+            }
+            return false;
+        }
+
+        public static bool ReInitVertsIfNeed(int width, int height, ref Vector3[] v) {
+            var len = width * height;
+            if (v == null || v.Length != len) {
+                v = new Vector3[len];
+                return true;
+            }
+            return false;
+        }
+        
+        public static bool ReInitUVIfNeed(int width, int height, ref Vector2[] uv) {
+            var len = width * height;
+            if (uv == null || uv.Length != len) {
+                var uvCalc = uv = new Vector2[len];
+                var d = new Vector2(1f / width, 1f / height) * 0.5f;
                 Parallel.For(0, len, i => {
-                    _uv[i] = d + new Vector2(
+                    uvCalc[i] = d + new Vector2(
                         (float)(i % width) / width,
-                        (float)(i / width) / heigth
+                        (float)(i / width) / height
                     );
                 });
+                return true;
             }
 
+            return false;
+        }
+        
+        public static bool ReInitTrianglesIfNeed(int width, int height, ref int[] tr) {
             var quadIndexes = 3 * 2;
-            var indexCount =  ((uint)width - 1) * (heigth - 1) * quadIndexes;
+            var indexCount =  ((uint)width - 1) * (height - 1) * quadIndexes;
             
-            if (_triangles == null || _triangles.LongLength != indexCount) {
-                _triangles = new int[indexCount];
+            if (tr == null || tr.LongLength != indexCount) {
+                var trCalc = tr = new int[indexCount];
                 
                 Parallel.For(0, indexCount / quadIndexes, iQuad => {
                     var iVert = (int) (iQuad + iQuad / (width - 1));
                     var i = iQuad * quadIndexes;
                     
-                    _triangles[i] = iVert;
-                    _triangles[i + 1] = _triangles[i + 3] = iVert + 1;
-                    _triangles[i + 2] = _triangles[i + 5] = iVert + width;
-                    _triangles[i + 4] = iVert + width + 1;
+                    trCalc[i] = iVert;
+                    trCalc[i + 1] = trCalc[i + 3] = iVert + 1;
+                    trCalc[i + 2] = trCalc[i + 5] = iVert + width;
+                    trCalc[i + 4] = iVert + width + 1;
                 });
+                return true;
             }
+
+            return false;
         }
 
         private void OnDepthDataCPU(DepthBuffer depth, MapDepthToCameraBuffer mapToCamera) {
-            ReInitMeshIfNeed(depth.width, depth.height, depth.data.Length);
+            ReInitMeshIfNeed(depth.width, depth.height, ref _vert, ref _triangles, ref _uv);
             Parallel.For(0, depth.data.Length, i => {
                 _vert[i] = PointDepthToVector3(depth, mapToCamera, i);
             });
@@ -156,6 +189,7 @@ namespace DepthSensorSandbox.Visualisation {
                     _mesh.vertices = _vert;
                 if (_mesh.GetIndexCount(0) != _triangles.LongLength) {
                     _mesh.uv = _uv;
+                    _mesh.indexFormat = _vert.Length > UInt16.MaxValue ? IndexFormat.UInt32 : IndexFormat.UInt16;
                     _mesh.triangles = _triangles;
                 }
 
@@ -168,7 +202,7 @@ namespace DepthSensorSandbox.Visualisation {
         }
 
         private void OnDepthDataGPU(DepthBuffer depth, MapDepthToCameraBuffer mapToCamera) {
-            ReInitMeshIfNeed(depth.width, depth.height, depth.data.Length);
+            ReInitMeshIfNeed(depth.width, depth.height, ref _vert, ref _triangles, ref _uv);
             if (_needUpdateBounds)
                 OnDepthDataCPU(depth, mapToCamera);
         }
