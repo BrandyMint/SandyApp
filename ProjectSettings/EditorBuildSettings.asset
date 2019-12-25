@@ -72,6 +72,9 @@ EditorBuildSettings:
     path: Assets/Scenes/GameMahjong.unity
     guid: bbe3a206e378a414ca8477c32e961e05
   - enabled: 1
+    path: Assets/Scenes/GameTrajectory.unity
+    guid: 85c0881d584d0ce49bb13e44ca2c67c7
+  - enabled: 1
     path: Assets/Scenes/GameAdaptiveGradient.unity
     guid: eae8d2375f594cc4ea547428ed43a96f
   - enabled: 1

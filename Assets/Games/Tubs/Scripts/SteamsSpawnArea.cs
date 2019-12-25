@@ -13,7 +13,10 @@ namespace Games.Tubs {
             _instances.Add(this);
         }
 
-        public override bool GetRandomSpawn(out Vector3 worldPos, out Quaternion worldRot, Vector3[] stayAway = null, float stayAwayDist = 1) {
+        public override bool GetRandomSpawn(out Vector3 worldPos, out Quaternion worldRot, 
+            Vector3[] stayAway = null, float stayAwayDist = 1,
+            Bounds[] stayAwayBounds = null) 
+        {
             worldPos = Vector3.zero;
             worldRot = Quaternion.identity;
             var tubes = _generator.Tubes.ToArray();
@@ -24,7 +27,7 @@ namespace Games.Tubs {
             do {
                 var s = tubes.Random();
                 if (s.GetRandomSteamSpawn(out var p, out worldRot)
-                && (stayAway == null || stayAway.All(a => Vector3.Distance(a, p) > stayAwayDist))) {
+                && (StayAway(p, stayAway, stayAwayDist, stayAwayBounds))) {
                     worldPos = p;
                     return true;
                 }

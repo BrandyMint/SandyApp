@@ -6,7 +6,7 @@ using Games.Common.GameFindObject;
 using UnityEngine;
 
 namespace Games.Batty {
-    public class GameBatty : BaseGame {
+    public class GameBatty : BaseGameWithGetDepth {
         [SerializeField] protected Interactable _tplBall;
         [SerializeField] protected Transform _player;
         [SerializeField] protected Bricks _bricks;
@@ -22,7 +22,7 @@ namespace Games.Batty {
 
         protected override void Start() {
             _testMouseModeHold = true;
-            SaveInitialSizes(Enumerable.Repeat(_player, 1).Append(_tplBall.transform));
+            SaveInitialSizes(_player, _tplBall);
             _tplBall.Show(false);
             _playerYPosViewport = _gameField.ViewportFromWorld(_player.position).y;
             

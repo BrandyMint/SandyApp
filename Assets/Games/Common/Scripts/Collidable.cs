@@ -7,6 +7,8 @@ namespace Games.Common {
     public class Collidable : MonoBehaviour {
         public static event Action<Collidable, Collision> OnCollisionEntered;
         public static event Action<Collidable, Collision2D> OnCollisionEntered2D;
+        public static event Action<Collidable, Collider> OnTriggerEntered;
+        public static event Action<Collidable, Collider2D> OnTriggerEntered2D;
 
         public static readonly Vector2[] Dirs9 = GetDirs9().ToArray();
 
@@ -24,9 +26,17 @@ namespace Games.Common {
         private void OnCollisionEnter(Collision other) {
             OnCollisionEntered?.Invoke(this, other);
         }
-        
+
         private void OnCollisionEnter2D(Collision2D other) {
             OnCollisionEntered2D?.Invoke(this, other);
+        }
+        
+        private void OnTriggerEnter(Collider other) {
+            OnTriggerEntered?.Invoke(this, other);
+        }
+        
+        private void OnTriggerEnter2D(Collider2D other) {
+            OnTriggerEntered2D?.Invoke(this, other);
         }
 
         public void Stop() {

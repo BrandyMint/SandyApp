@@ -31,9 +31,16 @@ namespace Games.Common {
             _instances.Remove(this);
         }
 
-        public IEnumerable<Transform> Spawns => _spawns; 
+        public IEnumerable<Transform> Spawns => _spawns;
+        
+        public static bool AnyGetRandomSpawn(out Vector3 worldPos, out Quaternion worldRot, Bounds[] stayAwayBounds) {
+            return AnyGetRandomSpawn(out worldPos, out worldRot, null, 1f, stayAwayBounds);
+        }
 
-        public static bool AnyGetRandomSpawn(out Vector3 worldPos, out Quaternion worldRot, Vector3[] stayAway = null, float stayAwayDist = 1f) {
+        public static bool AnyGetRandomSpawn(out Vector3 worldPos, out Quaternion worldRot,
+            Vector3[] stayAway = null, float stayAwayDist = 1f,
+            Bounds[] stayAwayBounds = null) 
+        {
             worldPos = Vector3.zero;
             worldRot = Quaternion.identity;
             if (!_instances.Any())
@@ -47,8 +54,15 @@ namespace Games.Common {
 
             return false;
         }
+
+        public virtual bool GetRandomSpawn(out Vector3 worldPos, out Quaternion worldRot, Bounds[] stayAwayBounds) {
+            return GetRandomSpawn(out worldPos, out worldRot, null, 1f, stayAwayBounds);
+        }
         
-        public virtual bool GetRandomSpawn(out Vector3 worldPos, out Quaternion worldRot, Vector3[] stayAway = null, float stayAwayDist = 1f) {
+        public virtual bool GetRandomSpawn(out Vector3 worldPos, out Quaternion worldRot, 
+            Vector3[] stayAway = null, float stayAwayDist = 1f,
+            Bounds[] stayAwayBounds = null) 
+        {
             worldPos = Vector3.zero;
             worldRot = Quaternion.identity;
             if (!_spawns.Any())
@@ -59,15 +73,15 @@ namespace Games.Common {
             do {
                 var s = _spawns.Random();
                 var p = worldPos = GetWorldPosition(s);
-                if (stayAway == null || stayAway.All(a => Vector3.Distance(a, p) > stayAwayDist))
+                if (StayAway(p, stayAway, stayAwayDist, stayAwayBounds))
                     spawn = s;
                 --iterations;
             } while (spawn == null && iterations > 0);
 
-            if (spawn == null && stayAway != null) {
+            if (spawn == null) {
                 foreach (var s in _spawns) {
                     var p = worldPos = GetWorldPosition(s);
-                    if (stayAway.All(a => Vector3.Distance(a, p) > stayAwayDist)) {
+                    if (StayAway(p, stayAway, stayAwayDist, stayAwayBounds)) {
                         spawn = s;
                         break;
                     }
@@ -79,6 +93,11 @@ namespace Games.Common {
             
             worldRot = GetWorldRotation(spawn);
             return true;
+        }
+
+        protected bool StayAway(Vector3 p, Vector3[] stayAway, float stayAwayDist, Bounds[] stayAwayBounds) {
+            return (stayAway == null || stayAway.All(a => Vector3.Distance(a, p) > stayAwayDist))
+                   && (stayAwayBounds == null || stayAwayBounds.All(b => !b.Contains(p)));
         }
 
         protected virtual Vector3 GetWorldPosition(Transform spawn) {

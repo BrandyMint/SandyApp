@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-namespace Games.Eatable {
+namespace Games.Common {
     public class LifeTime : MonoBehaviour{
         [SerializeField] public float time = 1f;
 
