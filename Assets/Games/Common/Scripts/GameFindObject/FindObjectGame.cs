@@ -7,7 +7,7 @@ using UnityEngine;
 using Utilities;
 
 namespace Games.Common.GameFindObject {
-    public class FindObjectGame : BaseGame {
+    public class FindObjectGame : BaseGameWithGetDepth {
         [SerializeField] protected Interactable[] _tplItems;
         [SerializeField] protected int _maxItems = 9;
         [SerializeField] private float _minItemTypeFullnes = 0.7f;

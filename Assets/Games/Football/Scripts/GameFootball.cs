@@ -7,7 +7,7 @@ using UnityEngine;
 using Random = UnityEngine.Random;
 
 namespace Games.Football {
-    public class GameFootball : BaseGame {
+    public class GameFootball : BaseGameWithGetDepth {
         [SerializeField] protected Interactable _tplBall;
         [SerializeField] protected SpawnArea _spawnsBall;
         [SerializeField] protected SpawnArea _spawnsGoals;

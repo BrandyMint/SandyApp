@@ -6,7 +6,7 @@ using Games.Common.GameFindObject;
 using UnityEngine;
 
 namespace Games.PingPong {
-    public class GamePingPong : BaseGame {
+    public class GamePingPong : BaseGameWithGetDepth {
         [SerializeField] protected Interactable _tplBall;
         [SerializeField] protected Transform[] _players;
         [SerializeField] private float _startBallVelocity = 0.5f;
