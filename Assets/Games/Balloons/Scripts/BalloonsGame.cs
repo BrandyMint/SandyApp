@@ -165,9 +165,9 @@ namespace Games.Balloons {
         }
 
         private void SetSizes(float dist) {
+            _gameField.AlignToCamera(_cam, dist);
             var size = _gameField.Scale * _initialBallSize;
             _tplBalloon.transform.localScale = Vector3.one * size;
-            _gameField.AlignToCamera(_cam, dist);
             _gameField.SetWidth(size * 2f);
         }
 
