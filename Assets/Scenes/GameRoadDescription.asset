@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a9f5a1d450904b4ba1e791f6e416c9f, type: 3}
+  m_Name: GameRoadDescription
+  m_EditorClassIdentifier: 
+  _scenePath: Assets/Scenes/GameRoad.unity
+  _sceneName: "\u0414\u041E\u0420\u041E\u0413\u0410"
+  _icon: {fileID: 0}
