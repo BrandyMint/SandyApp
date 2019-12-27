@@ -15,13 +15,17 @@ namespace UnityStandardAssets.Vehicles.Car {
             _initialDist = _wayPoint.localPosition;
         }
 
+        private float _t; 
+
         private void Update() {
             if (spline != null) {
                 var dist = transform.TransformVector(_initialDist).magnitude;
-                spline.FindNearestPointTo(transform.position, out var t, _accuracy);
-                _wayPoint.position = spline.MoveAlongSpline(ref t, dist);
-                _wayPoint.rotation = quaternion.LookRotation(spline.GetTangent(t), transform.up);
+                spline.FindNearestPointTo(transform.position, out _t, _accuracy);
+                _wayPoint.position = spline.MoveAlongSpline(ref _t, dist);
+                _wayPoint.rotation = quaternion.LookRotation(spline.GetTangent(_t), transform.up);
             }
         }
+
+        public float LastT => _t;
     }
 }

@@ -10,7 +10,8 @@ namespace Games.Common.GameFindObject {
         }
         
         public override void Bang(bool isRight) {
-            Show(false);
+            if (hideOnBang)
+                Show(false);
             StartCoroutine(PlayParticlesAndDead(isRight ? _rightBang : _wrongBang));
             PlayAudioBang(isRight);
         }

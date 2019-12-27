@@ -11,6 +11,9 @@ namespace Games.Common.GameFindObject {
         [SerializeField] protected AudioClip _audioRight;
         [SerializeField] protected AudioClip _audioWrong;
 
+        public bool hideOnBang = true;
+        public bool destroyOnBang = true;
+
         public static event Action<Interactable> OnDestroyed;
 
         protected Renderer _r;
@@ -32,7 +35,8 @@ namespace Games.Common.GameFindObject {
 
         public virtual void Bang(bool isRight) {
             gameObject.layer = 0;
-            _r.enabled = false;
+            if (hideOnBang)
+                Show(false);
             GetComponent<Collider>().enabled = false;
             StartCoroutine(PlayParticlesAndDead(isRight ? _rightBang : _wrongBang));
             PlayAudioBang(isRight);
@@ -57,7 +61,8 @@ namespace Games.Common.GameFindObject {
         protected virtual IEnumerator PlayParticlesAndDead(ParticleSystem particles) {
             particles.Play();
             yield return new WaitForSeconds(particles.main.duration + particles.main.startLifetime.constant);
-            Dead();
+            if (destroyOnBang)
+                Dead();
         }
 
         public virtual void Dead() {
