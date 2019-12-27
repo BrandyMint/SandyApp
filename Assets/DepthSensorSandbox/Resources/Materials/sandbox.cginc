@@ -61,9 +61,30 @@ struct v2f {
     }
 #endif
 
+
+#ifdef CALC_NORMAL
+    #define MODIFY_NORMAL(v, uv) \
+        v.normal = normalize( \
+            cross(v.vertex.xyz - sampleDepth(uv, L), B3) + \
+            cross(v.vertex.xyz - sampleDepth(uv, T), R3) + \
+            cross(v.vertex.xyz - sampleDepth(uv, R), T3) + \
+            cross(v.vertex.xyz - sampleDepth(uv, B), L3) \
+        );
+#else
+    #define MODIFY_NORMAL(v, uv)
+#endif
+
+#ifdef CALC_DEPTH 
+    #define MODIFY_VERT(v, uv) \
+        v.vertex = sampleDepth(uv, CURR); \
+        MODIFY_NORMAL(v, uv)
+#else
+    #define MODIFY_VERT(v, uv)
+#endif
+
 #ifdef UNITY_LIGHTING_COMMON_INCLUDED
     fixed4 calcLight(float3 normal, float3 lightDir) {
-        half nl = max(0, dot(normal, lightDir));
+        half4 nl = max(0, dot(normal, lightDir));
         return nl * _LightColor0;
     }
 #endif
@@ -71,17 +92,7 @@ struct v2f {
 v2f vert (appdata v) {
     v2f o;
     o.uv = v.uv;
-#ifdef CALC_DEPTH
-    v.vertex = sampleDepth(o.uv, CURR);
-    #ifdef CALC_NORMAL
-        v.normal = normalize(
-            cross(v.vertex.xyz - sampleDepth(o.uv, L), B3) +
-            cross(v.vertex.xyz - sampleDepth(o.uv, T), R3) +
-            cross(v.vertex.xyz - sampleDepth(o.uv, R), T3) +
-            cross(v.vertex.xyz - sampleDepth(o.uv, B), L3)
-        );
-    #endif
-#endif
+    MODIFY_VERT(v, o.uv)
     float3 pos = UnityObjectToViewPos(v.vertex);
     
     //fix over near clip
@@ -94,7 +105,7 @@ v2f vert (appdata v) {
 #endif
 #ifdef CALC_LIGHT
     o.light = calcLight(v.normal, ObjSpaceLightDir(float4(pos, 1.0)));
-    //o.light.rgb += ShadeSH9(half4(worldNormal,1));
+//    o.light.rgb += ShadeSH9(half4(UnityObjectToWorldNormal(normal),1));
 #endif    
 #ifdef TRANSFER_SHADOW
     TRANSFER_SHADOW(o)
@@ -109,5 +120,27 @@ float percentToDepth(float p) {
     } else {
         return lerp(_DepthZero, _DepthZero - _DepthMaxOffset, p);
     }
+}
+
+#ifndef EXTENSION_INPUT
+    #define EXTENSION_INPUT
+#endif
+
+struct Input {
+    float3 vpos;
+    float4 screenPos;
+    EXTENSION_INPUT
+};
+
+void vertSurf(inout appdata_full v, out Input o) {
+    MODIFY_VERT(v, v.texcoord.xy)
+    UNITY_INITIALIZE_OUTPUT(Input,o);
+    float3 pos = UnityObjectToViewPos(v.vertex);
+    
+    //fix over near clip
+    if (pos.z > -_ProjectionParams.y) pos.z = -_ProjectionParams.y - 0.01;
+    
+    o.screenPos = ComputeScreenPos(mul(UNITY_MATRIX_P, float4(pos, 1.0)));
+    o.vpos = float3(pos.xy, -pos.z);
 }
 
