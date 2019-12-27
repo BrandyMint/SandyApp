@@ -1,0 +1,86 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-8740965141409770207
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7613406940244402128}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ef93a9c46eb4d83ac9649092cf14e90, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spline: {fileID: 0}
+  _wayPoint: {fileID: 0}
+--- !u!114 &9210724826768461219
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7613406940244402128}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d963df58504b69045b8d0d746ba6f777, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_CautiousSpeedFactor: 0.5
+  m_CautiousMaxAngle: 180
+  m_CautiousMaxDistance: 100
+  m_CautiousAngularVelocityFactor: 30
+  m_SteerSensitivity: 0.01
+  m_AccelSensitivity: 1
+  m_BrakeSensitivity: 1
+  m_LateralWanderDistance: 3
+  m_LateralWanderSpeed: 0.2
+  m_AccelWanderAmount: 0.1
+  m_AccelWanderSpeed: 0.1
+  m_BrakeCondition: 2
+  m_Driving: 1
+  m_Target: {fileID: 8104559589674049852}
+  m_StopWhenTargetReached: 0
+  m_ReachTargetThreshold: 2
+--- !u!1001 &7613406940244433178
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 100042, guid: 926c44dcc74434a4c9c8971738707508, type: 3}
+      propertyPath: m_Name
+      value: CarAIWaypoint
+      objectReference: {fileID: 0}
+    - target: {fileID: 400050, guid: 926c44dcc74434a4c9c8971738707508, type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 400050, guid: 926c44dcc74434a4c9c8971738707508, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 400050, guid: 926c44dcc74434a4c9c8971738707508, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 400050, guid: 926c44dcc74434a4c9c8971738707508, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 11400022, guid: 926c44dcc74434a4c9c8971738707508, type: 3}
+  m_SourcePrefab: {fileID: 100100000, guid: 926c44dcc74434a4c9c8971738707508, type: 3}
+--- !u!1 &7613406940244402128 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 100042, guid: 926c44dcc74434a4c9c8971738707508,
+    type: 3}
+  m_PrefabInstance: {fileID: 7613406940244433178}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &8104559589674049852 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1860390473965942822, guid: 926c44dcc74434a4c9c8971738707508,
+    type: 3}
+  m_PrefabInstance: {fileID: 7613406940244433178}
+  m_PrefabAsset: {fileID: 0}
