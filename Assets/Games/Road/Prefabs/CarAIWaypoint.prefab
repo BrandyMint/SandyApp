@@ -171,12 +171,22 @@ PrefabInstance:
     - target: {fileID: 7613406940238883416, guid: d4f735c89355ef941a5479e2e7bb9214,
         type: 3}
       propertyPath: m_Topspeed
-      value: 100
+      value: 150
       objectReference: {fileID: 0}
     - target: {fileID: 7613406940238883416, guid: d4f735c89355ef941a5479e2e7bb9214,
         type: 3}
       propertyPath: m_SlipLimit
-      value: 20
+      value: 0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 7613406940238883416, guid: d4f735c89355ef941a5479e2e7bb9214,
+        type: 3}
+      propertyPath: m_FullTorqueOverAllWheels
+      value: 3000
+      objectReference: {fileID: 0}
+    - target: {fileID: 7613406940238883416, guid: d4f735c89355ef941a5479e2e7bb9214,
+        type: 3}
+      propertyPath: m_ReverseTorque
+      value: 1000
       objectReference: {fileID: 0}
     - target: {fileID: 7613406940244402080, guid: d4f735c89355ef941a5479e2e7bb9214,
         type: 3}
@@ -331,17 +341,7 @@ PrefabInstance:
     - target: {fileID: 9210724826768461219, guid: d4f735c89355ef941a5479e2e7bb9214,
         type: 3}
       propertyPath: m_CautiousSpeedFactor
-      value: 0.3
-      objectReference: {fileID: 0}
-    - target: {fileID: 9210724826768461219, guid: d4f735c89355ef941a5479e2e7bb9214,
-        type: 3}
-      propertyPath: m_CautiousMaxDistance
-      value: 40
-      objectReference: {fileID: 0}
-    - target: {fileID: 9210724826768461219, guid: d4f735c89355ef941a5479e2e7bb9214,
-        type: 3}
-      propertyPath: m_CautiousAngularVelocityFactor
-      value: 80
+      value: 0.4
       objectReference: {fileID: 0}
     - target: {fileID: 9210724826768461219, guid: d4f735c89355ef941a5479e2e7bb9214,
         type: 3}
@@ -381,7 +381,7 @@ PrefabInstance:
     - target: {fileID: 9210724826768461219, guid: d4f735c89355ef941a5479e2e7bb9214,
         type: 3}
       propertyPath: m_AccelSensitivity
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 9210724826768461219, guid: d4f735c89355ef941a5479e2e7bb9214,
         type: 3}
@@ -392,6 +392,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_BrakeCondition
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 9210724826768461219, guid: d4f735c89355ef941a5479e2e7bb9214,
+        type: 3}
+      propertyPath: m_CautiousMaxDistance
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 9210724826768461219, guid: d4f735c89355ef941a5479e2e7bb9214,
+        type: 3}
+      propertyPath: m_CautiousAngularVelocityFactor
+      value: 30
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d4f735c89355ef941a5479e2e7bb9214, type: 3}
