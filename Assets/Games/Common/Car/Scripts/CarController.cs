@@ -60,6 +60,10 @@ namespace UnityStandardAssets.Vehicles.Car
         public float CurrentSteerAngle {
             get { return m_SteerAngle; }
         }
+        
+        public float MaxSteerAngle {
+            get { return m_MaximumSteerAngle; }
+        }
 
         public float CurrentSpeed {
             get { return m_Rigidbody.velocity.magnitude * 2.23693629f; }

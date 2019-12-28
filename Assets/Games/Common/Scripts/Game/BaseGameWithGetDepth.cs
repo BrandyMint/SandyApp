@@ -11,8 +11,8 @@ namespace Games.Common.Game {
         [SerializeField] private int _depthHeight = 64;
         [SerializeField] private SandboxMesh _sandbox;
         [SerializeField] private Material _matDepth;
-        
-        private int _hitMask;
+
+        protected int _hitMask;
         private CameraRenderToTexture _renderDepth;
         protected readonly DelayedDisposeNativeArray<byte> _depth = new DelayedDisposeNativeArray<byte>();
         protected int2 _depthSize;
