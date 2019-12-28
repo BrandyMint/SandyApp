@@ -99,6 +99,7 @@ namespace Games.Driving {
                 var x = _steeringsX.Average();
                 var y = _maxSteer - 0.3f;
                 var s = -Vector2.SignedAngle(Vector2.up, new Vector2(x, y)) / 90f;
+                if (Prefs.App.FlipHorizontal ^ Prefs.App.FlipVertical) s = -s;
                 _carControl.OverrideSteering(s);
             }else {
                 _carControl.OverrideSteering(null);
