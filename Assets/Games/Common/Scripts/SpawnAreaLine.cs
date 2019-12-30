@@ -12,6 +12,7 @@ namespace Games.Common {
         }
 
         protected virtual void GenerateSpawns() {
+            if (_count < 2)  return;
             var offset = 1f / (_count - 1);
             for (int i = 0; i < _count; ++i) {
                 var spawn = i == 0 
