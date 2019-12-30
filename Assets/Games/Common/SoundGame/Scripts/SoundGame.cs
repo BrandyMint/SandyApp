@@ -5,10 +5,10 @@ using UnityEngine;
 
 namespace Games.Common.SoundGame {
     public class SoundGame : BaseGameWithGetDepth {
-        [SerializeField] private Transform _instrumentRoot;
+        [SerializeField] protected Transform _instrumentRoot;
 
         protected SoundKey[] _sounds;
-        protected readonly HashSet<SoundKey> _soundsPlaying = new HashSet<SoundKey>();
+        protected HashSet<SoundKey> _soundsPlaying = new HashSet<SoundKey>();
 
         private void Awake() {
             _sounds = _instrumentRoot.GetComponentsInChildren<SoundKey>();
@@ -18,13 +18,13 @@ namespace Games.Common.SoundGame {
             _testMouseModeHold = true;
             base.Start();
         }
-        
-        protected override void OnCalibrationChanged() {
-            base.OnCalibrationChanged();
-        }
 
         protected override void ProcessDepthFrame() {
             base.ProcessDepthFrame();
+            PostProcessDepthFrame();
+        }
+
+        protected virtual void PostProcessDepthFrame() {
             foreach (var sound in _sounds) {
                 if (!_soundsPlaying.Contains(sound))
                     sound.Stop();
@@ -38,7 +38,9 @@ namespace Games.Common.SoundGame {
                 OnSoundItem(sound, viewPos);
         }
 
-        private void OnSoundItem(SoundKey sound, Vector2 viewPos) {
+        protected virtual void OnSoundItem(SoundKey sound, Vector2 viewPos) {
+            if (_soundsPlaying.Contains(sound))
+                return;
             sound.Play();
             _soundsPlaying.Add(sound);
         }

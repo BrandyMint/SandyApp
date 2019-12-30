@@ -23,15 +23,20 @@ namespace Games.Common.SoundGame {
         }
 
         public void Play(bool isRight = true) {
-            if (!_animator.GetBool(_PLAY)) {
+            if (!Selected) {
                 PlayAudioBang(isRight);
-                _animator.SetBool(_PLAY, true);
+                Selected = true;
             }
+        }
+
+        public bool Selected {
+            get => _animator.GetBool(_PLAY);
+            set => _animator.SetBool(_PLAY, value);
         }
 
         public void Stop() {
             //_audioSource.Stop();
-            _animator.SetBool(_PLAY, false);
+            Selected = false;
         }
     }
 }
