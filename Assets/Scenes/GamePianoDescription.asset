@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: GamePianoDescription
   m_EditorClassIdentifier: 
   _scenePath: Assets/Scenes/GamePiano.unity
-  _sceneName: "\u0424\u041E\u0420\u0422\u0415\u041F\u042C\u042F\u041D\u041E"
+  _sceneName: "\u0424\u041E\u0420\u0422\u0415\u041F\u0418\u0410\u041D\u041E"
   _icon: {fileID: 0}
