@@ -36,12 +36,20 @@ namespace Games.Mahjong {
         }
 
         private void SetInteractable(bool interactable) {
-            _model.GetComponent<Collider>().enabled = interactable;
+            _model.GetComponentInChildren<Collider>().enabled = interactable;
         }
 
         public override void Bang(bool isRight) {
             (isRight ? _rightBang : _wrongBang).Play();
             PlayAudioBang(isRight);
+        }
+
+        public void SetTexture(Texture t) {
+            var r = _model.GetComponentInChildren<Renderer>();
+            var materials = r.materials;
+            var mat = new Material(materials[1]) {mainTexture = t};
+            materials[1] = mat;
+            r.materials = materials;
         }
     }
 }

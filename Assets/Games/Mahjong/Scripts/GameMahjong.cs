@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Games.Common;
@@ -9,7 +10,13 @@ using Utilities;
 
 namespace Games.Mahjong {
     public class GameMahjong : FindObjectGame {
+        [Serializable]
+        public class TexturePack {
+            public List<Texture> textures;
+        }
+        
         [SerializeField] private float _timeShowWrong = 1f;
+        [SerializeField] private TexturePack[] _texturePacks; 
         
         private readonly List<Card> _newOpened = new List<Card>();
         private int _showingWrong;
@@ -25,17 +32,18 @@ namespace Games.Mahjong {
         }
 
         protected override IEnumerator Spawning() {
-            foreach (var item in _tplItems) {
-                var color = item.GetComponentInChildren<RandomColorRenderer>();
-                color.SetRandomColor();
-            }
-            var tpls = _tplItems.Concat(_tplItems).ToList();
+            var pack = _texturePacks.Random();
+            var textures = pack.textures.Concat(pack.textures).ToList();
+            var tpl = _tplItems.First();
             foreach (var spawnArea in SpawnArea.Areas) {
                 foreach (var spawn in spawnArea.Spawns) {
-                    var tpl = tpls.Random();
-                    tpls.Remove(tpl);
-                    var newItem = Instantiate(tpl, spawn.position, spawn.rotation, tpl.transform.parent);
+                    var t = textures.Random();
+                    textures.Remove(t);
+                    var newItem = (Card) Instantiate(tpl, spawn.position, spawn.rotation, tpl.transform.parent);
                     newItem.gameObject.SetActive(true);
+                    newItem.GetComponentInChildren<Renderer>();
+                    newItem.ItemType = pack.textures.IndexOf(t);
+                    newItem.SetTexture(t);
                     _items.Add(newItem);
                 }
             }
@@ -54,7 +62,7 @@ namespace Games.Mahjong {
                 if (_newOpened[0].ItemType == _newOpened[1].ItemType) {
                     ++GameScore.Score;
                     obj.Bang(true);
-                    if (GameScore.Score >= _tplItems.Length) {
+                    if (GameScore.Score >= _items.Count / 2) {
                         GameEvent.Current = GameState.STOP;
                     }
                 } else {
