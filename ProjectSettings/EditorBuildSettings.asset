@@ -90,6 +90,9 @@ EditorBuildSettings:
     path: Assets/Scenes/GameFlowers.unity
     guid: 2f7f935dbfef7174996e8ec671f0c365
   - enabled: 1
+    path: Assets/Scenes/GameNotes.unity
+    guid: 63a50b0976b6c8e429ba68f2e63eb020
+  - enabled: 1
     path: Assets/Scenes/GameAdaptiveGradient.unity
     guid: eae8d2375f594cc4ea547428ed43a96f
   - enabled: 1

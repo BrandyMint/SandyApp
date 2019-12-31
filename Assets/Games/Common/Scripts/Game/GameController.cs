@@ -8,8 +8,8 @@ namespace Games.Common.Game {
         [SerializeField] private float _timeGame = 15f;
         [SerializeField] private float _timeScore = 3f;
         
-        public static float CurrStateTimeLeft { get; private set; }
-        public static float CurrStateDuration { get; private set; }
+        public static float CurrStateTimeLeft { get; set; }
+        public static float CurrStateDuration { get; set; }
 
         private Coroutine _timer;
 
@@ -54,14 +54,13 @@ namespace Games.Common.Game {
         private static IEnumerator Timer(float t, GameState next) {
             CurrStateDuration = t;
             CurrStateTimeLeft = t;
-            while (t > 0) {
+            while (CurrStateTimeLeft > 0) {
                 yield return null;
-                t -= Time.deltaTime;
-                if (t < 0f) {
-                    t = 0f;
+                CurrStateTimeLeft -= Time.deltaTime;
+                if (CurrStateTimeLeft < 0f) {
+                    CurrStateTimeLeft = 0f;
                     GameEvent.Current = next;
                 }
-                CurrStateTimeLeft = t;
             }
         }
     }

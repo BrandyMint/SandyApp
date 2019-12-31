@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 
 namespace Launcher {
     
-    //[CreateAssetMenu(fileName = "GamesList", menuName = "Games List")]
+    [CreateAssetMenu(fileName = "GamesList", menuName = "Custom Objects/Games List")]
     public class GamesList : ScriptableObject {
         private const string STORAGE_PATH = "GamesList";
         

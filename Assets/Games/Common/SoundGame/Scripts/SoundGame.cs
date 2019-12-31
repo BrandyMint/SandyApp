@@ -10,7 +10,7 @@ namespace Games.Common.SoundGame {
         protected SoundKey[] _sounds;
         protected HashSet<SoundKey> _soundsPlaying = new HashSet<SoundKey>();
 
-        private void Awake() {
+        protected virtual void Awake() {
             _sounds = _instrumentRoot.GetComponentsInChildren<SoundKey>();
         }
 
