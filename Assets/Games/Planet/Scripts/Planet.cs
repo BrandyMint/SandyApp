@@ -5,7 +5,9 @@ using UnityEngine;
 namespace Games.Planet {
     public class Planet : MonoBehaviour {
         [SerializeField] private float _rotSpeed = 15f;
+        [SerializeField] private float _cloudsRotSpeed = 25f;
         [SerializeField] private Transform _planet;
+        [SerializeField] private Transform _clouds;
 
         private Vector3 _initSize;
         private readonly List<Transform> _flyZones = new List<Transform>();
@@ -22,6 +24,7 @@ namespace Games.Planet {
 
         private void Update() {
             _planet.Rotate(Vector3.up, _rotSpeed * Time.deltaTime, Space.Self);
+            _clouds.Rotate(Vector3.forward, _cloudsRotSpeed * Time.deltaTime, Space.Self);
         }
 
         public void UpdateSize(GameField field) {
