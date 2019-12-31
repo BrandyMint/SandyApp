@@ -80,7 +80,8 @@ namespace Games.Notes {
             var note = Instantiate(tpl, tpl.transform.parent, false);
             note.gameObject.SetActive(true);
             var size = _instrumentRoot.TransformVector(Vector3.up).magnitude;
-            note.Go(s.bounds, -s.transform.up, _noteTime, size);
+            var v = s.transform.TransformVector(-Vector3.up);
+            note.Go(s.bounds, v, _noteTime, size);
             _notes.Add(note);
         }
 
