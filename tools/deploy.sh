@@ -24,6 +24,6 @@ ARCHIVE_NAME=sandbox-${PLATFORM}-${VERSION}.zip
 rm ${ARCHIVE_NAME}
 7z a ${ARCHIVE_NAME} * -x!*.zip -x!*.Linux64\* -x!*.Win64\*
 
-scp ${ARCHIVE_NAME} konstantin@office.brandymint.ru:/home/konstantin/SandyAppBuilds
+scp ${ARCHIVE_NAME} sandyapp@sandysunday.ru:/home/sandyapp/SandyAppBuilds/${PLATFORM}
 
 git tag v${VERSION}
