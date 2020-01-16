@@ -8,6 +8,8 @@ then
 	exit 0
 fi
 
+SERVER=devel@sandysunday.ru
+SERVER_BUILDS=/data/SandyAppBuilds
 PLATFORM=${1:-linux}
 BUILD=${2:-"../Builds"}
 
@@ -24,6 +26,7 @@ ARCHIVE_NAME=sandbox-${PLATFORM}-${VERSION}.zip
 rm ${ARCHIVE_NAME}
 7z a ${ARCHIVE_NAME} * -x!*.zip -x!*.Linux64\* -x!*.Win64\*
 
-scp ${ARCHIVE_NAME} sandyapp@sandysunday.ru:/home/sandyapp/SandyAppBuilds/${PLATFORM}
+scp ${ARCHIVE_NAME} ${SERVER}:${SERVER_BUILDS}/${PLATFORM}
+ssh ${SERVER} "cd ${SERVER_BUILDS}/${PLATFORM} && chown devel:sandyapp ${ARCHIVE_NAME} && chmod 644 ${ARCHIVE_NAME}"
 
 git tag v${VERSION}
