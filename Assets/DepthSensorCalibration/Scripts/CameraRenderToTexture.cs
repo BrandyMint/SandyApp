@@ -40,7 +40,7 @@ namespace DepthSensorCalibration {
                     if (value) 
                         DepthSensorSandboxProcessor.OnNewFrame += OnNewProcessedFrame;
                     else
-                        DepthSensorSandboxProcessor.OnNewFrame += OnNewProcessedFrame;
+                        DepthSensorSandboxProcessor.OnNewFrame -= OnNewProcessedFrame;
                     _invokesOnlyOnProcessedFrame = val;
                 }
             }
