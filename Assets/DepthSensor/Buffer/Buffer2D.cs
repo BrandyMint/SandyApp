@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using Unity.Collections;
 using UnityEngine;
@@ -35,7 +35,9 @@ namespace DepthSensor.Buffer {
         public override T1 Copy<T1>() {
             var copy = CreateSome<T1>();
             var buff = copy as Buffer2D<T>;
-            data.CopyTo(buff.data);
+            lock (SyncRoot) {
+                data.CopyTo(buff.data);
+            }
             return copy;
         }
 

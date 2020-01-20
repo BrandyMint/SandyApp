@@ -25,7 +25,9 @@ namespace DepthSensor.Buffer {
         public override T1 Copy<T1>() {
             var copy = CreateSome<T1>();
             var buff = copy as ArrayBuffer<T>;
-            Array.Copy(data, buff.data, data.Length);
+            lock (SyncRoot) {
+                Array.Copy(data, buff.data, data.Length);
+            }
             return copy;
         }
 
