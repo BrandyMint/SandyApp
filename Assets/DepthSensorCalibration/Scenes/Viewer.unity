@@ -233,6 +233,7 @@ GameObject:
   - component: {fileID: 799097241}
   - component: {fileID: 799097240}
   - component: {fileID: 799097242}
+  - component: {fileID: 799097244}
   - component: {fileID: 799097243}
   m_Layer: 5
   m_Name: View
@@ -317,9 +318,27 @@ MonoBehaviour:
   m_GameObject: {fileID: 799097238}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c9dfdc94c27e47f78168f7f8b77e04c0, type: 3}
+  m_Script: {fileID: 11500000, guid: 96c961e338de4ae28c381e1ab36da7d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _byUIFlip: 1
+  _bySandboxFlip: 1
+  _method: 0
+--- !u!114 &799097244
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 799097238}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a047a6b6a4b94249b381f15a13aa6497, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _byUIFlip: 1
+  _bySandboxFlip: 1
+  _method: 0
 --- !u!1 &938858881
 GameObject:
   m_ObjectHideFlags: 0
