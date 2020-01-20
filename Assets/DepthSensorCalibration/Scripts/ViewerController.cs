@@ -84,7 +84,8 @@ namespace DepthSensorCalibration {
                         _view.material = mode.material;
                     } else {
                         sensor.OnNewFrame -= OnNewFrame;
-                        sensor.Active = false;
+                        if (!sensor.AnySubscribedToNewFrames)
+                            sensor.Active = false;
                     }
                 }
             }
@@ -112,15 +113,6 @@ namespace DepthSensorCalibration {
             }
 
             return null;
-        }
-
-        private void FixedUpdate() {
-            if (_currentMode != null) {
-                var sensor = GetSensor(_currentMode.source);
-                if (sensor != null) {
-                    sensor.Active = true;
-                }
-            }
         }
 
         private void SwhitchUI() {
