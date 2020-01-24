@@ -76,6 +76,9 @@ namespace Launcher.KeyMapping {
             _bindsDown.Add(new KeyBind(KeyCode.RightAlt,KeyCode.F12, KeyEvent.FLIP_SANDBOX));
             _bindsDown.Add(new KeyBind(KeyCode.F12, KeyEvent.FLIP_DISPLAY));
             
+            _bindsDown.Add(new KeyBind(KeyCode.R, KeyEvent.RECORD));
+            _bindsDown.Add(new KeyBind(KeyCode.P, KeyEvent.PLAY_RECORD));
+            
             _bindsDown.Add(new KeyBind(KeyCode.Y, KeyEvent.SET_DEPTH_MAX));
             _bindsDown.Add(new KeyBind(KeyCode.H, KeyEvent.SET_DEPTH_ZERO));
             _bindsDown.Add(new KeyBind(KeyCode.N, KeyEvent.SET_DEPTH_MIN));

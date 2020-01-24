@@ -12,6 +12,7 @@ namespace DepthSensor.Sensor {
         bool Active { get; set; }
         int BuffersValid { get; }
         int BuffersCount { get; set; }
+        int FPS { get; }
     }
     
     public interface ISensor<out T> : ISensor where T : IBuffer {

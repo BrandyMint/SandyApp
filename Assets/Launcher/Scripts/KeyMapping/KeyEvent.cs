@@ -23,6 +23,8 @@
         SET_DEPTH_MIN,
         SET_DEPTH_MAX,
         ENTER,
+        RECORD,
+        PLAY_RECORD,
         EXIT
     }
 }

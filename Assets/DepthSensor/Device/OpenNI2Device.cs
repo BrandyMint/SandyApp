@@ -78,6 +78,10 @@ namespace DepthSensor.Device {
             _niInfrared = CreateNi2Sensor(OpenNIWrapper.Device.SensorType.Ir, init.modeInfrared, Infrared);
             _initInfo = null;
             
+            _internalDepth.SetTargetFps(_FPS);
+            _internalColor.SetTargetFps(_FPS);
+            _internalInfrared.SetTargetFps(_FPS);
+            
             _pollFrames = new Thread(PollFrames) {
                 Name = GetType().Name
             };

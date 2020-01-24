@@ -35,6 +35,8 @@ namespace DepthSensor.Sensor {
             }
         }
 
+        public int FPS { get; protected set; }
+
         protected Action<AbstractSensor> _onActiveChanged;
         private bool _active;
         protected int _buffersCount;
@@ -62,6 +64,10 @@ namespace DepthSensor.Sensor {
 
             protected internal Internal(AbstractSensor sensor) {
                 _abstractSensor = sensor;
+            }
+
+            protected internal void SetTargetFps(int fps) {
+                _abstractSensor.FPS = fps;
             }
             
             protected internal virtual void OnNewFrame() {

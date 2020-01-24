@@ -42,6 +42,13 @@ namespace DepthSensor.Device {
             _bodyKinect = new Windows.Kinect.Body[Body.GetOldest().data.Length];
             if (!_kinect.IsOpen)
                 _kinect.Open();
+            
+            _internalDepth.SetTargetFps(30);
+            _internalColor.SetTargetFps(30);
+            _internalInfrared.SetTargetFps(30);
+            _internalIndex.SetTargetFps(30);
+            _internalBody.SetTargetFps(30);
+            
             _reactivateSensors = new Thread(ReactivateSensorsBGLoop) {
                 Name = GetType().Name
             };

@@ -24,7 +24,7 @@ namespace DepthSensor.Buffer {
             texture.Apply(false);
         }
 
-        public Texture GetTexture() {
+        public Texture2D GetTexture() {
             return texture;
         }
     }

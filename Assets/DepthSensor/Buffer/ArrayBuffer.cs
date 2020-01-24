@@ -18,6 +18,10 @@ namespace DepthSensor.Buffer {
             }
         }
 
+        public override long LengthInBytes() {
+            return data.GetLengthInBytes();
+        }
+
         protected internal override object[] GetArgsForCreateSome() {
             return new object[] {data.Length};
         }
@@ -34,6 +38,12 @@ namespace DepthSensor.Buffer {
         public override void Clear() {
             lock (SyncRoot) {
                 Array.Clear(data, 0, data.Length);
+            }
+        }
+
+        protected internal override void Set(byte[] newData) {
+            lock (SyncRoot) {
+                MemUtils.CopyBytes(newData, data);
             }
         }
 

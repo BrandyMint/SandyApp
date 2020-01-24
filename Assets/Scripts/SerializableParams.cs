@@ -91,7 +91,7 @@ public abstract class SerializableParams {
         return p;
     }
 
-    protected virtual void Set(string paramName, object val) {
+    public virtual void Set(string paramName, object val) {
         var valIsLoaded = _params.TryGetValue(paramName, out var cache);
         if (valIsLoaded) {
             cache.val = val;
@@ -102,7 +102,7 @@ public abstract class SerializableParams {
             InvokeChanged();
     }
 
-    protected virtual T Get<T>(string paramName, T defVal = default(T)) {
+    public virtual T Get<T>(string paramName, T defVal = default(T)) {
         if (!_forceResetOnGet) {
             if (!_isLoaded)
                 Load(false);

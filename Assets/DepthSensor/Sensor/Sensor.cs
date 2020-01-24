@@ -88,15 +88,15 @@ namespace DepthSensor.Sensor {
         }
 
         public class Internal : AbstractSensor.Internal {
-            private readonly Sensor<T> _sensor;
+            protected internal readonly Sensor<T> sensor;
 
             protected internal Internal(Sensor<T> sensor) : base(sensor) {
-                _sensor = sensor;
+                this.sensor = sensor;
             }
 
             protected internal override void OnNewFrameBackground() {
-                var len = _sensor.BuffersCount;
-                _sensor._first = (len + _sensor._first + 1) % len;
+                var len = sensor.BuffersCount;
+                sensor._first = (len + sensor._first + 1) % len;
                 base.OnNewFrameBackground();
             }
         }

@@ -19,7 +19,11 @@ namespace DepthSensor.Buffer {
         
         public abstract void Clear();
 
+        public abstract long LengthInBytes();
+
         protected internal abstract object[] GetArgsForCreateSome();
+
+        protected internal abstract void Set(byte[] newData);
 
         protected internal abstract void Set(IntPtr newData);
 
