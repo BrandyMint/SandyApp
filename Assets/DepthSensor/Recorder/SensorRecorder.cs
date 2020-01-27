@@ -8,7 +8,7 @@ using DepthSensor.Sensor;
 using Utilities;
 
 namespace DepthSensor.Recorder {
-    public abstract class SensorRecorder<TBuf> : IDisposable where TBuf : IBuffer {
+    public abstract class SensorRecorder<TBuf> : IDisposable where TBuf : AbstractBuffer {
         private ISensor<TBuf> _sensor;
         private Stopwatch _timer;
         private bool _recordFramesLoop;
@@ -75,7 +75,7 @@ namespace DepthSensor.Recorder {
             var needUpdateBuffersCount = false;
             lock (_framesQueue) {
                 _framesQueue.Enqueue(frame);
-                _neededBuffersCount = _framesQueue.Count + 1;
+                _neededBuffersCount = _framesQueue.Count + 2;
                 if (_sensor.BuffersCount < _neededBuffersCount) {
                     needUpdateBuffersCount = true;
                 }
@@ -107,8 +107,9 @@ namespace DepthSensor.Recorder {
         private void RecordFrames(object path) {
             int fps = _sensor.FPS == 0 ? 2 : _sensor.FPS;
             int frameTime = 1000 / fps;
+            var frameSize = (int) _sensor.GetNewest().LengthInBytes() + sizeof(long) * 2;
             
-            using (var stream = new FileStream(path.ToString(), FileMode.CreateNew))
+            using (var stream = new FileStream(path.ToString(), FileMode.CreateNew, FileAccess.Write, FileShare.None, frameSize))
             using (var binary = new BinaryWriter(stream)) {
                 while (_recordFramesLoop) {
                     if (_framesReadyEvent.WaitOne(frameTime * 5)) {

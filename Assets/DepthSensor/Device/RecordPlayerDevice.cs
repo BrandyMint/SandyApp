@@ -38,8 +38,8 @@ namespace DepthSensor.Device {
                 if (!Opened && Sensor.Available) {
                     _isFrameReaded = false;
                     try {
-                        var frameLen = (int)Sensor.GetOldest().LengthInBytes();
-                        stream = new BufferedStream(new FileStream(_path, FileMode.Open, FileAccess.Read, FileShare.None), frameLen * 10);
+                        var frameLen = (int)Sensor.GetOldest().LengthInBytes() + sizeof(long) * 2;
+                        stream = new FileStream(_path, FileMode.Open, FileAccess.Read, FileShare.None, frameLen);
                         if (seek >= 0) {
                             stream.Seek(seek, SeekOrigin.Begin);
                         }

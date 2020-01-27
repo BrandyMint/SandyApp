@@ -55,7 +55,7 @@ namespace DepthSensor.Recorder {
             }
         }
 
-        private void StopSensorRecord<T>(SensorRecorder<T> recorder, string name) where T : IBuffer {
+        private void StopSensorRecord<T>(SensorRecorder<T> recorder, string name) where T : AbstractBuffer {
             if (recorder.Recording) {
                 var info = _manifest.Get<StreamInfo>(name);
                 info.framesCount = recorder.StopRecord();
