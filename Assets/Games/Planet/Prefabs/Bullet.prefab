@@ -4896,6 +4896,10 @@ MonoBehaviour:
   speed: 10
   _bang: {fileID: 2986594407882114950}
   _maxLifeTime: 10
+  _audioFire: {fileID: 8300000, guid: 2b7d80bed57ab23ce94a90c29601402c, type: 3}
+  _audioBang: {fileID: 8300000, guid: 020f1a6681d41c68b9dcdd637edb65e1, type: 3}
+  _model: {fileID: 5523764288605477530}
+  _minAudioSimultaneouslyPlayShift: 0.1
 --- !u!54 &413441887705181649
 Rigidbody:
   m_ObjectHideFlags: 0

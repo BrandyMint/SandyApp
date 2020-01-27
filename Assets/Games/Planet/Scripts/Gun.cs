@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using Games.Common.Game;
 using Unity.Mathematics;
 using UnityEngine;
