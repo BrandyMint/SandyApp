@@ -19,9 +19,7 @@
         ZOOM_IN,
         ZOOM_OUT,
         CHANGE_PROJECTOR_SIZE,
-        SET_DEPTH_ZERO,
-        SET_DEPTH_MIN,
-        SET_DEPTH_MAX,
+        SET_DEPTH,
         ENTER,
         EXIT
     }
