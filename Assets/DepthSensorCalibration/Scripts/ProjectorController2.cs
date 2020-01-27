@@ -117,7 +117,7 @@ namespace DepthSensorCalibration {
             if (string.IsNullOrEmpty(shortCut))
                 fld.txtShortCut.gameObject.SetActive(false);
             else
-                fld.txtShortCut.text = $"({shortCut})";
+                fld.txtShortCut.text = $"[{shortCut}]";
         }
 
         private void OnCalibrationChanged() {
