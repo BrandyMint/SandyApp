@@ -155,12 +155,12 @@ namespace Games.Spray {
         }
 
         private void SetSizes(float dist) {
+            _gameField.AlignToCamera(_cam, dist);
+            _gameField.SetWidth(0f);
             var size = _gameField.Scale * _initialItemSize;
             foreach (var item in _items) {
                 item.transform.localScale = Vector3.one * size;
             }
-            _gameField.AlignToCamera(_cam, dist);
-            _gameField.SetWidth(0f);
         }
         
         private void ShowItems(bool show) {

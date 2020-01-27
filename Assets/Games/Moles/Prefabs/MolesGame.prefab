@@ -86,6 +86,7 @@ MonoBehaviour:
   _byUIFlip: 1
   _bySandboxFlip: 1
   _method: 0
+  _prev: 1
 --- !u!1 &6648669531403264501
 GameObject:
   m_ObjectHideFlags: 0
@@ -133,6 +134,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _offsetedByWidth: []
   _offsetedByWidthAndSize: []
+  _fieldTexture: {fileID: 0}
+  _scaleZ: 0
 --- !u!1001 &742509753394388122
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -234,6 +237,21 @@ PrefabInstance:
         type: 3}
       propertyPath: m_RootOrder
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6189435222290316142, guid: e896628dc424e0841a1f01a59c7a777a,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6189435222290316142, guid: e896628dc424e0841a1f01a59c7a777a,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6189435222290316142, guid: e896628dc424e0841a1f01a59c7a777a,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 7795949437423083367, guid: e896628dc424e0841a1f01a59c7a777a,
         type: 3}

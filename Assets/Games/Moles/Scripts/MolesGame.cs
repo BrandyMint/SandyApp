@@ -162,13 +162,13 @@ namespace Games.Moles {
         }
 
         private void SetSizes(float dist) {
+            _gameField.AlignToCamera(_cam, dist);
+            _gameField.SetWidth(0f);
             var size = _gameField.Scale * _initialMoleSize;
             _tplMole.transform.localScale = Vector3.one * size;
             foreach (var mole in _moles) {
                 mole.transform.localScale = Vector3.one * size;
             }
-            _gameField.AlignToCamera(_cam, dist);
-            _gameField.SetWidth(0f);
         }
 
         private void ResetMoles() {
