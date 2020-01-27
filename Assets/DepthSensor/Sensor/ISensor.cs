@@ -19,6 +19,5 @@ namespace DepthSensor.Sensor {
         T Get(int i);
         T GetNewest();
         T GetOldest();
-        T GetNewestAndLock(int milliseconds = -1);
     }
 }

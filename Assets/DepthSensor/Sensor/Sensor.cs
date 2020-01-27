@@ -1,6 +1,5 @@
 using System;
 using DepthSensor.Buffer;
-using UnityEngine;
 using UnityEngine.Assertions;
 
 namespace DepthSensor.Sensor {
@@ -49,31 +48,6 @@ namespace DepthSensor.Sensor {
 
         public T GetOldest() {
             return Get(BuffersCount - 1);
-        }
-
-        public T GetNewestAndLock(int milliseconds = -1) {
-            var buffer = GetNewest();
-            if (buffer.Lock(milliseconds))
-                return buffer;
-            return null;
-        }
-
-        public T[] GetFreeBuffersAndLock(int milliseconds =-1) {
-            var len = Mathf.Min(BuffersValid, BuffersCount - 1);
-            if (_buffersCacheForExternalUse == null || _buffersCacheForExternalUse.Length != len)
-                _buffersCacheForExternalUse = new T[len];
-            for (int i = 0; i < len; ++i) {
-                var b = Get(i);
-                if (!b.Lock(milliseconds)) {
-                    for (int j = i - 1; j >= 0; --j) {
-                        _buffersCacheForExternalUse[j].Unlock();
-                    }
-                    return null;
-                }
-                _buffersCacheForExternalUse[i] = b;
-            }
-
-            return _buffersCacheForExternalUse;
         }
 
         private static int GetIdx(int i, int first, int len) {

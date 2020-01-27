@@ -5,8 +5,6 @@ using UnityEngine.Assertions;
 
 namespace DepthSensor.Buffer {
     public abstract class AbstractBuffer : IBuffer {
-        public readonly object SyncRoot = new object();
-
         public T CreateSome<T>() where T : IBuffer {
             var type = GetType();
             var args = GetArgsForCreateSome();
@@ -29,26 +27,6 @@ namespace DepthSensor.Buffer {
 
         protected internal abstract void SetBytes(IntPtr newData, long copyBytes);
 
-        public virtual void Dispose() {
-            if (Lock(100))
-                Unlock();
-        }
-
-        public bool Lock(int milliseconds = -1) {
-            if (milliseconds < 0) {
-                Monitor.Enter(SyncRoot);
-                return true;
-            }
-            return Monitor.TryEnter(SyncRoot, milliseconds);
-        }
-
-        public void Unlock() {
-            Monitor.Exit(SyncRoot);
-        }
-
-        public void SafeUnlock() {
-            if (Monitor.IsEntered(SyncRoot))
-                Unlock();
-        }
+        public virtual void Dispose() { }
     }
 }

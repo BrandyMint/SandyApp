@@ -13,7 +13,7 @@ namespace DepthSensor {
         public int fps;
         public bool use;
 
-        public StreamParams(int width, int height, int fps, bool use = false) {
+        public StreamParams(int width, int height, int fps, bool use = true) {
             this.width = width;
             this.height = height;
             this.fps = fps;

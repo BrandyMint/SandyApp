@@ -159,11 +159,6 @@ namespace DepthSensorSandbox {
         }
 
         private static void ActivateSensorIfNeed<T>(ISensor sensor, T buffer, bool activate) where T: AbstractBuffer {
-            if (!activate && buffer != null) {
-                buffer.SafeUnlock();
-                //buffer = null;
-            }
-
             var hasExternalUsings = sensor.AnySubscribedToNewFramesExcept(
                                         typeof(BgConveyer.BgConveyer), 
                                         typeof(DepthSensorSandboxProcessor)
@@ -225,7 +220,7 @@ namespace DepthSensorSandbox {
 
                 if (_bufDepth != null) {
                     var depthRaw = _processDepth && sDepth.Active 
-                        ? sDepth.GetNewestAndLock(200) 
+                        ? sDepth.GetNewest() 
                         : null;
                     if (depthRaw != null) {
                         var bufferChanged = false;
@@ -236,7 +231,6 @@ namespace DepthSensorSandbox {
                             p.Process(depthRaw, depth, depthPrev);
                             bufferChanged |= p.Active;
                         }
-                        depthRaw.Unlock();
 
                         _bufDepthInternal.OnNewFrameBackground();
                         _onDepthDataBackground?.Invoke(depth, _bufMapToCamera);
@@ -303,11 +297,11 @@ namespace DepthSensorSandbox {
 
         private static void FlushTextureBuffer<T>(T buffer, Action<T> action, bool dolock = false) where  T : ITextureBuffer {
             if (buffer != null) {
-                if (!dolock || buffer.Lock(200)) {
+                if (!dolock/* || buffer.Lock(200)*/) {
                     buffer.UpdateTexture();
                     action?.Invoke(buffer);
-                    if (dolock)
-                        buffer.Unlock();
+                    /*if (dolock)
+                        buffer.Unlock();*/
                 }
             }
         }

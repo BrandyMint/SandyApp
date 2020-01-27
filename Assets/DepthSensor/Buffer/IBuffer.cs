@@ -7,11 +7,5 @@ namespace DepthSensor.Buffer {
         T Copy<T>() where T : IBuffer;
         
         void Clear();
-        
-        bool Lock(int milliseconds = -1);
-
-        void Unlock();
-
-        void SafeUnlock();
     }
 }

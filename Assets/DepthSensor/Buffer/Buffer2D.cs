@@ -33,41 +33,29 @@ namespace DepthSensor.Buffer {
         public override T1 Copy<T1>() {
             var copy = CreateSome<T1>();
             var buff = copy as Buffer2D<T>;
-            lock (SyncRoot) {
-                data.CopyTo(buff.data);
-            }
+            data.CopyTo(buff.data);
             return copy;
         }
 
         public override void Clear() {
-            lock (SyncRoot) {
-                var val = default(T);
-                Parallel.For(0, data.Length, i => { data[i] = val; });
-            }
+            var val = default(T);
+            Parallel.For(0, data.Length, i => { data[i] = val; });
         }
 
         protected internal override void Set(byte[] newData) {
-            lock (SyncRoot) {
-                MemUtils.CopyBytes(newData, data);
-            }
+            MemUtils.CopyBytes(newData, data);
         }
 
         protected internal virtual void Set(T[] newData) {
-            lock (SyncRoot) {
-                data.CopyFrom(newData);
-            }
+            data.CopyFrom(newData);
         }
             
         protected internal override void Set(IntPtr newData) {
-            lock (SyncRoot) {
-                MemUtils.Copy(newData, data);
-            }
+            MemUtils.Copy(newData, data);
         }
             
         protected internal override void SetBytes(IntPtr newData, long copyBytes) {
-            lock (SyncRoot) {
-                MemUtils.CopyBytes(newData, data, copyBytes);
-            }
+            MemUtils.CopyBytes(newData, data, copyBytes);
         }
 
         public override void Dispose() {
