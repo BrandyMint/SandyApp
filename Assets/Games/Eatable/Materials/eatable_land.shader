@@ -27,7 +27,7 @@
             CGPROGRAM
             #pragma multi_compile _ CALC_DEPTH
             #pragma vertex vert
-            #pragma fragment fragMultiPlayers
+            #pragma fragment frag
 
             #include "UnityCG.cginc"
             
@@ -35,7 +35,8 @@
 
             #include "Assets/DepthSensorSandbox/Resources/Materials/utils.cginc"
             #include "Assets/DepthSensorSandbox/Resources/Materials/sandbox.cginc"
-            #include "Assets/Games/Common/Materials/depth_slice.cginc"
+            #include "Assets/Games/Common/Materials/depth_slice.cginc"            
+            #include "Assets/Games/Common/Materials/multi_players.cginc"
 
             fixed4 _ColorMin;
             fixed4 _ColorMax;
@@ -51,10 +52,11 @@
                 float min = _DepthZero + _DepthMinOffset;
                 float k = inverseLerp(min, max, z);
                 fixed4 c = lerp(_ColorMin, _ColorMax, k);
-                return c;
+                fixed4 player = colorMultiPlayers(i);
+                if (player.a < 1)
+                    return c * player * player.a;
+                return player;
             }
-            
-            #include "Assets/Games/Common/Materials/multi_players.cginc"
 
             ENDCG
         }
