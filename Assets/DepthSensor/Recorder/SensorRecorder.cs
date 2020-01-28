@@ -6,6 +6,7 @@ using System.Threading;
 using DepthSensor.Buffer;
 using DepthSensor.Sensor;
 using Utilities;
+using Debug = UnityEngine.Debug;
 
 namespace DepthSensor.Recorder {
     public abstract class SensorRecorder<TBuf> : IDisposable where TBuf : AbstractBuffer {
@@ -38,7 +39,8 @@ namespace DepthSensor.Recorder {
             _recordFramesLoop = true;
             sensor.OnNewFrameBackground += OnNewFrame;
             _recordFrames = new Thread(RecordFrames) {
-                Name = GetType().Name
+                Name = GetType().Name,
+                Priority = ThreadPriority.Lowest
             };
             _recordFrames.Start(path);
 
