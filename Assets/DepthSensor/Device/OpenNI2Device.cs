@@ -308,7 +308,10 @@ namespace DepthSensor.Device {
         }
 
         private void PollFrames() {
-            var waits = new AutoResetEvent[0];
+            var waits = new WaitHandle[0];
+            int idx, colorIdx = 0, infraredIdx = 0, depthIdx = 0;
+            //frame idx checking because frame are duplicated when multisensor reading
+            //TODO: but how avoid duplicate stream.ReadFrame() ?
             try {
                 while (_pollFramesLoop) {
                     if (_sensorActiveChangedEvent.WaitOne(0)) {
@@ -319,12 +322,14 @@ namespace DepthSensor.Device {
                         using (var depth = _niDepth.started ? _niDepth.stream.ReadFrame() : null)
                         using (var infrared = _niInfrared.started ? _niInfrared.stream.ReadFrame() : null)
                         using (var color = _niColor.started ? _niColor.stream.ReadFrame() : null) {
-                            if (color != null) {
+                            if (color != null && colorIdx != (idx = color.FrameIndex)) {
+                                colorIdx = idx;
                                 Color.GetOldest().SetBytes(color.Data, color.DataSize);
                                 _internalColor.OnNewFrameBackground();
                             }
                             
-                            if (infrared != null) {
+                            if (infrared != null && infraredIdx != (idx = infrared.FrameIndex)) {
+                                infraredIdx = idx;
                                 Infrared.GetOldest().SetBytes(infrared.Data, infrared.DataSize);
                                 _internalInfrared.OnNewFrameBackground();
                             }
@@ -334,7 +339,8 @@ namespace DepthSensor.Device {
                                 _internalMapDepthToCamera.OnNewFrameBackground();
                             }
 
-                            if (depth != null) {
+                            if (depth != null && depthIdx != (idx = depth.FrameIndex)) {
+                                depthIdx = idx;
                                 Depth.GetOldest().SetBytes(depth.Data, depth.DataSize);
                                 _internalDepth.OnNewFrameBackground();
                             }
