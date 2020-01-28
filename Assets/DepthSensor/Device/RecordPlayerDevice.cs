@@ -229,13 +229,11 @@ namespace DepthSensor.Device {
 
 #region Background
         private void ReOpenStreamsBackground() {
+            //TODO: seek to current time instead of reopen
             foreach (var stream in _streams) {
-                //TODO: seek to file
-                if (stream.Sensor.Active != stream.Opened) {
-                    if (stream.Sensor.Active)
-                        stream.Open();
-                    else
-                        stream.Close();
+                stream.Close();
+                if (stream.Sensor.Active) {
+                    stream.Open();
                 }
             }
         }
@@ -277,6 +275,7 @@ namespace DepthSensor.Device {
                             _framesArrivedEvent.Set();
                         if (_sensorActiveChangedEvent.WaitOne(0)) {
                             ReOpenStreamsBackground();
+                            timer = Stopwatch.StartNew();
                         }
                     }
                     isFirstTime = false;
