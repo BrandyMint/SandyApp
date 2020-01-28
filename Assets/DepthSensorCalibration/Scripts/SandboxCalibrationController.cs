@@ -29,6 +29,7 @@ namespace DepthSensorCalibration {
             public ShortCutValue OffsetMinDepth { get; set; }
             public ShortCutValue ZeroDepth { get; set; }
             public ShortCutValue OffsetMaxDepth { get; set; }
+            public ShortCutValue OffsetDepthHelp { get; set; }
         }
         private readonly SandboxFields _sandboxFields = new SandboxFields();
         private event Action _updateUIValues;
@@ -103,17 +104,13 @@ namespace DepthSensorCalibration {
         private void SubscribeKeys() {
             KeyMapper.AddListener(KeyEvent.RESET, OnBtnReset);
             KeyMapper.AddListener(KeyEvent.SHOW_UI, SwithcUI);
-            KeyMapper.AddListener(KeyEvent.SET_DEPTH_MAX, SetDepthMax);
-            KeyMapper.AddListener(KeyEvent.SET_DEPTH_ZERO, SetDepthZero);
-            KeyMapper.AddListener(KeyEvent.SET_DEPTH_MIN, SetDepthMin);
+            KeyMapper.AddListener(KeyEvent.SET_DEPTH, SetDepth);
         }
 
         private void UnSubscribeKeys() {
             KeyMapper.RemoveListener(KeyEvent.RESET, OnBtnReset);
             KeyMapper.RemoveListener(KeyEvent.SHOW_UI, SwithcUI);
-            KeyMapper.RemoveListener(KeyEvent.SET_DEPTH_MAX, SetDepthMax);
-            KeyMapper.RemoveListener(KeyEvent.SET_DEPTH_ZERO, SetDepthZero);
-            KeyMapper.RemoveListener(KeyEvent.SET_DEPTH_MIN, SetDepthMin);
+            KeyMapper.RemoveListener(KeyEvent.SET_DEPTH, SetDepth);
         }
         
         private void SwithcUI() {
@@ -152,19 +149,12 @@ namespace DepthSensorCalibration {
             _depthValid = true;
         }
 
-        private void SetDepthMax() {
-            if (_depthValid) 
+        private void SetDepth() {
+            if (_depthValid) {
                 Prefs.Sandbox.OffsetMaxDepth = _tempSettings.OffsetMaxDepth;
-        }
-
-        private void SetDepthMin() {
-            if (_depthValid) 
                 Prefs.Sandbox.OffsetMinDepth = _tempSettings.OffsetMinDepth;
-        }
-
-        private void SetDepthZero() {
-            if (_depthValid) 
                 Prefs.Sandbox.ZeroDepth = _tempSettings.ZeroDepth;
+            }
         }
 #endregion
 
@@ -173,19 +163,22 @@ namespace DepthSensorCalibration {
             BtnKeyBind.ShortCut(_btnReset, KeyEvent.RESET);
             
             UnityHelper.SetPropsByGameObjects(_sandboxFields, _pnlSandboxSettings);
-            InitShortCutValue(_sandboxFields.OffsetMaxDepth, KeyEvent.SET_DEPTH_MAX, () => Prefs.Sandbox.OffsetMaxDepth);
-            InitShortCutValue(_sandboxFields.ZeroDepth, KeyEvent.SET_DEPTH_ZERO, () => Prefs.Sandbox.ZeroDepth + Prefs.Calibration.Position.z);
-            InitShortCutValue(_sandboxFields.OffsetMinDepth, KeyEvent.SET_DEPTH_MIN, () => Prefs.Sandbox.OffsetMinDepth);
+            InitUIValue(_sandboxFields.OffsetMaxDepth, () => Prefs.Sandbox.OffsetMaxDepth);
+            InitUIValue(_sandboxFields.ZeroDepth, () => Prefs.Sandbox.ZeroDepth + Prefs.Calibration.Position.z);
+            InitUIValue(_sandboxFields.OffsetMinDepth, () => Prefs.Sandbox.OffsetMinDepth);
+            InitShortCut(_sandboxFields.OffsetDepthHelp, KeyEvent.SET_DEPTH);
             OnSandboxSettingChanged();
         }
 
-        private void InitShortCutValue(ShortCutValue scv, KeyEvent ev, Func<float> get) {
+        private void InitUIValue(ShortCutValue scv, Func<float> get) {
+            _updateUIValues += () => SetTextDistValue(scv.txtValue, get());
+        }
+
+        private static void InitShortCut(ShortCutValue field, KeyEvent ev) {
             var key = KeyMapper.FindFirstKey(ev);
             if (key != null) {
-                scv.txtShortCut.text = key.ShortCut;
+                field.txtShortCut.text = key.ShortCut;
             }
-
-            _updateUIValues += () => SetTextDistValue(scv.txtValue, get());
         }
 
         private void OnSandboxSettingChanged() {

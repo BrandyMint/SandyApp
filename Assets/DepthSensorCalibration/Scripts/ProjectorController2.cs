@@ -58,7 +58,7 @@ namespace DepthSensorCalibration {
             _sampler.OnSampleAreaPoints += ShowSampleArea;
             
             KeyMapper.AddListener(KeyEvent.RESET, OnBtnReset);
-            KeyMapper.AddListener(KeyEvent.SET_DEPTH_ZERO, SampleSensorDist);
+            KeyMapper.AddListener(KeyEvent.SET_DEPTH, SampleSensorDist);
             KeyMapper.AddListener(KeyEvent.CHANGE_PROJECTOR_SIZE, OnChangeProjectorSize);
             KeyMapper.AddListener(KeyEvent.SWITCH_OBLIQUE, OnChangeOblique);
         }
@@ -68,7 +68,7 @@ namespace DepthSensorCalibration {
             InitField(_projectorFields.Angel);
             InitField(_projectorFields.Oblique, KeyEvent.SWITCH_OBLIQUE);
             InitField(_projectorFields.ProjectorSize, KeyEvent.CHANGE_PROJECTOR_SIZE);
-            InitField(_projectorFields.SensorDist, KeyEvent.SET_DEPTH_ZERO);
+            InitField(_projectorFields.SensorDist, KeyEvent.SET_DEPTH);
             InitField(_projectorFields.Z, KeyEvent.ZOOM_OUT, KeyEvent.ZOOM_IN);
             InitField(_projectorFields.X, KeyEvent.LEFT, KeyEvent.RIGHT);
             InitField(_projectorFields.Y, KeyEvent.UP, KeyEvent.DOWN);
@@ -80,7 +80,7 @@ namespace DepthSensorCalibration {
 
         private void OnDestroy() {
             KeyMapper.RemoveListener(KeyEvent.RESET, OnBtnReset);
-            KeyMapper.RemoveListener(KeyEvent.SET_DEPTH_ZERO, SampleSensorDist);
+            KeyMapper.RemoveListener(KeyEvent.SET_DEPTH, SampleSensorDist);
             KeyMapper.RemoveListener(KeyEvent.CHANGE_PROJECTOR_SIZE, OnChangeProjectorSize);
             KeyMapper.RemoveListener(KeyEvent.SWITCH_OBLIQUE, OnChangeOblique);
             if (_sampler != null) {
@@ -117,7 +117,7 @@ namespace DepthSensorCalibration {
             if (string.IsNullOrEmpty(shortCut))
                 fld.txtShortCut.gameObject.SetActive(false);
             else
-                fld.txtShortCut.text = $"({shortCut})";
+                fld.txtShortCut.text = $"[{shortCut}]";
         }
 
         private void OnCalibrationChanged() {

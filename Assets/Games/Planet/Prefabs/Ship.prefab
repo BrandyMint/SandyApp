@@ -4803,7 +4803,7 @@ MonoBehaviour:
   _rightBang: {fileID: 3358533577847933351}
   _wrongBang: {fileID: 3358533577847933351}
   _itemType: 0
-  _audioRight: {fileID: 0}
+  _audioRight: {fileID: 8300000, guid: cdafc1f6d29a391f59ecfd09ff30ab27, type: 3}
   _audioWrong: {fileID: 0}
   hideOnBang: 1
   destroyOnBang: 1

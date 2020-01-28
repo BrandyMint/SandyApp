@@ -68,7 +68,7 @@ namespace Games.Planet {
 
         private void OnBulletCollide(Bullet b, Collision coll) {
             --_planetHP.Val;
-            if (_planetHP.Val <= 0) {
+            if (_planetHP.Val <= 0 && GameEvent.Current == GameState.START) {
                 GameEvent.Current = GameState.STOP;
             }
         }

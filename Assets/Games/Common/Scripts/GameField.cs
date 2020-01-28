@@ -63,20 +63,39 @@ namespace Games.Common {
             _lastCam = cam;
             _distFromCamera = dist;
             transform.rotation = cam.transform.rotation;
-            var dir = cam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 1.0f)).direction;
-            var pos = cam.transform.position + dir * dist;
-            var vertical = Math.Abs(Prefs.Calibration.Oblique) < 0.5f 
-                ? MathHelper.IsoscelesTriangleSize(dist, cam.fieldOfView)
-                : MathHelper.RightTriangleSize(dist, cam.fieldOfView);
-            pos.y += vertical * Prefs.Calibration.Oblique / 2f;
+
+            var plane = PlaneOnDist(dist);
+            var up = PlaneRaycastFromViewport(plane, new Vector2(0.5f, 1f));
+            var down = PlaneRaycastFromViewport(plane, new Vector2(0.5f, 0f));
+            var left = PlaneRaycastFromViewport(plane, new Vector2(0f, 0.5f));
+            var right = PlaneRaycastFromViewport(plane, new Vector2(1f, 0.5f));
+            var pos = (up + down + left + right) / 4f;
             transform.position = pos;
+            var vert = Vector3.Distance(up, down);
+            var hor = Vector3.Distance(left, right);
             transform.localScale = _startScale * new float3(
-                vertical * cam.aspect,
-                vertical,
-                _scaleZ ? vertical : 1f
+                hor,
+                vert,
+                _scaleZ ? vert : 1f
             );
             
             UpdateWidth();
+        }
+
+        public Plane PlaneOnDist(float dist) {
+            var up = transform.forward;
+            up = (Vector3.Dot(up, -_lastCam.transform.forward) > 0f) ? up : -up;
+            return new Plane(up, _lastCam.transform.position - up * dist);
+        }
+
+        public Vector3 PlaneRaycastFromViewport(Plane plane, Vector2 uv) {
+            var ray = _lastCam.ViewportPointToRay(new Vector3(uv.x, uv.y, 1f));
+            if (plane.Raycast(ray, out var dist)) {
+                return ray.GetPoint(dist);
+            } else {
+                Debug.LogError("GameFiled: Cant align to camera");
+                return ray.GetPoint(1f);
+            }
         }
         
         public float Scale => Mathf.Abs(transform.localScale.y);

@@ -11,7 +11,7 @@ namespace Games.Common {
         [SerializeField] protected bool _byUIFlip = true;
         [SerializeField] protected bool _bySandboxFlip = true;
         [SerializeField] protected CorrectMethod _method = CorrectMethod.SCALE; 
-        protected float _prev = 1f;
+        [HideInInspector] [SerializeField] protected float _prev = 1f;
         
         private void Awake() {
             Prefs.App.OnChanged += OnAppChanged;

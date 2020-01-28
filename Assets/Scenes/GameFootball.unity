@@ -978,7 +978,7 @@ PrefabInstance:
     - target: {fileID: 7717991294403081787, guid: 88b8641e37e39964183bb966bc9c5410,
         type: 3}
       propertyPath: m_Name
-      value: GamePingPong
+      value: GameFootball
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 88b8641e37e39964183bb966bc9c5410, type: 3}
