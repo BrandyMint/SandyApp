@@ -24,6 +24,14 @@ namespace DepthSensor {
     }
     
     public class SensorParams : SerializableParams {
+        protected override void OnLoadedNotActualVersion() {
+            base.OnLoadedNotActualVersion();
+            if (Version == 0) {
+                Reset();
+                Save();
+            }
+        }
+
         public StreamParams Depth {
             get => Get(nameof(Depth), StreamParams.Default);
             set => Set(nameof(Depth), value);

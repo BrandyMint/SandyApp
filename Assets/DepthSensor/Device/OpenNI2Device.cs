@@ -192,7 +192,7 @@ namespace DepthSensor.Device {
                             //for Kinect2 Depth 640x480@30 is invalid
                             def = new StreamParams(512, 424, 30, true);
                             break;
-                        /*case OpenNIWrapper.Device.SensorType.Ir:
+                        case OpenNIWrapper.Device.SensorType.Ir:
                             def = Prefs.Sensor.IR;
                             break;
                         case OpenNIWrapper.Device.SensorType.Color:
@@ -200,7 +200,7 @@ namespace DepthSensor.Device {
                             break;
                         case OpenNIWrapper.Device.SensorType.Depth:
                             def = Prefs.Sensor.Depth;
-                            break;*/
+                            break;
                     }
 
                     foreach (var m in supportedModes) {

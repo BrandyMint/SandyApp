@@ -12,6 +12,12 @@ public abstract class SerializableParams {
     public bool HasChanges => _params.Values.Any(p => p.IsChanged);
     [JsonIgnore]
     public bool HasFile { get; private set; }
+    [JsonIgnore]
+    public virtual int ActualVersion => 1;
+    public int Version {
+        get => Get(nameof(Version), 0);
+        set => Set(nameof(Version), value);
+    }
 
     protected class ParamCache {
         public object val;
@@ -46,6 +52,8 @@ public abstract class SerializableParams {
             var json = File.ReadAllText(GetFullPath());
             JsonConvert.PopulateObject(json, this);
             HasFile = true;
+            if (Version != ActualVersion)
+                OnLoadedNotActualVersion();
         } catch (Exception e) {
             //Debug.LogWarning(e);
             Reset();
@@ -59,8 +67,13 @@ public abstract class SerializableParams {
         return true;
     }
 
+    protected virtual void OnLoadedNotActualVersion() { }
+
     public bool Save() {
         try {
+            _invokeChangedOnSetting = false;
+            Version = ActualVersion;
+            _invokeChangedOnSetting = true;
             var json = JsonConvert.SerializeObject(this, Formatting.Indented);
             File.WriteAllText(GetFullPath(), json);
             foreach (var cache in _params.Values) {
