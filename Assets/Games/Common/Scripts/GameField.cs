@@ -83,9 +83,8 @@ namespace Games.Common {
         }
 
         public Plane PlaneOnDist(float dist) {
-            var toCam = _lastCam.transform.position - transform.position;
             var up = transform.forward;
-            up = (Vector3.Dot(up, toCam) > 0f) ? up : -up;
+            up = (Vector3.Dot(up, -_lastCam.transform.forward) > 0f) ? up : -up;
             return new Plane(up, _lastCam.transform.position - up * dist);
         }
 
