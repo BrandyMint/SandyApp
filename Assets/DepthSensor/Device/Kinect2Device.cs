@@ -157,10 +157,8 @@ namespace DepthSensor.Device {
                         using (var raw = color.LockRawImageBuffer()) {
                             //Color.GetOldest().SetBytes(raw.UnderlyingBuffer, raw.Length);
                             var buff = Color.GetOldest();
-                            lock (buff.SyncRoot) {
-                                color.CopyConvertedFrameDataToIntPtr(buff.data.IntPtr(),
-                                    (uint) buff.data.GetLengthInBytes(), _COLOR_FORMAT);
-                            }
+                            color.CopyConvertedFrameDataToIntPtr(buff.data.IntPtr(),
+                                (uint) buff.data.GetLengthInBytes(), _COLOR_FORMAT);
                         }
                         _internalColor.OnNewFrameBackground();
                     }
@@ -201,13 +199,11 @@ namespace DepthSensor.Device {
         private void UpdateBodies(BodyFrame frame) {
             frame.GetAndRefreshBodyData(_bodyKinect);
             var buff = Body.GetOldest();
-            lock (buff.SyncRoot) {
-                if (!_internalBodyBuffers.TryGetValue(buff, out var intern)) {
-                    intern = new BodyBuffer.Internal<Windows.Kinect.Body>(buff);
-                }
-
-                intern.UpdateBodiesIndexed(_bodyKinect, GetBodyId, UpdateBody);
+            if (!_internalBodyBuffers.TryGetValue(buff, out var intern)) {
+                intern = new BodyBuffer.Internal<Windows.Kinect.Body>(buff);
             }
+
+            intern.UpdateBodiesIndexed(_bodyKinect, GetBodyId, UpdateBody);
         }
 
         private static bool GetBodyId(Windows.Kinect.Body body, out ulong id) {
@@ -300,19 +296,17 @@ namespace DepthSensor.Device {
             //TODO: broken table in SDK, workaround with MapDepthFrameToCameraSpace
             //var map = _kinect.CoordinateMapper.GetDepthFrameToCameraSpaceTable();
             var depthBuff = Depth.GetOldest();
-            lock (depthBuff.SyncRoot) {
-                var map = new CameraSpacePoint[depthBuff.data.Length];
-                var depth = new ushort[depthBuff.data.Length];
-                Parallel.For(0, depth.Length, i => {
-                    depth[i] = 1000;
-                });
-                _kinect.CoordinateMapper.MapDepthFrameToCameraSpace(depth, map);
-                var mapBuff = MapDepthToCamera.GetOldest();
-                Parallel.For(0, map.Length, i => {
-                    var mapPoint = map[i];
-                    mapBuff.data[i] = new half2(new float2(mapPoint.X, mapPoint.Y));
-                });
-            }
+            var map = new CameraSpacePoint[depthBuff.data.Length];
+            var depth = new ushort[depthBuff.data.Length];
+            Parallel.For(0, depth.Length, i => {
+                depth[i] = 1000;
+            });
+            _kinect.CoordinateMapper.MapDepthFrameToCameraSpace(depth, map);
+            var mapBuff = MapDepthToCamera.GetOldest();
+            Parallel.For(0, map.Length, i => {
+                var mapPoint = map[i];
+                mapBuff.data[i] = new half2(new float2(mapPoint.X, mapPoint.Y));
+            });
             
             _needUpdateMapDepthToColorSpace = false;
             _mapDepthToCameraUpdated = true;
