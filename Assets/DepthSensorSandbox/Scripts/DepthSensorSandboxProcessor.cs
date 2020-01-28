@@ -297,12 +297,12 @@ namespace DepthSensorSandbox {
 
         private static void FlushTextureBuffer<T>(T buffer, Action<T> action, bool dolock = false) where  T : ITextureBuffer {
             if (buffer != null) {
-                if (!dolock/* || buffer.Lock(200)*/) {
+                /*if (!dolock || buffer.Lock(200)) {*/
                     buffer.UpdateTexture();
                     action?.Invoke(buffer);
                     /*if (dolock)
-                        buffer.Unlock();*/
-                }
+                        buffer.Unlock();
+                }*/
             }
         }
 #endregion
