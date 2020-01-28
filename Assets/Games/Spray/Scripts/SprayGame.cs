@@ -2,7 +2,6 @@
 using System.Linq;
 using DepthSensorCalibration;
 using DepthSensorSandbox.Visualisation;
-using Games.Balloons;
 using Games.Common;
 using Games.Common.Game;
 using Unity.Mathematics;
@@ -126,29 +125,34 @@ namespace Games.Spray {
             var spawnArea = SpawnArea.Areas.First().transform;
             if (cam != null) {
                 cam.OnCalibrationChanged();
-                SetSizes(Prefs.Sandbox.ZeroDepth - Prefs.Sandbox.OffsetMaxDepth);
-                CorrectSpraySpawns(spawnArea, Prefs.Sandbox.OffsetMaxDepth, Prefs.Sandbox.OffsetMinDepth, _gameField.transform, _items.First());
+                SetSizes(SelectDist(Prefs.Sandbox.ZeroDepth, Prefs.Sandbox.OffsetMaxDepth));
+                CorrectSpraySpawns(spawnArea, Prefs.Sandbox.ZeroDepth + Prefs.Sandbox.OffsetMinDepth, _items.First());
             } else {
-                SetSizes(1.66f - 0.2f); //for testing
-                CorrectSpraySpawns(spawnArea, 0.2f, 0.2f, _gameField.transform, _items.First());
+                SetSizes(SelectDist(1.66f, 0.35f)); //for testing
+                CorrectSpraySpawns(spawnArea, 1.66f + 0.25f, _items.First());
             }
             
             Spawn();
         }
 
-        private void CorrectSpraySpawns(Transform spawnArea, float h, float minH, Transform field, Spray spray) {
-            var hSpray = math.cmax(spray.transform.lossyScale);
-            h = Mathf.Min(h + hSpray, hSpray * 3f) - h;
-            var hVec = Vector3.up * h;
-            hVec = field.InverseTransformVector(hVec);
-            
-            var spawnPos = spawnArea.localPosition;
-            spawnPos.z = hVec.z;
-            spawnArea.localPosition = spawnPos;
+        private float SelectDist(float h, float offset) {
+            _gameField.AlignToCamera(_cam, h - offset);
+            var size = _gameField.Scale * _initialItemSize;
+            return h - Mathf.Max(size * 1.5f, offset * 1.5f);
+        }
 
-            var s = 0.5f - spawnPos.y;
+        private void CorrectSpraySpawns(Transform spawnArea, float minH, Spray spray) {
+            var plane = _gameField.PlaneOnDist(minH);
+            var pUp = _gameField.PlaneRaycastFromViewport(plane, new Vector2(0.5f, 1f));
+            var pUp2 = _gameField.PlaneRaycastFromViewport(plane, new Vector2(0.5f, 0f));
+            if ((spawnArea.position - pUp2).sqrMagnitude > (spawnArea.position - pUp).sqrMagnitude)
+                pUp = pUp2;
+            var pDown = plane.ClosestPointOnPlane(spawnArea.position);
             var sprayAngle = spray.GetSprayAngle();
-            var a = MathHelper.RightTriangleAngle(Mathf.Abs(s), Mathf.Abs(hVec.z + minH)) - sprayAngle / 2f;
+            var a = MathHelper.RightTriangleAngle(
+                Vector3.Distance(pUp, pDown),
+                Vector3.Distance(pDown, spawnArea.position)
+            ) - sprayAngle / 2f;
             var spawnRot = spawnArea.localEulerAngles;
             spawnRot.x = 90f - a;
             spawnArea.localEulerAngles = spawnRot;
