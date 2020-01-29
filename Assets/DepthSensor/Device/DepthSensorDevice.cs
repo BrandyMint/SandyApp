@@ -63,6 +63,7 @@ namespace DepthSensor.Device {
         public abstract Vector2 CameraPosToDepthMapPos(Vector3 pos);
         public abstract Vector2 CameraPosToColorMapPos(Vector3 pos);
         public abstract Vector2 DepthMapPosToColorMapPos(Vector2 pos, ushort depth);
+        public abstract Vector3 DepthMapPosToCameraPos(Vector2 pos, ushort depth);
         public abstract void DepthMapToColorMap(NativeArray<ushort> depth, NativeArray<Vector2> color);
 
         protected abstract void SensorActiveChanged(AbstractSensor sensor);

@@ -1,5 +1,6 @@
 ﻿using System;
 using DepthSensor.Buffer;
+using UnityEngine;
 
 namespace DepthSensor.Sensor {
     public interface ISensor {
@@ -13,6 +14,7 @@ namespace DepthSensor.Sensor {
         int BuffersValid { get; }
         int BuffersCount { get; set; }
         int FPS { get; }
+        Vector2 FOV { get; }
     }
     
     public interface ISensor<out T> : ISensor where T : IBuffer {

@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using UnityEngine;
 
 namespace DepthSensor.Sensor {
     public abstract class AbstractSensor : ISensor, IDisposable {
@@ -36,6 +37,7 @@ namespace DepthSensor.Sensor {
         }
 
         public int FPS { get; protected set; }
+        public Vector2 FOV { get; protected set; }
 
         protected Action<AbstractSensor> _onActiveChanged;
         private bool _active;
@@ -68,6 +70,10 @@ namespace DepthSensor.Sensor {
 
             protected internal void SetTargetFps(int fps) {
                 _abstractSensor.FPS = fps;
+            }
+            
+            protected internal void SetFov(Vector2 fov) {
+                _abstractSensor.FOV = fov;
             }
             
             protected internal virtual void OnNewFrame() {

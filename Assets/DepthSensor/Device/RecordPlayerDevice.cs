@@ -147,6 +147,7 @@ namespace DepthSensor.Device {
             var info = ((InitInfoRecordPlayer) _initInfo).manifest.Get<StreamInfo>(name);
             if (info != null) {
                 internalSensor.SetTargetFps(info.fps);
+                //TODO: internalSensor.SetFov();
             }
             _streams.Add(stream);
 
@@ -348,6 +349,10 @@ namespace DepthSensor.Device {
             
             return new Vector2(vx, vy);*/
             return Vector2.zero;
+        }
+
+        public override Vector3 DepthMapPosToCameraPos(Vector2 pos, ushort depth) {
+            return Vector3.zero;
         }
 
         private DepthBuffer _parBuf;

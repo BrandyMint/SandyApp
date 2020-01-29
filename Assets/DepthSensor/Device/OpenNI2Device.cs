@@ -73,14 +73,10 @@ namespace DepthSensor.Device {
             _device = init.device;
             if (_device != null)
                 _device.DepthColorSyncEnabled = true;
-            _niDepth = CreateNi2Sensor(OpenNIWrapper.Device.SensorType.Depth, init.modeDepth, Depth);
-            _niColor = CreateNi2Sensor(OpenNIWrapper.Device.SensorType.Color, init.modeColor, Color);
-            _niInfrared = CreateNi2Sensor(OpenNIWrapper.Device.SensorType.Ir, init.modeInfrared, Infrared);
+            _niDepth = CreateNi2Sensor(OpenNIWrapper.Device.SensorType.Depth, init.modeDepth, _internalDepth);
+            _niColor = CreateNi2Sensor(OpenNIWrapper.Device.SensorType.Color, init.modeColor, _internalColor);
+            _niInfrared = CreateNi2Sensor(OpenNIWrapper.Device.SensorType.Ir, init.modeInfrared, _internalInfrared);
             _initInfo = null;
-            
-            _internalDepth.SetTargetFps(_FPS);
-            _internalColor.SetTargetFps(_FPS);
-            _internalInfrared.SetTargetFps(_FPS);
             
             _pollFrames = new Thread(PollFrames) {
                 Name = GetType().Name
@@ -88,15 +84,17 @@ namespace DepthSensor.Device {
             _pollFrames.Start();
         }
 
-        private NI2Sensor CreateNi2Sensor(OpenNIWrapper.Device.SensorType type, VideoMode mode, AbstractSensor sensor) {
+        private NI2Sensor CreateNi2Sensor<T>(OpenNIWrapper.Device.SensorType type, VideoMode mode, Sensor<T>.Internal internalSensor) where T : AbstractBuffer {
             var ni = new NI2Sensor {
-                Sensor = sensor
+                Sensor = internalSensor.sensor
             };
             
-            if (sensor.Available && _device != null) {
+            if (internalSensor.sensor.Available && _device != null) {
                 ni.stream = _device.CreateVideoStream(type);
                 ni.stream.VideoMode = mode;
                 ni.stream.OnNewFrame += s => ni.frameEvent.Set();
+                internalSensor.SetTargetFps(mode.Fps);
+                internalSensor.SetFov(new Vector2(ni.stream.HorizontalFieldOfView, ni.stream.VerticalFieldOfView));
             }
             
             _niSensors.Add(ni);
@@ -420,6 +418,18 @@ namespace DepthSensor.Device {
             
             return new Vector2(vx, vy);
         }
+        
+        public override Vector3 DepthMapPosToCameraPos(Vector2 pos, ushort depth) {
+            var v = Vector3.zero;
+            if (_niDepth.stream != null)
+                CoordinateConverter.ConvertDepthToWorld(
+                    _niDepth.stream,
+                    pos.x, pos.y, depth,
+                    out v.x, out v.y, out v.z
+                );
+            
+            return v / _DEPTH_MUL;
+        }
 
         private DepthBuffer _parBuf;
         private NativeArray<ushort> _parDepth;
@@ -434,18 +444,6 @@ namespace DepthSensor.Device {
         private void DepthMapToColorMapBody(int i) {
             var p = _parBuf.GetXYFrom(i);
             _parColor[i] = DepthMapPosToColorMapPos(p, _parDepth[i]);
-        }
-
-        private Vector3 DepthMapPosToCameraPos(Vector2 pos, ushort depth) {
-            Vector3 v = Vector3.zero;
-            if (_niDepth.stream != null)
-                CoordinateConverter.ConvertDepthToWorld(
-                    _niDepth.stream,
-                    (int)pos.x, (int)pos.y, depth,
-                    out v.x, out v.y, out v.z
-                );
-            
-            return v / _DEPTH_MUL;
         }
 
         private MapDepthToCameraBuffer _parMap;

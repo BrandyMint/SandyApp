@@ -43,17 +43,27 @@ namespace DepthSensor.Device {
             if (!_kinect.IsOpen)
                 _kinect.Open();
             
-            _internalDepth.SetTargetFps(30);
-            _internalColor.SetTargetFps(30);
-            _internalInfrared.SetTargetFps(30);
-            _internalIndex.SetTargetFps(30);
-            _internalBody.SetTargetFps(30);
+            InitSensorInfo(_internalDepth, _kinect.DepthFrameSource.FrameDescription);
+            InitSensorInfo(_internalColor, _kinect.ColorFrameSource.FrameDescription);
+            InitSensorInfo(_internalInfrared, _kinect.InfraredFrameSource.FrameDescription);
+            InitSensorInfo(_internalIndex, _kinect.BodyIndexFrameSource.FrameDescription);
+            InitSensorInfo(_internalBody, _kinect.BodyIndexFrameSource.FrameDescription);
             
             _reactivateSensors = new Thread(ReactivateSensorsBGLoop) {
                 Name = GetType().Name
             };
             _kinect.CoordinateMapper.CoordinateMappingChanged += OnCoordinateMappingChanged;
             _reactivateSensors.Start();
+        }
+
+        private static void InitSensorInfo<T>(Sensor<T>.Internal internalSensor, FrameDescription desc) where T : AbstractBuffer {
+            if (internalSensor.sensor.Available) {
+                internalSensor.SetTargetFps(30);
+                internalSensor.SetFov(new Vector2(
+                    desc.HorizontalFieldOfView,
+                    desc.VerticalFieldOfView
+                ));
+            }
         }
 
         private static InitInfo Init() {
@@ -282,6 +292,12 @@ namespace DepthSensor.Device {
             if (_kinect == null) return Vector2.zero;
             return ToVector2(_kinect.CoordinateMapper.
                 MapDepthPointToColorSpace(ToDepthPoint(pos), depth));
+        }
+
+        public override Vector3 DepthMapPosToCameraPos(Vector2 pos, ushort depth) {
+            if (_kinect == null) return Vector3.zero;
+            return ToVector3(_kinect.CoordinateMapper.
+                MapDepthPointToCameraSpace(ToDepthPoint(pos), depth));
         }
 
         public override void DepthMapToColorMap(NativeArray<ushort> depth, NativeArray<Vector2> color) {
