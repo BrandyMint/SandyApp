@@ -61,8 +61,13 @@ namespace DepthSensor.Recorder {
             lock (_framesQueue) {
                 _framesQueue.Clear();
             }
-            if (_recordFrames != null && _recordFrames.IsAlive && !_recordFrames.Join(5000))
-                _recordFrames.Abort();
+
+            if (_recordFrames != null) {
+                if (_recordFrames.IsAlive && !_recordFrames.Join(5000))
+                    _recordFrames.Abort();
+                _recordFrames = null;
+            }
+
             return _recordedFramesCount;
         }
 
