@@ -6,8 +6,8 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Experimental.Rendering;
 
-namespace Utilities {
-    public static class OpenCVSharpHelper {
+namespace Utilities.OpenCVSharpUnity {
+    public static class MatHelper {
         /*public class LshIndexParams : IndexParams {
             public LshIndexParams(int table_number = 12, int key_size = 20, int multi_probe_level = 2) {
                 SetAlgorithm(6);

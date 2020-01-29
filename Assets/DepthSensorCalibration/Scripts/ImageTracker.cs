@@ -7,6 +7,7 @@ using Unity.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using Utilities;
+using Utilities.OpenCVSharpUnity;
 
 namespace DepthSensorCalibration {
     public class ImageTracker : MonoBehaviour {
@@ -71,7 +72,7 @@ namespace DepthSensorCalibration {
         }
 
         private static void Set(ref Mat m, Texture t, Action onDone) {
-            OpenCVSharpHelper.ReCreateIfNeedCompatible(ref m, t);
+            MatHelper.ReCreateIfNeedCompatible(ref m, t);
 #if USE_MAT_ASYNC_SET
             m.AsyncSetFrom(t, onDone);
 #else
@@ -140,13 +141,13 @@ namespace DepthSensorCalibration {
         }
 
         public void VisualizeDetection(Texture2D imgVisualize, Color detectedColor) {
-            OpenCVSharpHelper.ReCreateWithLinkedDataIfNeed(ref _visualizeMat, imgVisualize);
+            MatHelper.ReCreateWithLinkedDataIfNeed(ref _visualizeMat, imgVisualize);
             Cv2.DrawKeypoints(_matFrame, _keyPointsFrame, _visualizeMat, null,
                 DrawMatchesFlags.DrawRichKeypoints);
 
             if (_frameDetected) {
                 _visualizeMat.Polylines(new[] {_detectedCorners.Select(p => new Point(p.X, p.Y))}, true, 
-                    OpenCVSharpHelper.GetScalarFrom(new Color(detectedColor.b, detectedColor.g, detectedColor.r)),
+                    MatHelper.GetScalarFrom(new Color(detectedColor.b, detectedColor.g, detectedColor.r)),
                     3, LineTypes.AntiAlias);
             }
             
