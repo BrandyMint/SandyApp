@@ -76,8 +76,7 @@ namespace DepthSensor {
 		private bool CreateDeviceFromType(Type type) {
 			try {
 				Debug.Log("Initializing " + type.Name);
-				//Device = (DepthSensorDevice) Activator.CreateInstance(type);
-				Device = new RecordPlayerDevice("/home/konstantin/.config/unity3d/Darkkon/sandbox/Records/norm2");
+				Device = (DepthSensorDevice) Activator.CreateInstance(type);
 				_internalDevice = new DepthSensorDevice.Internal(Device);
 				return true;
 			}

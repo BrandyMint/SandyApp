@@ -46,6 +46,7 @@ namespace Utilities.OpenCVSharpUnity {
             principalY = (float) imgSizeUsedOnCalculate.Height / 2f;
             focusX = principalX / Mathf.Tan(fov.x / 2f * Mathf.Deg2Rad);
             focusY = principalY / Mathf.Tan(fov.y / 2f * Mathf.Deg2Rad);
+            cameraMatrix[2, 2] = 1d;
         }
         
         //TODO: need testing

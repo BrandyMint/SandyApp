@@ -27,9 +27,9 @@ namespace DepthSensor.Recorder {
             set => Set(nameof(R), value);
         }
         
-        public double[] T {
-            get => Get<double[]>(nameof(R));
-            set => Set(nameof(R), value);
+        public double[,] T {
+            get => Get<double[,]>(nameof(T));
+            set => Set(nameof(T), value);
         }
     }
 }

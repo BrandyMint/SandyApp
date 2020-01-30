@@ -10,6 +10,8 @@ using Debug = UnityEngine.Debug;
 
 namespace DepthSensor.Recorder {
     public abstract class SensorRecorder<TBuf> : IDisposable where TBuf : AbstractBuffer {
+        public Action OnFail;
+        
         private ISensor<TBuf> _sensor;
         private Stopwatch _timer;
         private bool _recordFramesLoop;
@@ -26,12 +28,14 @@ namespace DepthSensor.Recorder {
 
         private readonly Queue<FrameInfo> _framesQueue = new Queue<FrameInfo>();
         private int _neededBuffersCount;
-        
+        private long _storedBytes;
 
         public bool Recording => _recordFramesLoop;
+        public long StoredBytes => _storedBytes;
 
         public void StartRecord(Stopwatch timer, ISensor<TBuf> sensor, string path) {
             StopRecord();
+            _storedBytes = 0;
             _timer = timer;
             _sensor = sensor;
             _buffersCountOnStart = _sensor.BuffersCount;
@@ -115,48 +119,56 @@ namespace DepthSensor.Recorder {
             int fps = _sensor.FPS == 0 ? 2 : _sensor.FPS;
             int frameTime = 1000 / fps;
             var frameSize = (int) _sensor.GetNewest().LengthInBytes() + sizeof(long) * 2;
-            
-            using (var stream = new FileStream(path.ToString(), FileMode.CreateNew, FileAccess.Write, FileShare.None, frameSize))
-            using (var binary = new BinaryWriter(stream)) {
-                while (_recordFramesLoop) {
-                    if (_framesReadyEvent.WaitOne(frameTime * 5)) {
-                        FrameInfo info;
-                        lock (_framesQueue) {
-                            if (_framesQueue.Count <= 0)
-                                continue;
-                            info = _framesQueue.Peek();
+
+            try {
+                using (var stream = new FileStream(path.ToString(), FileMode.CreateNew, FileAccess.Write,
+                    FileShare.None, frameSize))
+                using (var binary = new BinaryWriter(stream)) {
+                    while (_recordFramesLoop) {
+                        if (_framesReadyEvent.WaitOne(frameTime * 5)) {
+                            FrameInfo info;
+                            lock (_framesQueue) {
+                                if (_framesQueue.Count <= 0)
+                                    continue;
+                                info = _framesQueue.Peek();
+                            }
+
+                            binary.Write(info.time);
+                            _storedBytes += WriteFrame(stream, binary, info.buffer) + sizeof(long);
+
+                            ++_recordedFramesCount;
+                            lock (_framesQueue) {
+                                _framesQueue.Dequeue();
+                            }
+                        } else {
+                            Thread.Sleep(frameTime / 3);
                         }
-                        
-                        binary.Write(info.time);
-                        WriteFrame(stream, binary, info.buffer);
-                        
-                        ++_recordedFramesCount;
-                        lock (_framesQueue) {
-                            _framesQueue.Dequeue();
-                        }
-                    } else {
-                        Thread.Sleep(frameTime / 3);
                     }
                 }
+            } catch (Exception e) {
+                Debug.LogException(e);
+                OnFail?.Invoke();
             }
         }
 
-        protected abstract void WriteFrame(Stream fileStream, BinaryWriter stream, TBuf buffer);
+        protected abstract long WriteFrame(Stream fileStream, BinaryWriter stream, TBuf buffer);
     }
     
     public class SensorRecorderArrayBuffer<T> : SensorRecorder<ArrayBuffer<T>> where T : struct {
-        protected override void WriteFrame(Stream stream, BinaryWriter binary, ArrayBuffer<T> buffer) {
+        protected override long WriteFrame(Stream stream, BinaryWriter binary, ArrayBuffer<T> buffer) {
             var bytes = buffer.data.GetLengthInBytes();
             binary.Write(bytes);
             MemUtils.CopyBytes(buffer.data, stream, bytes);
+            return bytes + sizeof(long);
         }
     }
     
     public class SensorRecorderBuffer2D<T> : SensorRecorder<Buffer2D<T>> where T : struct {
-        protected override void WriteFrame(Stream stream, BinaryWriter binary, Buffer2D<T> buffer) {
+        protected override long WriteFrame(Stream stream, BinaryWriter binary, Buffer2D<T> buffer) {
             var bytes = buffer.data.GetLengthInBytes();
             binary.Write(bytes);
             MemUtils.CopyBytes(buffer.data, stream, bytes);
+            return bytes + sizeof(long);
         }
     }
 }

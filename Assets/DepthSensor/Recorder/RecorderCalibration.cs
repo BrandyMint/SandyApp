@@ -5,10 +5,11 @@ using DepthSensor.Buffer;
 using DepthSensor.Device;
 using DepthSensor.Sensor;
 using OpenCvSharp;
+using UnityEngine;
 using Utilities;
 using Utilities.OpenCVSharpUnity;
+using Action = OpenCvSharp.Util.Action;
 using Convert = Utilities.OpenCVSharpUnity.Convert;
-using Random = UnityEngine.Random;
 using ThreadPriority = System.Threading.ThreadPriority;
 
 namespace DepthSensor.Recorder {
@@ -27,13 +28,37 @@ namespace DepthSensor.Recorder {
         private List<Point2f[]> _imgPointsDataDepth = new List<Point2f[]>();
         private List<Point2f[]> _imgPointsDataColor = new List<Point2f[]>();
         private Thread _calibrating;
+        private Action _onDone;
+        private RecordCalibrationResult _result;
+        
+        public event Action OnFail;
 
         public bool Working => _isCollecting || _isCalibrating;
 
-        public bool Start(DepthSensorDevice device, string path) {
-            Stop(true);
+        public static bool IsNeedCalibrate(DepthSensorDevice device) {
+            var result = new RecordCalibrationResult();
+            var depth = device.Depth.GetNewest();
+            if (!result.Load() 
+                || result.DeviceName != device.Name 
+                || result.IntrinsicDepth == null
+                || result.IntrinsicDepth.imgSizeUsedOnCalculate.Width != depth.width
+                || result.IntrinsicDepth.imgSizeUsedOnCalculate.Height != depth.height)
+                return true;
+            if (device.Color.Available) {
+                var color = device.Color.GetNewest();
+                if (result.IntrinsicColor == null
+                    || result.IntrinsicColor.imgSizeUsedOnCalculate.Width != color.width
+                    || result.IntrinsicColor.imgSizeUsedOnCalculate.Height != color.height)
+                    return true;
+            }
+            return false;
+        }
+
+        public bool Start(DepthSensorDevice device, Action OnDone) {
+            Stop();
             
             _device = device;
+            _onDone = OnDone;
             
             _isCollecting = true;
             _collectingCounter = 0;
@@ -42,13 +67,13 @@ namespace DepthSensor.Recorder {
             device.Depth.Active = true;
 
             if (!device.Depth.Active) {
-                Stop(true);
+                Stop();
                 return false;
             }
             return true;
         }
 
-        public void Stop(bool force = false) {
+        public void Stop() {
             _isCollecting = false;
             _isCalibrating = false;
             if (_device?.Depth != null) {
@@ -63,6 +88,9 @@ namespace DepthSensor.Recorder {
                     _calibrating.Abort();
                 _calibrating = null;
             }
+
+            _onDone = null;
+            _result = null;
 
             _objPointsData.Clear();
             _imgPointsDataColor.Clear();
@@ -81,7 +109,7 @@ namespace DepthSensor.Recorder {
                 if (_doCalibrateColor)
                     pointsColor = new Point2f[collectPointsInFrame];
                 for (int i = 0; i < pointsDepth.Length; ++i) {
-                    var idx = Random.Range(0, depth.data.Length);
+                    var idx = (i + 1) * depth.data.Length / (collectPointsInFrame + 1);
                     var pDepth = depth.GetXYFrom(idx);
                     var d = depth.data[idx];
                     if (d < 1) d = 1000;
@@ -92,6 +120,7 @@ namespace DepthSensor.Recorder {
                     if (_doCalibrateColor)
                         pointsColor[i] = Convert.ToPoint2f(pColor);
                 }
+
                 _objPointsData.Add(pointsObj);
                 _imgPointsDataDepth.Add(pointsDepth);
                 if (_doCalibrateColor)
@@ -108,6 +137,7 @@ namespace DepthSensor.Recorder {
         private void StartCalibrate() {
             if (!_isCalibrating)
                 return;
+            _result = SerializableParams.Default<RecordCalibrationResult>();
             _calibrating = new Thread(Calibrate) {
                 Name = GetType().Name,
                 Priority = ThreadPriority.Lowest
@@ -116,40 +146,51 @@ namespace DepthSensor.Recorder {
         }
 
         private void Calibrate() {
-            _isCalibrating = true;
-            var result = SerializableParams.Default<RecordCalibrationResult>();
-            result.IntrinsicDepth = GetInitialIntrinsic(_device.Depth, out var isFovValidDepth);
-            bool isFovValidColor = false;
-            if (_doCalibrateColor)
-                result.IntrinsicColor = GetInitialIntrinsic(_device.Color, out isFovValidColor);
-            var flags = CalibrationFlags.None;
-            if (isFovValidDepth && (!_doCalibrateColor || isFovValidColor))
-                flags |= CalibrationFlags.FixFocalLength;
-            using (var R = new Mat()) using (var T = new Mat())
-            using (var E = new Mat()) using (var F = new Mat()) {
-                result.IntrinsicDepth.reprojError = result.IntrinsicColor.reprojError = Cv2.StereoCalibrate(
-                    _objPointsData, _imgPointsDataDepth, _imgPointsDataColor,
-                    result.IntrinsicDepth.cameraMatrix, result.IntrinsicDepth.distCoeffs,
-                    result.IntrinsicColor.cameraMatrix, result.IntrinsicColor.distCoeffs,
-                    result.IntrinsicDepth.imgSizeUsedOnCalculate,
-                    R, T, E, F, flags
-                );
-                result.R = new double[3, 3];
-                R.GetArray(0, 0, result.R);
-                result.T = T.GetArray(0, 0);
-                result.Save();
+            try { 
+                var flags = CalibrationFlags.FixFocalLength | CalibrationFlags.UseIntrinsicGuess;
+                _result.DeviceName = _device.Name;
+                _result.IntrinsicDepth = GetInitialIntrinsic(_device.Depth);
+                if (_doCalibrateColor)
+                    _result.IntrinsicColor = GetInitialIntrinsic(_device.Color);
+                
+                using (var R = new Mat()) using (var T = new Mat())
+                using (var E = new Mat()) using (var F = new Mat()) {
+                    _result.IntrinsicDepth.reprojError = _result.IntrinsicColor.reprojError = Cv2.StereoCalibrate(
+                        _objPointsData, _imgPointsDataDepth, _imgPointsDataColor,
+                        _result.IntrinsicDepth.cameraMatrix, _result.IntrinsicDepth.distCoeffs,
+                        _result.IntrinsicColor.cameraMatrix, _result.IntrinsicColor.distCoeffs,
+                        _result.IntrinsicDepth.imgSizeUsedOnCalculate,
+                        R, T, E, F, flags
+                    );
+                    var r = new double[R.Height, R.Width];
+                    R.GetArray(0, 0, r);
+                    var t = new double[T.Height, T.Width];
+                    T.GetArray(0, 0, t);
+                    _result.R = r;
+                    _result.T = t;
+                }
+                MainThread.Push(OnDone);
+            } catch (Exception e) {
+                Debug.LogException(e);
+                OnFail?.Invoke();
             }
-            _isCalibrating = false;
         }
 
-        private static CameraIntrinsicParams GetInitialIntrinsic<T>(ISensor<T> deviceDepth, out bool isFovValid) where T : AbstractBuffer2D {
+        private void OnDone() {
+            _result.Save();
+            _isCalibrating = false;
+            _onDone?.Invoke();
+            Stop();
+        }
+
+        private static CameraIntrinsicParams GetInitialIntrinsic<T>(ISensor<T> deviceDepth) where T : AbstractBuffer2D {
             var fov = deviceDepth.FOV;
             var frame = deviceDepth.GetNewest();
             var size = new Size(frame.width, frame.height);
-            isFovValid = fov.x > 0f && fov.y > 0f;
-            return isFovValid 
-                ? new CameraIntrinsicParams(fov, size) 
-                : new CameraIntrinsicParams(size);
+            var isFovValid = fov.x > 0f && fov.y > 0f;
+            if (!isFovValid)
+                fov = new Vector2(60f, 60f / size.Width * size.Height);
+            return new CameraIntrinsicParams(fov, size);
         }
 
         public void Dispose() {

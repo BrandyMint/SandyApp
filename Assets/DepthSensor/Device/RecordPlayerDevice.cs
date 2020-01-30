@@ -5,11 +5,14 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using DepthSensor.Buffer;
 using DepthSensor.Recorder;
 using DepthSensor.Sensor;
+using OpenCvSharp;
 using Unity.Collections;
 using UnityEngine;
+using Convert = Utilities.OpenCVSharpUnity.Convert;
 using Debug = UnityEngine.Debug;
 
 namespace DepthSensor.Device {
@@ -112,7 +115,8 @@ namespace DepthSensor.Device {
                 return false;
             }
         }
-        
+
+        private readonly RecordCalibrationResult _calibration;
         private volatile bool _pollFramesLoop = true;
         private volatile bool _mapDepthToCameraUpdated;
         private readonly Thread _pollFrames;
@@ -132,6 +136,7 @@ namespace DepthSensor.Device {
             _depthStream = InitStream(_internalDepth, path, nameof(Depth));
 
             _initInfo = null;
+            _calibration = new RecordCalibrationResult(path);
             
             _pollFrames = new Thread(PollFrames) {
                 Name = GetType().Name
@@ -221,6 +226,7 @@ namespace DepthSensor.Device {
         }
 
         public override bool IsAvailable() {
+            //TODO: check IO errors
             return true;
         }
 
@@ -305,97 +311,71 @@ namespace DepthSensor.Device {
         }
         
 #region Coordinate Map
+
+        private static readonly double[] _VEC_ZERO = {0d, 0d, 0d};
+
         public override Vector2 CameraPosToDepthMapPos(Vector3 pos) {
-            /*pos *= _DEPTH_MUL;
-            Vector2 v = Vector3.zero;
-            if (_niDepth.stream != null)
-                CoordinateConverter.ConvertWorldToDepth(
-                    _niDepth.stream,
-                    pos.x, pos.y, pos.z,
-                    out v.x, out v.y, out _
-                );
-            return v;*/
+            if (_calibration.IntrinsicDepth != null) {
+                Cv2.ProjectPoints(
+                    new []{Convert.ToPoint3f(pos)}, 
+                    _VEC_ZERO, _VEC_ZERO, 
+                    _calibration.IntrinsicDepth.cameraMatrix, 
+                    _calibration.IntrinsicDepth.distCoeffs,
+                    out var imgPoints, out var _);
+                return Convert.ToVector2(imgPoints[0]);
+            }
             return Vector2.zero;
         }
 
+        private double[] _rvec_color;
+        private double[] _tvec_color;
         public override Vector2 CameraPosToColorMapPos(Vector3 pos) {
-            /*pos *= _DEPTH_MUL;
-            int vx = 0, vy = 0;
-            if (_niDepth.stream != null && _niColor.stream != null) {
-                CoordinateConverter.ConvertWorldToDepth(
-                    _niDepth.stream,
-                    pos.x, pos.y, pos.z,
-                    out var dx, out var dy, out ushort dz
-                );
-                CoordinateConverter.ConvertDepthToColor(
-                    _niDepth.stream, _niColor.stream,
-                    dx, dy, dz,
-                    out vx, out vy
-                );
+            if (_calibration.IntrinsicColor != null) {
+                if (_rvec_color == null || _tvec_color == null) {
+                    Cv2.Rodrigues(_calibration.R, out _rvec_color);
+                    var t = _calibration.T;
+                    _tvec_color = new[] {t[0, 0], t[1, 0], t[2, 0]}; 
+                }
+                Cv2.ProjectPoints(
+                    new []{Convert.ToPoint3f(pos)}, 
+                    _rvec_color, _tvec_color, 
+                    _calibration.IntrinsicColor.cameraMatrix, 
+                    _calibration.IntrinsicColor.distCoeffs,
+                    out var imgPoints, out var _);
+                return Convert.ToVector2(imgPoints[0]);
             }
-
-            return new Vector2(vx, vy);*/
             return Vector2.zero;
         }
 
         public override Vector2 DepthMapPosToColorMapPos(Vector2 pos, ushort depth) {
-            /*int vx = 0, vy = 0;
-            if (_niDepth.stream != null)
-                CoordinateConverter.ConvertDepthToColor(
-                    _niDepth.stream, _niColor.stream,
-                    (int)pos.x, (int)pos.y, depth,
-                    out vx, out vy
-                );
-            
-            return new Vector2(vx, vy);*/
-            return Vector2.zero;
+            return CameraPosToColorMapPos(DepthMapPosToCameraPos(pos, depth));
         }
 
         public override Vector3 DepthMapPosToCameraPos(Vector2 pos, ushort depth) {
-            return Vector3.zero;
+            //TODO: use camera matrix
+            var map = MapDepthToCamera.GetNewest();
+            var i = map.GetIFrom((int) pos.x, (int) pos.y);
+            if (i < 0 || i >= map.data.Length)
+                return Vector3.zero;
+            var xy = map.data[i];
+            var d = (float) depth / 1000f;
+            return new Vector3(xy.x * d, xy.y * d, d);
         }
 
         private DepthBuffer _parBuf;
         private NativeArray<ushort> _parDepth;
         private NativeArray<Vector2> _parColor;
         public override void DepthMapToColorMap(NativeArray<ushort> depth, NativeArray<Vector2> color) {
-            /*_parBuf = Depth.GetOldest();
+            _parBuf = Depth.GetOldest();
             _parDepth = depth;
             _parColor = color;
-            Parallel.For(0, depth.Length, DepthMapToColorMapBody);*/
+            Parallel.For(0, depth.Length, DepthMapToColorMapBody);
         }
 
-        /*private void DepthMapToColorMapBody(int i) {
+        private void DepthMapToColorMapBody(int i) {
             var p = _parBuf.GetXYFrom(i);
             _parColor[i] = DepthMapPosToColorMapPos(p, _parDepth[i]);
         }
-
-        private Vector3 DepthMapPosToCameraPos(Vector2 pos, ushort depth) {
-            Vector3 v = Vector3.zero;
-            if (_niDepth.stream != null)
-                CoordinateConverter.ConvertDepthToWorld(
-                    _niDepth.stream,
-                    (int)pos.x, (int)pos.y, depth,
-                    out v.x, out v.y, out v.z
-                );
-            
-            return v / _DEPTH_MUL;
-        }
-
-        private MapDepthToCameraBuffer _parMap;
-        private void UpdateMapDepthToCamera() {
-            _parMap = MapDepthToCamera.GetOldest();
-            lock (_parMap.SyncRoot) {
-                Parallel.For(0, _parMap.data.Length, UpdateMapDepthToCameraBody);
-            }
-            _needUpdateMapDepthToColorSpace = false;
-            _mapDepthToCameraUpdated = true;
-        }
-
-        private void UpdateMapDepthToCameraBody(int i) {
-            var p = DepthMapPosToCameraPos(_parMap.GetXYFrom(i), _DEPTH_MUL);
-            _parMap.data[i] = new half2((half) p.x, (half) p.y);
-        }*/
 #endregion
     }
 }
