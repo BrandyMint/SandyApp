@@ -70,20 +70,32 @@ public abstract class SerializableParams {
     protected virtual void OnLoadedNotActualVersion() { }
 
     public bool Save() {
+        return SaveToInternal(GetFullPath(), false);
+    }
+
+    public bool SaveCopyTo(string path) {
+        return SaveToInternal(Path.Combine(path, GetFileName()), true);
+    }
+    
+    protected bool SaveToInternal(string fullPath, bool isCopy) {
         try {
             _invokeChangedOnSetting = false;
             Version = ActualVersion;
             _invokeChangedOnSetting = true;
             var json = JsonConvert.SerializeObject(this, Formatting.Indented);
-            File.WriteAllText(GetFullPath(), json);
+            File.WriteAllText(fullPath, json);
             foreach (var cache in _params.Values) {
                 cache.oldVal = cache.val;
             }
-            HasFile = true;
+            if (!isCopy)
+                HasFile = true;
             return true;
         } catch (Exception e) {
             Debug.LogException(e);
             return false;
+        } finally {
+            if (isCopy && HasFile)
+                Load(false);
         }
     }
 
