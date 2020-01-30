@@ -94,7 +94,7 @@ namespace DepthSensor.Device {
                 ni.stream.VideoMode = mode;
                 ni.stream.OnNewFrame += s => ni.frameEvent.Set();
                 internalSensor.SetTargetFps(mode.Fps);
-                internalSensor.SetFov(new Vector2(ni.stream.HorizontalFieldOfView, ni.stream.VerticalFieldOfView));
+                internalSensor.SetFov(new Vector2(ni.stream.HorizontalFieldOfView, ni.stream.VerticalFieldOfView) * Mathf.Rad2Deg);
             }
             
             _niSensors.Add(ni);
