@@ -184,6 +184,11 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8973478528956889626, guid: bcc87629a2adda946842da79a2fcbcea,
+        type: 3}
+      propertyPath: _objsSwitch.Array.size
+      value: 2
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 5968833150621189464, guid: bcc87629a2adda946842da79a2fcbcea, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: bcc87629a2adda946842da79a2fcbcea, type: 3}

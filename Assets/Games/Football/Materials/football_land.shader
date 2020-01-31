@@ -5,8 +5,12 @@
         _PlayerColorAlpha ("Player Color Aplpha", Float) = 1
         
         _GrassTex ("Grass", 2D) = "white" {}
+        _hsvGrass1 ("HSV Grass 1", Vector) = (0, 0, 0, 0)
+        _hsvGrass2 ("HSV Grass 2", Vector) = (0, 0, 0, 0)
+        _stripesCount ("Stripes Count", Float) = 15 
+        
         _LayoutTex ("Layout", 2D) = "white" {}
-        _LayoutCenterTex ("Layout", 2D) = "white" {}
+        _LayoutCenterTex ("Layout", 2D) = "white" {}        
         
         _DepthSliceOffset ("Depth Slice", Float) = 0.05        
         _DotSlice ("Dot Slice", Float) = 0.7        
@@ -44,8 +48,12 @@
             
             float _DotSliceOverride;
             sampler2D _GrassTex; float4 _GrassTex_ST;
+            fixed3 _hsvGrass1;
+            fixed3 _hsvGrass2;
+            float _stripesCount;
+                        
             sampler2D _LayoutTex; 
-            sampler2D _LayoutCenterTex;
+            sampler2D _LayoutCenterTex;            
             
             v2f vertFootball (appdata v) {
                 v2f o = vert(v);
@@ -58,11 +66,15 @@
                 if (hands > 0)
                     return fixed4(0, 0, 0, 1);
                 
+                fixed2 uv = i.screenPos.xy / i.screenPos.w;
+                fixed3 hsvGrass = _hsvGrass1;
+                if (frac(uv.x / _ScreenParams.z  * _stripesCount / 2) > 0.5)
+                    hsvGrass = _hsvGrass2;
+                fixed4 c = adjust(tex2D(_GrassTex, i.uvGrass), hsvGrass);
+                
                 float z = i.vpos.z;
                 float k = inverseLerp( _DepthZero - _DepthMaxOffset, _DepthZero + _DepthMinOffset, z);
-                fixed4 c = tex2D(_GrassTex, i.uvGrass);
                 fixed4 player = colorMultiPlayers(i);
-                fixed2 uv = i.screenPos.xy / i.screenPos.w;
                 c = lerp(c, player * c, lerp(0, k / 2 + 0.5, abs(uv.x - 0.5) * 2));
                 c.rgba /= c.a;
                 
