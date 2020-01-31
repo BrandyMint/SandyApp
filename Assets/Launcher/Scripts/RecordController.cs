@@ -11,7 +11,9 @@ namespace Launcher.Scripts {
     public class RecordController : MonoBehaviour {
         private ulong _BYTES_IN_GB = 1024 * 1024 * 1024;
         
+        public event Action<string, string> OnRecordFinished;
         public bool Recording => _recorder.Recording;
+        public object RecordsPath => _path;
 
         private readonly DepthSensorRecorder _recorder = new DepthSensorRecorder();
         private string _path;
@@ -90,6 +92,7 @@ namespace Launcher.Scripts {
                 foreach (var config in AlsoSaveConfigs()) {
                     config.SaveCopyTo(configPath);
                 }
+                OnRecordFinished?.Invoke(_path, _currRecordingName);
             }
         }
 

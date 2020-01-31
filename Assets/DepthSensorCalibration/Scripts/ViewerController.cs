@@ -11,6 +11,8 @@ namespace DepthSensorCalibration {
     public class ViewerController : MonoBehaviour {
         [SerializeField] private RawImage _view;
         [SerializeField] private GameObject _ui;
+        [SerializeField] private GameObject _manualCalibrateImg;
+        [SerializeField] private GameObject _autoCalibrateImg;
         [SerializeField] private Mode[] _modes;
         [SerializeField] private int _minBuffersCount = 3;
 
@@ -39,6 +41,7 @@ namespace DepthSensorCalibration {
 
             KeyMapper.AddListener(KeyEvent.SWITCH_MODE, SwitchMode);
             KeyMapper.AddListener(KeyEvent.SHOW_UI, SwhitchUI);
+            KeyMapper.AddListener(KeyEvent.SWITCH_TARGET, SwitchTarget);
 
             SwhitchUI();
         }
@@ -46,6 +49,7 @@ namespace DepthSensorCalibration {
         private void OnDestroy() {
             KeyMapper.RemoveListener(KeyEvent.SHOW_UI, SwhitchUI);
             KeyMapper.RemoveListener(KeyEvent.SWITCH_MODE, SwitchMode);
+            KeyMapper.RemoveListener(KeyEvent.SWITCH_TARGET, SwitchTarget);
             
             if (DepthSensorManager.Instance != null)
                 DepthSensorManager.Instance.OnInitialized -= OnDepthSensorAvailable;
@@ -68,6 +72,13 @@ namespace DepthSensorCalibration {
         private void SwitchMode() {
             _currentModeId = (_currentModeId + 1) % _modes.Length;
             ActivateMode(_modes[_currentModeId]);
+        }
+
+        private void SwitchTarget() {
+            var manual = _manualCalibrateImg.activeSelf;
+            var auto = _autoCalibrateImg.activeSelf;
+            _manualCalibrateImg.SetActive(!manual && !auto);
+            _autoCalibrateImg.SetActive(manual);
         }
 
         private void ActivateMode(Mode mode) {
