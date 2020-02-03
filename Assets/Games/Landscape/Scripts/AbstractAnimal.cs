@@ -106,7 +106,7 @@ namespace Games.Landscape {
             _walker.enabled = true;
             _walker.NormalizedT = 0f;
             while (_walker.enabled) {
-                _walker.speed = _speed * math.cmax(transform.localScale) * field.Scale;
+                _walker.speed = _speed * math.cmax(transform.localScale);
                 yield return null;
             }
             _spline.gameObject.SetActive(false);
