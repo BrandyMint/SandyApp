@@ -34,9 +34,10 @@
     }
     
     SubShader {
-        Tags { "RenderType"="Opaque" }
+        Tags { "RenderType"="Opaque" "Queue" = "Background"}
         
 		Lighting Off
+		ZWrite Off
 		//Blend One OneMinusSrcAlpha
 
         Pass {

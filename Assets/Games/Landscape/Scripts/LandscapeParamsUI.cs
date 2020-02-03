@@ -18,6 +18,7 @@ namespace Games.Landscape {
         [SerializeField] private Toggle _tglWater;
         [SerializeField] private LandscapeVisualizer _landscape;
         [SerializeField] private Transform _pnlParams;
+        [SerializeField] private GameObject _animals;
         
         private class SliderField {
             public Slider sl { get; set; }
@@ -49,11 +50,14 @@ namespace Games.Landscape {
         private readonly List<Action> _onParamsReset = new List<Action>();
 
         private void Start() {
+            _animals.SetActive(false);
+
             _btnResetWater.onClick.AddListener(OnBtnResetWater);
             BtnKeyBind.ShortCut(_btnBack, KeyEvent.BACK);
             BtnKeyBind.ShortCut(_btnReset, KeyEvent.RESET);
             
             KeyMapper.AddListener(KeyEvent.RESET, OnBtnReset);
+            KeyMapper.AddListener(KeyEvent.SWITCH_ALPHA_FEATURES, SwitchAnimals);
 
             _tglWater.isOn = Prefs.Landscape.EnableWaterSimulation;
             _tglWater.onValueChanged.AddListener(OnTglWater);
@@ -74,7 +78,12 @@ namespace Games.Landscape {
 
         private void OnDestroy() {
             KeyMapper.RemoveListener(KeyEvent.RESET, OnBtnReset);
+            KeyMapper.RemoveListener(KeyEvent.SWITCH_ALPHA_FEATURES, SwitchAnimals);
             Save();
+        }
+
+        private void SwitchAnimals() {
+            _animals.SetActive(!_animals.activeSelf);
         }
 
         private void Save() {

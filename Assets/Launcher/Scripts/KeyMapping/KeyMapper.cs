@@ -85,6 +85,7 @@ namespace Launcher.KeyMapping {
             _bindsDown.Add(new KeyBind(KeyCode.T, KeyEvent.SWITCH_TARGET));
             _bindsDown.Add(new KeyBind(KeyCode.LeftControl,KeyCode.O, KeyEvent.OPEN, "CTRL-O"));
             _bindsDown.Add(new KeyBind(KeyCode.RightControl,KeyCode.O, KeyEvent.OPEN));
+            _bindsDown.Add(new KeyBind(KeyCode.A, KeyEvent.SWITCH_ALPHA_FEATURES));
 
             _bindsDown.Add(new KeyBind(KeyCode.LeftControl,KeyCode.Q, KeyEvent.EXIT, "CTRL-Q"));
             _bindsDown.Add(new KeyBind(KeyCode.RightControl,KeyCode.Q, KeyEvent.EXIT));

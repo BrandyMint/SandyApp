@@ -25,6 +25,7 @@
         ENTER,
         RECORD,
         PLAY_RECORD,
+        SWITCH_ALPHA_FEATURES,
         EXIT
     }
 }
