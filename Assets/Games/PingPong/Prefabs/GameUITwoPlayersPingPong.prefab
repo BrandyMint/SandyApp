@@ -18,7 +18,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 2800000, guid: 20523635fe377504e99590a77b09189b, type: 3}
+  m_Texture: {fileID: 2800000, guid: 4c41a2dae1c10cb89b9df0c7d4a74299, type: 3}
   m_UVRect:
     serializedVersion: 2
     x: 0
@@ -72,7 +72,7 @@ PrefabInstance:
     - target: {fileID: 4677885620995768420, guid: bcc87629a2adda946842da79a2fcbcea,
         type: 3}
       propertyPath: m_Name
-      value: GameUITwoPlayersPingPong
+      value: GameUITwoPlayers
       objectReference: {fileID: 0}
     - target: {fileID: 5237005055880077238, guid: bcc87629a2adda946842da79a2fcbcea,
         type: 3}
@@ -183,6 +183,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_IsActive
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8973478528956889626, guid: bcc87629a2adda946842da79a2fcbcea,
+        type: 3}
+      propertyPath: _objsSwitch.Array.size
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 5968833150621189464, guid: bcc87629a2adda946842da79a2fcbcea, type: 3}

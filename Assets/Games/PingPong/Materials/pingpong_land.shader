@@ -1,13 +1,11 @@
-﻿Shader "Sandbox/Game/Football" {
+Shader "Sandbox/Game/PingPong" {
     Properties {
         _FieldTex ("Field", 2D) = "white" {}
         _PlayersTex ("Player Colors", 2D) = "white" {}
         _PlayerColorAlpha ("Player Color Aplpha", Float) = 1
         
-        _GrassTex ("Grass", 2D) = "white" {}
-        _hsvGrass1 ("HSV Grass 1", Vector) = (0, 0, 0, 0)
-        _hsvGrass2 ("HSV Grass 2", Vector) = (0, 0, 0, 0)
-        _stripesCount ("Stripes Count", Float) = 15 
+        _ColorCenter ("Color Center", Color) = (1, 1, 1, 1)
+        _ColorBg ("Color Bg", Color) = (0, 0, 1, 1)
         
         _LayoutTex ("Layout", 2D) = "white" {}
         _LayoutCenterTex ("Layout Center", 2D) = "white" {}        
@@ -48,12 +46,11 @@
             
             float _DotSliceOverride;
             sampler2D _GrassTex; float4 _GrassTex_ST;
-            fixed3 _hsvGrass1;
-            fixed3 _hsvGrass2;
-            float _stripesCount;
                         
             sampler2D _LayoutTex; 
-            sampler2D _LayoutCenterTex;            
+            sampler2D _LayoutCenterTex;
+            fixed4 _ColorCenter;
+            fixed4 _ColorBg;
             
             v2f vertFootball (appdata v) {
                 v2f o = vert(v);
@@ -67,27 +64,28 @@
                     return fixed4(0, 0, 0, 1);
                 
                 fixed2 uv = i.screenPos.xy / i.screenPos.w;
-                fixed3 hsvGrass = _hsvGrass1;
-                if (frac(uv.x / _ScreenParams.z  * _stripesCount / 2) > 0.5)
-                    hsvGrass = _hsvGrass2;
-                fixed4 c = adjust(tex2D(_GrassTex, i.uvGrass), hsvGrass);
+                float scrAspect = _ScreenParams.x / _ScreenParams.y;
+                fixed4 c = lerp(_ColorCenter, _ColorBg, min(1, length(fixed2((uv.x - 0.5) * scrAspect, uv.y - 0.5))));
                 
                 float z = i.vpos.z;
                 float k = inverseLerp( _DepthZero - _DepthMaxOffset, _DepthZero + _DepthMinOffset, z);
                 fixed4 player = colorMultiPlayers(i);
-                c = lerp(c, player * c, lerp(0, k / 2 + 0.5, abs(uv.x - 0.5) * 2));
-                c.rgba /= c.a;
+                c = lerp(c, player, player.a * lerp(0, k / 2 + 0.5, pow(abs(uv.x - 0.5) * 2, 3)));
+                c.a = 1;
                 
-                fixed2 uvc = uv; 
-                float scrAspect = _ScreenParams.x / _ScreenParams.y;
+                fixed2 uvc = uv;                
                 float newAspect = scrAspect * 3 / 4;
                 if (uv.x < 0.5)
                     uv.x *= newAspect;
                 else
                     uv.x = 1 - (1 - uv.x) * newAspect;
                 uvc.x = (uvc.x - 0.5) * newAspect + 0.5; 
-                fixed4 l = max(tex2D(_LayoutTex, uv), tex2D(_LayoutCenterTex, uvc));
+                fixed4 l = tex2D(_LayoutTex, uv);
+                fixed4 lc = tex2D(_LayoutCenterTex, uvc);
+                l.rgb = lerp(l.rgb * l.a, lc.rgb * lc.a, lc.a);
+                l.a = max(l.a, lc.a);
                 c = lerp(c, l, l.a);
+                c.a = 1;
                 return c;
             }            
             
