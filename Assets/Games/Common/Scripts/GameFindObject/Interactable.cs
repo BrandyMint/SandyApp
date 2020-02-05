@@ -29,7 +29,7 @@ namespace Games.Common.GameFindObject {
             CreateAudioIfNeed();
         }
 
-        private void OnDestroy() {
+        protected virtual void OnDestroy() {
             OnDestroyed?.Invoke(this);
         }
 

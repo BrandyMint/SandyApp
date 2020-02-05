@@ -1,6 +1,6 @@
 ﻿Shader "Sandbox/Game/BalloonsSkyNew" {
     Properties {
-        _MainTex("Background", 2D) = "white" {} 
+        //_MainTex("Background", 2D) = "white" {} 
     
         _DepthSliceOffset ("Depth Slice", Float) = 0.05        
         _DotSlice ("Dot Slice", Float) = 0.7        
@@ -12,7 +12,9 @@
     }
     
     SubShader {
-        Tags { "RenderType"="Opaque" "Queue" = "Background"}
+        Tags { "RenderType"="Transporent" "Queue" = "Background"}
+        
+        Blend One OneMinusSrcAlpha
         
 		Lighting Off
 		ZWrite Off
@@ -41,11 +43,12 @@
                 if (hands > 0)
                     return fixed4(0, 0, 0, 1);
                 
-                fixed2 uv = i.screenPos.xy / i.screenPos.w;
+                /*fixed2 uv = i.screenPos.xy / i.screenPos.w;
                 //float aspect = _ScreenParams.x / _ScreenParams.y * _MainTex_TexelSize.x / _MainTex_TexelSize.y;
                 float aspect = 1;
                 fixed4 c = tex2D(_MainTex, fixed2((uv.x - 0.5) * aspect + 0.5, uv.y)); 
-                return c;
+                return c;*/
+                return fixed4(0, 0, 0, 0);
             }
             ENDCG
         }

@@ -5,6 +5,7 @@ using DepthSensorCalibration;
 using DepthSensorSandbox.Visualisation;
 using Games.Common;
 using Games.Common.Game;
+using Games.Common.GameFindObject;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -24,7 +25,7 @@ namespace Games.Balloons {
         [SerializeField] private SandboxMesh _sandbox;
         [SerializeField] private Material _matDepth;
 
-        private List<Balloon> _balloons = new List<Balloon>();
+        private List<Interactable> _balloons = new List<Interactable>();
         
         private int _hitMask;
         private CameraRenderToTexture _renderDepth;
@@ -45,7 +46,7 @@ namespace Games.Balloons {
             _initialBallSize = math.cmax(_tplBalloon.transform.localScale);
             _tplBalloon.gameObject.SetActive(false);
 
-            Balloon.OnDestroyed += OnBalloonDestroyed;
+            Interactable.OnDestroyed += OnBalloonDestroyed;
             Balloon.OnCollisionEntered += OnBalloonCollisionEnter;
             Prefs.Calibration.OnChanged += OnCalibrationChanged;
             Prefs.Sandbox.OnChanged += OnCalibrationChanged;
@@ -62,7 +63,7 @@ namespace Games.Balloons {
             Prefs.Sandbox.OnChanged -= OnCalibrationChanged;
             Prefs.Calibration.OnChanged -= OnCalibrationChanged;
             Balloon.OnCollisionEntered -= OnBalloonCollisionEnter;
-            Balloon.OnDestroyed -= OnBalloonDestroyed;
+            Interactable.OnDestroyed -= OnBalloonDestroyed;
             if (_renderDepth != null) {
                 _renderDepth.Disable();
             }
@@ -80,27 +81,36 @@ namespace Games.Balloons {
 
         private void SpawnBalloon() {
             var stayAway = _balloons.Select(b => b.transform.position).ToArray();
-            var stayAwayDist = math.cmax(_tplBalloon.transform.localScale) * 1.5f;
+            var size = math.cmax(_tplBalloon.transform.localScale);
+            var stayAwayDist = size * 1.5f;
+            var wSize = math.cmax(_tplBalloon.transform.lossyScale);
+            var scaleMass = wSize;
             if (SpawnArea.AnyGetRandomSpawn(out var worldPos, out var worldRot, stayAway, stayAwayDist)) {
                 var newBalloon = Instantiate(_tplBalloon, worldPos, worldRot, _tplBalloon.transform.parent);
-                
-                var force = newBalloon.GetComponent<ConstantForce>();
-                force.force *= new float3(_gameField.transform.localScale);
-                    
+
                 var rigid = newBalloon.GetComponent<Rigidbody>();
                 newBalloon.gameObject.SetActive(true);
-                var dir = newBalloon.transform.rotation * Vector3.forward;
-                rigid.AddForce(_startForce * Mathf.Abs(_gameField.transform.localScale.y) * dir);
+
+                
+                newBalloon.FullMass = rigid.mass *= scaleMass;
+                foreach (var strBodySegment in newBalloon.String.GetComponentsInChildren<Rigidbody>()) {
+                    var m = strBodySegment.mass *= scaleMass;
+                    newBalloon.FullMass += m;
+                }
+                
+                var force = newBalloon.GetComponent<ConstantForce>();
+                force.force = -Physics.gravity * newBalloon.FullMass
+                    + _startForce * _gameField.Scale * newBalloon.FullMass * newBalloon.transform.forward;
                 _balloons.Add(newBalloon);
             }
         }
 
-        private void OnBalloonDestroyed(Balloon balloon) {
+        private void OnBalloonDestroyed(Interactable balloon) {
             _balloons.Remove(balloon);
         }
 
         private void OnBalloonCollisionEnter(Balloon balloon, Collision collision) {
-            if (collision.collider == _gameField.ExitBorder) {
+            if (_gameField.ExitBorder.Contains(collision.collider)) {
                 balloon.Dead();
             }
         }
@@ -118,11 +128,11 @@ namespace Games.Balloons {
             
             var ray = _cam.ViewportPointToRay(viewPos);
             if (Physics.Raycast(ray, out var hit, _cam.farClipPlane, _hitMask)) {
-                var balloon = hit.collider.GetComponent<Balloon>();
+                var balloon = hit.collider.GetComponentInParent<Balloon>();
                 if (balloon != null) {
                     ++GameScore.Score;
-                    balloon.Bang();
-                    var force =  Mathf.Abs(_gameField.transform.localScale.y) * _startForce * _explosionForceMult;
+                    balloon.Bang(true);
+                    var force =  _explosionForceMult * _gameField.Scale * balloon.FullMass;
                     var radius = math.cmax(balloon.transform.lossyScale) * _explosionRadiusMult;
                     var pos = balloon.transform.position;
                     foreach (var b in _balloons) {
