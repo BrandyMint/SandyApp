@@ -34,7 +34,10 @@ namespace Games.Planet {
 
         private void OnCollisionEnter(Collision other) {
             OnCollide?.Invoke(this, other);
-            
+
+            var body = GetComponent<Rigidbody>();
+            body.velocity = Vector3.zero;
+            body.constraints = RigidbodyConstraints.FreezeAll;
             _bang.transform.rotation = Quaternion.LookRotation(other.GetContact(0).normal);
             _bang.Play();
             PlayAudio(_audioBang);
