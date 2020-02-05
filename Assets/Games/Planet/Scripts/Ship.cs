@@ -41,6 +41,11 @@ namespace Games.Planet {
             FlyNextPath();
         }
 
+        public override void Show(bool show) {
+            _walker.enabled = false;
+            base.Show(show);
+        }
+
         private void FlyNextPath() {
             var start = _flySpline[0];
             start.position = transform.position;
