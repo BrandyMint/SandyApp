@@ -2,19 +2,23 @@
 
 namespace Games.Common {
     public class GravityOverride : MonoBehaviour {
-        [SerializeField] private Vector3 _gravity;
+        [SerializeField] protected Vector3 _gravity;
 
         private static Vector3 _defGravity;
         private static int _instances;
 
-        private void Awake() {
+        protected virtual void Awake() {
             if (_instances <= 0)
                 _defGravity = Physics.gravity;
-            Physics.gravity = _gravity;
+            Physics.gravity = GetNewGravity();
             ++_instances;
         }
 
-        private void OnDestroy() {
+        protected virtual Vector3 GetNewGravity() {
+            return _gravity;
+        }
+
+        protected virtual void OnDestroy() {
             --_instances;
             if (_instances <= 0)
                 Physics.gravity = _defGravity;

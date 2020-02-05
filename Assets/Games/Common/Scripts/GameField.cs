@@ -7,10 +7,11 @@ using Utilities;
 
 namespace Games.Common {
     public class GameField : MonoBehaviour {
-        [SerializeField] private Transform[] _offsetedByWidth;
-        [SerializeField] private Transform[] _offsetedByWidthAndSize;
+        [SerializeField] protected Transform[] _offsetedByWidth;
+        [SerializeField] protected Transform[] _offsetedByWidthAndSize;
         [SerializeField] private Texture2D _fieldTexture;
         [SerializeField] private bool _scaleZ = false;
+        [SerializeField] protected Transform _bordersRoot;
 
         private Camera _lastCam;
 
@@ -31,8 +32,10 @@ namespace Games.Common {
         private Vector3 _startScale;
 
         protected virtual void Awake() {
+            if (_bordersRoot == null)
+                _bordersRoot = transform;
             _startScale = transform.localScale;
-            _borders = transform.GetComponentsOnlyInChildren<Collider>()
+            _borders = _bordersRoot.GetComponentsOnlyInChildren<Collider>()
                 .Select(c => new BorderInfo(c)).ToArray();
         }
 
