@@ -66,8 +66,8 @@ MonoBehaviour:
   _gameField: {fileID: 51518868594645806}
   _maxBallons: 10
   _timeOffsetSpown: 0.3
-  _startForce: 0.2
-  _explosionForceMult: 25
+  _startForce: 0.15
+  _explosionForceMult: 40
   _explosionRadiusMult: 3
   _depthHeight: 64
   _sandbox: {fileID: 0}
