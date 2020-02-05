@@ -20,6 +20,7 @@ namespace Games.Trajectory {
             var impulse = other.impulse.magnitude;
             if (_maxImpulse < 0) _maxImpulse = impulse;
             var volume = Mathf.Min(impulse / _maxImpulse, 1f);
+            volume *= volume;
             if (volume > _minSoundVolume) {
                 PlayAudioBang(false, volume);
             }

@@ -20,8 +20,12 @@ namespace Games.Trajectory {
         [SerializeField] private float _areaForNoGoals = 0.4f;
         
         private readonly List<Interactable> _balls = new List<Interactable>();
+        private readonly Dictionary<SpawnArea, float> _initialSpawnZ = new Dictionary<SpawnArea, float>();
 
         protected override void Start() {
+            foreach (var ballSpawn in _ballSpawns) {
+                _initialSpawnZ.Add(ballSpawn, ballSpawn.transform.localPosition.z);
+            }
             SaveInitialSizes(_ballTpl, _goal);
             _ballTpl.gameObject.SetActive(false);
             _goal.gameObject.SetActive(false);
@@ -61,7 +65,8 @@ namespace Games.Trajectory {
             SetSizes(_gameField.Scale, objs);
             foreach (var ballSpawn in _ballSpawns) {
                 var pos = ballSpawn.transform.localPosition;
-                pos.z = -Prefs.Sandbox.OffsetMaxDepth;
+                var z = _initialSpawnZ[ballSpawn] * _gameField.Scale;
+                pos.z = Mathf.Min(-Prefs.Sandbox.OffsetMaxDepth, z);
                 ballSpawn.transform.localPosition = pos;
             }
         }
