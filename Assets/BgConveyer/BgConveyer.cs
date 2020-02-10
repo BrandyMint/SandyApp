@@ -51,23 +51,22 @@ namespace BgConveyer {
 
         protected void OnDestroy() {
             Stop();
-            if (thread != null && thread.IsAlive && !thread.Join(1000)) {
-                loop = false;
-                thread.Abort();
-            }
         }
 
         public void Run() {
+            loop = true;
             if (thread == null) {
                 thread = new Thread(Loop) {Name = GetType().Name};
-            }
-            loop = true;
-            if (!thread.IsAlive)
                 thread.Start();
+            }
         }
 
         public void Stop() {
             loop = false;
+            if (thread != null && thread.IsAlive && !thread.Join(1000)) {
+                thread.Abort();
+            }
+            thread = null;
         }
 
         private void Loop() {

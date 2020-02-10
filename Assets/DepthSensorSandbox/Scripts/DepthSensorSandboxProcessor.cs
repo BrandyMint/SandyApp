@@ -129,6 +129,9 @@ namespace DepthSensorSandbox {
             device.MapDepthToCamera.OnNewFrame -= OnUpdateMapDepthToCamera;
             DisposeBuffer(ref _bufDepthToColor);
             DisposeSensor(ref _bufDepth);
+            _bufColor = null;
+            _bufMapToCamera = null;
+            _needActivateSensors = true;
         }
 
         private static void UpdateBuffersCount(int value) {
@@ -278,8 +281,8 @@ namespace DepthSensorSandbox {
                 }
 
                 //_evUnlock.Set();
-                ActivateSensorsIfNeed();
                 yield return null;
+                ActivateSensorsIfNeed();
             }
         }
 

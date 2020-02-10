@@ -255,7 +255,7 @@ namespace DepthSensor.Device {
             }
         }
 
-        protected override void Close() {
+        protected override void OnCloseInternal() {
             _pollFramesLoop = false;
             if (_reactivateSensors != null && _reactivateSensors.IsAlive && !_reactivateSensors.Join(5000))
                 _reactivateSensors.Abort();
@@ -264,7 +264,6 @@ namespace DepthSensor.Device {
             }
             Close(ref _kinect);
             _frameArrivedEvent.Dispose();
-            base.Close();
         }
 
         private static void Close(ref KinectSensor kinect) {

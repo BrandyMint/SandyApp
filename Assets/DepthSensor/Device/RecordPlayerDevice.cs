@@ -225,7 +225,7 @@ namespace DepthSensor.Device {
             return true;
         }
 
-        protected override void Close() {
+        protected override void OnCloseInternal() {
             _pollFramesLoop = false;
             if (_pollFrames != null && _pollFrames.IsAlive && !_pollFrames.Join(5000))
                 _pollFrames.Abort();
@@ -237,7 +237,6 @@ namespace DepthSensor.Device {
 #if TEST_COMPARE_PLAYER_WITH_DEVICE
             _testDevInternal.Close();
 #endif
-            base.Close();
         }
 
         public override bool IsAvailable() {
