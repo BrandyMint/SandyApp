@@ -38,14 +38,28 @@ namespace DepthSensor {
 #if !UNITY_EDITOR
 			Application.targetFrameRate = 30;
 #endif
-			TryInit();
+			if (!string.IsNullOrEmpty(Prefs.CmdLine.Record))
+				OpenRecord(Prefs.CmdLine.Record);
+			else
+				OpenDevice();
 		}
 
 		private void OnDestroy() {
 			Stop(true);
 		}
+		
+		public void OpenRecord(string recordPath = null) {
+			_recordPath = recordPath;
+			ReOpen();
+		}
 
-		public void TryInit() {
+		public void OpenDevice() {
+			_recordPath = null;
+			ReOpen();
+		}
+
+		public void ReOpen() {
+			Stop();
 			StartCoroutine(Initing());
 		}
 

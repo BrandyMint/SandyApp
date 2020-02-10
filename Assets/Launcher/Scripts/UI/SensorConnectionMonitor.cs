@@ -1,4 +1,4 @@
-﻿using DepthSensor;
+﻿﻿using DepthSensor;
 using UINotify;
 using UnityEngine;
 using UnityEngine.UI;
@@ -51,8 +51,7 @@ namespace Launcher.UI {
         }
 
         private static void OnBtnTryInit() {
-            DepthSensorManager.Instance.Stop();
-            DepthSensorManager.Instance.TryInit();
+            DepthSensorManager.Instance.ReOpen();
         }
     }
 }
