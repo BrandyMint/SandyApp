@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using DepthSensor;
+using DepthSensor.Device;
 using DepthSensor.Recorder;
 using Launcher.KeyMapping;
 using UINotify;
@@ -40,6 +41,9 @@ namespace Launcher.Scripts {
 
         private void Start() {
             _recorder.OnFail += OnRecordFail;
+            DepthSensorManager.OnInitialized += OnDepthSensorAvailable;
+            if (DepthSensorManager.IsInitialized())
+                OnDepthSensorAvailable();
             KeyMapper.AddListener(KeyEvent.RECORD, OnBtnStartStopRecord);
             KeyMapper.AddListener(KeyEvent.PLAY_RECORD, OnBtnStartStopPlay);
         }
@@ -47,10 +51,23 @@ namespace Launcher.Scripts {
         private void OnDestroy() {
             KeyMapper.RemoveListener(KeyEvent.RECORD, OnBtnStartStopRecord);
             KeyMapper.RemoveListener(KeyEvent.PLAY_RECORD, OnBtnStartStopPlay);
+            DepthSensorManager.OnInitialized -= OnDepthSensorAvailable;
+            if (DepthSensorManager.IsInitialized()) {
+                UnSubscribeDevice(DepthSensorManager.Instance.Device);
+            }
             if (_recorder != null) {
                 _recorder.Dispose();
                 _recorder.OnFail -= OnRecordFail;
             }
+        }
+
+        private void OnDepthSensorAvailable() {
+            DepthSensorManager.Instance.Device.OnClose += UnSubscribeDevice;
+        }
+
+        private void UnSubscribeDevice(DepthSensorDevice device) {
+            device.OnClose -= UnSubscribeDevice;
+            StopRecord();
         }
 
         private void OnBtnStartStopRecord() {

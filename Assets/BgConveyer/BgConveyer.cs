@@ -37,8 +37,10 @@ namespace BgConveyer {
         private void Update() {
             if (currMainThreadTasks.Count > 0 && Monitor.TryEnter(currMainThreadTasks)) {
                 try {
-                    foreach (var task in currMainThreadTasks) {
-                        DoAction(task);
+                    if (loop) {
+                        foreach (var task in currMainThreadTasks) {
+                            DoAction(task);
+                        }
                     }
                     currMainThreadTasks.Clear();
                 } finally {

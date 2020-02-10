@@ -160,15 +160,9 @@ namespace DepthSensor.Device {
                         format
                     ));
                 }
-            } catch (OpenNI2Exception e) {
-                OpenNI.Shutdown();
-                Close(ref init.device);
-                if (e.status != OpenNI.Status.NoDevice) {
-                    throw;
-                }
             } catch (Exception) {
-                OpenNI.Shutdown();
                 Close(ref init.device);
+                OpenNI.Shutdown();
                 throw;
             }
             

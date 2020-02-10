@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
+using System.Threading;
 using DepthSensor.Sensor;
 using Unity.Collections;
 using UnityEngine;
@@ -12,6 +14,8 @@ namespace DepthSensor.Device {
         public readonly SensorBody Body;
         public readonly SensorMapDepthToCamera MapDepthToCamera;
         public readonly string Name;
+
+        public event Action<DepthSensorDevice> OnClose;
         
         
         protected InitInfo _initInfo;
@@ -70,12 +74,14 @@ namespace DepthSensor.Device {
         protected abstract IEnumerator Update();
 
         protected virtual void Close() {
-            Depth.Dispose();
-            Infrared.Dispose();
-            Index.Dispose();
-            Color.Dispose();
-            Body.Dispose();
-            MapDepthToCamera.Dispose();
+            OnClose?.Invoke(this);
+            Thread.Sleep(500);
+            Depth?.Dispose();
+            Infrared?.Dispose();
+            Index?.Dispose();
+            Color?.Dispose();
+            Body?.Dispose();
+            MapDepthToCamera?.Dispose();
         }
         
         public class Internal {

@@ -34,9 +34,8 @@ namespace DepthSensorCalibration {
         private void Start() {
             _view.gameObject.SetActive(false);
 
-            if (GetDeviceIfAvailable() == null)
-                DepthSensorManager.Instance.OnInitialized += OnDepthSensorAvailable;
-            else
+            DepthSensorManager.OnInitialized += OnDepthSensorAvailable;
+            if (DepthSensorManager.IsInitialized())
                 OnDepthSensorAvailable();
 
             KeyMapper.AddListener(KeyEvent.SWITCH_MODE, SwitchMode);
@@ -51,22 +50,29 @@ namespace DepthSensorCalibration {
             KeyMapper.RemoveListener(KeyEvent.SWITCH_MODE, SwitchMode);
             KeyMapper.RemoveListener(KeyEvent.SWITCH_TARGET, SwitchTarget);
             
-            if (DepthSensorManager.Instance != null)
-                DepthSensorManager.Instance.OnInitialized -= OnDepthSensorAvailable;
+            DepthSensorManager.OnInitialized -= OnDepthSensorAvailable;
+            if (DepthSensorManager.IsInitialized()) {
+                UnSubscribeDevice(DepthSensorManager.Instance.Device);
+            }
             
             ActivateMode(null);
         }
 
         private static DepthSensorDevice GetDeviceIfAvailable() {
-            var dsm = DepthSensorManager.Instance;
-            if (dsm != null && dsm.Device != null && dsm.Device.IsAvailable()) {
-                return dsm.Device;
+            if (DepthSensorManager.IsInitialized()) {
+                return DepthSensorManager.Instance.Device;
             }
             return null;
         }
 
         private void OnDepthSensorAvailable() {
+            DepthSensorManager.Instance.Device.OnClose += UnSubscribeDevice;
             SwitchMode();
+        }
+
+        private void UnSubscribeDevice(DepthSensorDevice device) {
+            device.OnClose -= UnSubscribeDevice;
+            ActivateMode(null);
         }
 
         private void SwitchMode() {

@@ -55,10 +55,13 @@ namespace DepthSensor.Sensor {
         }
 
         public override void Dispose() {
-            foreach (var buf in _buffers) {
-                buf?.Dispose();
+            if (_buffers != null) {
+                foreach (var buf in _buffers) {
+                    buf?.Dispose();
+                }
+
+                _buffers = null;
             }
-            _buffers = null;
         }
 
         public class Internal : AbstractSensor.Internal {

@@ -15,14 +15,17 @@ namespace DepthSensor {
 			typeof(OpenNI2Device)
 #endif
 		};
+		private Type[] _TRYING_INIT_QUEUE_RECORD_PLAYER = new Type[] {
+			typeof(RecordPlayerDevice)
+		};
 		
 		public static DepthSensorManager Instance {get; private set;}
 		public DepthSensorDevice Device {get; private set;}
-		public event Action OnInitialized;
+		public static event Action OnInitialized;
 
 		private DepthSensorDevice.Internal _internalDevice;
-
 		private bool _initializing;
+		private string _recordPath;
 
 		private void Awake() {
 			Instance = this;
@@ -58,11 +61,19 @@ namespace DepthSensor {
 
 		private IEnumerator Initing() {
 			_initializing = true;
-			foreach (var typeSensor in _TRYING_INIT_QUEUE) {
-				if (CreateDeviceFromType(typeSensor)) {
+			var initQueue = string.IsNullOrEmpty(_recordPath) ? _TRYING_INIT_QUEUE : _TRYING_INIT_QUEUE_RECORD_PLAYER;
+			foreach (var typeSensor in initQueue) {
+				var isDeviceCreated = string.IsNullOrEmpty(_recordPath) 
+					? CreateDeviceFromType(typeSensor)
+					: CreateDeviceFromType(typeSensor, _recordPath);
+				if (isDeviceCreated) {
 					var maxWait = Time.realtimeSinceStartup + _WAIT_AVAILABLE;
 					yield return new WaitUntil(() => IsInitialized() || Time.realtimeSinceStartup > maxWait);
-					if (IsInitialized()) break;
+					if (IsInitialized()) {
+						break;
+					} else {
+						_internalDevice?.Close();
+					}
 				}
 			}
 			
@@ -73,10 +84,10 @@ namespace DepthSensor {
 			_initializing = false;
 		}
 
-		private bool CreateDeviceFromType(Type type) {
+		private bool CreateDeviceFromType(Type type, params object[] args) {
 			try {
 				Debug.Log("Initializing " + type.Name);
-				Device = (DepthSensorDevice) Activator.CreateInstance(type);
+				Device = (DepthSensorDevice) Activator.CreateInstance(type, args);
 				_internalDevice = new DepthSensorDevice.Internal(Device);
 				return true;
 			}
