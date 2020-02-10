@@ -1,3 +1,5 @@
+//#define TEST_COMPARE_PLAYER_WITH_DEVICE
+//#define TEST_CAMPARE_PLAYER_WITH_MAP
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,8 +11,8 @@ using System.Threading.Tasks;
 using DepthSensor.Buffer;
 using DepthSensor.Recorder;
 using DepthSensor.Sensor;
-using OpenCvSharp;
 using Unity.Collections;
+using Unity.Mathematics;
 using UnityEngine;
 using Convert = Utilities.OpenCVSharpUnity.Convert;
 using Debug = UnityEngine.Debug;
@@ -128,6 +130,10 @@ namespace DepthSensor.Device {
         private readonly SensorStream _infraredStream;
         private readonly SensorStream _mapStream;
         private readonly List<SensorStream> _streams = new List<SensorStream>();
+#if TEST_COMPARE_PLAYER_WITH_DEVICE
+        private readonly DepthSensorDevice _testDev;
+        private readonly DepthSensorDevice.Internal _testDevInternal;
+#endif
 
         public RecordPlayerDevice(string path) : base(Init(path)) {
             _colorStream = InitStream(_internalColor, path, nameof(Color));
@@ -137,6 +143,12 @@ namespace DepthSensor.Device {
 
             _initInfo = null;
             _calibration = new RecordCalibrationResult(path);
+            _calibration.Load();
+#if TEST_COMPARE_PLAYER_WITH_DEVICE
+            _testDev = new OpenNI2Device();
+            _testDevInternal = new Internal(_testDev);
+#endif
+            InitCamMatrices();
             
             _pollFrames = new Thread(PollFrames) {
                 Name = GetType().Name
@@ -222,6 +234,9 @@ namespace DepthSensor.Device {
             foreach (var stream in _streams) {
                 stream.Dispose();
             }
+#if TEST_COMPARE_PLAYER_WITH_DEVICE
+            _testDevInternal.Close();
+#endif
             base.Close();
         }
 
@@ -305,6 +320,12 @@ namespace DepthSensor.Device {
                 if (_mapDepthToCameraUpdated) {
                     _internalMapDepthToCamera.OnNewFrame();
                     _mapDepthToCameraUpdated = false;
+#if TEST_CAMPARE_PLAYER_WITH_MAP
+                    TestWithMap();
+#endif
+#if TEST_COMPARE_PLAYER_WITH_DEVICE
+                    TestWithDevice();
+#endif
                 }
                 yield return null;
             }
@@ -312,39 +333,58 @@ namespace DepthSensor.Device {
         
 #region Coordinate Map
 
-        private static readonly double[] _VEC_ZERO = {0d, 0d, 0d};
+        private struct Distortion {
+            public float k1;
+            public float k2;
+            public float p1;
+            public float p2;
+            public float k3;
 
-        public override Vector2 CameraPosToDepthMapPos(Vector3 pos) {
-            if (_calibration.IntrinsicDepth != null) {
-                Cv2.ProjectPoints(
-                    new []{Convert.ToPoint3f(pos)}, 
-                    _VEC_ZERO, _VEC_ZERO, 
-                    _calibration.IntrinsicDepth.cameraMatrix, 
-                    _calibration.IntrinsicDepth.distCoeffs,
-                    out var imgPoints, out var _);
-                return Convert.ToVector2(imgPoints[0]);
+            public Distortion(double[] d) {
+                k1 = (float)d[0];
+                k2 = (float)d[1];
+                p1 = (float)d[2];
+                p2 = (float)d[2];
+                k3 = (float)d[4];
             }
-            return Vector2.zero;
+        }
+        private float3x3 _mDepth = float3x3.identity;
+        private float3x3 _mDepthInv = float3x3.identity;
+        private float3x3 _mColor = float3x3.identity;
+        private float4x4 _mColorRT = float4x4.identity;
+        private Distortion _distDepth = new Distortion();
+        private Distortion _distColor = new Distortion();
+        private int _depthHeight;
+        private int _colorHeight;
+
+        private void InitCamMatrices() {
+            if (_calibration.IntrinsicDepth != null) {
+                _mDepth = Convert.ToFloat3x3(_calibration.IntrinsicDepth.cameraMatrix);
+                _mDepthInv = math.inverse(_mDepth);
+                _distDepth = new Distortion(_calibration.IntrinsicDepth.distCoeffs);
+                _depthHeight = _calibration.IntrinsicDepth.imgSizeUsedOnCalculate.Height;
+            }
+            if (_calibration.IntrinsicColor != null) {
+                _mColor = Convert.ToFloat3x3(_calibration.IntrinsicColor.cameraMatrix);
+                var tvec = Convert.ToVec3d(_calibration.T);
+                _mColorRT = math.inverse(Convert.RodriguesTVecToFloat4x4(_calibration.R, tvec));
+                //_mColorRT = new float4x4(float3x3.identity, new float3((float) -tvec.Item0, 0f, 0f));
+                _distColor = new Distortion(_calibration.IntrinsicColor.distCoeffs);
+                _colorHeight = _calibration.IntrinsicColor.imgSizeUsedOnCalculate.Height;
+            }
         }
 
-        private double[] _rvec_color;
-        private double[] _tvec_color;
+        public override Vector2 CameraPosToDepthMapPos(Vector3 pos) {
+            var pp = new float2(pos.x / pos.z, pos.y / pos.z);
+            var uv = math.mul(_mDepth, new float3(pp /*Distort(pp, _distDepth)*/, 1f));
+            return new Vector2(uv.x, _depthHeight - uv.y);
+        }
+        
         public override Vector2 CameraPosToColorMapPos(Vector3 pos) {
-            if (_calibration.IntrinsicColor != null) {
-                if (_rvec_color == null || _tvec_color == null) {
-                    Cv2.Rodrigues(_calibration.R, out _rvec_color);
-                    var t = _calibration.T;
-                    _tvec_color = new[] {t[0, 0], t[1, 0], t[2, 0]}; 
-                }
-                Cv2.ProjectPoints(
-                    new []{Convert.ToPoint3f(pos)}, 
-                    _rvec_color, _tvec_color, 
-                    _calibration.IntrinsicColor.cameraMatrix, 
-                    _calibration.IntrinsicColor.distCoeffs,
-                    out var imgPoints, out var _);
-                return Convert.ToVector2(imgPoints[0]);
-            }
-            return Vector2.zero;
+            var p = math.mul(_mColorRT, new float4(pos, 1f));
+            var pp = new float2(p.x / p.z, p.y / p.z);
+            var uv = math.mul(_mColor, new float3(Distort(pp, _distColor), 1f));
+            return new Vector2(uv.x, _colorHeight - uv.y);
         }
 
         public override Vector2 DepthMapPosToColorMapPos(Vector2 pos, ushort depth) {
@@ -352,15 +392,37 @@ namespace DepthSensor.Device {
         }
 
         public override Vector3 DepthMapPosToCameraPos(Vector2 pos, ushort depth) {
-            //TODO: use camera matrix
-            var map = MapDepthToCamera.GetNewest();
-            var i = map.GetIFrom((int) pos.x, (int) pos.y);
-            if (i < 0 || i >= map.data.Length)
-                return Vector3.zero;
-            var xy = map.data[i];
-            var d = (float) depth / 1000f;
-            return new Vector3(xy.x * d, xy.y * d, d);
+            var z = (float) depth / 1000f;
+            pos.y = _depthHeight - pos.y;
+            var p = math.mul(_mDepthInv, new float3(pos, 1f));
+            var pp = p;//new float3(UnDistort(new float2(p.x, p.y), _distDepth), p.z);
+            return new Vector3(pp.x, pp.y, pp.z) * z;
         }
+
+        private static float2 Distort(float2 p, Distortion d) {
+            var r2 = p.x * p.x + p.y * p.y;
+            var r4 = r2 * r2;
+            var r6 = r4 * r2;
+            var a1 = 2f * p.x * p.y;
+            var a2 = r2 + 2f * p.x * p.x;
+            var a3 = r2 + 2f * p.y * p.y;
+            var cdist = 1f + d.k1 * r2 + d.k2 * r4 + d.k3 * r6;
+            return new float2(
+                p.x*cdist + d.p1*a1 + d.p2*a2,
+                p.y*cdist + d.p1*a3 + 2*d.p2*a1
+            );
+        }
+        
+        /*private static float2 UnDistort(float2 p, Distortion d) {
+            return p;
+            return p;
+            var r = p.x * p.x + p.y * p.y;
+            var k = 1f + d.k1*r + d.k2*r*r + d.k3*r*r*r;
+            return new float2(
+                p.x*k + 2*d.p1*p.x*p.y + d.p2*(r + 2*p.x*p.x),
+                p.y*k + d.p1*(r + 2*p.y*p.y) + 2*d.p2*p.x*p.y
+            );
+        }*/
 
         private DepthBuffer _parBuf;
         private NativeArray<ushort> _parDepth;
@@ -376,6 +438,70 @@ namespace DepthSensor.Device {
             var p = _parBuf.GetXYFrom(i);
             _parColor[i] = DepthMapPosToColorMapPos(p, _parDepth[i]);
         }
+#endregion
+
+#region TEST Coordinate map
+#if TEST_CAMPARE_PLAYER_WITH_MAP
+        private void TestWithMap() {
+            var map = MapDepthToCamera.GetNewest();
+            var maxError = 0f;
+            var maxErrRightD = float3.zero;
+            var maxErrActualD = float3.zero;
+            var maxErrRightP = float2.zero;
+            var maxErrActualP = float2.zero;
+            for (int x = 0; x < map.width; x++) {
+                for (int y = 0; y < map.height; y++) {
+                    var d = map.data[map.GetIFrom(x, y)];
+                    var rightD = new float3(d, 1f) * 5f;
+                    var actualD = DepthMapPosToCameraPos(new Vector2(x, y), 5000);
+                    var err = math.distance(rightD, actualD);
+                    if (err > maxError) {
+                        maxError = err;
+                        maxErrRightD = rightD;
+                        maxErrActualD = actualD;
+                        maxErrRightP = new float2(x, y);
+                        maxErrActualP = CameraPosToDepthMapPos(actualD);
+                    }
+                }
+            }
+            Debug.Log("Error " + maxError + "\t" + maxErrRightD + "\t" + maxErrActualD);
+            Debug.Log("pix err " + math.distance(maxErrRightP, maxErrActualP) + "\t" + maxErrRightP + "\t" + maxErrActualP);
+        }
+#endif
+        
+#if TEST_COMPARE_PLAYER_WITH_DEVICE
+        private void TestWithDevice() {
+            Debug.Log("cam to depth");
+            TestWithDevice(_testDev.DepthMapPosToCameraPos, _testDev.CameraPosToDepthMapPos, CameraPosToDepthMapPos);
+            Debug.Log("cam to color");
+            TestWithDevice(_testDev.DepthMapPosToCameraPos, _testDev.CameraPosToColorMapPos, CameraPosToColorMapPos);
+        }
+        
+        private void TestWithDevice(Func<Vector2, ushort, Vector3> getP, Func<Vector3, Vector2> fDev, Func<Vector3, Vector2> fRec) {
+            var map = MapDepthToCamera.GetNewest();
+            var maxError = 0f;
+            var maxErrRightD = float2.zero;
+            var maxErrActualD = float2.zero;
+            var maxErrP = float2.zero;
+            for (int x = 0; x < map.width; x++) {
+                for (int y = 0; y < map.height; y++) {
+                    var pp = new float2(x, y);
+                    var p = getP.Invoke(pp, 5000);
+                    var rightD = fDev.Invoke(p);
+                    var actualD = fRec.Invoke(p);
+                    var err = math.distance(rightD, actualD);
+                    if (err > maxError) {
+                        maxError = err;
+                        maxErrRightD = rightD;
+                        maxErrActualD = actualD;
+                        maxErrP = pp;
+                    }
+                }
+            }
+            Debug.Log(maxErrP);
+            Debug.Log("Error " + maxError + "\t" + maxErrRightD + "\t" + maxErrActualD);
+        }
+#endif
 #endregion
     }
 }
