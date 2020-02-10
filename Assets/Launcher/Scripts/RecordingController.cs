@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using DepthSensor;
 using DepthSensor.Device;
@@ -8,8 +7,8 @@ using Launcher.KeyMapping;
 using UINotify;
 using UnityEngine;
 
-namespace Launcher.Scripts {
-    public class RecordController : MonoBehaviour {
+namespace Launcher {
+    public class RecordingController : MonoBehaviour {
         private ulong _BYTES_IN_GB = 1024 * 1024 * 1024;
         
         public event Action<string, string> OnRecordFinished;
@@ -30,14 +29,6 @@ namespace Launcher.Scripts {
                 time = LifeTime.INFINITY
             };
         }
-        
-        private IEnumerable<SerializableParams> AlsoSaveConfigs() {
-            yield return Prefs.App;
-            yield return Prefs.Projector;
-            yield return Prefs.Calibration;
-            yield return Prefs.Sandbox;
-            yield return Prefs.Landscape;
-        }
 
         private void Start() {
             _recorder.OnFail += OnRecordFail;
@@ -45,19 +36,17 @@ namespace Launcher.Scripts {
             if (DepthSensorManager.IsInitialized())
                 OnDepthSensorAvailable();
             KeyMapper.AddListener(KeyEvent.RECORD, OnBtnStartStopRecord);
-            KeyMapper.AddListener(KeyEvent.PLAY_RECORD, OnBtnStartStopPlay);
         }
 
         private void OnDestroy() {
             KeyMapper.RemoveListener(KeyEvent.RECORD, OnBtnStartStopRecord);
-            KeyMapper.RemoveListener(KeyEvent.PLAY_RECORD, OnBtnStartStopPlay);
             DepthSensorManager.OnInitialized -= OnDepthSensorAvailable;
             if (DepthSensorManager.IsInitialized()) {
                 UnSubscribeDevice(DepthSensorManager.Instance.Device);
             }
             if (_recorder != null) {
-                _recorder.Dispose();
                 _recorder.OnFail -= OnRecordFail;
+                _recorder.Dispose();
             }
         }
 
@@ -75,10 +64,6 @@ namespace Launcher.Scripts {
                 StopRecord();
             else
                 StartRecord();
-        }
-
-        private void OnBtnStartStopPlay() {
-            //TODO: start play
         }
 
         public void StartRecord() {
@@ -106,7 +91,7 @@ namespace Launcher.Scripts {
                 var configPath = Path.Combine(_path, _currRecordingName, "Configs");
                 if (!Directory.Exists(configPath))
                     Directory.CreateDirectory(configPath);
-                foreach (var config in AlsoSaveConfigs()) {
+                foreach (var config in Prefs.RecordPlayerOverrides()) {
                     config.SaveCopyTo(configPath);
                 }
                 OnRecordFinished?.Invoke(_path, _currRecordingName);

@@ -34,6 +34,7 @@ public abstract class SerializableParams {
     }
 
     protected string _path;
+    protected string _overridePath;
     protected bool _invokeChangedOnSetting = true;
     protected bool _isLoaded;
     protected bool _forceResetOnGet;
@@ -42,7 +43,8 @@ public abstract class SerializableParams {
     protected virtual string GetFullPath() {
         if (_path == null)
             _path = Application.persistentDataPath;
-        return Path.Combine(_path, GetFileName());
+        var path = !string.IsNullOrEmpty(_overridePath) ? _overridePath : _path;
+        return Path.Combine(path, GetFileName());
     }
 
     public bool Load(bool invokeChanged = true) {
@@ -65,6 +67,11 @@ public abstract class SerializableParams {
         if (invokeChanged)
             InvokeChanged();
         return true;
+    }
+
+    public void OverrideLoad(string path) {
+        _overridePath = path;
+        Load();
     }
 
     protected virtual void OnLoadedNotActualVersion() { }

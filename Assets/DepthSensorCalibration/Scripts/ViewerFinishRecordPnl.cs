@@ -1,8 +1,8 @@
 using System;
 using System.IO;
 using System.Linq;
+using Launcher;
 using Launcher.KeyMapping;
-using Launcher.Scripts;
 using UnityEngine;
 using UnityEngine.UI;
 using Utilities;
@@ -10,7 +10,7 @@ using Utilities;
 namespace DepthSensorCalibration {
     public class ViewerFinishRecordPnl : MonoBehaviour {
         [SerializeField] private GameObject _pnl;
-        [SerializeField] private RecordController _controller;
+        [SerializeField] private RecordingController _controller;
         
         private class Field {
             public InputField fld { get; set; }

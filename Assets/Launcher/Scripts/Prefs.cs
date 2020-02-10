@@ -1,4 +1,5 @@
-﻿using UINotify;
+﻿using System.Collections.Generic;
+using UINotify;
 
 public static partial class Prefs {
     private const string _TXT_SAVED = "Сохранено";
@@ -39,5 +40,13 @@ public static partial class Prefs {
             get => Get(nameof(FlipVerticalSandbox), false);
             set => Set(nameof(FlipVerticalSandbox), value);
         }
+    }
+    
+    public static IEnumerable<SerializableParams> RecordPlayerOverrides() {
+        yield return App;
+        yield return Projector;
+        yield return Calibration;
+        yield return Sandbox;
+        yield return Landscape;
     }
 }

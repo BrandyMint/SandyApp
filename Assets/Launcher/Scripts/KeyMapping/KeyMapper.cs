@@ -64,6 +64,7 @@ namespace Launcher.KeyMapping {
             _bindsDown.Add(new KeyBind(KeyCode.Tab, KeyEvent.SWITCH_MODE));
             _bindsDown.Add(new KeyBind(KeyCode.Escape, KeyEvent.BACK, "ESC"));
             
+            //scenes
             _bindsDown.Add(new KeyBind(KeyCode.LeftShift, KeyCode.F2, KeyEvent.OPEN_PREV_GAME, "SHIFT-F2"));
             _bindsDown.Add(new KeyBind(KeyCode.RightShift, KeyCode.F2, KeyEvent.OPEN_PREV_GAME));
             _bindsDown.Add(new KeyBind(KeyCode.F2, KeyEvent.OPEN_NEXT_GAME));
@@ -76,17 +77,23 @@ namespace Launcher.KeyMapping {
             _bindsDown.Add(new KeyBind(KeyCode.RightAlt,KeyCode.F12, KeyEvent.FLIP_SANDBOX));
             _bindsDown.Add(new KeyBind(KeyCode.F12, KeyEvent.FLIP_DISPLAY));
             
+            //records
+            _bindsDown.Add(new KeyBind(KeyCode.LeftAlt,KeyCode.R, KeyEvent.RECORD, "ALT-R"));
+            _bindsDown.Add(new KeyBind(KeyCode.RightAlt,KeyCode.R, KeyEvent.RECORD));
+            _bindsDown.Add(new KeyBind(KeyCode.LeftAlt,KeyCode.P, KeyEvent.PLAY_RECORD, "ALT-P"));
+            _bindsDown.Add(new KeyBind(KeyCode.RightAlt,KeyCode.P, KeyEvent.PLAY_RECORD));
+            _bindsDown.Add(new KeyBind(KeyCode.T, KeyEvent.SWITCH_TARGET));
+            _bindsDown.Add(new KeyBind(KeyCode.LeftAlt,KeyCode.O, KeyEvent.OPEN, "ALT-O"));
+            _bindsDown.Add(new KeyBind(KeyCode.RightAlt,KeyCode.O, KeyEvent.OPEN));
+            
+            //calibrating
             _bindsDown.Add(new KeyBind(KeyCode.H, KeyEvent.SET_DEPTH));
             _bindsDown.Add(new KeyBind(KeyCode.P, KeyEvent.CHANGE_PROJECTOR_SIZE));
             _bindsDown.Add(new KeyBind(KeyCode.A, KeyEvent.SWITCH_OBLIQUE));
             _bindsDown.Add(new KeyBind(KeyCode.Return,KeyEvent.ENTER, "ENTER"));
-            _bindsDown.Add(new KeyBind(KeyCode.R, KeyEvent.RECORD));
-            _bindsDown.Add(new KeyBind(KeyCode.P, KeyEvent.PLAY_RECORD));
-            _bindsDown.Add(new KeyBind(KeyCode.T, KeyEvent.SWITCH_TARGET));
-            _bindsDown.Add(new KeyBind(KeyCode.LeftControl,KeyCode.O, KeyEvent.OPEN, "CTRL-O"));
-            _bindsDown.Add(new KeyBind(KeyCode.RightControl,KeyCode.O, KeyEvent.OPEN));
             _bindsDown.Add(new KeyBind(KeyCode.A, KeyEvent.SWITCH_ALPHA_FEATURES));
 
+            //exit
             _bindsDown.Add(new KeyBind(KeyCode.LeftControl,KeyCode.Q, KeyEvent.EXIT, "CTRL-Q"));
             _bindsDown.Add(new KeyBind(KeyCode.RightControl,KeyCode.Q, KeyEvent.EXIT));
             _bindsDown.Add(new KeyBind(KeyCode.LeftControl,KeyCode.C, KeyEvent.EXIT));

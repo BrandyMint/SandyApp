@@ -130,12 +130,15 @@ namespace DepthSensor.Device {
         private readonly SensorStream _infraredStream;
         private readonly SensorStream _mapStream;
         private readonly List<SensorStream> _streams = new List<SensorStream>();
+        private readonly string _recordPath;
 #if TEST_COMPARE_PLAYER_WITH_DEVICE
         private readonly DepthSensorDevice _testDev;
         private readonly DepthSensorDevice.Internal _testDevInternal;
 #endif
 
         public RecordPlayerDevice(string path) : base(Init(path)) {
+            _recordPath = path;
+            
             _colorStream = InitStream(_internalColor, path, nameof(Color));
             _infraredStream = InitStream(_internalInfrared, path, nameof(Infrared));
             _mapStream = InitStream(_internalMapDepthToCamera, path, nameof(MapDepthToCamera));
@@ -182,7 +185,7 @@ namespace DepthSensor.Device {
                 }
 
                 Debug.Log($"Load record {init.manifest.DeviceName} in {path}");
-                init.Name = $"{init.manifest.DeviceName} (Record)";
+                init.Name = $"{init.manifest.DeviceName} ▶️'{new DirectoryInfo(path).Name}'";
 
                 if (init.manifest.Depth != null && Check(init.manifest, path, nameof(init.manifest.Depth))) {
                     init.Depth = new SensorDepth(new DepthBuffer(
@@ -238,6 +241,8 @@ namespace DepthSensor.Device {
             _testDevInternal.Close();
 #endif
         }
+
+        public string RecordPath => _recordPath;
 
         public override bool IsAvailable() {
             //TODO: check IO errors

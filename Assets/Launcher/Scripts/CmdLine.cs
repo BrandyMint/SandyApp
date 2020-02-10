@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
-using Launcher.Scripts;
+using Launcher;
 using UnityEngine;
 
 public static partial class Prefs {
     public static readonly CmdLine CmdLine = new CmdLine();
 }
 
-namespace Launcher.Scripts {
+namespace Launcher {
     public class CmdLine {
         public string Record { get; private set; }
 
