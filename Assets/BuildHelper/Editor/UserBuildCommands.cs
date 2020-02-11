@@ -1,6 +1,7 @@
 ﻿﻿using System;
-using BuildHelper.Editor.Core;
-using UnityEditor;
+ using System.IO;
+ using BuildHelper.Editor.Core;
+ using UnityEditor;
  using UnityEngine;
 
  namespace BuildHelper.Editor {
@@ -13,18 +14,22 @@ using UnityEditor;
 
         [MenuItem("Build/Build Win64")]
         public static void BuildWin64() {
-            Build(BuildTarget.StandaloneWindows64);
+            BuildRelease(BuildTarget.StandaloneWindows64);
         }
         
         [MenuItem("Build/Build Linux")]
         public static void BuildLinux() {
-            Build(BuildTarget.StandaloneLinux64);
+            BuildRelease(BuildTarget.StandaloneLinux64);
         }
         
-        [MenuItem("Build/Build Both")]
+        [MenuItem("Build/Build Both Release")]
         public static void BuildBoth() {
-            Build(BuildTarget.StandaloneWindows64);
-            Build(BuildTarget.StandaloneLinux64);
+            BuildWinLinux(BuildRelease);
+        }
+        
+        [MenuItem("Build/Build Activators")]
+        public static void BuildActivators() {
+            BuildWinLinux(BuildActivator);
         }
 
         /*[MenuItem("Build/Build all from master branch")]
@@ -43,6 +48,35 @@ using UnityEditor;
 #endregion
 
 #region Utility functions
+        public static void BuildWinLinux(Action<BuildTarget> buildInvoke) {
+#if UNITY_EDITOR_WIN
+            buildInvoke(BuildTarget.StandaloneLinux64);
+            buildInvoke(BuildTarget.StandaloneWindows64);
+#else
+            buildInvoke(BuildTarget.StandaloneWindows64);
+            buildInvoke(BuildTarget.StandaloneLinux64);
+#endif
+        }
+
+        public static void BuildRelease(BuildTarget target) {
+            Build(target, null, (t, options) => {
+                var buildGroup = BuildPipeline.GetBuildTargetGroup(target);
+                AddScriptingDefine(buildGroup, "BUILD_PROTECT_COPY");
+            });
+        }
+
+        public static void BuildActivator(BuildTarget target) {
+            Build(target, null, (t, options) => {
+                options.scenes = new[] {"Assets/SimpleProtect/Scenes/Activate.unity"};
+                var buildGroup = BuildPipeline.GetBuildTargetGroup(target);
+                foreach (var assetDir in Directory.EnumerateDirectories("Assets")) {
+                    if (!assetDir.EndsWith("SimpleProtect") && !assetDir.EndsWith("BuildHelper"))
+                        BuildTime.ExcludePath(assetDir);
+                }
+                AddScriptingDefine(buildGroup, "BUILD_ACTIVATOR");
+            });
+        }
+
         public static void BuildInDevelop(BuildTarget target) {
             Build(target, null, (t, options) => {
                 var buildGroup = BuildPipeline.GetBuildTargetGroup(target);
