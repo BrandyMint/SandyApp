@@ -80,7 +80,7 @@ namespace BuildHelper.Editor.Core {
             if (!_settingsAlreadySaved) {
                 var settingsPath = BuildHelperStrings.ProjRoot(_SETTINGS_PATH);
                 var settingsPathTemp = BuildHelperStrings.ProjRoot(_SETTINGS_TEMP_PATH);
-                FileUtil.CopyFileOrDirectory(settingsPath, settingsPathTemp);
+                File.Copy(settingsPath, settingsPathTemp, true);
                 _settingsAlreadySaved = true;
                 Debug.Log("BuildTime: Project Settings saved");
             }
@@ -93,9 +93,7 @@ namespace BuildHelper.Editor.Core {
         /// </summary>
         public static void AcceptChangedSettings() {
             var settingsPathTemp = BuildHelperStrings.ProjRoot(_SETTINGS_TEMP_PATH);
-            if (FileOrPathExist(settingsPathTemp)) {
-                FileUtil.DeleteFileOrDirectory(settingsPathTemp);
-            }
+            DeleteFileOrDirectory(settingsPathTemp);
             _settingsAlreadySaved = false;
             AssetDatabase.SaveAssets();
             Debug.Log("BuildTime: Project Settings accepted");
@@ -113,8 +111,7 @@ namespace BuildHelper.Editor.Core {
             var settingsPath = BuildHelperStrings.ProjRoot(_SETTINGS_PATH);
             var settingsPathTemp = BuildHelperStrings.ProjRoot(_SETTINGS_TEMP_PATH);
             if (FileOrPathExist(settingsPathTemp)) {
-                FileUtil.ReplaceDirectory(settingsPathTemp, settingsPath);
-                FileUtil.DeleteFileOrDirectory(settingsPathTemp);
+                MoveFileOrDirectoryWithReplace(settingsPathTemp, settingsPath);
                 Debug.Log("BuildTime: Project Settings restored");
                 AssetDatabase.Refresh();
             }
@@ -186,19 +183,14 @@ namespace BuildHelper.Editor.Core {
 #region OverrideIcon
         public static void OverrideIcon(string defIconPath, string overrideIconPath) {
             var tempPath = GenFileInBuildHelperTempPath();
-            FileUtil.CopyFileOrDirectory(defIconPath, tempPath);
-            FileUtil.ReplaceFile(overrideIconPath, defIconPath);
+            CopyFileOrDirectoryWithReplace(defIconPath, tempPath);
+            CopyFileOrDirectoryWithReplace(overrideIconPath, defIconPath);
             LogOverrideIcon(defIconPath, tempPath);
         }
         
         private static void RestoreOverridenIcons() {
             if (WasOverrideIcon()) {
-                var logPath = GenFileInBuildHelperTempPath(_OVERRIDE_ICONS_LOG_PATH);
-                var lines = File.ReadAllLines(logPath);
-                for (int i = lines.Length - 1; i > 0; i -= 2) {
-                    FileUtil.ReplaceFile(lines[i], lines[i - 1]);                    
-                }
-                File.Delete(logPath);
+                RestoreReplaced(_OVERRIDE_ICONS_LOG_PATH);
             }
         }
         
@@ -248,13 +240,28 @@ namespace BuildHelper.Editor.Core {
         }
 
         private static void MoveFileOrDirectoryWithReplace(string src, string dst) {
-            if (File.Exists(dst)) {
-                File.Delete(dst);
+            DeleteFileOrDirectory(dst);
+            if (File.Exists(src))
+                File.Move(src, dst);
+            else 
+                Directory.Move(src, dst);
+        }
+        
+        private static void CopyFileOrDirectoryWithReplace(string src, string dst) {
+            DeleteFileOrDirectory(dst);
+            if (File.Exists(src))
+                File.Copy(src, dst, true);
+            else 
+                FileUtil.CopyFileOrDirectory(src, dst);
+        }
+        
+        private static void DeleteFileOrDirectory(string path) {
+            if (File.Exists(path)) {
+                File.Delete(path);
             }
-            if (Directory.Exists(dst)) {
-                Directory.Delete(dst, true);
+            if (Directory.Exists(path)) {
+                Directory.Delete(path, true);
             }
-            FileUtil.MoveFileOrDirectory(src, dst);
         }
 
         private static void LogExcludePath(string path) {
@@ -297,7 +304,7 @@ namespace BuildHelper.Editor.Core {
             var tempPath = "";
             if (needBackup) {
                 tempPath = GenFileInBuildHelperTempPath();
-                FileUtil.CopyFileOrDirectory(file, tempPath);
+                CopyFileOrDirectoryWithReplace(file, tempPath);
             }
             
             var text = File.ReadAllText(file);
@@ -324,13 +331,17 @@ namespace BuildHelper.Editor.Core {
         
         private static void RestoreReplacedFiles() {
             if (WasReplaceFile()) {
-                var logPath = GenFileInBuildHelperTempPath(_REPLACE_FILE_LOG_PATH);
-                var lines = File.ReadAllLines(logPath);
-                for (int i = lines.Length - 1; i > 0; i -= 2) {
-                    FileUtil.ReplaceFile(lines[i], lines[i - 1]);                    
-                }
-                File.Delete(logPath);
+                RestoreReplaced(_REPLACE_FILE_LOG_PATH);
             }
+        }
+        
+        private static void RestoreReplaced(string logName) {
+            var logPath = GenFileInBuildHelperTempPath(logName);
+            var lines = File.ReadAllLines(logPath);
+            for (int i = lines.Length - 1; i > 0; i -= 2) {
+                MoveFileOrDirectoryWithReplace(lines[i], lines[i - 1]);          
+            }
+            File.Delete(logPath);
         }
         
         private static bool WasReplaceFile() {
