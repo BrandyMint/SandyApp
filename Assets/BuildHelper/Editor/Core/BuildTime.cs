@@ -177,7 +177,11 @@ namespace BuildHelper.Editor.Core {
         }
 
         private static void SyncSolution() {
-            EditorApplication.ExecuteMenuItem("Assets/Sync C# Project");
+            try {
+                EditorApplication.ExecuteMenuItem("Assets/Sync C# Project");
+            } catch {
+                // ignored
+            }
         }
 
 #region OverrideIcon
