@@ -68,11 +68,16 @@
         public static void BuildActivator(BuildTarget target) {
             Build(target, null, (t, options) => {
                 options.scenes = new[] {"Assets/SimpleProtect/Scenes/Activate.unity"};
-                var buildGroup = BuildPipeline.GetBuildTargetGroup(target);
+                
+                var buildVersion = BuildHelperStrings.GetBuildVersion();
+                options.locationPathName = BuildHelperStrings.GetBuildPath(target, "Activator " + buildVersion);
+                
                 foreach (var assetDir in Directory.EnumerateDirectories("Assets")) {
                     if (!assetDir.EndsWith("SimpleProtect") && !assetDir.EndsWith("BuildHelper"))
                         BuildTime.ExcludePath(assetDir);
                 }
+                
+                var buildGroup = BuildPipeline.GetBuildTargetGroup(target);
                 AddScriptingDefine(buildGroup, "BUILD_ACTIVATOR");
             });
         }
