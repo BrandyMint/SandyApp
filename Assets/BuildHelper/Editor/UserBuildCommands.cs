@@ -1,10 +1,10 @@
 ﻿﻿using System;
- using System.IO;
- using BuildHelper.Editor.Core;
- using UnityEditor;
- using UnityEngine;
+using System.IO;
+using BuildHelper.Editor.Core;
+using UnityEditor;
+using UnityEngine;
 
- namespace BuildHelper.Editor {
+namespace BuildHelper.Editor {
     public static class UserBuildCommands {
 #region Build Menu
         [MenuItem("Build/Build In Develop Win64")]
@@ -62,23 +62,27 @@
             Build(target, null, (t, options) => {
                 var buildGroup = BuildPipeline.GetBuildTargetGroup(target);
                 AddScriptingDefine(buildGroup, "BUILD_PROTECT_COPY");
+                return options;
             });
         }
 
         public static void BuildActivator(BuildTarget target) {
             Build(target, null, (t, options) => {
-                options.scenes = new[] {"Assets/SimpleProtect/Scenes/Activate.unity"};
+                options.scenes = new []{"Assets/SimpleProtect/Scenes/Activate.unity"};
                 
                 var buildVersion = BuildHelperStrings.GetBuildVersion();
                 options.locationPathName = BuildHelperStrings.GetBuildPath(target, "Activator " + buildVersion);
                 
                 foreach (var assetDir in Directory.EnumerateDirectories("Assets")) {
-                    if (!assetDir.EndsWith("SimpleProtect") && !assetDir.EndsWith("BuildHelper"))
+                    if (!assetDir.EndsWith("SimpleProtect") 
+                        && !assetDir.EndsWith("BuildHelper"))
                         BuildTime.ExcludePath(assetDir);
                 }
+                BuildTime.ExcludePath("Deploy");
                 
                 var buildGroup = BuildPipeline.GetBuildTargetGroup(target);
                 AddScriptingDefine(buildGroup, "BUILD_ACTIVATOR");
+                return options;
             });
         }
 
@@ -86,15 +90,18 @@
             Build(target, null, (t, options) => {
                 var buildGroup = BuildPipeline.GetBuildTargetGroup(target);
                 AddScriptingDefine(buildGroup, "IN_DEVELOP");
+                return options;
             });
         }
 
-        public static void Build(string outputPath = null, Action<BuildTarget, BuildPlayerOptions> customize = null) {
+        public static void Build(string outputPath = null, CustomizeBuildAction customize = null) {
             var target = EditorUserBuildSettings.activeBuildTarget;
             Build(target, outputPath, customize);
         }
 
-        private static void Build(BuildTarget target, string outputPath = null, Action<BuildTarget, BuildPlayerOptions> customize = null) {
+        public delegate BuildPlayerOptions CustomizeBuildAction(BuildTarget target, BuildPlayerOptions options);
+
+        private static void Build(BuildTarget target, string outputPath = null, CustomizeBuildAction customize = null) {
             if (Application.isBatchMode) {
                 outputPath = GetCmdArg("-outputPath");
                 var targetStr = GetCmdArg("-target");
@@ -107,7 +114,8 @@
                 var buildVersion = BuildHelperStrings.GetBuildVersion();
                 var options = GetStandardPlayerOptions(target);
                 options.locationPathName = BuildHelperStrings.GetBuildPath(target, buildVersion, outputPath);
-                customize?.Invoke(target, options);
+                if (customize != null)
+                    options = customize.Invoke(target, options);
 
                 if (target == BuildTarget.StandaloneLinux64) {
                     var buildGroup = BuildPipeline.GetBuildTargetGroup(target);
