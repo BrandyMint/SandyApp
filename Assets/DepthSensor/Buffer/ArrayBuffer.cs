@@ -2,26 +2,7 @@ using System;
 using UnityEngine.Assertions;
 
 namespace DepthSensor.Buffer {
-    public abstract class ArrayBuffer : AbstractBuffer {
-        public readonly int length;
-        
-        protected ArrayBuffer(int len) {
-            this.length = len;
-        }
-        
-        public static bool ReCreateIfNeed<T>(ref T buffer, int len) where T : ArrayBuffer {
-            Assert.IsNotNull(buffer, "Create buffer before using recreate!");
-            if (buffer.length != len) {
-                var type = buffer.GetType();
-                buffer?.Dispose();
-                buffer = (T) Create(type, new object[] {len});
-                return true;
-            }
-            return false;
-        }
-    }
-    
-    public class ArrayBuffer<T> : ArrayBuffer {
+    public class ArrayBuffer<T> : AbstractBuffer {
         public readonly T[] data;
 
         public ArrayBuffer(int len) : base(len) {

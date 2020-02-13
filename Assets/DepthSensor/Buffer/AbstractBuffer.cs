@@ -4,6 +4,23 @@ using UnityEngine.Assertions;
 
 namespace DepthSensor.Buffer {
     public abstract class AbstractBuffer : IBuffer {
+        public readonly int length;
+        
+        protected AbstractBuffer(int len) {
+            this.length = len;
+        }
+        
+        public static bool ReCreateIfNeed<T>(ref T buffer, int len) where T : AbstractBuffer {
+            Assert.IsNotNull(buffer, "Create buffer before using recreate!");
+            if (buffer.length != len) {
+                var type = buffer.GetType();
+                buffer?.Dispose();
+                buffer = (T) Create(type, new object[] {len});
+                return true;
+            }
+            return false;
+        }
+        
         public T CreateSome<T>() where T : IBuffer {
             return Create<T>(GetArgsForCreateSome());
         }

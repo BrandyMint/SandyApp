@@ -41,9 +41,9 @@ namespace DepthSensorSandbox.Processing {
                 _depthLongExpos = new Buffer2D<ushort>(1, 1);
             }
             
-            if (Buffer2D.ReCreateIfNeed(ref _depthLongExpos, buffer.width, buffer.height)) {
+            if (AbstractBuffer2D.ReCreateIfNeed(ref _depthLongExpos, buffer.width, buffer.height)) {
                 buffer.data.CopyTo(_depthLongExpos.data);
-                Buffer2D.ReCreateIfNeed(ref _handsMask, buffer.width, buffer.height);
+                AbstractBuffer2D.ReCreateIfNeed(ref _handsMask, buffer.width, buffer.height);
                 _queue.MaxSize = buffer.length;
             }
         }
@@ -57,23 +57,23 @@ namespace DepthSensorSandbox.Processing {
             
             Parallel.Invoke(FillBorderUp, FillBorderDown, FillBorderLeft, FillBorderRight);
             FillHandsMask();
-            Parallel.For(0, _inOut.length, WriteMaskResultBody);
+            Parallel.For(0, _out.length, WriteMaskResultBody);
         }
 
         private void FillBorderUp() {
-            FillMaskLine(1, 1, _inOut.width - 2);
+            FillMaskLine(1, 1, _out.width - 2);
         }
 
         private void FillBorderDown() {
-            FillMaskLine(_inOut.length - _inOut.width + 1, 1, _inOut.width - 2);
+            FillMaskLine(_out.length - _out.width + 1, 1, _out.width - 2);
         }
 
         private void FillBorderLeft() {
-            FillMaskLine(0,  _inOut.width, _inOut.height);
+            FillMaskLine(0,  _out.width, _out.height);
         }
 
         private void FillBorderRight() {
-            FillMaskLine(_inOut.width,  _inOut.width, _inOut.height);
+            FillMaskLine(_out.width,  _out.width, _out.height);
         }
 
         private void FillMaskLine(int start, int step, int n) {
@@ -126,7 +126,7 @@ namespace DepthSensorSandbox.Processing {
             var valLongExpos = _depthLongExpos.data[i];
             var color = _handsMask.data[i];
             if (color != CLEAR_COLOR) {
-                _inOut.data[i] = valLongExpos;
+                _out.data[i] = valLongExpos;
             } else {
                 _depthLongExpos.data[i] = (ushort) Mathf.Lerp(val, valLongExpos, Exposition);
             }

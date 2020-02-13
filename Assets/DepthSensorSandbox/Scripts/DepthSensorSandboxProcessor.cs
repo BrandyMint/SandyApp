@@ -249,39 +249,38 @@ namespace DepthSensorSandbox {
         private IEnumerator ConveyerUpdateMain() {
             while (true) {
                 var device = DepthSensorManager.Instance.Device;
-                if (device != null) {
-                    var sDepth = device.Depth;
-                    if (!ReCreateBuffersIfNeed()) {
-                        var depth = _bufDepth.GetNewest();
-                        if (_processColor)
-                            FlushTextureBuffer(_bufColor, _onColor, true);
+                if (device != null && !ReCreateBuffersIfNeed(device)) {
+                    var depth = _bufDepth.GetNewest();
+                    if (_processColor)
+                        FlushTextureBuffer(_bufColor, _onColor, true);
 
-                        if (_processMap)
-                            FlushTextureBuffer(_bufDepthToColor, _onDepthToColor);
+                    if (_processMap)
+                        FlushTextureBuffer(_bufDepthToColor, _onDepthToColor);
 
-                        if (_processDepth)
-                            FlushTextureBuffer(depth, InvokeOnNewFrame);
-                    }
+                    if (_processDepth)
+                        FlushTextureBuffer(depth, InvokeOnNewFrame);
                 }
                 yield return null;
                 ActivateSensorsIfNeed();
             }
         }
 
-        private bool ReCreateBuffersIfNeed() {
-            var buf = _dsm.Device.Depth.GetNewest();
-            if (_bufDepth == null || _bufDepth.width != buf.width || _bufDepth.height != buf.height) {
-                DisposeBuffer(ref _bufDepth);
-                if (buf.Lock(300)) {
-                    _bufDepth = buf.Copy<DepthBuffer>();
-                    foreach (var processing in _processings) {
-                        processing.InitInMainThread(_bufDepth);
-                    }
-
-                    DisposeBuffer(ref _bufDepthToColor);
-                    _bufDepthToColor = new DepthToColorBuffer(_bufDepth.width, _bufDepth.height);
-                    return true;
+        private bool ReCreateBuffersIfNeed(DepthSensorDevice device) {
+            var bufDevice = device.Depth.GetNewest();
+            var bufProcessing = _bufDepth?.GetNewest();
+            if (bufProcessing == null || bufProcessing.width != bufDevice.width || bufProcessing.height != bufDevice.height) {
+                DisposeSensor(ref _bufDepth);
+                _bufDepth = new SensorDepth(bufDevice.CreateSome<DepthBuffer>()) {
+                    BuffersCount = _buffersCount
+                };
+                _bufDepthInternal = new Sensor<DepthBuffer>.Internal(_bufDepth);
+                foreach (var processing in _processings) {
+                    processing.InitInMainThread(bufDevice);
                 }
+
+                DisposeBuffer(ref _bufDepthToColor);
+                _bufDepthToColor = new DepthToColorBuffer(bufDevice.width, bufDevice.height);
+                return true;
             }
 
             return false;

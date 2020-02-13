@@ -28,10 +28,10 @@ namespace Test.Editor {
             int len1 = buf.length;
             var type = buf.GetType();
             try {
-                Assert.IsFalse(ArrayBuffer.ReCreateIfNeed(ref buf, len1));
+                Assert.IsFalse(AbstractBuffer.ReCreateIfNeed(ref buf, len1));
                 TestBufferValid(buf, type, len1, testVal);
 
-                Assert.IsTrue(ArrayBuffer.ReCreateIfNeed(ref buf, len2));
+                Assert.IsTrue(AbstractBuffer.ReCreateIfNeed(ref buf, len2));
                 TestBufferValid(buf, type, len2, testVal);
             }
             finally {
@@ -43,10 +43,10 @@ namespace Test.Editor {
             int w1 = buf.width, h1 = buf.height;
             var type = buf.GetType();
             try {
-                Assert.IsFalse(Buffer2D.ReCreateIfNeed(ref buf, w1, h1));
+                Assert.IsFalse(AbstractBuffer2D.ReCreateIfNeed(ref buf, w1, h1));
                 TestBufferValid(buf, type, w1, h1, testVal);
 
-                Assert.IsTrue(Buffer2D.ReCreateIfNeed(ref buf, w2, h2));
+                Assert.IsTrue(AbstractBuffer2D.ReCreateIfNeed(ref buf, w2, h2));
                 TestBufferValid(buf, type, w2, h2, testVal);
             }
             finally {

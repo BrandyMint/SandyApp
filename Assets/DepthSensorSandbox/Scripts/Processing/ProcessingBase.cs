@@ -6,6 +6,7 @@ namespace DepthSensorSandbox.Processing {
         public bool OnlyRawBufferIsInput = true;
         public bool Active = true;
         
+        protected DepthBuffer _inDepth;
         protected DepthBuffer _rawBuffer;
         protected DepthBuffer _out;
         protected DepthBuffer _prev;
@@ -16,6 +17,7 @@ namespace DepthSensorSandbox.Processing {
                 _rawBuffer = rawBuffer;
                 _out = outBuffer;
                 _prev = prevBuffer;
+                _inDepth = OnlyRawBufferIsInput ? _rawBuffer : _out;
                 _s.SetDimens(_rawBuffer.width, _rawBuffer.height);
                 ProcessInternal();
             }
@@ -39,8 +41,8 @@ namespace DepthSensorSandbox.Processing {
             return false;
         }
         
-        protected bool CheckValid(Buffer2D b) {
-            return b != null && b.width == _inOut.width && b.height == _inOut.height;
+        protected bool CheckValid(AbstractBuffer2D b) {
+            return b != null && b.width == _out.width && b.height == _out.height;
         }
 
         public virtual void Dispose() {}

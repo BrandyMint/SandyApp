@@ -19,15 +19,19 @@ namespace DepthSensorSandbox.Test {
         
         private void Start() {
             _hands = DepthSensorSandboxProcessor.Instance.Hands;
+#if HANDS_WAVE_STEP_DEBUG
             _hands.WaveBarrier.AddParticipant();
+#endif
             _btnStep.onClick.AddListener(OnBtnStep);
             _btnContinue.onClick.AddListener(OnBtnContinue);
             DepthSensorSandboxProcessor.OnNewFrame += OnNewFrame;
         }
 
         private void OnDestroy() {
+#if HANDS_WAVE_STEP_DEBUG
             if (DepthSensorSandboxProcessor.Instance != null && DepthSensorSandboxProcessor.Instance.Hands != null)
                 DepthSensorSandboxProcessor.Instance.Hands.WaveBarrier.RemoveParticipant();
+#endif
             DepthSensorSandboxProcessor.OnNewFrame -= OnNewFrame;
         }
 
