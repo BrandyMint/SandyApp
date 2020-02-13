@@ -1,11 +1,23 @@
 using System;
+using System.Linq;
+using UnityEngine;
 
 namespace DepthSensor.Sensor {
-    public abstract class AbstractSensor : IDisposable {
+    public abstract class AbstractSensor : ISensor, IDisposable {
         public bool Available { get; protected set; } = true;
-        public event Action<AbstractSensor> OnNewFrame;
-        public event Action<AbstractSensor> OnNewFrameBackground;
+        public event Action<ISensor> OnNewFrame;
+        public event Action<ISensor> OnNewFrameBackground;
+
+        public bool AnySubscribedToNewFrames => AnySubscribedTo(null, false, OnNewFrame, OnNewFrameBackground);
+
+        public bool AnySubscribedToNewFramesExcept(params Type[] types) {
+            return AnySubscribedTo(types, true, OnNewFrame, OnNewFrameBackground);
+        }
         
+        public bool AnySubscribedToNewFramesFrom(params Type[] types) {
+            return AnySubscribedTo(types, false, OnNewFrame, OnNewFrameBackground);
+        }
+
         public bool Active {
             get { return _active; }
             set { if (Available && _active != value) {
@@ -24,6 +36,9 @@ namespace DepthSensor.Sensor {
             }
         }
 
+        public int FPS { get; protected set; }
+        public Vector2 FOV { get; protected set; }
+
         protected Action<AbstractSensor> _onActiveChanged;
         private bool _active;
         protected int _buffersCount;
@@ -32,11 +47,33 @@ namespace DepthSensor.Sensor {
 
         protected abstract void OnBuffersCountChanged(int newCount);
 
+        private static bool AnySubscribedTo(Type[] types, bool except, params Action<ISensor>[] actions) {
+            if (actions == null)
+                return false;
+            return actions.Any(a => a != null && a.GetInvocationList().Any(d => {
+                if (types == null)
+                    return true;
+                var dt = d.Method.ReflectedType;
+                var hasTargetInTypes = types.Any(t => t.IsAssignableFrom(dt));
+                if (except)
+                    return !hasTargetInTypes;
+                return hasTargetInTypes;
+            }));
+        }
+
         public class Internal {
             private readonly AbstractSensor _abstractSensor;
 
             protected internal Internal(AbstractSensor sensor) {
                 _abstractSensor = sensor;
+            }
+
+            protected internal void SetTargetFps(int fps) {
+                _abstractSensor.FPS = fps;
+            }
+            
+            protected internal void SetFov(Vector2 fov) {
+                _abstractSensor.FOV = fov;
             }
             
             protected internal virtual void OnNewFrame() {

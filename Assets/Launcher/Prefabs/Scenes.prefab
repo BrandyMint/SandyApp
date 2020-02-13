@@ -11,6 +11,8 @@ GameObject:
   - component: {fileID: 2580222189140254417}
   - component: {fileID: 2580222189140254418}
   - component: {fileID: -8017239747588144962}
+  - component: {fileID: 6917613083910844641}
+  - component: {fileID: 3700465533972520753}
   m_Layer: 0
   m_Name: Scenes
   m_TagString: Untagged
@@ -44,6 +46,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a3b7a8e13fc493baba365c668c0675c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _sceneMainPath: Assets/Scenes/Launcher.unity
+  _sceneCalibrationPath: Assets/DepthSensorCalibration/Scenes/DepthSensorCalibration2.unity
+  _sceneSandboxCalibrationPath: Assets/DepthSensorCalibration/Scenes/SandboxCalibration.unity
+  _sceneCalibrationViewPath: Assets/DepthSensorCalibration/Scenes/Viewer.unity
 --- !u!114 &-8017239747588144962
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -57,4 +63,30 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _useMultiMonitorFix: 0
-  _useMonitors: 2
+  _revertDefaultScreenSettingsOnExit: 1
+  _useMonitors: 1
+  _testMonitorsInEditor: 1
+--- !u!114 &6917613083910844641
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2580222189140254419}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c210d850c54a41749687c6c13952c765, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &3700465533972520753
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2580222189140254419}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 419345e9885592948b4befef9d88f2cd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

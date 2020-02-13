@@ -10,7 +10,7 @@ namespace Games.Landscape {
     namespace DepthSensorSandbox {
         public class LandscapeParams : SerializableParams {
             public float DepthSeaBottom {
-                get => Get(nameof(DepthSeaBottom), -0.1f);
+                get => Get(nameof(DepthSeaBottom), -1f);
                 set => Set(nameof(DepthSeaBottom), value);
             }
             
@@ -20,17 +20,22 @@ namespace Games.Landscape {
             }
             
             public float DepthGround {
-                get => Get(nameof(DepthGround), 0.02f);
+                get => Get(nameof(DepthGround), 0.1f);
                 set => Set(nameof(DepthGround), value);
             }
             
+            public float DepthDirt {
+                get => Get(nameof(DepthDirt), 0.3f);
+                set => Set(nameof(DepthDirt), value);
+            }
+            
             public float DepthMountains {
-                get => Get(nameof(DepthMountains), 0.05f);
+                get => Get(nameof(DepthMountains), 0.7f);
                 set => Set(nameof(DepthMountains), value);
             }
             
             public float DepthIce {
-                get => Get(nameof(DepthIce), 0.05f);
+                get => Get(nameof(DepthIce), 1f);
                 set => Set(nameof(DepthIce), value);
             }
             
@@ -40,7 +45,7 @@ namespace Games.Landscape {
             }
             
             public bool EnableWaterSimulation {
-                get => Get(nameof(EnableWaterSimulation), true);
+                get => Get(nameof(EnableWaterSimulation), false);
                 set => Set(nameof(EnableWaterSimulation), value);
             }
             

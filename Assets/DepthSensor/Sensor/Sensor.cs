@@ -1,10 +1,9 @@
 using System;
 using DepthSensor.Buffer;
-using UnityEngine;
 using UnityEngine.Assertions;
 
 namespace DepthSensor.Sensor {
-    public class Sensor<T> : AbstractSensor where T : AbstractBuffer {
+    public class Sensor<T> : AbstractSensor, ISensor<T> where T : AbstractBuffer {
         protected T[] _buffers;
         protected int _first;
         
@@ -51,52 +50,30 @@ namespace DepthSensor.Sensor {
             return Get(BuffersCount - 1);
         }
 
-        public T GetNewestAndLock(int milliseconds = -1) {
-            var buffer = GetNewest();
-            if (buffer.Lock(milliseconds))
-                return buffer;
-            return null;
-        }
-
-        public T[] GetFreeBuffersAndLock(int milliseconds =-1) {
-            var len = Mathf.Min(BuffersValid, BuffersCount - 1);
-            if (_buffersCacheForExternalUse == null || _buffersCacheForExternalUse.Length != len)
-                _buffersCacheForExternalUse = new T[len];
-            for (int i = 0; i < len; ++i) {
-                var b = Get(i);
-                if (!b.Lock(milliseconds)) {
-                    for (int j = i - 1; j >= 0; --j) {
-                        _buffersCacheForExternalUse[j].Unlock();
-                    }
-                    return null;
-                }
-                _buffersCacheForExternalUse[i] = b;
-            }
-
-            return _buffersCacheForExternalUse;
-        }
-
         private static int GetIdx(int i, int first, int len) {
             return (len + first - i) % len;
         }
 
         public override void Dispose() {
-            foreach (var buf in _buffers) {
-                buf?.Dispose();
+            if (_buffers != null) {
+                foreach (var buf in _buffers) {
+                    buf?.Dispose();
+                }
+
+                _buffers = null;
             }
-            _buffers = null;
         }
 
         public class Internal : AbstractSensor.Internal {
-            private readonly Sensor<T> _sensor;
+            protected internal readonly Sensor<T> sensor;
 
             protected internal Internal(Sensor<T> sensor) : base(sensor) {
-                _sensor = sensor;
+                this.sensor = sensor;
             }
 
             protected internal override void OnNewFrameBackground() {
-                var len = _sensor.BuffersCount;
-                _sensor._first = (len + _sensor._first + 1) % len;
+                var len = sensor.BuffersCount;
+                sensor._first = (len + sensor._first + 1) % len;
                 base.OnNewFrameBackground();
             }
         }

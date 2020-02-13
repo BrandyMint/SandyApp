@@ -24,9 +24,13 @@ namespace Utilities {
             return false;
         }
 
-        public static bool ReCreateIfNeedCompatible(ref Texture2D t, Texture tRef) {
-            return ReCreateIfNeed(ref t, tRef.width, tRef.height,
-                GraphicsFormatUtility.GetTextureFormat(tRef.graphicsFormat), tRef.mipmapCount > 1);
+        public static bool ReCreateIfNeedCompatible(ref Texture2D t, Texture tRef, TextureFormat fallbackFormat = TextureFormat.RGBA32) {
+            var isFallbackFormat = !TryGetCompatibleFormat(tRef.graphicsFormat, out var format, fallbackFormat);
+            var isCreated = ReCreateIfNeed(ref t, tRef.width, tRef.height, format, tRef.mipmapCount > 1);
+            if (isCreated && isFallbackFormat) {
+                Debug.LogWarning($"No compatible texture format for ${tRef.graphicsFormat}. Fallback to {format}.");
+            }
+            return isCreated;
         }
         
         public static bool ReCreateIfNeed(ref RenderTexture t, int width, int height, int depth = 0,
@@ -41,13 +45,18 @@ namespace Utilities {
             return false;
         }
         
-        public static bool ReCreateIfNeedCompatible(ref RenderTexture t, Texture tRef) {
+        public static bool ReCreateIfNeedCompatible(ref RenderTexture t, Texture tRef, RenderTextureFormat fallbackFormat = RenderTextureFormat.ARGB32) {
+            var isFallbackFormat = !TryGetCompatibleFormat(tRef.graphicsFormat, out var format, fallbackFormat);
+            
             var depth = 0;
             var refRend = tRef as RenderTexture;
             if (refRend != null)
                 depth = refRend.depth;
-            return ReCreateIfNeed(ref t, tRef.width, tRef.height, depth,
-                GraphicsFormatUtility.GetRenderTextureFormat(tRef.graphicsFormat));
+            var isCreated = ReCreateIfNeed(ref t, tRef.width, tRef.height, depth, format);
+            if (isCreated && isFallbackFormat) {
+                Debug.LogWarning($"No compatible render texture format for ${tRef.graphicsFormat}. Fallback to {format}.");
+            }
+            return isCreated;
         }
         
         public static bool ReCreateIfNeed<T>(ref NativeArray<T> a, int len, 
@@ -62,6 +71,28 @@ namespace Utilities {
             }
             return false;
         }
+
+        public static bool TryGetCompatibleFormat(GraphicsFormat src, out TextureFormat dst,
+            TextureFormat fallback = TextureFormat.RGBA32) {
+            dst = GraphicsFormatUtility.GetTextureFormat(src);
+            if (!Enum.IsDefined(typeof(TextureFormat), dst) || !SystemInfo.SupportsTextureFormat(dst)) {
+                dst = fallback;
+                return false;
+            }
+
+            return true;
+        }
+        
+        public static bool TryGetCompatibleFormat(GraphicsFormat src, out RenderTextureFormat dst,
+            RenderTextureFormat fallback = RenderTextureFormat.ARGB32) {
+            dst = GraphicsFormatUtility.GetRenderTextureFormat(src);
+            if (!Enum.IsDefined(typeof(RenderTextureFormat), dst) || !SystemInfo.SupportsRenderTextureFormat(dst)) {
+                dst = fallback;
+                return false;
+            }
+
+            return true;
+        } 
         
         public static int GetPixelsCount(this Texture t) {
             var len = t.width * t.height;
@@ -98,8 +129,16 @@ namespace Utilities {
         public static void Copy(RenderTexture src, Texture2D dst) {
             var prevRend = RenderTexture.active;
             RenderTexture.active = src;
-            dst.ReadPixels(new UnityEngine.Rect(0, 0, src.width, src.height), 0, 0);
+            dst.ReadPixels(new Rect(0, 0, src.width, src.height), 0, 0);
+            dst.Apply();
             RenderTexture.active = prevRend;
+        }
+
+        public static void Clear(RenderTexture dst, Color color = default) {
+            var rt = RenderTexture.active;
+            RenderTexture.active = dst;
+            GL.Clear(true, true, Color.clear);
+            RenderTexture.active = rt;
         }
     }
 }

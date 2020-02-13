@@ -3,20 +3,20 @@ using DepthSensor.Buffer;
 
 namespace DepthSensorSandbox.Processing {
     public abstract class ProcessingBase : IDisposable {
-        public bool OnlyRawBuffersIsInput = true;
+        public bool OnlyRawBufferIsInput = true;
         public bool Active = true;
         
-        protected DepthBuffer[] _rawBuffers;
-        protected DepthBuffer _inOut;
-        protected DepthBuffer _inDepth;
+        protected DepthBuffer _rawBuffer;
+        protected DepthBuffer _out;
+        protected DepthBuffer _prev;
         protected Sampler _s = new Sampler();
 
-        public void Process(DepthBuffer[] rawBuffers, DepthBuffer inOut) {
+        public void Process(DepthBuffer rawBuffer, DepthBuffer outBuffer, DepthBuffer prevBuffer) {
             if (Active) {
-                _rawBuffers = rawBuffers;
-                _inOut = inOut;
-                _inDepth = OnlyRawBuffersIsInput ? _rawBuffers[0] : _inOut;
-                _s.SetDimens(_inDepth.width, _inDepth.height);
+                _rawBuffer = rawBuffer;
+                _out = outBuffer;
+                _prev = prevBuffer;
+                _s.SetDimens(_rawBuffer.width, _rawBuffer.height);
                 ProcessInternal();
             }
         }

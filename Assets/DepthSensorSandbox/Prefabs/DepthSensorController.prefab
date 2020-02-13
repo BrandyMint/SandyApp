@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 4648422577653558669}
   - component: {fileID: 4689643101899965791}
   - component: {fileID: 6472969029474293863}
+  - component: {fileID: 9154685900479359070}
   m_Layer: 0
   m_Name: DepthSensorController
   m_TagString: Untagged
@@ -57,7 +58,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 79186ed3944074147b24e08ba940e87d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _buffersCount: 3
+  _buffersCount: 5
 --- !u!114 &6472969029474293863
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -72,3 +73,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _btnTryInit: {fileID: 1690503303347570664, guid: 43f2f0cf4e634d348b8893c76a8ce75b,
     type: 3}
+--- !u!114 &9154685900479359070
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4688712977940313597}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0f7beb37e5a1f6d1984b8ca2e59bb6f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

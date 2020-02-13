@@ -26,10 +26,9 @@
             fixed4 _Color1;
             float _Depth1;
             fixed4 _ColorZero;
-            float _DepthZero;
 
             fixed4 frag (v2f i) : SV_Target {
-                float d = i.pos.z;
+                float d = i.vpos.z;
                 if (d > _DepthZero)
                     return _ColorZero;
                 if (d > _DepthZero - _Depth1)
@@ -38,6 +37,6 @@
             }
             ENDCG
         }
+        UsePass "Sandbox/ShadowCaster"
     }
-    Fallback "Mobile/VertexLit"
 }

@@ -30,6 +30,7 @@ namespace DepthSensor.Device {
             public OpenNIWrapper.Device device;
             public VideoMode modeDepth;
             public VideoMode modeColor;
+            public VideoMode modeInfrared;
         }
 
         private class NI2Sensor {
@@ -56,6 +57,7 @@ namespace DepthSensor.Device {
         private OpenNIWrapper.Device _device;
         private NI2Sensor _niDepth;
         private NI2Sensor _niColor;
+        private NI2Sensor _niInfrared;
         private readonly List<NI2Sensor> _niSensors = new List<NI2Sensor>();
 
         private volatile bool _needUpdateMapDepthToColorSpace;
@@ -71,8 +73,9 @@ namespace DepthSensor.Device {
             _device = init.device;
             if (_device != null)
                 _device.DepthColorSyncEnabled = true;
-            _niDepth = CreateNi2Sensor(OpenNIWrapper.Device.SensorType.Depth, init.modeDepth, Depth);
-            _niColor = CreateNi2Sensor(OpenNIWrapper.Device.SensorType.Color, init.modeColor, Color);
+            _niDepth = CreateNi2Sensor(OpenNIWrapper.Device.SensorType.Depth, init.modeDepth, _internalDepth);
+            _niColor = CreateNi2Sensor(OpenNIWrapper.Device.SensorType.Color, init.modeColor, _internalColor);
+            _niInfrared = CreateNi2Sensor(OpenNIWrapper.Device.SensorType.Ir, init.modeInfrared, _internalInfrared);
             _initInfo = null;
             
             _pollFrames = new Thread(PollFrames) {
@@ -81,15 +84,17 @@ namespace DepthSensor.Device {
             _pollFrames.Start();
         }
 
-        private NI2Sensor CreateNi2Sensor(OpenNIWrapper.Device.SensorType type, VideoMode mode, AbstractSensor sensor) {
+        private NI2Sensor CreateNi2Sensor<T>(OpenNIWrapper.Device.SensorType type, VideoMode mode, Sensor<T>.Internal internalSensor) where T : AbstractBuffer {
             var ni = new NI2Sensor {
-                Sensor = sensor
+                Sensor = internalSensor.sensor
             };
             
-            if (sensor.Available && _device != null) {
+            if (internalSensor.sensor.Available && _device != null) {
                 ni.stream = _device.CreateVideoStream(type);
                 ni.stream.VideoMode = mode;
                 ni.stream.OnNewFrame += s => ni.frameEvent.Set();
+                internalSensor.SetTargetFps(mode.Fps);
+                internalSensor.SetFov(new Vector2(ni.stream.HorizontalFieldOfView, ni.stream.VerticalFieldOfView) * Mathf.Rad2Deg);
             }
             
             _niSensors.Add(ni);
@@ -118,7 +123,7 @@ namespace DepthSensor.Device {
                 init.modeDepth = GetBestVideoMod(init.device, OpenNIWrapper.Device.SensorType.Depth);
                 if (init.modeDepth != null) {
                     if (init.modeDepth.DataPixelFormat != VideoMode.PixelFormat.Depth1Mm)
-                        throw new NotImplementedException();
+                        throw new NotImplementedException("Not implemented infrared pixel format " + init.modeDepth.DataPixelFormat);
                     init.Depth = new SensorDepth(new DepthBuffer(
                         init.modeDepth.Resolution.Width,
                         init.modeDepth.Resolution.Height
@@ -132,22 +137,32 @@ namespace DepthSensor.Device {
                 init.modeColor = GetBestVideoMod(init.device, OpenNIWrapper.Device.SensorType.Color);
                 if (init.modeColor != null) {
                     if (init.modeColor.DataPixelFormat != VideoMode.PixelFormat.Rgb888)
-                        throw new NotImplementedException();
-                    init.SensorColor = new SensorColor(new ColorBuffer(
+                        throw new NotImplementedException("Not implemented color pixel format " + init.modeColor.DataPixelFormat);
+                    init.Color = new SensorColor(new ColorBuffer(
                         init.modeColor.Resolution.Width,
                         init.modeColor.Resolution.Height,
                         TextureFormat.RGB24
                     ));
                 }
-            } catch (OpenNI2Exception e) {
-                OpenNI.Shutdown();
-                Close(ref init.device);
-                if (e.status != OpenNI.Status.NoDevice) {
-                    throw;
+                
+                init.modeInfrared = GetBestVideoMod(init.device, OpenNIWrapper.Device.SensorType.Ir);
+                if (init.modeInfrared != null) {
+                    TextureFormat format;
+                    if (init.modeInfrared.DataPixelFormat == VideoMode.PixelFormat.Gray8)
+                        format = TextureFormat.R8;
+                    else if (init.modeInfrared.DataPixelFormat == VideoMode.PixelFormat.Gray16)
+                        format = TextureFormat.R16;
+                    else
+                        throw new NotImplementedException("Not implemented infrared pixel format " + init.modeInfrared.DataPixelFormat);
+                    init.Infrared = new SensorInfrared(new InfraredBuffer(
+                        init.modeInfrared.Resolution.Width,
+                        init.modeInfrared.Resolution.Height,
+                        format
+                    ));
                 }
             } catch (Exception) {
-                OpenNI.Shutdown();
                 Close(ref init.device);
+                OpenNI.Shutdown();
                 throw;
             }
             
@@ -159,12 +174,38 @@ namespace DepthSensor.Device {
             if (device.HasSensor(type)) {
                 var stream = device.CreateVideoStream(type);
                 if (stream != null) {
-                    var supportedModes = stream.SensorInfo.GetSupportedVideoModes();
-                    //for Kinect2 Depth 640x480@30 is invalid
-                    if (type == OpenNIWrapper.Device.SensorType.Depth && device.DeviceInfo.Uri.StartsWith("freenect2"))
-                        return supportedModes.First(m => m.Fps == 30 && m.Resolution.Width == 512);
-                    
+                    var supportedModes = stream.SensorInfo.GetSupportedVideoModes().ToArray();
+
+                    var def = StreamParams.Default;
+                    var isFreenect2 = device.DeviceInfo.Uri.StartsWith("freenect2");
+                    switch (type) {
+                        case OpenNIWrapper.Device.SensorType.Ir when isFreenect2:
+                        case OpenNIWrapper.Device.SensorType.Depth when isFreenect2:
+                            //for Kinect2 Depth 640x480@30 is invalid
+                            def = new StreamParams(512, 424, 30, true);
+                            break;
+                        case OpenNIWrapper.Device.SensorType.Ir:
+                            def = Prefs.Sensor.IR;
+                            break;
+                        case OpenNIWrapper.Device.SensorType.Color:
+                            def = Prefs.Sensor.Color;
+                            break;
+                        case OpenNIWrapper.Device.SensorType.Depth:
+                            def = Prefs.Sensor.Depth;
+                            break;
+                    }
+
+                    foreach (var m in supportedModes) {
+                        Debug.Log("available " + m);
+                    }
                     mode = supportedModes.Aggregate((m1, m2) => {
+                        if (def.use) {
+                            var match1 = MatchDefault(def, m1);
+                            var match2 = MatchDefault(def, m2);
+                            if (Math.Abs(match1 - match2) > 0.01f)
+                                return match1 > match2 ? m1 : m2;
+                        }
+                        
                         if (m1.Fps != m2.Fps) {
                             return Math.Abs(m1.Fps - _FPS) < Math.Abs(m2.Fps - _FPS) ? m1 : m2;
                         }
@@ -177,8 +218,8 @@ namespace DepthSensor.Device {
 
                         switch (type) {
                             case OpenNIWrapper.Device.SensorType.Color when m2.DataPixelFormat == VideoMode.PixelFormat.Rgb888:
-                                return m2;
                             case OpenNIWrapper.Device.SensorType.Depth when m2.DataPixelFormat == VideoMode.PixelFormat.Depth1Mm:
+                            case OpenNIWrapper.Device.SensorType.Ir when m2.DataPixelFormat == VideoMode.PixelFormat.Gray8:
                                 return m2;
                             default:
                                 return m1;
@@ -191,6 +232,15 @@ namespace DepthSensor.Device {
             return mode;
         }
 
+        private static float MatchDefault(StreamParams def, VideoMode m) {
+            if (m.Resolution.Width > def.width || m.Resolution.Height > def.height)
+                return -1f;
+            var resolutionMatch = (float) m.Resolution.Height / def.height * m.Resolution.Width / def.width;
+            if (m.Fps > def.fps)
+                return resolutionMatch / 2f * def.fps / m.Fps;
+            return resolutionMatch * m.Fps / def.fps;
+        }
+
         private static void Close(ref OpenNIWrapper.Device device) {
             if (device != null) {
                 device.Close();
@@ -198,7 +248,7 @@ namespace DepthSensor.Device {
             }
         }
 
-        protected override void Close() {
+        protected override void OnCloseInternal() {
             _pollFramesLoop = false;
             if (_pollFrames != null && _pollFrames.IsAlive && !_pollFrames.Join(5000))
                 _pollFrames.Abort();
@@ -209,7 +259,6 @@ namespace DepthSensor.Device {
             }
             _framesArrivedEvent.Dispose();
             _sensorActiveChangedEvent.Dispose();
-            base.Close();
         }
 
         public override bool IsAvailable() {
@@ -250,7 +299,10 @@ namespace DepthSensor.Device {
         }
 
         private void PollFrames() {
-            var waits = new AutoResetEvent[0];
+            var waits = new WaitHandle[0];
+            int idx, colorIdx = 0, infraredIdx = 0, depthIdx = 0;
+            //frame idx checking because frame are duplicated when multisensor reading
+            //TODO: but how avoid duplicate stream.ReadFrame() ?
             try {
                 while (_pollFramesLoop) {
                     if (_sensorActiveChangedEvent.WaitOne(0)) {
@@ -259,10 +311,18 @@ namespace DepthSensor.Device {
                     }
                     if (waits.Length > 0 && WaitHandle.WaitAll(waits, _FRAME_TIME * 5)) {
                         using (var depth = _niDepth.started ? _niDepth.stream.ReadFrame() : null)
+                        using (var infrared = _niInfrared.started ? _niInfrared.stream.ReadFrame() : null)
                         using (var color = _niColor.started ? _niColor.stream.ReadFrame() : null) {
-                            if (color != null) {
+                            if (color != null && colorIdx != (idx = color.FrameIndex)) {
+                                colorIdx = idx;
                                 Color.GetOldest().SetBytes(color.Data, color.DataSize);
                                 _internalColor.OnNewFrameBackground();
+                            }
+                            
+                            if (infrared != null && infraredIdx != (idx = infrared.FrameIndex)) {
+                                infraredIdx = idx;
+                                Infrared.GetOldest().SetBytes(infrared.Data, infrared.DataSize);
+                                _internalInfrared.OnNewFrameBackground();
                             }
 
                             if (_needUpdateMapDepthToColorSpace) {
@@ -270,7 +330,8 @@ namespace DepthSensor.Device {
                                 _internalMapDepthToCamera.OnNewFrameBackground();
                             }
 
-                            if (depth != null) {
+                            if (depth != null && depthIdx != (idx = depth.FrameIndex)) {
+                                depthIdx = idx;
                                 Depth.GetOldest().SetBytes(depth.Data, depth.DataSize);
                                 _internalDepth.OnNewFrameBackground();
                             }
@@ -296,6 +357,7 @@ namespace DepthSensor.Device {
             while (_pollFramesLoop) {
                 if (_framesArrivedEvent.WaitOne(0)) {
                     if (Depth.Active) _internalDepth.OnNewFrame();
+                    if (Infrared.Active) _internalInfrared.OnNewFrame();
                     if (Color.Active) _internalColor.OnNewFrame();
                 }
                 if (_mapDepthToCameraUpdated) {
@@ -349,6 +411,18 @@ namespace DepthSensor.Device {
             
             return new Vector2(vx, vy);
         }
+        
+        public override Vector3 DepthMapPosToCameraPos(Vector2 pos, ushort depth) {
+            var v = Vector3.zero;
+            if (_niDepth.stream != null)
+                CoordinateConverter.ConvertDepthToWorld(
+                    _niDepth.stream,
+                    pos.x, pos.y, depth,
+                    out v.x, out v.y, out v.z
+                );
+            
+            return v / _DEPTH_MUL;
+        }
 
         private DepthBuffer _parBuf;
         private NativeArray<ushort> _parDepth;
@@ -365,24 +439,10 @@ namespace DepthSensor.Device {
             _parColor[i] = DepthMapPosToColorMapPos(p, _parDepth[i]);
         }
 
-        private Vector3 DepthMapPosToCameraPos(Vector2 pos, ushort depth) {
-            Vector3 v = Vector3.zero;
-            if (_niDepth.stream != null)
-                CoordinateConverter.ConvertDepthToWorld(
-                    _niDepth.stream,
-                    (int)pos.x, (int)pos.y, depth,
-                    out v.x, out v.y, out v.z
-                );
-            
-            return v / _DEPTH_MUL;
-        }
-
         private MapDepthToCameraBuffer _parMap;
         private void UpdateMapDepthToCamera() {
             _parMap = MapDepthToCamera.GetOldest();
-            lock (_parMap.SyncRoot) {
-                Parallel.For(0, _parMap.length, UpdateMapDepthToCameraBody);
-            }
+            Parallel.For(0, _parMap.length, UpdateMapDepthToCameraBody);
             _needUpdateMapDepthToColorSpace = false;
             _mapDepthToCameraUpdated = true;
         }

@@ -10,6 +10,11 @@ namespace DepthSensor.Sensor {
         public SensorDepth(DepthBuffer buffer) : base(buffer) { }
         public SensorDepth(bool available) : base(available) { }
     }
+    
+    public class SensorInfrared : Sensor<InfraredBuffer> {
+        public SensorInfrared(InfraredBuffer buffer) : base(buffer) { }
+        public SensorInfrared(bool available) : base(available) { }
+    }
 
     public class SensorIndex : Sensor<IndexBuffer> {
         public SensorIndex(IndexBuffer buffer) : base(buffer) { }

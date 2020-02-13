@@ -35,6 +35,10 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _DirtTex:
+        m_Texture: {fileID: 2800000, guid: 40b81be53559c7c43a2d0eecbf907d87, type: 3}
+        m_Scale: {x: 10, y: 10}
+        m_Offset: {x: 0, y: 0}
     - _EmissionMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -71,12 +75,15 @@ Material:
     - _BumpScale: 1
     - _Cutoff: 0.5
     - _Depth1: 0.1
+    - _DepthDirt: 0.3
     - _DepthGround: 0.01
-    - _DepthIce: 0.2
-    - _DepthMountains: 0.1
+    - _DepthIce: 1
+    - _DepthMaxOffset: 0.2
+    - _DepthMinOffset: 0.2
+    - _DepthMountains: 0.7
     - _DepthSea: 0
-    - _DepthSeaBottom: -0.1
-    - _DepthZero: 1.65
+    - _DepthSeaBottom: -0.4
+    - _DepthZero: 1.6
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
     - _GlossMapScale: 1
@@ -100,12 +107,13 @@ Material:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _Color1: {r: 0, g: 1, b: 0, a: 1}
     - _Color2: {r: 1, g: 1, b: 1, a: 1}
-    - _ColorIce: {r: 1, g: 1, b: 1, a: 0.7294118}
+    - _ColorIce: {r: 1, g: 1, b: 1, a: 1}
     - _ColorSea: {r: 0, g: 0.104886435, b: 0.3301887, a: 1}
     - _ColorSeaMax: {r: 0.12941177, g: 0.25490198, b: 0.41960785, a: 0.9372549}
     - _ColorSeaMin: {r: 0, g: 0.5468068, b: 0.7264151, a: 0.6901961}
     - _ColorZero: {r: 0, g: 0, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _hsvDirt: {r: 0, g: 0, b: 0.11, a: 0}
     - _hsvGround: {r: 0.01, g: 0.02, b: 0.4, a: 0}
     - _hsvMountains: {r: 0, g: 0, b: 0.07, a: 0}
     - _hsvSand: {r: 0.04, g: 0, b: 0.11, a: 0}

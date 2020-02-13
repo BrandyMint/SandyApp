@@ -7,6 +7,8 @@ using UnityEngine;
 namespace AsyncGPUReadbackPluginNs {
     public class AsyncGPURequestLifeTimeManager : MonoBehaviour {
         private static AsyncGPURequestLifeTimeManager _instance;
+        
+        private int _mainThreadId = -1;
 
         public static AsyncGPURequestLifeTimeManager Instance {
             get {
@@ -21,6 +23,10 @@ namespace AsyncGPUReadbackPluginNs {
         }
 
         private AsyncGPURequestLifeTimeManager() { }
+        
+        private void Awake() {
+            _mainThreadId = Thread.CurrentThread.ManagedThreadId;
+        }
 
         private class RequestState {
             public AsyncGPUReadbackRequest request;
@@ -43,7 +49,7 @@ namespace AsyncGPUReadbackPluginNs {
                 request = request,
                 onDone = onDone
             };
-            if (!Thread.CurrentThread.IsBackground) {
+            if (Thread.CurrentThread.ManagedThreadId == _mainThreadId) {
                 StartCoroutine(FirstUpdateImmediatelyThanAdd(s));
             } else {
                 lock (_requests) {

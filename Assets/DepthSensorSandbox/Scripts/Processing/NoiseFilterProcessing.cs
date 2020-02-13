@@ -7,24 +7,23 @@ namespace DepthSensorSandbox.Processing {
         public ushort MaxError = 50;
         
         protected override void ProcessInternal() {
-            Parallel.For(0, _inOut.length, FilterBody);
+            Parallel.For(0, _out.length, FilterBody);
         }
 
         private void FilterBody(int i) {
-            var depth = _rawBuffers[0];
-            var actualVal = depth.data[i];
+            var actualVal = _rawBuffer.data[i];
             if (actualVal == Sampler.INVALID_DEPTH) {
-                _inOut.data[i] = Sampler.INVALID_DEPTH;
+                _out.data[i] = Sampler.INVALID_DEPTH;
                 return;
             }
             
-            var prevVal = _inOut.data[i];
+            var prevVal = _prev.data[i];
             var error = Mathf.Abs(actualVal - prevVal);
             if (error > MaxError || prevVal == Sampler.INVALID_DEPTH) {
-                _inOut.data[i] = actualVal;
+                _out.data[i] = actualVal;
             } else {
                 var k = Smooth * Mathf.Sqrt((float)(MaxError - error) / MaxError);
-                _inOut.data[i] = (ushort) Mathf.Lerp(actualVal, prevVal, k);
+                _out.data[i] = (ushort) Mathf.Lerp(actualVal, prevVal, k);
             }
         }
     }

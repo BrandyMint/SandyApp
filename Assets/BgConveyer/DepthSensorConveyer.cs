@@ -2,13 +2,13 @@
 using System.Collections;
 using System.Threading;
 using DepthSensor;
+using DepthSensor.Device;
 using DepthSensor.Sensor;
 
 namespace BgConveyer {
     public class DepthSensorConveyer : BgConveyer {
         //private Stopwatch watch = Stopwatch.StartNew();
-        public const string TASK_NAME = "WaitNewFrame";  
-        private DepthSensorManager _dsm;
+        public const string TASK_NAME = "WaitNewFrame";
         private readonly AutoResetEvent _newFrameEvent = new AutoResetEvent(false);
         public event Action OnNoFrame;
 
@@ -18,15 +18,15 @@ namespace BgConveyer {
         }
 
         private void Start() {
-            _dsm = DepthSensorManager.Instance;
-            if (_dsm != null)
-                _dsm.OnInitialized += OnDepthSensorInit;
+            DepthSensorManager.OnInitialized += OnDepthSensorInit;
+            if (DepthSensorManager.IsInitialized())
+                OnDepthSensorInit();
         }
 
         protected new void OnDestroy() {
+            DepthSensorManager.OnInitialized -= OnDepthSensorInit;
             if (DepthSensorManager.IsInitialized()) {
-                _dsm.Device.Depth.OnNewFrameBackground -= OnNewFrame;
-                _dsm.OnInitialized -= OnDepthSensorInit;
+                UnSubscribe(DepthSensorManager.Instance.Device);
             }
             _newFrameEvent.Dispose();
             base.OnDestroy();
@@ -34,10 +34,17 @@ namespace BgConveyer {
 
         private void OnDepthSensorInit() {
             Run();
-            _dsm.Device.Depth.OnNewFrameBackground += OnNewFrame;
+            DepthSensorManager.Instance.Device.OnClose += UnSubscribe;
+            DepthSensorManager.Instance.Device.Depth.OnNewFrameBackground += OnNewFrame;
         }
 
-        private void OnNewFrame(AbstractSensor abstractBuffer) {
+        private void UnSubscribe(DepthSensorDevice device) {
+            Stop();
+            device.OnClose -= UnSubscribe;
+            device.Depth.OnNewFrameBackground -= OnNewFrame;
+        }
+
+        private void OnNewFrame(ISensor abstractBuffer) {
             _newFrameEvent.Set();
         }
         

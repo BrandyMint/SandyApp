@@ -4,6 +4,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
@@ -28,16 +29,13 @@ namespace BuildHelper.Editor.Core {
             RestoreAll();
         }
 
-        [MenuItem("Build/Restore")]
-        public static void RestoreAll() {
-            RestoreOverridenIcons();
-            RestoreSettings();
-        }
-
         private const string _SETTINGS_PATH = "ProjectSettings/ProjectSettings.asset";
         private const string _SETTINGS_TEMP_PATH = "ProjectSettings/ProjectSettings.temp";
         private const string _BUILD_HELPER_TEMP_PATH = "BuildHelper_Temp";
-        private const string _OVERRIDE_ICONS_LOG_PATH = _BUILD_HELPER_TEMP_PATH + "/override_icons_log.txt";
+        private const string _VERSION_FILE_PATH = "version";
+        private const string _OVERRIDE_ICONS_LOG_PATH = "override_icons_log.txt";
+        private const string _EXCLUDED_LOG_PATH = "excluded_log.txt";
+        private const string _REPLACE_FILE_LOG_PATH = "replaced_log.txt";
         private static bool _settingsAlreadySaved;
 
         /// <summary>
@@ -54,8 +52,9 @@ namespace BuildHelper.Editor.Core {
             Debug.Log("Starting build to: " + report.summary.outputPath);
             SaveSettingsToRestore();
             PlayerSettings.bundleVersion = BuildHelperStrings.GetBuildVersion();
-            if (WasOverrideIcon())
+            if (WasOverrideIcon() || WasExcludedPath() || WasReplaceFile()) {
                 AssetDatabase.Refresh();
+            }
         }
 
         /// <summary>
@@ -64,6 +63,10 @@ namespace BuildHelper.Editor.Core {
         /// </summary>
         /// <param name="report"></param>
         public void OnPostprocessBuild(BuildReport report) {
+            var path = Directory.Exists(report.summary.outputPath) 
+                ? report.summary.outputPath 
+                : Path.GetDirectoryName(report.summary.outputPath);
+            PlaceVersionFile(path);
             RestoreAll();
         }
 
@@ -90,9 +93,7 @@ namespace BuildHelper.Editor.Core {
         /// </summary>
         public static void AcceptChangedSettings() {
             var settingsPathTemp = BuildHelperStrings.ProjRoot(_SETTINGS_TEMP_PATH);
-            if (File.Exists(settingsPathTemp)) {
-                File.Delete(settingsPathTemp);
-            }
+            DeleteFileOrDirectory(settingsPathTemp);
             _settingsAlreadySaved = false;
             AssetDatabase.SaveAssets();
             Debug.Log("BuildTime: Project Settings accepted");
@@ -109,14 +110,24 @@ namespace BuildHelper.Editor.Core {
         public static void RestoreSettings() {
             var settingsPath = BuildHelperStrings.ProjRoot(_SETTINGS_PATH);
             var settingsPathTemp = BuildHelperStrings.ProjRoot(_SETTINGS_TEMP_PATH);
-            if (File.Exists(settingsPathTemp)) {
-                File.Copy(settingsPathTemp, settingsPath, true);
-                File.Delete(settingsPathTemp);
+            if (FileOrPathExist(settingsPathTemp)) {
+                MoveFileOrDirectoryWithReplace(settingsPathTemp, settingsPath);
                 Debug.Log("BuildTime: Project Settings restored");
                 AssetDatabase.Refresh();
             }
             _settingsAlreadySaved = false;
             RestoreKeystoreInfo();
+        }
+
+        [MenuItem("Build/Restore")]
+        public static void RestoreAll() {
+            RestoreExcludedPaths();
+            RestoreReplacedFiles();
+            RestoreOverridenIcons();
+            RestoreSettings();
+            var temp = BuildHelperStrings.ProjRoot(_BUILD_HELPER_TEMP_PATH);
+            if (Directory.Exists(temp))
+                Directory.Delete(temp, true);
         }
 
         /// <summary>
@@ -143,6 +154,8 @@ namespace BuildHelper.Editor.Core {
         /// <exception cref="BuildFailedException">Throw 
         /// if <see cref="BuildPipeline.BuildPlayer(BuildPlayerOptions)"/> return error</exception>
         public static void Build(BuildPlayerOptions options) {
+            if (WasExcludedPath())
+                SyncSolution();
 #if UNITY_2018_1_OR_NEWER
             var report = BuildPipeline.BuildPlayer(options);
             if (report == null)
@@ -152,48 +165,196 @@ namespace BuildHelper.Editor.Core {
                     throw new BuildFailedException("Check log file. Build ended unsuccessfully with result: " + report.summary.result);
             }
 #else
-            if (!string.IsNullOrEmpty(BuildPipeline.BuildPlayer(options))) {
-                throw new BuildFailedException("");
-            }
+                if (!string.IsNullOrEmpty(BuildPipeline.BuildPlayer(options))) {
+                    throw new BuildFailedException("");
+                }
 #endif
+        }
+
+        private void PlaceVersionFile(string path) {
+            path = Path.Combine(path, _VERSION_FILE_PATH);
+            File.WriteAllText(path, PlayerSettings.bundleVersion);
+        }
+
+        private static void SyncSolution() {
+            try {
+                EditorApplication.ExecuteMenuItem("Assets/Sync C# Project");
+            } catch {
+                // ignored
+            }
         }
 
 #region OverrideIcon
         public static void OverrideIcon(string defIconPath, string overrideIconPath) {
-            var tempPath = GenFileNameInBuildHelperTempPath();
-            FileUtil.CopyFileOrDirectory(defIconPath, tempPath);
-            FileUtil.ReplaceFile(overrideIconPath, defIconPath);
+            var tempPath = GenFileInBuildHelperTempPath();
+            CopyFileOrDirectoryWithReplace(defIconPath, tempPath);
+            CopyFileOrDirectoryWithReplace(overrideIconPath, defIconPath);
             LogOverrideIcon(defIconPath, tempPath);
         }
         
         private static void RestoreOverridenIcons() {
             if (WasOverrideIcon()) {
-                var logPath = BuildHelperStrings.ProjRoot(_OVERRIDE_ICONS_LOG_PATH);
-                var lines = File.ReadAllLines(logPath);
-                for (int i = lines.Length - 1; i > 0; i -= 2) {
-                    FileUtil.ReplaceFile(lines[i], lines[i - 1]);                    
-                }
-                Directory.Delete(BuildHelperStrings.ProjRoot(_BUILD_HELPER_TEMP_PATH), true);
+                RestoreReplaced(_OVERRIDE_ICONS_LOG_PATH);
             }
         }
         
         private static bool WasOverrideIcon() {
-            var logPath = BuildHelperStrings.ProjRoot(_OVERRIDE_ICONS_LOG_PATH);
+            var logPath = GenFileInBuildHelperTempPath(_OVERRIDE_ICONS_LOG_PATH, false);
             return File.Exists(logPath);
-        }
+        } 
 
-        private static string GenFileNameInBuildHelperTempPath() {
-            var dir = Directory.CreateDirectory(BuildHelperStrings.ProjRoot(_BUILD_HELPER_TEMP_PATH));
-            var existFiles = dir.GetFiles();
-            string fileName;
-            do {
-                fileName = UnityEngine.Random.Range(0, int.MaxValue).ToString();
-            } while (existFiles.Any(file => file.Name == fileName));
-            return Path.Combine(dir.FullName, fileName);
+        private static string GenFileInBuildHelperTempPath(string fileName = null, bool createTempDir = true) {
+            var tempDir = BuildHelperStrings.ProjRoot(_BUILD_HELPER_TEMP_PATH);
+            if (createTempDir && !Directory.Exists(tempDir)) 
+                Directory.CreateDirectory(tempDir);
+
+            if (string.IsNullOrEmpty(fileName)) {
+                var existFiles = Directory.GetFiles(tempDir);
+                do {
+                    fileName = UnityEngine.Random.Range(0, int.MaxValue).ToString();
+                } while (existFiles.Any(file => file == fileName));
+            }
+            
+            return Path.Combine(tempDir, fileName);
         }
 
         private static void LogOverrideIcon(params string[] lines) {
-            var logPath = BuildHelperStrings.ProjRoot(_OVERRIDE_ICONS_LOG_PATH);
+            var logPath = GenFileInBuildHelperTempPath(_OVERRIDE_ICONS_LOG_PATH);
+            using (var sw = new StreamWriter(logPath, true)) {
+                foreach (var line in lines) {
+                    sw.WriteLine(line);
+                }
+            }
+        }
+#endregion
+
+#region Exclude Path
+        public static void ExcludePath(string path) {
+            MoveFileOrDirectoryWithReplace(path, path + "~");
+            LogExcludePath(path);
+            var meta = path + ".meta";
+            if (FileOrPathExist(meta)) {
+                MoveFileOrDirectoryWithReplace(meta, meta + "~");
+                LogExcludePath(meta);
+            }
+        }
+
+        private static bool FileOrPathExist(string path) {
+            return File.Exists(path) || Directory.Exists(path);
+        }
+
+        private static void MoveFileOrDirectoryWithReplace(string src, string dst) {
+            DeleteFileOrDirectory(dst);
+            if (File.Exists(src))
+                File.Move(src, dst);
+            else 
+                Directory.Move(src, dst);
+        }
+        
+        private static void CopyFileOrDirectoryWithReplace(string src, string dst) {
+            DeleteFileOrDirectory(dst);
+            if (File.Exists(src))
+                File.Copy(src, dst, true);
+            else 
+                FileUtil.CopyFileOrDirectory(src, dst);
+        }
+        
+        private static void DeleteFileOrDirectory(string path) {
+            if (File.Exists(path)) {
+                File.Delete(path);
+            }
+            if (Directory.Exists(path)) {
+                Directory.Delete(path, true);
+            }
+        }
+
+        private static void LogExcludePath(string path) {
+            var logPath = GenFileInBuildHelperTempPath(_EXCLUDED_LOG_PATH);
+            using (var sw = new StreamWriter(logPath, true)) {
+                sw.WriteLine(path);
+            }
+        }
+        
+        private static void RestoreExcludedPaths() {
+            if (WasExcludedPath()) {
+                var logPath = GenFileInBuildHelperTempPath(_EXCLUDED_LOG_PATH);
+                var lines = File.ReadAllLines(logPath);
+                for (int i = lines.Length - 1; i >= 0; --i) {
+                    var path = lines[i];
+                    MoveFileOrDirectoryWithReplace(path + "~", path);                    
+                }
+                File.Delete(logPath);
+            }
+        }
+        
+        private static bool WasExcludedPath() {
+            var logPath = GenFileInBuildHelperTempPath(_EXCLUDED_LOG_PATH, false);
+            return File.Exists(logPath);
+        }
+#endregion
+        
+#region Replace In File
+
+        public static void ReplaceInFile(string file, string search, string replace = "") {
+            ReplaceInFile(file, false, search, replace);
+        }
+
+        public static void ReplaceInFileRegex(string file, string search, string replace = "") {
+            ReplaceInFile(file, true, search, replace);
+        }
+
+        public static void ReplaceInFile(string file, bool regex, string search, string replace) {
+            bool needBackup = !ReplaceFileIsBackuped(file);
+            var tempPath = "";
+            if (needBackup) {
+                tempPath = GenFileInBuildHelperTempPath();
+                CopyFileOrDirectoryWithReplace(file, tempPath);
+            }
+            
+            var text = File.ReadAllText(file);
+            text = Regex.Replace(text, search, replace);
+            File.WriteAllText(file, text);
+
+            if (needBackup) {
+                LogReplacedFile(file, tempPath);
+            }
+        }
+
+        private static bool ReplaceFileIsBackuped(string path) {
+            if (WasReplaceFile()) {
+                var logPath = GenFileInBuildHelperTempPath(_REPLACE_FILE_LOG_PATH);
+                var replacedList = File.ReadAllLines(logPath);
+                foreach (var replaced in replacedList) {
+                    if (path == replaced)
+                        return true;
+                }
+            }
+
+            return false;
+        }
+        
+        private static void RestoreReplacedFiles() {
+            if (WasReplaceFile()) {
+                RestoreReplaced(_REPLACE_FILE_LOG_PATH);
+            }
+        }
+        
+        private static void RestoreReplaced(string logName) {
+            var logPath = GenFileInBuildHelperTempPath(logName);
+            var lines = File.ReadAllLines(logPath);
+            for (int i = lines.Length - 1; i > 0; i -= 2) {
+                MoveFileOrDirectoryWithReplace(lines[i], lines[i - 1]);          
+            }
+            File.Delete(logPath);
+        }
+        
+        private static bool WasReplaceFile() {
+            var logPath = GenFileInBuildHelperTempPath(_REPLACE_FILE_LOG_PATH, false);
+            return File.Exists(logPath);
+        }
+
+        private static void LogReplacedFile(params string[] lines) {
+            var logPath = GenFileInBuildHelperTempPath(_REPLACE_FILE_LOG_PATH);
             using (var sw = new StreamWriter(logPath, true)) {
                 foreach (var line in lines) {
                     sw.WriteLine(line);

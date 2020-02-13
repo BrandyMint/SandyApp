@@ -95,7 +95,7 @@ namespace DepthSensorCalibration {
         }
 
         private void RestorePrefs() {
-            Prefs.Calibration.ZeroDepth = _savedZeroDepth;
+            Prefs.Sandbox.ZeroDepth = _savedZeroDepth;
             _ctrl.SandboxCam.GetComponent<SandboxCamera>().ResetToCalibration();
         }
 
@@ -116,14 +116,14 @@ namespace DepthSensorCalibration {
             _frameReady = false;
             
             _savedSandboxGPU = _sandboxMesh.UpdateMeshOnGpu;
-            _savedZeroDepth = Prefs.Calibration.ZeroDepth;
+            _savedZeroDepth = Prefs.Sandbox.ZeroDepth;
 
             _sandboxMesh.RequestUpdateBounds();
             yield return new WaitUntil(_sandboxMesh.IsBoundsValid);
             var b = _sandboxMesh.GetBounds();
             var d = MathHelper.IsoscelesTriangleHeight(b.size.y / 3f, _ctrl.SandboxCam.fieldOfView);
             
-            Prefs.Calibration.ZeroDepth = _ctrl.SandboxCam.farClipPlane;
+            Prefs.Sandbox.ZeroDepth = _ctrl.SandboxCam.farClipPlane;
             _ctrl.SandboxCam.transform.localPosition = Vector3.back * d;
             _ctrl.SandboxCam.transform.localRotation = Quaternion.identity;
             _ctrl.SandboxCam.farClipPlane = d + b.size.z;
@@ -221,7 +221,7 @@ namespace DepthSensorCalibration {
                 var zeroDepth = sumZeroDepth / count;
                 Prefs.Calibration.Position = pos;
                 Prefs.Calibration.Rotation = Quaternion.LookRotation(forward, up);
-                Prefs.Calibration.ZeroDepth = zeroDepth;
+                Prefs.Sandbox.ZeroDepth = zeroDepth;
                 Notify.Show(Style.SUCCESS, _TXT_CALIBRATION_SUCCESS);
             } else {
                 RestorePrefs();
@@ -271,7 +271,7 @@ namespace DepthSensorCalibration {
             _renderDepth.Enable(_matDepth, RenderTextureFormat.R16, t => {
 #if USE_MAT_ASYNC_SET
                 TexturesHelper.ReCreateIfNeed(ref _depth, t.GetPixelsCount());
-                AsyncGPUReadback.RequestIntoNativeArray(ref _depth, _renderDepth.GetTempCopy(), 0, r => {
+                AsyncGPUReadback.RequestIntoNativeArray(ref _depth, t, 0, r => {
                     if (!r.hasError) depthValid = true;
                 });
 #else

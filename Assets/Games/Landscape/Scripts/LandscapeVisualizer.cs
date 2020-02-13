@@ -8,6 +8,7 @@ namespace Games.Landscape {
         private static readonly int _DEPTH_SEA_BOTTOM = Shader.PropertyToID("_DepthSeaBottom");
         private static readonly int _DEPTH_SEA = Shader.PropertyToID("_DepthSea");
         private static readonly int _DEPTH_GROUND = Shader.PropertyToID("_DepthGround");
+        private static readonly int _DEPTH_DIRT = Shader.PropertyToID("_DepthDirt");
         private static readonly int _DEPTH_MOUNTAINS = Shader.PropertyToID("_DepthMountains");
         private static readonly int _DEPTH_ICE = Shader.PropertyToID("_DepthIce");
         private static readonly int _MIX_DEPTH = Shader.PropertyToID("_MixDepth");
@@ -29,15 +30,16 @@ namespace Games.Landscape {
         };
         private readonly Dictionary<int, float> _detailSizeFloatDefaults = new Dictionary<int, float>();
         private readonly Dictionary<int, Vector2> _detailSizeTexScaleDefaults = new Dictionary<int, Vector2>();
+        private bool _prevWaterEnabled;
 
-        private void Start() {
+        protected override void Init() {
+            base.Init();
             foreach (var propId in _DetailSizeFloats) {
                 _detailSizeFloatDefaults.Add(propId, _material.GetFloat(propId));
             }
             foreach (var propId in _DetailSizeTexScales) {
                 _detailSizeTexScaleDefaults.Add(propId, _material.GetTextureScale(propId));
             }
-            SetEnable(true);
         }
 
         public override void SetEnable(bool enable) {
@@ -57,6 +59,7 @@ namespace Games.Landscape {
 
             _material.SetFloat(_DEPTH_SEA_BOTTOM, Prefs.Landscape.DepthSeaBottom);
             _material.SetFloat(_DEPTH_GROUND, Prefs.Landscape.DepthGround);
+            _material.SetFloat(_DEPTH_DIRT, Prefs.Landscape.DepthDirt);
             _material.SetFloat(_DEPTH_MOUNTAINS, Prefs.Landscape.DepthMountains);
             _material.SetFloat(_DEPTH_ICE, Prefs.Landscape.DepthIce);
 
@@ -82,9 +85,12 @@ namespace Games.Landscape {
             //water
             if (Prefs.Landscape.EnableWaterSimulation) {
                 _material.EnableKeyword(_DYNAMIC_FLUID);
+                if (_prevWaterEnabled != Prefs.Landscape.EnableWaterSimulation)
+                    ClearFluidFlows();
             } else {
                 _material.DisableKeyword(_DYNAMIC_FLUID);
             }
+            _prevWaterEnabled = Prefs.Landscape.EnableWaterSimulation;
             
             _matFluidCalc.SetFloat(_FLUX_ACCELERATION, Prefs.Landscape.FluidAcceleration);
             _matFluidCalc.SetFloat(_FLUX_FADING, Prefs.Landscape.FluidFading);

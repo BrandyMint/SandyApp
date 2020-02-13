@@ -12,6 +12,10 @@ namespace DepthSensor.Editor {
         private static string _LOG_PATH = "Logs/Deploy.log";
         private static string[] _PLATFROMS = {"Linux", "Windows"};
         private static string[] _LIB_EXTENSIONS = {".dll", ".so"};
+        private static string[] _DISABLE_FILE_CONTAINS = {
+            "rs2driver_primeSenseEmulate", //rs2 with Prime Sense Emulate
+            //"freenect2.dll", "freenect2-openni2.dll", "glfw3.dll", "libusb-1.0.dll", "turbojpeg.dll" //freenect2 on windows
+        };
         
         static Deploy() {
             EditorApplication.playModeStateChanged += state => {
@@ -93,6 +97,8 @@ namespace DepthSensor.Editor {
         private static void CopyRecursive(DirectoryInfo source, DirectoryInfo target, bool log, bool overwriteLibs) {
             using (var appendLog = log ? File.AppendText(GetLogPath()) : null) {
                 foreach (var fi in source.GetFiles()) {
+                    if (_DISABLE_FILE_CONTAINS.Any(disable => fi.Name.Contains(disable)))
+                        continue;
                     var destination = Path.Combine(target.FullName, fi.Name);
                     if (File.Exists(destination) && _LIB_EXTENSIONS.Contains(fi.Extension) && !overwriteLibs)
                         continue;

@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Runtime.InteropServices;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
@@ -50,6 +51,24 @@ public static class MemUtils {
         CopyBytes(src, dst, dstBytes);
     }
     
+    public static void CopyBytes<T1, T2>(T1[] src, T2[] dst, long copyBytes = -1) {
+        var srcBytes = src.GetLengthInBytes();
+        if (copyBytes < 0)
+            copyBytes = srcBytes;
+        var handle = GCHandle.Alloc(src, GCHandleType.Pinned);
+        CopyBytes(handle.AddrOfPinnedObject(), dst, srcBytes);
+        handle.Free();
+    }
+    
+    public static void CopyBytes<T1, T2>(T1[] src, NativeArray<T2> dst, long copyBytes = -1) where T2 : struct {
+        var srcBytes = src.GetLengthInBytes();
+        if (copyBytes < 0)
+            copyBytes = srcBytes;
+        var handle = GCHandle.Alloc(src, GCHandleType.Pinned);
+        CopyBytes(handle.AddrOfPinnedObject(), dst, copyBytes);
+        handle.Free();
+    }
+    
     public static void CopyBytes<T>(IntPtr src, T[] dst, long copyBytes) {
         var handle = GCHandle.Alloc(dst, GCHandleType.Pinned);
         var dstBytes = dst.GetLengthInBytes();
@@ -67,6 +86,24 @@ public static class MemUtils {
     public static void CopyBytes(IntPtr src, IntPtr dst, long destBytes, long copyBytes) {
         unsafe {
             Buffer.MemoryCopy(src.ToPointer(), dst.ToPointer(), destBytes, copyBytes);
+        }
+    }
+
+    public static void CopyBytes<T>(NativeArray<T> src, Stream stream, long copyBytes) where T : struct {
+        CopyBytes(src.IntPtr(), stream, copyBytes);
+    }
+    
+    public static void CopyBytes<T>(T[] src, Stream stream, long copyBytes) {
+        var handle = GCHandle.Alloc(src, GCHandleType.Pinned);
+        CopyBytes(handle.AddrOfPinnedObject(), stream, copyBytes);
+        handle.Free();
+    }
+
+    public static void CopyBytes(IntPtr src, Stream stream, long copyBytes) {
+        unsafe {
+            using (var mem = new UnmanagedMemoryStream((byte*) src.ToPointer(), copyBytes, copyBytes, FileAccess.Read)) {
+                mem.CopyTo(stream);
+            }
         }
     }
     

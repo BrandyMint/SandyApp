@@ -16,10 +16,10 @@ namespace BuildHelper.Editor.Core {
         /// <seealso cref="GetBuildVersion"/>
         public const string RELEASE_BRANCH = "master";
         /// <summary>
-        /// Minor version prefix for develop builds.
+        /// Patch version prefix for develop builds.
         /// </summary>
         /// <seealso cref="GetBuildVersion"/>
-        public const string PREFIX_DEVELOP = "d-";
+        public const string PREFIX_DEVELOP = "-b";
 
 #region Locations
         /// <summary>
@@ -122,15 +122,16 @@ namespace BuildHelper.Editor.Core {
         /// <seealso cref="GitRequest.Revision"/>
         /// <returns>Ganerated version</returns>
         public static string GetBuildVersion() {
+            var versionPattern = PlayerSettings.bundleVersion + ".*";
+            if (!GitRequest.GetNewVersion(versionPattern, out var version))
+                return version;
             var branch = GitRequest.CurrentBranch();
-            string version;
-            if (branch == RELEASE_BRANCH) {
-                version = GitRequest.Revision(true);
-            } else {
-                Debug.LogWarningFormat("Build development version from '{0}'", branch);
-                version = PREFIX_DEVELOP + GitRequest.Revision(false);
+            if (branch != RELEASE_BRANCH) {
+                versionPattern = version + PREFIX_DEVELOP + "*";
+                GitRequest.GetNewVersion(versionPattern, out version, 1);
             }
-            return PlayerSettings.bundleVersion + "." + version;
+            //GitRequest.SetVersionTag(version);
+            return version;
         }
 
         /// <summary>

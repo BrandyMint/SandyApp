@@ -1,8 +1,10 @@
 using System;
-using System.Diagnostics;
+using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 using UnityEditor;
-using Debug = UnityEngine.Debug;
+using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace BuildHelper.Editor.Core {
     /// <summary>
@@ -43,6 +45,46 @@ namespace BuildHelper.Editor.Core {
                 "rev-list --count HEAD" :
                 "rev-parse --short HEAD"
             ).Execute().Trim();
+        }
+        
+        public static bool GetNewVersion(string majorMinor, out string newVersion, int startPatch = 0) {
+            Assert.AreEqual(majorMinor.Count(x => x == '*'), 1, "majorMinor must have one '*' for place patch num");
+            var part = majorMinor.Split('*');
+            var pattern = "^v" + Regex.Escape(part[0]) + @"(\d+)" + Regex.Escape(part[1]);
+            
+            //CreateRequestGit("fetch").Execute();
+            var currTag = CreateRequestGit(
+                "tag -l --contains HEAD"
+            ).Execute().Trim();
+            if (Regex.IsMatch(currTag, pattern)) {
+                newVersion = currTag.Substring(1);
+                return false;
+            }
+
+            var tagSearch = "v" + majorMinor + "*";
+#if !UNITY_EDITOR_WIN
+            tagSearch = "'" + tagSearch + "'";
+#endif
+            var tags = CreateRequestGit(
+                "tag -l " + tagSearch
+            ).Execute();
+            
+            int patch = startPatch;
+            var m = Regex.Match(tags, pattern, RegexOptions.Multiline);
+            while (m.Success) {
+                if (int.TryParse(m.Groups[1].Value, out int existPatch) && existPatch >= patch) {
+                    patch = existPatch + 1;
+                }
+                m = m.NextMatch();
+            }
+            newVersion = part[0] + patch + part[1];
+            return true;
+        }
+
+        public static void SetVersionTag(string version) {
+            CreateRequestGit(
+                "tag v" + version
+            ).Execute();
         }
 
         /// <summary>
@@ -89,6 +131,12 @@ namespace BuildHelper.Editor.Core {
                 findStr = rev;
             }
             return CreateRequestGit("--no-pager log -" + len + " " + findStr).Execute();
+        }
+
+        public static string FindVersion(string rev, int len) {
+            return CreateRequestGit(
+                "--no-pager log -" + len + " v" + rev
+            ).Execute();
         }
 
         private static ProgramRequest CreateRequestGit(string args = "") {

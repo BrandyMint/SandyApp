@@ -1,4 +1,6 @@
 using System;
+using DepthSensor.Buffer;
+using Launcher.KeyMapping;
 using UnityEngine;
 using UnityEngine.Rendering;
 using Utilities;
@@ -20,21 +22,33 @@ namespace DepthSensorSandbox.Visualisation {
         private readonly CommandBuffer[] _commandBuffers = new CommandBuffer[2];
         private int _currFluidBuffer;
         private int _clearStep;
+        private bool _wasFirstFrame;
 
-        private void Start() {
+        protected override void Init() {
+            base.Init();
             if (_instantiateMaterial)
                 _matFluidCalc = new Material(_matFluidCalc);
-            SetEnable(true);
+            KeyMapper.AddListener(KeyEvent.FLIP_SANDBOX, ClearFluidFlows);
+            DepthSensorSandboxProcessor.OnNewFrame += OnNewFrame;
+        }
+
+        private void OnNewFrame(DepthBuffer depth, MapDepthToCameraBuffer map) {
+            if (enabled && !_wasFirstFrame && depth.IsDepthValid()) {
+                _wasFirstFrame = true;
+                ClearFluidFlows();
+            }
         }
 
         protected override void OnDestroy() {
             base.OnDestroy();
+            DepthSensorSandboxProcessor.OnNewFrame -= OnNewFrame;
             for (int i = 0; i < _commandBuffers.Length; ++i) {
                 DisposeCommandBuffer(ref _commandBuffers[i], _FLUID_EVENT);
             }
             foreach (var t in _texFluxBuffers) {
                 if (t != null) t.Release();
             }
+            KeyMapper.RemoveListener(KeyEvent.FLIP_SANDBOX, ClearFluidFlows);
         }
 
         public override void SetEnable(bool enable) {

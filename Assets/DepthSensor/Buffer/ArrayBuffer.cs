@@ -33,9 +33,11 @@ namespace DepthSensor.Buffer {
         }
 
         protected internal virtual void Set(T[] newData) {
-            lock (SyncRoot) {
-                Array.Copy(newData, data, newData.Length);
-            }
+            Array.Copy(newData, data, newData.Length);
+        }
+
+        public override long LengthInBytes() {
+            return data.GetLengthInBytes();
         }
 
         protected internal override object[] GetArgsForCreateSome() {
@@ -50,21 +52,19 @@ namespace DepthSensor.Buffer {
         }
 
         public override void Clear() {
-            lock (SyncRoot) {
-                Array.Clear(data, 0, length);
-            }
+            Array.Clear(data, 0, length);
+        }
+
+        protected internal override void Set(byte[] newData) {
+            MemUtils.CopyBytes(newData, data);
         }
 
         protected internal override void Set(IntPtr newData) {
-            lock (SyncRoot) {
-                MemUtils.Copy(newData, data);
-            }
+            MemUtils.Copy(newData, data);
         }
 
         protected internal override void SetBytes(IntPtr newData, long copyBytes) {
-            lock (SyncRoot) {
-                MemUtils.CopyBytes(newData, data, copyBytes);
-            }
+            MemUtils.CopyBytes(newData, data, copyBytes);
         }
     }
 }

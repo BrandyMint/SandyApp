@@ -31,5 +31,9 @@ namespace DepthSensor.Buffer {
         public virtual void UpdateTexture() {
             texture.Apply(false);
         }
+
+        public Texture2D GetTexture() {
+            return texture;
+        }
     }
 }

@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading;
 using UnityEngine;
+using Utilities;
 
 namespace UINotify {
     public class Notify : MonoBehaviour {
@@ -71,12 +72,12 @@ namespace UINotify {
         }
 
         private void ExecuteOrEnqueue(Task task) {
-            if (Thread.CurrentThread.IsBackground) {
+            if (MainThread.IsMainThread) {
+                ExecuteTask(task);
+            } else {
                 lock (_tasksQueue) {
                     _tasksQueue.Enqueue(task);
                 }
-            } else {
-                ExecuteTask(task);
             }
         }
 

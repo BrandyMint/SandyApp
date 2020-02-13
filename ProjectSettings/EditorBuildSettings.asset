@@ -6,12 +6,117 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/GameLandscape.unity
+    guid: c6f82c9225df0d70ea5afed0d2c3f5c5
+  - enabled: 1
+    path: Assets/Scenes/GameLunar.unity
+    guid: 95eec2e2e043de543bcafdffeaf582ba
+  - enabled: 1
+    path: Assets/Scenes/GameBallons.unity
+    guid: 1f3f3577ad618c74b97992189f561bd4
+  - enabled: 0
+    path: Assets/Scenes/GameTopography.unity
+    guid: 60b867707e6ca30428af1d97d79da4a1
+  - enabled: 1
+    path: Assets/Scenes/GameTopographyOld.unity
+    guid: 3cacaccfcc599d245990b3f01df7ad31
+  - enabled: 1
+    path: Assets/Scenes/GamePaint.unity
+    guid: e0d978b3d8fe16e2882e9eabdf347e33
+  - enabled: 1
+    path: Assets/Scenes/GameMoles.unity
+    guid: 9a17b74f4c06d284ba6973db6239b214
+  - enabled: 1
+    path: Assets/Scenes/GameFlowersAndMushrooms.unity
+    guid: e30ec22dd97256e4a8838a0d1209cfef
+  - enabled: 1
+    path: Assets/Scenes/GameGeometry.unity
+    guid: b4831e3ed3f807b44ad51aacce3139b2
+  - enabled: 1
+    path: Assets/Scenes/GameArithmeticPlus.unity
+    guid: ac4aefacacadb2446bfddb8cd8f000dd
+  - enabled: 1
+    path: Assets/Scenes/GameArithmeticMinus.unity
+    guid: 2aa2fcc3679ee3246aedeb7a7e5bafda
+  - enabled: 1
+    path: Assets/Scenes/GameArithmeticMult.unity
+    guid: 88ca2448cc7fae34fb5e1686fdc17bf0
+  - enabled: 1
+    path: Assets/Scenes/GameSpray.unity
+    guid: 876c7ef84e87a8f4da03cd603e1dca5e
+  - enabled: 1
+    path: Assets/Scenes/GameEatableVeggies.unity
+    guid: 17d4682a697743b41ad94b429fbad659
+  - enabled: 1
+    path: Assets/Scenes/GameEatableFruits.unity
+    guid: 2d7144673170f8b44ac89c0578f0c95b
+  - enabled: 1
+    path: Assets/Scenes/GameSlime.unity
+    guid: 89beb8eef034a134096e4ca017eaaf8e
+  - enabled: 1
+    path: Assets/Scenes/GamePlanet.unity
+    guid: 13a06acafad34104aa9c72b45765cca0
+  - enabled: 1
+    path: Assets/Scenes/GameTubes.unity
+    guid: 1ee71661b9b1ab74e9561f009741f834
+  - enabled: 1
+    path: Assets/Scenes/GamePingPong.unity
+    guid: 8fe7ab75d5ad71147accc653eeccf049
+  - enabled: 1
+    path: Assets/Scenes/GameFootball.unity
+    guid: 160851ad035cc5b4b875857325c56010
+  - enabled: 1
+    path: Assets/Scenes/GameBatty.unity
+    guid: 1feb9f17a031dcd43ba227b4524b4ec1
+  - enabled: 1
+    path: Assets/Scenes/GameMahjong.unity
+    guid: bbe3a206e378a414ca8477c32e961e05
+  - enabled: 1
+    path: Assets/Scenes/GameTrajectory.unity
+    guid: 85c0881d584d0ce49bb13e44ca2c67c7
+  - enabled: 1
+    path: Assets/Scenes/GameRoad.unity
+    guid: 0cd13662fb96b7c46b93c61fa2fdf298
+  - enabled: 1
+    path: Assets/Scenes/GameDriving.unity
+    guid: d0fc068b15fb6a54f93d7a07a894b0bf
+  - enabled: 1
+    path: Assets/Scenes/GamePiano.unity
+    guid: 48798b1fdefd8dd449aafc4213cf27e9
+  - enabled: 1
+    path: Assets/Scenes/GameGuitar.unity
+    guid: 3b0246ff435f8bf4bb165178c33a6e6c
+  - enabled: 1
+    path: Assets/Scenes/GameFlowers.unity
+    guid: 2f7f935dbfef7174996e8ec671f0c365
+  - enabled: 1
+    path: Assets/Scenes/GameNotes.unity
+    guid: 63a50b0976b6c8e429ba68f2e63eb020
+  - enabled: 1
+    path: Assets/Scenes/GameAdaptiveGradient.unity
+    guid: eae8d2375f594cc4ea547428ed43a96f
+  - enabled: 1
+    path: Assets/Scenes/GameTopographyBorders.unity
+    guid: 3d6860687545ca943a436460454a0679
+  - enabled: 1
     path: Assets/Scenes/Launcher.unity
     guid: 0f96224a9eff60021a72ce64e9b41f75
+  - enabled: 0
+    path: Assets/DepthSensorCalibration/Scenes/ProjectorParams.unity
+    guid: 957eb4911928b13498378b02783bb6b6
   - enabled: 1
+    path: Assets/DepthSensorCalibration/Scenes/DepthSensorCalibration2.unity
+    guid: 28d2fc7be72460d4ba08a1756c477035
+  - enabled: 0
     path: Assets/DepthSensorCalibration/Scenes/DepthSensorCalibration.unity
     guid: 65f1d7e90be6de14caf45c1ce53d77f4
   - enabled: 1
-    path: Assets/Scenes/GameLandscape.unity
-    guid: c6f82c9225df0d70ea5afed0d2c3f5c5
+    path: Assets/DepthSensorCalibration/Scenes/SandboxCalibration.unity
+    guid: 240af4b136ffeb74dadd3c08ddb0e01c
+  - enabled: 1
+    path: Assets/DepthSensorCalibration/Scenes/Viewer.unity
+    guid: 7051ca7824fdb0c4dbe76202fa7e82d0
+  - enabled: 1
+    path: Assets/SimpleProtect/Scenes/NotUnlocked.unity
+    guid: eb631ecb0523e37ba87b08e8d584df0d
   m_configObjects: {}

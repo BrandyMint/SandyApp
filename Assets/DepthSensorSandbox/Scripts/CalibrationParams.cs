@@ -11,7 +11,7 @@ namespace DepthSensorSandbox {
     public class CalibrationParams : SerializableParams {
         [JsonConverter(typeof(JsonPublicFieldsConverter))]
         public Vector3 Position {
-            get => Get(nameof(Position), Vector3.zero);
+            get => Get(nameof(Position), new Vector3(0f, 0f, -0.6f));
             set => Set(nameof(Position), value);
         }
 
@@ -22,13 +22,18 @@ namespace DepthSensorSandbox {
         }
 
         public float Fov {
-            get => Get(nameof(Fov), 60f);
+            get => Get(nameof(Fov), 26.4f);
             set => Set(nameof(Fov), value);
         }
-
-        public float ZeroDepth {
-            get => Get(nameof(ZeroDepth), 4f);
-            set => Set(nameof(ZeroDepth), value);
+        
+        public float Oblique {
+            get => Get(nameof(Oblique), 0f);
+            set => Set(nameof(Oblique), value);
+        }
+        
+        public float SensorSwitchingViewTimer {
+            get => Get(nameof(SensorSwitchingViewTimer), 1f);
+            set => Set(nameof(SensorSwitchingViewTimer), value);
         }
     }
 }

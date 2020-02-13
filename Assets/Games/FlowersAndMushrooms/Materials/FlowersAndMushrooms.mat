@@ -1,0 +1,130 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: FlowersAndMushrooms
+  m_Shader: {fileID: 4800000, guid: e986501774fb0ed48a550b745b725cae, type: 3}
+  m_ShaderKeywords: 
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _BumpMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailAlbedoMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailMask:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailNormalMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _EmissionMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _GroundTex:
+        m_Texture: {fileID: 2800000, guid: e143287065d101f038bbf235667ff41a, type: 3}
+        m_Scale: {x: 2, y: 2}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MaxTex:
+        m_Texture: {fileID: 2800000, guid: b13de5e6cfd59734a922be2a86798444, type: 3}
+        m_Scale: {x: 3, y: 3}
+        m_Offset: {x: 0, y: 0}
+    - _MetallicGlossMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MinTex:
+        m_Texture: {fileID: 2800000, guid: 10408205ea5677f499a4232e86c5318c, type: 3}
+        m_Scale: {x: 5, y: 5}
+        m_Offset: {x: 0, y: 0}
+    - _MountainsTex:
+        m_Texture: {fileID: 2800000, guid: 5950b77b1844e0830a111d61b902bf8c, type: 3}
+        m_Scale: {x: 3, y: 3}
+        m_Offset: {x: 0, y: 0}
+    - _OcclusionMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _ParallaxMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SandTex:
+        m_Texture: {fileID: 2800000, guid: cb3c3c7a981b3adec83e36373caed826, type: 3}
+        m_Scale: {x: 4, y: 4}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - _BumpScale: 1
+    - _Cutoff: 0.5
+    - _Depth1: 0.1
+    - _DepthGround: 0.01
+    - _DepthIce: 1
+    - _DepthMaxOffset: 0.2
+    - _DepthMinOffset: 0.5
+    - _DepthMountains: 0.5
+    - _DepthSea: 0
+    - _DepthSeaBottom: -0.4
+    - _DepthSliceOffset: 0.05
+    - _DepthZero: 1.6
+    - _DetailNormalMapScale: 1
+    - _DotSlice: 0.7
+    - _DotSliceOverride: 0.5
+    - _DstBlend: 0
+    - _GlossMapScale: 1
+    - _Glossiness: 0.5
+    - _GlossyReflections: 1
+    - _Metallic: 0
+    - _MinAlphaSea: 0.2
+    - _Mix: 0.5
+    - _MixDepth: 0.02
+    - _MixDepthPercent: 0.2
+    - _MixNoiseSize: 20
+    - _MixNoiseStrength: 0.05
+    - _Mode: 0
+    - _NoiseSize: 20
+    - _NoiseStrength: 0.05
+    - _OcclusionStrength: 1
+    - _Parallax: 0.02
+    - _PerlinSize: 7.4
+    - _SmoothnessTextureChannel: 0
+    - _SpecularHighlights: 1
+    - _SrcBlend: 1
+    - _UVSec: 0
+    - _ZWrite: 1
+    m_Colors:
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color1: {r: 0, g: 1, b: 0, a: 1}
+    - _Color2: {r: 1, g: 1, b: 1, a: 1}
+    - _ColorIce: {r: 1, g: 1, b: 1, a: 0.7294118}
+    - _ColorMax: {r: 0.823, g: 0.823, b: 0.823, a: 1}
+    - _ColorMin: {r: 0, g: 0, b: 1, a: 1}
+    - _ColorSea: {r: 0, g: 0.104886435, b: 0.3301887, a: 1}
+    - _ColorSeaMax: {r: 0.12941177, g: 0.25490198, b: 0.41960785, a: 0.9372549}
+    - _ColorSeaMin: {r: 0, g: 0.5468068, b: 0.7264151, a: 0.6901961}
+    - _ColorZero: {r: 0, g: 0, b: 1, a: 1}
+    - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _hsvGround: {r: 0.01, g: 0.02, b: 0.4, a: 0}
+    - _hsvMountains: {r: 0, g: 0, b: 0.07, a: 0}
+    - _hsvSand: {r: 0.04, g: 0, b: 0.11, a: 0}

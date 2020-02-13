@@ -42,11 +42,28 @@ namespace DepthSensor.Device {
             _bodyKinect = new Windows.Kinect.Body[Body.GetOldest().length];
             if (!_kinect.IsOpen)
                 _kinect.Open();
+            
+            InitSensorInfo(_internalDepth, _kinect.DepthFrameSource.FrameDescription);
+            InitSensorInfo(_internalColor, _kinect.ColorFrameSource.FrameDescription);
+            InitSensorInfo(_internalInfrared, _kinect.InfraredFrameSource.FrameDescription);
+            InitSensorInfo(_internalIndex, _kinect.BodyIndexFrameSource.FrameDescription);
+            InitSensorInfo(_internalBody, _kinect.BodyIndexFrameSource.FrameDescription);
+            
             _reactivateSensors = new Thread(ReactivateSensorsBGLoop) {
                 Name = GetType().Name
             };
             _kinect.CoordinateMapper.CoordinateMappingChanged += OnCoordinateMappingChanged;
             _reactivateSensors.Start();
+        }
+
+        private static void InitSensorInfo<T>(Sensor<T>.Internal internalSensor, FrameDescription desc) where T : AbstractBuffer {
+            if (internalSensor.sensor.Available) {
+                internalSensor.SetTargetFps(30);
+                internalSensor.SetFov(new Vector2(
+                    desc.HorizontalFieldOfView,
+                    desc.VerticalFieldOfView
+                ));
+            }
         }
 
         private static InitInfo Init() {
@@ -58,14 +75,20 @@ namespace DepthSensor.Device {
                 init.kinect = KinectSensor.GetDefault();
                 init.Depth = new SensorDepth(new DepthBuffer( 
                     init.kinect.DepthFrameSource.FrameDescription.Width,
-                    init.kinect.DepthFrameSource.FrameDescription.Height)
-                );
-                init.SensorIndex = new SensorIndex(new IndexBuffer(
+                    init.kinect.DepthFrameSource.FrameDescription.Height
+                ));
+                init.Infrared = new SensorInfrared(new InfraredBuffer( 
+                    init.kinect.InfraredFrameSource.FrameDescription.Width,
+                    init.kinect.InfraredFrameSource.FrameDescription.Height,
+                    init.kinect.InfraredFrameSource.FrameDescription.BytesPerPixel == 2
+                        ? TextureFormat.R16 : TextureFormat.R8
+                ));
+                init.Index = new SensorIndex(new IndexBuffer(
                     init.kinect.BodyIndexFrameSource.FrameDescription.Width,
                     init.kinect.BodyIndexFrameSource.FrameDescription.Height
                 ));
                 var colorDesc = init.kinect.ColorFrameSource.CreateFrameDescription(_COLOR_FORMAT);
-                init.SensorColor = new SensorColor(new ColorBuffer(
+                init.Color = new SensorColor(new ColorBuffer(
                     colorDesc.Width, colorDesc.Height, TextureFormat.RGBA32
                 ));
                 init.Body = new SensorBody(new BodyBuffer(init.kinect.BodyFrameSource.BodyCount));
@@ -101,10 +124,11 @@ namespace DepthSensor.Device {
 
         private void ReActivateSensors() {
             CloseSensors();
-            if (!Depth.Active && !Index.Active && !Body.Active && !Color.Active) 
+            if (!Depth.Active && !Infrared.Active && !Index.Active && !Body.Active && !Color.Active) 
                 return;
             _multiReader = _kinect.OpenMultiSourceFrameReader(
                 (Depth.Active ? FrameSourceTypes.Depth : 0) |
+                (Infrared.Active ? FrameSourceTypes.Infrared : 0) |
                 (Index.Active ? FrameSourceTypes.BodyIndex : 0) | 
                 (Body.Active ? FrameSourceTypes.Body : 0) |
                 (Color.Active ? FrameSourceTypes.Color : 0));
@@ -130,8 +154,9 @@ namespace DepthSensor.Device {
             
             if (frame != null) {
                 using (var body = frame.BodyFrameReference.AcquireFrame())
-                using (var index = frame.BodyIndexFrameReference.AcquireFrame())
+                using (var index = frame.BodyIndexFrameReference.AcquireFrame())    
                 using (var color = frame.ColorFrameReference.AcquireFrame())
+                using (var infrared = frame.InfraredFrameReference.AcquireFrame())
                 using (var depth = frame.DepthFrameReference.AcquireFrame()) {
                     if (body != null) {
                         UpdateBodies(body);
@@ -142,10 +167,8 @@ namespace DepthSensor.Device {
                         using (var raw = color.LockRawImageBuffer()) {
                             //Color.GetOldest().SetBytes(raw.UnderlyingBuffer, raw.Length);
                             var buff = Color.GetOldest();
-                            lock (buff.SyncRoot) {
-                                color.CopyConvertedFrameDataToIntPtr(buff.data.IntPtr(),
-                                    (uint) buff.data.GetLengthInBytes(), _COLOR_FORMAT);
-                            }
+                            color.CopyConvertedFrameDataToIntPtr(buff.data.IntPtr(),
+                                (uint) buff.data.GetLengthInBytes(), _COLOR_FORMAT);
                         }
                         _internalColor.OnNewFrameBackground();
                     }
@@ -155,6 +178,13 @@ namespace DepthSensor.Device {
                             Index.GetOldest().SetBytes(buffer.UnderlyingBuffer, buffer.Length);
                         }
                         _internalIndex.OnNewFrameBackground();
+                    }
+                    
+                    if (infrared != null) {
+                        using (var buffer = infrared.LockImageBuffer()) {
+                            Infrared.GetOldest().SetBytes(buffer.UnderlyingBuffer, buffer.Length);
+                        }
+                        _internalInfrared.OnNewFrameBackground();
                     }
 
                     if (_needUpdateMapDepthToColorSpace ||
@@ -179,13 +209,11 @@ namespace DepthSensor.Device {
         private void UpdateBodies(BodyFrame frame) {
             frame.GetAndRefreshBodyData(_bodyKinect);
             var buff = Body.GetOldest();
-            lock (buff.SyncRoot) {
-                if (!_internalBodyBuffers.TryGetValue(buff, out var intern)) {
-                    intern = new BodyBuffer.Internal<Windows.Kinect.Body>(buff);
-                }
-
-                intern.UpdateBodiesIndexed(_bodyKinect, GetBodyId, UpdateBody);
+            if (!_internalBodyBuffers.TryGetValue(buff, out var intern)) {
+                intern = new BodyBuffer.Internal<Windows.Kinect.Body>(buff);
             }
+
+            intern.UpdateBodiesIndexed(_bodyKinect, GetBodyId, UpdateBody);
         }
 
         private static bool GetBodyId(Windows.Kinect.Body body, out ulong id) {
@@ -208,6 +236,7 @@ namespace DepthSensor.Device {
             while (_pollFramesLoop) {
                 if (_frameArrivedEvent.WaitOne(0)) {
                     if (Depth.Active) _internalDepth.OnNewFrame();
+                    if (Infrared.Active) _internalInfrared.OnNewFrame();
                     if (Index.Active) _internalIndex.OnNewFrame();
                     if (Color.Active) _internalColor.OnNewFrame();
                     if (Body.Active) _internalBody.OnNewFrame();
@@ -226,7 +255,7 @@ namespace DepthSensor.Device {
             }
         }
 
-        protected override void Close() {
+        protected override void OnCloseInternal() {
             _pollFramesLoop = false;
             if (_reactivateSensors != null && _reactivateSensors.IsAlive && !_reactivateSensors.Join(5000))
                 _reactivateSensors.Abort();
@@ -235,7 +264,6 @@ namespace DepthSensor.Device {
             }
             Close(ref _kinect);
             _frameArrivedEvent.Dispose();
-            base.Close();
         }
 
         private static void Close(ref KinectSensor kinect) {
@@ -265,6 +293,12 @@ namespace DepthSensor.Device {
                 MapDepthPointToColorSpace(ToDepthPoint(pos), depth));
         }
 
+        public override Vector3 DepthMapPosToCameraPos(Vector2 pos, ushort depth) {
+            if (_kinect == null) return Vector3.zero;
+            return ToVector3(_kinect.CoordinateMapper.
+                MapDepthPointToCameraSpace(ToDepthPoint(pos), depth));
+        }
+
         public override void DepthMapToColorMap(NativeArray<ushort> depth, NativeArray<Vector2> color) {
             if (_kinect == null) return;
             _kinect.CoordinateMapper.MapDepthFrameToColorSpaceUsingIntPtr(
@@ -277,19 +311,17 @@ namespace DepthSensor.Device {
             //TODO: broken table in SDK, workaround with MapDepthFrameToCameraSpace
             //var map = _kinect.CoordinateMapper.GetDepthFrameToCameraSpaceTable();
             var depthBuff = Depth.GetOldest();
-            lock (depthBuff.SyncRoot) {
-                var map = new CameraSpacePoint[depthBuff.length];
-                var depth = new ushort[depthBuff.length];
-                Parallel.For(0, depth.Length, i => {
-                    depth[i] = 1000;
-                });
-                _kinect.CoordinateMapper.MapDepthFrameToCameraSpace(depth, map);
-                var mapBuff = MapDepthToCamera.GetOldest();
-                Parallel.For(0, map.Length, i => {
-                    var mapPoint = map[i];
-                    mapBuff.data[i] = new half2(new float2(mapPoint.X, mapPoint.Y));
-                });
-            }
+            var map = new CameraSpacePoint[depthBuff.length];
+            var depth = new ushort[depthBuff.length];
+            Parallel.For(0, depth.Length, i => {
+                depth[i] = 1000;
+            });
+            _kinect.CoordinateMapper.MapDepthFrameToCameraSpace(depth, map);
+            var mapBuff = MapDepthToCamera.GetOldest();
+            Parallel.For(0, map.Length, i => {
+                var mapPoint = map[i];
+                mapBuff.data[i] = new half2(new float2(mapPoint.X, mapPoint.Y));
+            });
             
             _needUpdateMapDepthToColorSpace = false;
             _mapDepthToCameraUpdated = true;

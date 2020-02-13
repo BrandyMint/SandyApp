@@ -1,24 +1,21 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace Utilities {
     public static class UnityHelper {
         public static T[] GetComponentsOnlyInChildren<T>(this Component obj) where T : Component {
-            return obj.GetComponentsOnlyInChildren<T>(false);
-        }
-
-        public static T[] GetComponentsOnlyInChildren<T>(this Component obj, bool includeInactive) where T : Component {
-            List<T> objList = new List<T>();
-            foreach (T componentsInChild in obj.GetComponentsInChildren<T>(includeInactive))
-            {
-                if (componentsInChild.gameObject != obj.gameObject)
-                    objList.Add(componentsInChild);
+            var objList = new List<T>();
+            for (int i = 0; i < obj.transform.childCount; ++i) {
+                var child = obj.transform.GetChild(i).GetComponent<T>();
+                if (child != null)
+                    objList.Add(child);
             }
             return objList.ToArray();
         }
@@ -28,16 +25,16 @@ namespace Utilities {
         }
     
         public static T Random<T>(this IEnumerable<T> enumerable) {
-            var ret = default(T);
-            if (!TryRandom(enumerable, ref ret))
+            if (!TryRandom(enumerable, out var ret))
                 throw new ArgumentOutOfRangeException();
             return ret;
         }
 
-        public static bool TryRandom<T>(this IEnumerable<T> enumerable, ref T ret) {
+        public static bool TryRandom<T>(this IEnumerable<T> enumerable, out T ret) {
             var array = PrepareToMultipleEnumerate(enumerable);
             var count = array.Count();
             if (count == 0) {
+                ret = default;
                 return false;
             }
             var rand = UnityEngine.Random.Range(0, count);
@@ -104,13 +101,12 @@ namespace Utilities {
         
         public static void SetPropsByGameObjects(object obj, Transform root) {
             foreach (var propInfo in obj.GetType().GetProperties()) {
-                if (root == null || propInfo.Name == null) {
-                    Debug.Log("FTF??");
-                }
                 var row = root.FindChildRecursively(propInfo.Name);
                 Assert.IsNotNull(row, $"Not found {propInfo.Name} in {root.name}");
                 object prop;
-                if (propInfo.PropertyType.IsSubclassOf(typeof(Component))) {
+                if (typeof(GameObject).IsAssignableFrom(propInfo.PropertyType)) {
+                    prop = row.gameObject;
+                } else if (typeof(Component).IsAssignableFrom(propInfo.PropertyType)) {
                     prop = row.GetComponent(propInfo.PropertyType) ?? row.GetComponentInChildren(propInfo.PropertyType);
                 } else {
                     prop = Activator.CreateInstance(propInfo.PropertyType);
@@ -130,6 +126,47 @@ namespace Utilities {
                 et.triggers.Add(trigger);
             }
             trigger.callback.AddListener(action);
+        }
+        
+        public static void CopyFrom(this Component comp, Component other) {
+            var type = comp.GetType();
+            var otherType = other.GetType();
+            Assert.IsTrue(otherType.IsAssignableFrom(type), $"type mis-match: {type.Name} and {otherType.Name}"); 
+            const BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Default;
+            var props = type.GetProperties(flags);
+            foreach (var prop in props) {
+                if (prop.CanWrite) {
+                    prop.SetValue(comp, prop.GetValue(other, null), null);
+                }
+            }
+            var fields = type.GetFields(flags);
+            foreach (var field in fields) {
+                field.SetValue(comp, field.GetValue(other));
+            }
+        }
+        
+        public static T AddComponent<T>(this GameObject go, Component toAdd) where T : Component {
+            var c = go.AddComponent<T>();
+            c.CopyFrom(toAdd);
+            return c;
+        }
+        
+        public static Component AddComponent(this GameObject go, Component toAdd) {
+            var c = go.AddComponent(toAdd.GetType());
+            c.CopyFrom(toAdd);
+            return c;
+        }
+        
+        public static void ScrollTo(this ScrollRect scrollRect, Transform child) {
+            Canvas.ForceUpdateCanvases();
+            Vector2 viewportLocalPosition = scrollRect.viewport.localPosition;
+            Vector2 childLocalPosition = child.localPosition;
+            Vector2 old = scrollRect.content.localPosition;
+            var result = new Vector2(
+                scrollRect.horizontal ? -(viewportLocalPosition.x + childLocalPosition.x) : old.x,
+                scrollRect.vertical ? -(viewportLocalPosition.y + childLocalPosition.y) : old.y
+            );
+            scrollRect.content.localPosition = result;
         }
     }
 }

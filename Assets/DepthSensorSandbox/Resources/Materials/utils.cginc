@@ -1,3 +1,5 @@
+static const float PI = 3.141592653589793238462;
+
 #ifndef RGBtoHSV
     half3 RGBtoHSV(half3 arg1) {
         half4 K = half4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
@@ -24,4 +26,12 @@ inline fixed4 adjust(fixed4 c, fixed3 modHSV) {
 
 inline float smooth(float dmin, float dmax, float z) {
     return smoothstep(0, 1, (z - dmin) / (dmax - dmin));
+}
+
+float inverseLerp(float a, float b, float k) {
+    return (k - a) / (b - a);
+}
+
+float angleSigned(float3 v1, float3 v2, float3 n) {
+    return atan2(dot(n, cross(v1, v2)), dot(v1, v2));
 }
