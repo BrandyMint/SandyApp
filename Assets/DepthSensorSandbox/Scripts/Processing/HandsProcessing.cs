@@ -1,4 +1,4 @@
-﻿#if !UNITY_EDITOR
+#if !UNITY_EDITOR
     #undef HANDS_WAVE_STEP_DEBUG
 #endif
 
@@ -27,6 +27,7 @@ namespace DepthSensorSandbox.Processing {
         private IndexBuffer _handsMask;
         private Buffer2D<ushort> _depthLongExpos;
         private readonly ArrayIntQueue _queue = new ArrayIntQueue();
+        private RectInt _r;
 
         public override void Dispose() {
 #if HANDS_WAVE_STEP_DEBUG
@@ -54,43 +55,45 @@ namespace DepthSensorSandbox.Processing {
             
             _queue.Clear();
             _handsMask.Clear();
-            
+
+            _r = new RectInt(0, 0, _out.width, _out.height);
             Parallel.Invoke(FillBorderUp, FillBorderDown, FillBorderLeft, FillBorderRight);
             FillHandsMask();
             Parallel.For(0, _out.length, WriteMaskResultBody);
         }
 
         private void FillBorderUp() {
-            FillMaskLine(1, 1, _out.width - 2);
+            FillMaskLine(_out.GetIFrom(_r.xMin, _r.yMin) + 1, 1, _r.width - 2);
         }
 
         private void FillBorderDown() {
-            FillMaskLine(_out.length - _out.width + 1, 1, _out.width - 2);
+            FillMaskLine(_out.GetIFrom(_r.xMin, _r.yMax - 1) + 1, 1, _r.width - 2);
         }
 
         private void FillBorderLeft() {
-            FillMaskLine(0,  _out.width, _out.height);
+            FillMaskLine(_out.GetIFrom(_r.xMin, _r.yMin),  _out.width, _r.height);
         }
 
         private void FillBorderRight() {
-            FillMaskLine(_out.width,  _out.width, _out.height);
+            FillMaskLine(_out.GetIFrom(_r.xMax - 1, _r.yMin),  _out.width, _r.height);
         }
 
         private void FillMaskLine(int start, int step, int n) {
             var id = start;
             for (int i = 0; i < n; ++i) {
-                Fill(COLOR, i, MinDistance);
+                Fill(COLOR, id, MinDistanceAtBorder, true);
                 id += step;
             }
         }
 
-        private bool Fill(byte color, int i, ushort minDiffer) {
+        private bool Fill(byte color, int i, ushort minDiffer, bool doLock = false) {
+            var longExp = Sampler.INVALID_DEPTH;
             if (i !=  Sampler.INVALID_ID && _handsMask.data[i] == CLEAR_COLOR 
-                                && _inDepth.data[i] - _depthLongExpos.data[i] > minDiffer) {
+            && (longExp = _depthLongExpos.data[i]) != Sampler.INVALID_DEPTH 
+            &&  _inDepth.data[i] - longExp > minDiffer) {
                 _handsMask.data[i] = color;
-                lock (_queue) {
-                    _queue.Enqueue(i);
-                }
+                if (doLock) lock (_queue) _queue.Enqueue(i);
+                else _queue.Enqueue(i);
                 return true;
             }
             return false;
@@ -104,11 +107,9 @@ namespace DepthSensorSandbox.Processing {
 #endif
             while (_queue.GetCount() > 0) {
                 int i = _queue.Dequeue();
-                for (int n = 0; n < 8; ++n) {
+                for (int n = 0; n < 4; ++n) {
                     int j = _s.GetIndexOfNeighbor(i, n);
-                    if (Fill(COLOR, j, MaxError)) {
-                        _queue.Enqueue(j);
-                    }
+                    Fill(COLOR, j, MaxError);
                 }
 #if HANDS_WAVE_STEP_DEBUG
                 --countInCurrWave;
@@ -122,12 +123,12 @@ namespace DepthSensorSandbox.Processing {
         }
 
         private void WriteMaskResultBody(int i) {
-            var val = _inDepth.data[i];
             var valLongExpos = _depthLongExpos.data[i];
             var color = _handsMask.data[i];
             if (color != CLEAR_COLOR) {
                 _out.data[i] = valLongExpos;
             } else {
+                var val = _inDepth.data[i];
                 _depthLongExpos.data[i] = (ushort) Mathf.Lerp(val, valLongExpos, Exposition);
             }
         }

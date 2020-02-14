@@ -5,7 +5,6 @@ using DepthSensor.Buffer;
 using DepthSensorSandbox.Processing;
 using UnityEngine;
 using UnityEngine.UI;
-using Utilities;
 
 namespace DepthSensorSandbox.Test {
     public class HandsWaveTest : MonoBehaviour {
@@ -53,11 +52,12 @@ namespace DepthSensorSandbox.Test {
         }
 
         private void ShowWave() {
-#if HANDS_WAVE_STEP_DEBUG
             if (_hands.HandsMask.texture.filterMode != FilterMode.Point)
                 _hands.HandsMask.texture.filterMode = FilterMode.Point;
             _hands.HandsMask.UpdateTexture();
             _image.texture = _hands.HandsMask.texture;
+            _image.gameObject.SetActive(true);
+#if HANDS_WAVE_STEP_DEBUG
             _txtWawe.text = _hands.CurrWave.ToString();
             _hands.WaveBarrier.SignalAndWait(3000);
 #else
