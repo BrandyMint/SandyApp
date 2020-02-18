@@ -61,40 +61,24 @@ namespace DepthSensorSandbox.Processing {
         }
 
         private void FillBorderUp() {
-            //var r = _s.GetRect();
-            //FillMaskLine(_out.GetIFrom(r.xMin, r.yMin) + 1, 1, r.width - 2);
             _s.EachInHorizontal(0, FillMaskLine, 1, 1);
         }
 
         private void FillBorderDown() {
-            //var r = _s.GetRect();
-            //FillMaskLine(_out.GetIFrom(r.xMin, r.yMax - 1) + 1, 1, r.width - 2);
             _s.EachInHorizontal(_out.height, FillMaskLine, 1, 1);
         }
 
         private void FillBorderLeft() {
-            //var r = _s.GetRect();
-            //FillMaskLine(_out.GetIFrom(r.xMin, r.yMin),  _out.width, r.height);
             _s.EachInVertical(0, FillMaskLine);
         }
 
         private void FillBorderRight() {
-            //var r = _s.GetRect();
-            //FillMaskLine(_out.GetIFrom(r.xMax - 1, r.yMin),  _out.width, r.height);
             _s.EachInVertical(_out.width, FillMaskLine);
         }
         
         private void FillMaskLine(int id) {
             Fill(COLOR, id, MinDistanceAtBorder, true);
         }
-
-        /*private void FillMaskLine(int start, int step, int n) {
-            var id = start;
-            for (int i = 0; i < n; ++i) {
-                Fill(COLOR, id, MinDistanceAtBorder, true);
-                id += step;
-            }
-        }*/
 
         private bool Fill(byte color, int i, ushort minDiffer, bool doLock = false) {
             ushort longExp;

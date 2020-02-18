@@ -2,7 +2,7 @@ using DepthSensorSandbox.Visualisation;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace DepthSensorSandbox.Test {
+namespace DepthSensorSandbox.Test.Fluid {
     public class SandboxFluidTest : SandboxFluid {
         private const string _DYNAMIC_FLUID = "DYNAMIC_FLUID";
         private const string _DRAW_LANDSCAPE = "DRAW_LANDSCAPE";

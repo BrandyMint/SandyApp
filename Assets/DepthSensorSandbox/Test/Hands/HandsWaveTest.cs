@@ -6,7 +6,7 @@ using DepthSensorSandbox.Processing;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace DepthSensorSandbox.Test {
+namespace DepthSensorSandbox.Test.Hands {
     public class HandsWaveTest : MonoBehaviour {
         [SerializeField] private Button _btnStep;
         [SerializeField] private Button _btnContinue;

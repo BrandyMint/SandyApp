@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: sandbox_color_debug_fluid
-  m_Shader: {fileID: 4800000, guid: 5e7ba7913b164378b09a487eb183eba2, type: 3}
+  m_Shader: {fileID: 4800000, guid: 658623cd9f209284d833624f4f801c54, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -57,11 +57,16 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - _BumpScale: 1
+    - _CellArea: 1
+    - _CellHeight: 1
     - _ColorBright: 1
     - _Cutoff: 0.5
+    - _DepthZero: 1.6
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
+    - _FluxAcceleration: 9.8
     - _FluxBright: 10
+    - _FluxFading: 0.999
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
