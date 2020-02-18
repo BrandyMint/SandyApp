@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace DepthSensorSandbox.Visualisation {
@@ -6,6 +7,8 @@ namespace DepthSensorSandbox.Visualisation {
         private const float _MAX_VALID_ASPECT = 3f;
 
         private Camera _cam;
+
+        public static Action<SandboxCamera> AfterCalibrationUpdated;
 
         private void Awake() {
             _cam = GetComponent<Camera>();
@@ -30,10 +33,16 @@ namespace DepthSensorSandbox.Visualisation {
                 _cam.ResetAspect();
             }
             _cam.fieldOfView = Prefs.Calibration.Fov;
+
+            AfterCalibrationUpdated?.Invoke(this);
         }
 
         public void ResetToCalibration() {
             OnCalibrationChanged();
+        }
+
+        public Camera GetCamera() {
+            return _cam;
         }
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using DepthSensor.Buffer;
+using UnityEngine;
 
 namespace DepthSensorSandbox.Processing {
     public abstract class ProcessingBase : IDisposable {
@@ -10,7 +11,7 @@ namespace DepthSensorSandbox.Processing {
         protected DepthBuffer _rawBuffer;
         protected DepthBuffer _out;
         protected DepthBuffer _prev;
-        protected Sampler _s = new Sampler();
+        protected Sampler _s = Sampler.Create();
 
         public void Process(DepthBuffer rawBuffer, DepthBuffer outBuffer, DepthBuffer prevBuffer) {
             if (Active) {
@@ -43,6 +44,10 @@ namespace DepthSensorSandbox.Processing {
         
         protected bool CheckValid(AbstractBuffer2D b) {
             return b != null && b.width == _out.width && b.height == _out.height;
+        }
+
+        public void SetCropping(Rect cropping01) {
+            _s.SetCropping01(cropping01);
         }
 
         public virtual void Dispose() {}

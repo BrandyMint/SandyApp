@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using DepthSensorSandbox.Visualisation;
 using Games.Common.Game;
 using Unity.Mathematics;
 using UnityEngine;
@@ -86,19 +87,13 @@ namespace Games.Common {
         }
 
         public Plane PlaneOnDist(float dist) {
-            var up = transform.forward;
-            up = (Vector3.Dot(up, -_lastCam.transform.forward) > 0f) ? up : -up;
-            return new Plane(up, _lastCam.transform.position - up * dist);
+            return _lastCam.PlaneOnDist(dist, transform.forward);
         }
 
         public Vector3 PlaneRaycastFromViewport(Plane plane, Vector2 uv) {
-            var ray = _lastCam.ViewportPointToRay(new Vector3(uv.x, uv.y, 1f));
-            if (plane.Raycast(ray, out var dist)) {
-                return ray.GetPoint(dist);
-            } else {
+            if (!_lastCam.PlaneRaycastFromViewport(plane, uv, out var pos))
                 Debug.LogError("GameFiled: Cant align to camera");
-                return ray.GetPoint(1f);
-            }
+            return pos;
         }
         
         public float Scale => Mathf.Abs(transform.localScale.y);

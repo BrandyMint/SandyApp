@@ -1,4 +1,4 @@
-#if !UNITY_EDITOR
+﻿#if !UNITY_EDITOR
     #undef HANDS_WAVE_STEP_DEBUG
 #endif
 
@@ -16,7 +16,7 @@ namespace DepthSensorSandbox.Processing {
         
         public float Exposition = 0.99f;
         public ushort MaxError = 10;
-        public ushort MinDistance = 100;
+        public ushort MinDistanceAtBorder = 100;
         
         public IndexBuffer HandsMask => _handsMask;
 #if HANDS_WAVE_STEP_DEBUG
@@ -27,7 +27,6 @@ namespace DepthSensorSandbox.Processing {
         private IndexBuffer _handsMask;
         private Buffer2D<ushort> _depthLongExpos;
         private readonly ArrayIntQueue _queue = new ArrayIntQueue();
-        private RectInt _r;
 
         public override void Dispose() {
 #if HANDS_WAVE_STEP_DEBUG
@@ -55,39 +54,50 @@ namespace DepthSensorSandbox.Processing {
             
             _queue.Clear();
             _handsMask.Clear();
-
-            _r = new RectInt(0, 0, _out.width, _out.height);
+            
             Parallel.Invoke(FillBorderUp, FillBorderDown, FillBorderLeft, FillBorderRight);
             FillHandsMask();
-            Parallel.For(0, _out.length, WriteMaskResultBody);
+            _s.EachParallelHorizontal(WriteMaskResultBody);
         }
 
         private void FillBorderUp() {
-            FillMaskLine(_out.GetIFrom(_r.xMin, _r.yMin) + 1, 1, _r.width - 2);
+            //var r = _s.GetRect();
+            //FillMaskLine(_out.GetIFrom(r.xMin, r.yMin) + 1, 1, r.width - 2);
+            _s.EachInHorizontal(0, FillMaskLine, 1, 1);
         }
 
         private void FillBorderDown() {
-            FillMaskLine(_out.GetIFrom(_r.xMin, _r.yMax - 1) + 1, 1, _r.width - 2);
+            //var r = _s.GetRect();
+            //FillMaskLine(_out.GetIFrom(r.xMin, r.yMax - 1) + 1, 1, r.width - 2);
+            _s.EachInHorizontal(_out.height, FillMaskLine, 1, 1);
         }
 
         private void FillBorderLeft() {
-            FillMaskLine(_out.GetIFrom(_r.xMin, _r.yMin),  _out.width, _r.height);
+            //var r = _s.GetRect();
+            //FillMaskLine(_out.GetIFrom(r.xMin, r.yMin),  _out.width, r.height);
+            _s.EachInVertical(0, FillMaskLine);
         }
 
         private void FillBorderRight() {
-            FillMaskLine(_out.GetIFrom(_r.xMax - 1, _r.yMin),  _out.width, _r.height);
+            //var r = _s.GetRect();
+            //FillMaskLine(_out.GetIFrom(r.xMax - 1, r.yMin),  _out.width, r.height);
+            _s.EachInVertical(_out.width, FillMaskLine);
+        }
+        
+        private void FillMaskLine(int id) {
+            Fill(COLOR, id, MinDistanceAtBorder, true);
         }
 
-        private void FillMaskLine(int start, int step, int n) {
+        /*private void FillMaskLine(int start, int step, int n) {
             var id = start;
             for (int i = 0; i < n; ++i) {
                 Fill(COLOR, id, MinDistanceAtBorder, true);
                 id += step;
             }
-        }
+        }*/
 
         private bool Fill(byte color, int i, ushort minDiffer, bool doLock = false) {
-            var longExp = Sampler.INVALID_DEPTH;
+            ushort longExp;
             if (i !=  Sampler.INVALID_ID && _handsMask.data[i] == CLEAR_COLOR 
             && (longExp = _depthLongExpos.data[i]) != Sampler.INVALID_DEPTH 
             &&  _inDepth.data[i] - longExp > minDiffer) {

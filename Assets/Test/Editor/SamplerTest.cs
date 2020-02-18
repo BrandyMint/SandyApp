@@ -32,7 +32,7 @@ namespace Test.Editor {
         [TestCase(9, 16)]
         [TestCase(16, 9)]
         public void TestGetNeighbors(int w, int h) {
-            var s = new Sampler();
+            var s = Sampler.Create();
             var indexes = new int [w, h];
             var i = 0;
             for (var y = 0; y < h; ++y) {
@@ -46,7 +46,7 @@ namespace Test.Editor {
             for (p.x = 0; p.x < w; ++p.x) {
                 for (p.y = 0; p.y < h; ++p.y) {
                     var id = GetIdFromIndexes(indexes, p);
-                    
+                    if (id < 0) continue;
                     for (int k = 0; k < _neighbours.Length; ++k) {
                         var pn = p + _neighbours[k];
                         var idn = GetIdFromIndexes(indexes, pn);
@@ -55,10 +55,55 @@ namespace Test.Editor {
                 }
             }
         }
+        
+        [TestCase(1, 1, 0, 0, 1, 1)]
+        [TestCase(1, 3, 0, 1, 1, 2)]
+        [TestCase(2, 3, 1, 0, 1, 2)]
+        [TestCase(1, 4, 0, 1, 1, 3)]
+        [TestCase(2, 4, 1, 0, 1, 3)]
+        [TestCase(3, 1, 2, 0, 3, 0)]
+        [TestCase(3, 2, -1, 0, 2, 1)]
+        [TestCase(4, 1, 2, 3, 0, 0)]
+        [TestCase(4, 2, 2, 3, 0, 1)]
+        [TestCase(16, 16, 5, 4, 13, 15)]
+        [TestCase(9, 16, 3, 5, 8, 13)]
+        [TestCase(16, 9, 5, 3, 16, 9)]
+        public void TestGetNeighborsWithCropping(int w, int h, int xMin, int yMin, int xMax, int yMax) {
+            var s = Sampler.Create();
+            var r = new RectInt(xMin, yMin, xMax - xMin, yMax - yMin);
+            var indexes = new int [w, h];
+            var i = 0;
+            for (var y = 0; y < h; ++y) {
+                for (var x = 0; x < w; ++x) {
+                    indexes[x, y] = i++;
+                }
+            }
 
-        private static int GetIdFromIndexes(int[,] indexes, Vector2Int i) {
+            s.SetDimens(w, h);
+            s.SetCropping(r);
+            var p = Vector2Int.zero;
+            for (p.x = 0; p.x < w; ++p.x) {
+                for (p.y = 0; p.y < h; ++p.y) {
+                    var id = GetIdFromIndexes(indexes, p, r);
+                    if (id < 0) continue;
+                    for (int k = 0; k < _neighbours.Length; ++k) {
+                        var pn = p + _neighbours[k];
+                        var idn = GetIdFromIndexes(indexes, pn, r);
+                        Assert.AreEqual(idn, s.GetIndexOfNeighbor(id, k), $"i = {id}, k = {k}, pn = {pn}");
+                    }
+                }
+            }
+        }
+
+        private int GetIdFromIndexes(int[,] indexes, Vector2Int p, RectInt cropping) {
+            if (cropping.Contains(p))
+                return GetIdFromIndexes(indexes, p);
+            return Sampler.INVALID_ID;
+        }
+
+        private static int GetIdFromIndexes(int[,] indexes, Vector2Int p) {
             try {
-                return indexes[i.x, i.y];
+                return indexes[p.x, p.y];
             }
             catch (IndexOutOfRangeException) {
                 return Sampler.INVALID_ID;

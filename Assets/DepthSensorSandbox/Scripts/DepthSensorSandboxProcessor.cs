@@ -6,6 +6,7 @@ using DepthSensor.Buffer;
 using DepthSensor.Device;
 using DepthSensor.Sensor;
 using DepthSensorSandbox.Processing;
+using DepthSensorSandbox.Visualisation;
 using UnityEngine;
 
 namespace DepthSensorSandbox {
@@ -43,7 +44,7 @@ namespace DepthSensorSandbox {
 
         public static DepthSensorSandboxProcessor Instance { get; private set; }
 
-        public readonly FixHolesProcessing FixHoles = new FixHolesProcessing();
+        public readonly FixHolesProcessingOld FixHoles = new FixHolesProcessingOld();
         public readonly NoiseFilterProcessing NoiseFilter = new NoiseFilterProcessing();
         public readonly HandsProcessing Hands = new HandsProcessing();
 
@@ -66,6 +67,7 @@ namespace DepthSensorSandbox {
         private static bool _processColor;
         private static bool _processDepth;
         private static bool _processMap;
+        private SandboxCamera _needUpdateCroppingCamera;
 
 #region Initializing
 
@@ -88,10 +90,13 @@ namespace DepthSensorSandbox {
             if (DepthSensorManager.IsInitialized()) {
                 OnDepthSensorAvailable();
             }
+
+            SandboxCamera.AfterCalibrationUpdated += UpdateCropping;
             SetupConveyer(ConveyerUpdateBG(), ConveyerUpdateMain());
         }
 
         private void OnDestroy() {
+            SandboxCamera.AfterCalibrationUpdated -= UpdateCropping;
             if (_conveyer != null)
                 _conveyer.OnNoFrame -= ActivateSensorsIfNeed;
             RemoveConveyers();
@@ -126,6 +131,7 @@ namespace DepthSensorSandbox {
             }
 
             UpdateBuffersCount(BuffersCount);
+            UpdateCropping(_needUpdateCroppingCamera);
         }
 
         private void UnSubscribeDevice(DepthSensorDevice device) {
@@ -205,6 +211,25 @@ namespace DepthSensorSandbox {
         private void RemoveConveyers() {
             if (_coveyerId >= 0)
                 _conveyer.RemoveTask(_coveyerId);
+        }
+
+        private void UpdateCropping(SandboxCamera scam) {
+            var device = GetDeviceIfAvailable();
+            if (device == null) {
+                _needUpdateCroppingCamera = scam;
+                return;
+            }
+            _needUpdateCroppingCamera = null;
+            
+            if (scam == null) return;
+            var cam = scam.GetCamera();
+            var dist = Prefs.Sandbox.ZeroDepth + Prefs.Sandbox.OffsetMinDepth;
+            var cropping = cam.GetCroppingToDepth(dist, device);
+            Debug.Log("cropping " + cropping);
+
+            foreach (var processing in _processings) {
+                processing.SetCropping(cropping);
+            }
         }
 #endregion
 

@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace DepthSensorSandbox.Processing {
@@ -7,7 +6,8 @@ namespace DepthSensorSandbox.Processing {
         public ushort MaxError = 50;
         
         protected override void ProcessInternal() {
-            Parallel.For(0, _out.length, FilterBody);
+            //Parallel.For(0, _out.length, FilterBody);
+            _s.EachParallelHorizontal(FilterBody);
         }
 
         private void FilterBody(int i) {

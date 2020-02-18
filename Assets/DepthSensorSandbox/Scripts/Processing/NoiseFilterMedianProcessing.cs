@@ -1,32 +1,35 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using UnityEngine;
 using Utilities;
 
 namespace DepthSensorSandbox.Processing {
     public class NoiseFilterMedianProcessing : ProcessingBase {
+        private const int _NEIGHBORS = 8;
+        
         public float Smooth = 0.9f;
         public ushort MaxError = 50;
 
-        public class ParallelLocalState {
+        public class ParallelLocalState : Sampler.IParallelLocalState {
             public ushort[] medianArr;
             public bool used;
+            public Action<int, ParallelLocalState> handler;
+
+            public void Handle(int id) {
+                handler.Invoke(id, this);
+            }
         }
 
         private readonly List<ParallelLocalState> _stateCaches = new List<ParallelLocalState>();
-        private readonly Vector2Int[] _neighbors = {
-            new Vector2Int(-1, 0), new Vector2Int(0, 1), new Vector2Int(1, 0), new Vector2Int(0, -1),
-            new Vector2Int(-1, 1), new Vector2Int(1, 1), new Vector2Int(1, -1), new Vector2Int(-1, -1),
-            /*new Vector2Int(-2, 0), new Vector2Int(0, 2), new Vector2Int(2, 0), new Vector2Int(0, -2),*/
-        };
         
         protected override void ProcessInternal() {
-            Parallel.For(0, _out.length,
+            /*Parallel.For(0, _out.length,
                 InitLocalState,
                 FilterBody,
                 FinallyLocalState
-            );
+            );*/
+            _s.EachParallelHorizontal(InitLocalState, FinallyLocalState);
         }
 
         private ParallelLocalState InitLocalState() {
@@ -34,8 +37,9 @@ namespace DepthSensorSandbox.Processing {
                 var state = _stateCaches.FirstOrDefault(s => !s.used);
                 if (state == null) {
                     state = new ParallelLocalState();
-                    ReCreateIfNeed(ref state.medianArr, 1 + _neighbors.Length);
+                    ReCreateIfNeed(ref state.medianArr, 1 + _NEIGHBORS);
                     _stateCaches.Add(state);
+                    state.handler = FilterBody;
                 }
                 state.used = true;
                 return state;
@@ -46,18 +50,19 @@ namespace DepthSensorSandbox.Processing {
             state.used = false;
         }
 
-        private ParallelLocalState FilterBody(int i, ParallelLoopState loop, ParallelLocalState local) {
+        private void FilterBody(int i, ParallelLocalState local) {
             var actualVal = _rawBuffer.data[i];
             if (actualVal == Sampler.INVALID_DEPTH) {
                 _out.data[i] = Sampler.INVALID_DEPTH;
-                return local;
+                return;
             }
 
             local.medianArr[0] = actualVal;
             var j = 1;
-            var p = _out.GetXYiFrom(i);
-            for (int k = 0; k < _neighbors.Length; ++k) {
-                var d = _s.SafeGet(_rawBuffer, p + _neighbors[k]);
+            var p = _s.GetXYiFrom(i);
+            for (int k = 0; k < _NEIGHBORS; ++k) {
+                var ki = _s.GetIndexOfNeighbor(i, k);
+                var d = ki != Sampler.INVALID_ID ? _rawBuffer.data[ki] : Sampler.INVALID_DEPTH;
                 Accumulate(local.medianArr, j++, d, actualVal);
             }
 
@@ -70,8 +75,6 @@ namespace DepthSensorSandbox.Processing {
                 var k = Smooth * Mathf.Sqrt((float)(MaxError - error) / MaxError);
                 _out.data[i] = (ushort) Mathf.Lerp(median, prevVal, k);
             }
-
-            return local;
         }
 
         private static void Accumulate(ushort[] a, int i, ushort val, ushort def) {
