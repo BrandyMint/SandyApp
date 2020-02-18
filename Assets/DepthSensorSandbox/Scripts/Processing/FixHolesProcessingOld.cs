@@ -69,7 +69,7 @@ namespace DepthSensorSandbox.Processing {
         }
 
         private ushort FixDepthHole(ushort v1, ushort v2, int s1, int s2) {
-            var k = (float) s1 / (s1 + s2);
+            var k = (float) (s1 + 1) / (s1 + s2 + 2);
             return (ushort) Mathf.Lerp(v1, v2, k);
         }
         
