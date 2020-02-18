@@ -231,12 +231,13 @@ namespace DepthSensorSandbox {
             if (scam == null) return;
             var cam = scam.GetCamera();
             var maxDist = Prefs.Sandbox.ZeroDepth + Prefs.Sandbox.OffsetMinDepth;
-            var minDist = Mathf.Max(Prefs.Sandbox.ZeroDepth - 2f * Prefs.Sandbox.OffsetMaxDepth, cam.nearClipPlane);
+            var minDist = Prefs.Sandbox.ZeroDepth - 3f * Prefs.Sandbox.OffsetMaxDepth;
+            minDist = Mathf.Max(Mathf.Lerp(minDist, 0.4f * Prefs.Sandbox.ZeroDepth, 0.5f), cam.nearClipPlane);
             var meshTransform = FindObjectOfType<SandboxMesh>()?.transform;
             var croppingMax = cam.GetCroppingToDepth(meshTransform, maxDist, device);
             var croppingMin = cam.GetCroppingToDepth(meshTransform, minDist, device);
             var cropping = RectUtils.Encompass(croppingMin, croppingMax);
-
+            //Debug.Log("cropping " + cropping);
             foreach (var processing in _processings) {
                 processing.SetCropping(cropping);
             }
