@@ -1,6 +1,7 @@
 using System;
 using DepthSensor.Device;
 using UnityEngine;
+using Utilities;
 
 namespace DepthSensorSandbox.Visualisation {
     public static class SandboxCameraUtils {
@@ -43,29 +44,27 @@ namespace DepthSensorSandbox.Visualisation {
                 max = toNewView01(camMax);
             }
 
-            if (max.x < min.x) Swap(ref max.x, ref min.x);
-            if (max.y < min.y) Swap(ref max.y, ref min.y);
+            if (max.x < min.x) MathHelper.Swap(ref max.x, ref min.x);
+            if (max.y < min.y) MathHelper.Swap(ref max.y, ref min.y);
 
             return Rect.MinMaxRect(min.x, min.y, max.x, max.y);
         }
         
-        public static Rect GetCroppingToDepth(this Camera cam, float dist, DepthSensorDevice device) {
+        public static Rect GetCroppingToDepth(this Camera cam, Transform depthTransform, float dist, DepthSensorDevice device) {
             var depth = device.Depth.GetNewest();
-            var minUV = Vector2.zero;
-            var maxUV = Vector2.one;
-
-            return GetCropping(cam, dist, minUV, maxUV, pWorld => {
+            var toNewView01 = new Func<Vector3, Vector2>(pWorld => {
+                if (depthTransform != null)
+                    pWorld = depthTransform.InverseTransformPoint(pWorld);
                 var p = device.CameraPosToDepthMapPos(pWorld);
                 p.x /= depth.width;
                 p.y /= depth.height;
                 return p;
             });
-        }
 
-        private static void Swap<T>(ref T a, ref T b) {
-            var t = a;
-            a = b;
-            b = t;
+            return RectUtils.Encompass(
+                GetCropping(cam, dist, new Vector2(0f, 0f), new Vector2(1f, 1f), toNewView01),
+                GetCropping(cam, dist, new Vector2(1f, 0f), new Vector2(0f, 1f), toNewView01)
+            );
         }
     }
 }

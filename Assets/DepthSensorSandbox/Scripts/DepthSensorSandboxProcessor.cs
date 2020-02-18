@@ -8,6 +8,7 @@ using DepthSensor.Sensor;
 using DepthSensorSandbox.Processing;
 using DepthSensorSandbox.Visualisation;
 using UnityEngine;
+using Utilities;
 
 namespace DepthSensorSandbox {
     public class DepthSensorSandboxProcessor : MonoBehaviour {
@@ -44,7 +45,7 @@ namespace DepthSensorSandbox {
 
         public static DepthSensorSandboxProcessor Instance { get; private set; }
 
-        public readonly FixHolesProcessingOld FixHoles = new FixHolesProcessingOld();
+        public readonly FixHolesProcessing FixHoles = new FixHolesProcessing();
         public readonly NoiseFilterProcessing NoiseFilter = new NoiseFilterProcessing();
         public readonly HandsProcessing Hands = new HandsProcessing();
 
@@ -131,7 +132,7 @@ namespace DepthSensorSandbox {
             }
 
             UpdateBuffersCount(BuffersCount);
-            UpdateCropping(_needUpdateCroppingCamera);
+            FindCameraIfNotAndUpdateCropping();
         }
 
         private void UnSubscribeDevice(DepthSensorDevice device) {
@@ -213,6 +214,12 @@ namespace DepthSensorSandbox {
                 _conveyer.RemoveTask(_coveyerId);
         }
 
+        private void FindCameraIfNotAndUpdateCropping() {
+            if (_needUpdateCroppingCamera == null)
+                _needUpdateCroppingCamera = FindObjectOfType<SandboxCamera>();
+            UpdateCropping(_needUpdateCroppingCamera);
+        }
+
         private void UpdateCropping(SandboxCamera scam) {
             var device = GetDeviceIfAvailable();
             if (device == null) {
@@ -223,9 +230,12 @@ namespace DepthSensorSandbox {
             
             if (scam == null) return;
             var cam = scam.GetCamera();
-            var dist = Prefs.Sandbox.ZeroDepth + Prefs.Sandbox.OffsetMinDepth;
-            var cropping = cam.GetCroppingToDepth(dist, device);
-            Debug.Log("cropping " + cropping);
+            var maxDist = Prefs.Sandbox.ZeroDepth + Prefs.Sandbox.OffsetMinDepth;
+            var minDist = Mathf.Max(Prefs.Sandbox.ZeroDepth - 2f * Prefs.Sandbox.OffsetMaxDepth, cam.nearClipPlane);
+            var meshTransform = FindObjectOfType<SandboxMesh>()?.transform;
+            var croppingMax = cam.GetCroppingToDepth(meshTransform, maxDist, device);
+            var croppingMin = cam.GetCroppingToDepth(meshTransform, minDist, device);
+            var cropping = RectUtils.Encompass(croppingMin, croppingMax);
 
             foreach (var processing in _processings) {
                 processing.SetCropping(cropping);
@@ -318,7 +328,8 @@ namespace DepthSensorSandbox {
         }
 
         private void InvokeOnNewFrame(DepthBuffer buff) {
-            _onNewFrame?.Invoke(buff, _bufMapToCamera);
+            if (_bufMapToCamera != null)
+                _onNewFrame?.Invoke(buff, _bufMapToCamera);
         }
 
         private void UpdateDepthToColor(DepthSensorDevice device, DepthBuffer depth) {

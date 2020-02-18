@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
 namespace DepthSensorSandbox.Visualisation {
@@ -34,8 +35,14 @@ namespace DepthSensorSandbox.Visualisation {
             }
             _cam.fieldOfView = Prefs.Calibration.Fov;
 
-            AfterCalibrationUpdated?.Invoke(this);
+            StopCoroutine(nameof(InvokeAfterCalibrationOnNextFrame));
+            StartCoroutine(nameof(InvokeAfterCalibrationOnNextFrame));
         }
+
+        private IEnumerator InvokeAfterCalibrationOnNextFrame() {
+            yield return null;
+            AfterCalibrationUpdated?.Invoke(this);
+        } 
 
         public void ResetToCalibration() {
             OnCalibrationChanged();

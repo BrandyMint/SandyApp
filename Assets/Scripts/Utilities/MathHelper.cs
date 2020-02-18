@@ -187,5 +187,11 @@ namespace Utilities {
             a[i] = a[j];
             a[j] = t;
         }
+
+        public static void Swap<T>(ref T a, ref T b) {
+            var t = a;
+            a = b;
+            b = t;
+        }
     }
 }
