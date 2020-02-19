@@ -9,10 +9,8 @@ namespace DepthSensorSandbox.Visualisation {
         
         [SerializeField] protected bool _enableOnStart = true;
         
-        private Material _material;
         protected SandboxMesh _sandbox;
         private SandboxParams _sandboxParams;
-        
 
         protected virtual void Awake() {
             _sandbox = GetComponent<SandboxMesh>();
@@ -30,7 +28,6 @@ namespace DepthSensorSandbox.Visualisation {
             enabled = enable;
             if (enable) {
                 DepthSensorSandboxProcessor.OnNewFrame += OnNewFrame;
-                _sandbox.Material = _material;
             } else {
                 DepthSensorSandboxProcessor.OnNewFrame -= OnNewFrame;
             }
