@@ -97,7 +97,7 @@ namespace DepthSensorSandbox.Processing {
             ushort longExp;
             if (i !=  Sampler.INVALID_ID && _currHandsMask.data[i] == CLEAR_COLOR 
             && (longExp = _depthLongExpos.data[i]) != Sampler.INVALID_DEPTH 
-            &&  _inDepth.data[i] - longExp > minDiffer) {
+            &&  longExp - _inDepth.data[i] > minDiffer) {
                 _currHandsMask.data[i] = color;
                 if (doLock) lock (_queue) _queue.Enqueue(i);
                 else _queue.Enqueue(i);
