@@ -7,10 +7,13 @@
 #endif
 using System.Threading.Tasks;
 using DepthSensor.Buffer;
+using DepthSensor.Sensor;
 using UnityEngine;
 
 namespace DepthSensorSandbox.Processing {
     public class HandsProcessing : ProcessingBase {
+        private const int _HANDS_MASK_BUFFERS_COUNT = 3;
+    
         public const byte CLEAR_COLOR = 0;
         public const byte COLOR = 1;
         
@@ -18,13 +21,16 @@ namespace DepthSensorSandbox.Processing {
         public ushort MaxError = 10;
         public ushort MinDistanceAtBorder = 100;
         
-        public IndexBuffer HandsMask => _handsMask;
+        public SensorIndex HandsMask => _sensorHands;
+        public IndexBuffer CurrHandsMask => _currHandsMask;
 #if HANDS_WAVE_STEP_DEBUG
         public int CurrWave { get;  private set; }
         public readonly Barrier WaveBarrier = new Barrier(1);
 #endif
 
-        private IndexBuffer _handsMask;
+        private SensorIndex _sensorHands;
+        private SensorIndex.Internal _sensorHandsInternal;
+        private IndexBuffer _currHandsMask;
         private Buffer2D<ushort> _depthLongExpos;
         private readonly ArrayIntQueue _queue = new ArrayIntQueue();
 
@@ -32,32 +38,39 @@ namespace DepthSensorSandbox.Processing {
 #if HANDS_WAVE_STEP_DEBUG
             WaveBarrier?.Dispose();
 #endif
-            _handsMask?.Dispose();
+            _sensorHands?.Dispose();
         }
         
         protected override void InitInMainThreadInternal(DepthBuffer buffer) {
-            if (_handsMask == null) {
-                _handsMask = new IndexBuffer(1, 1);
+            if (_depthLongExpos == null) {
                 _depthLongExpos = new Buffer2D<ushort>(1, 1);
             }
             
             if (AbstractBuffer2D.ReCreateIfNeed(ref _depthLongExpos, buffer.width, buffer.height)) {
                 buffer.data.CopyTo(_depthLongExpos.data);
-                AbstractBuffer2D.ReCreateIfNeed(ref _handsMask, buffer.width, buffer.height);
+                _currHandsMask = null;
+                _sensorHands?.Dispose();
+                _sensorHands = new SensorIndex(new IndexBuffer(buffer.width, buffer.height)) {
+                    BuffersCount = _HANDS_MASK_BUFFERS_COUNT
+                };
+                _sensorHandsInternal = new Sensor<IndexBuffer>.Internal(_sensorHands);
                 _queue.MaxSize = buffer.length;
             }
         }
 
         protected override void ProcessInternal() {
-            if (!CheckValid(_depthLongExpos) || !CheckValid(_handsMask))
+            if (!CheckValid(_depthLongExpos))
                 return;
             
             _queue.Clear();
-            _handsMask.Clear();
+            _currHandsMask = _sensorHands.GetOldest();
+            _currHandsMask.Clear();
             
             Parallel.Invoke(FillBorderUp, FillBorderDown, FillBorderLeft, FillBorderRight);
             FillHandsMask();
             _s.EachParallelHorizontal(WriteMaskResultBody);
+            
+            _sensorHandsInternal.OnNewFrameBackground();
         }
 
         private void FillBorderUp() {
@@ -82,10 +95,10 @@ namespace DepthSensorSandbox.Processing {
 
         private bool Fill(byte color, int i, ushort minDiffer, bool doLock = false) {
             ushort longExp;
-            if (i !=  Sampler.INVALID_ID && _handsMask.data[i] == CLEAR_COLOR 
+            if (i !=  Sampler.INVALID_ID && _currHandsMask.data[i] == CLEAR_COLOR 
             && (longExp = _depthLongExpos.data[i]) != Sampler.INVALID_DEPTH 
             &&  _inDepth.data[i] - longExp > minDiffer) {
-                _handsMask.data[i] = color;
+                _currHandsMask.data[i] = color;
                 if (doLock) lock (_queue) _queue.Enqueue(i);
                 else _queue.Enqueue(i);
                 return true;
@@ -118,7 +131,7 @@ namespace DepthSensorSandbox.Processing {
 
         private void WriteMaskResultBody(int i) {
             var valLongExpos = _depthLongExpos.data[i];
-            var color = _handsMask.data[i];
+            var color = _currHandsMask.data[i];
             if (color != CLEAR_COLOR) {
                 _out.data[i] = valLongExpos;
             } else {

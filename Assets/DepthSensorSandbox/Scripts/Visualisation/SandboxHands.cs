@@ -37,7 +37,7 @@ namespace DepthSensorSandbox.Visualisation {
             if (_sandbox == null)
                 return;
             var props = _sandbox.PropertyBlock;
-            var mask = DepthSensorSandboxProcessor.Instance.Hands.HandsMask;
+            var mask = DepthSensorSandboxProcessor.Instance.Hands.HandsMask.GetNewest();
             mask.UpdateTexture();
             props.SetTexture(_HANDS_MASK_TEX, mask.texture);
             _sandbox.PropertyBlock = props;

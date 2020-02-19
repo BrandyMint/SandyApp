@@ -27,9 +27,7 @@ namespace DepthSensorSandbox.Processing {
         protected abstract void ProcessInternal();
 
         public void InitInMainThread(DepthBuffer buffer) {
-            if (Active) {
-                InitInMainThreadInternal(buffer);
-            }
+            InitInMainThreadInternal(buffer);
         }
 
         protected virtual void InitInMainThreadInternal(DepthBuffer buffer) {}

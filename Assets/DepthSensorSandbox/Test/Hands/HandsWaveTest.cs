@@ -52,10 +52,10 @@ namespace DepthSensorSandbox.Test.Hands {
         }
 
         private void ShowWave() {
-            if (_hands.HandsMask.texture.filterMode != FilterMode.Point)
-                _hands.HandsMask.texture.filterMode = FilterMode.Point;
-            _hands.HandsMask.UpdateTexture();
-            _image.texture = _hands.HandsMask.texture;
+            if (_hands.CurrHandsMask.texture.filterMode != FilterMode.Point)
+                _hands.CurrHandsMask.texture.filterMode = FilterMode.Point;
+            _hands.CurrHandsMask.UpdateTexture();
+            _image.texture = _hands.CurrHandsMask.texture;
             _image.gameObject.SetActive(true);
 #if HANDS_WAVE_STEP_DEBUG
             _txtWawe.text = _hands.CurrWave.ToString();
