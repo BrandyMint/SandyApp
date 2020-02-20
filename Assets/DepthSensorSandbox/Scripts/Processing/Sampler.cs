@@ -167,6 +167,12 @@ namespace DepthSensorSandbox.Processing {
                 id += step;
             }
         }
+
+        public void Each(Action<int> handler) {
+            for (var y = _cropping.yMin; y < _cropping.yMax; ++y) {
+                EachInHorizontal(y, handler);
+            }
+        }
         
 #region Each parallel simple
         private Action<int> _eachHandler;

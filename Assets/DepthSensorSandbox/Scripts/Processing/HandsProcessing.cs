@@ -41,6 +41,7 @@ namespace DepthSensorSandbox.Processing {
         private DepthBuffer _currHandsDepth;
         private SensorDepth _sensorHandsDepth;
         private SensorDepth.Internal _sensorHandsDepthInternal;
+        private Sampler _samplerHandsDepth = Sampler.Create();
         
         private Buffer2D<ushort> _depthLongExpos;
         private readonly ArrayIntQueue _queue = new ArrayIntQueue();
@@ -82,11 +83,21 @@ namespace DepthSensorSandbox.Processing {
                     BuffersCount = _HANDS_MASK_BUFFERS_COUNT
                 };
                 _sensorHandsDepthInternal = new Sensor<DepthBuffer>.Internal(_sensorHandsDepth);
+                _samplerHandsDepth.SetDimens(_currHandsDepth.width, _currHandsDepth.height);
 
                 _queue.MaxSize = buffer.length;
                 _queueErrorAura.MaxSize = buffer.length;
                 _queueErrorAuraExtend.MaxSize = buffer.length;
             }
+        }
+        
+        public override void SetCropping(Rect cropping01) {
+            base.SetCropping(cropping01);
+            _samplerHandsDepth.SetCropping01(cropping01);
+        }
+        
+        public Sampler GetSamplerHandsDecreased() {
+            return _samplerHandsDepth;
         }
 
         protected override void ProcessInternal() {
