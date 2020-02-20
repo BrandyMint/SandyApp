@@ -6,8 +6,11 @@ namespace DepthSensorSandbox.Visualisation {
     [RequireComponent(typeof(SandboxMesh))]
     public class SandboxHands : MonoBehaviour {
         private static readonly int _HANDS_MASK_TEX = Shader.PropertyToID("_HandsMaskTex");
+        private static readonly int _HANDS_DEPTH_TEX = Shader.PropertyToID("_HandsDepthTex");
         
         [SerializeField] protected bool _enableOnStart = true;
+        [SerializeField] public bool UpdateMask = true;
+        [SerializeField] public bool UpdateHandsDepth = true;
         
         protected SandboxMesh _sandbox;
         private SandboxParams _sandboxParams;
@@ -37,9 +40,16 @@ namespace DepthSensorSandbox.Visualisation {
             if (_sandbox == null)
                 return;
             var props = _sandbox.PropertyBlock;
-            var mask = DepthSensorSandboxProcessor.Instance.Hands.HandsMask.GetNewest();
-            mask.UpdateTexture();
-            props.SetTexture(_HANDS_MASK_TEX, mask.texture);
+            if (UpdateMask) {
+                var mask = DepthSensorSandboxProcessor.Instance.Hands.HandsMask.GetNewest();
+                mask.UpdateTexture();
+                props.SetTexture(_HANDS_MASK_TEX, mask.texture);
+            }
+            if (UpdateHandsDepth) {
+                var hands = DepthSensorSandboxProcessor.Instance.Hands.HandsDepth.GetNewest();
+                hands.UpdateTexture();
+                props.SetTexture(_HANDS_DEPTH_TEX, hands.texture);
+            }
             _sandbox.PropertyBlock = props;
         }
     }

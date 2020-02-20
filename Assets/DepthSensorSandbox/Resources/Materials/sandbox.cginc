@@ -18,6 +18,8 @@ struct appdata {
     float2 uv : TEXCOORD0;    
 };
 
+#define DEPTH_TO_FLOAT 65.535
+
 #define CURR float2(0, 0)
 #define L float2(-1, 0)
 #define R float2(1, 0)
@@ -56,7 +58,7 @@ struct v2f {
         uv += offset * _DepthTex_TexelSize.xy;
         clamp(uv, 0, 1);
         float2 p = tex2Dlod(_MapToCameraTex, float4(uv, 0, 0)).rg;
-        float d = tex2Dlod(_DepthTex, float4(uv, 0, 0)).r * 65.535;
+        float d = tex2Dlod(_DepthTex, float4(uv, 0, 0)).r * DEPTH_TO_FLOAT;
         return float4(p.xy * d, d, 0);
     }
 #endif

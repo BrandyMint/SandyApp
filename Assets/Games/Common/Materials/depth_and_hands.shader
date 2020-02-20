@@ -33,7 +33,7 @@
                 return half4(
                     i.vpos.z,
                     fragSlice(i),
-                    0, 0);// / 65.535;
+                    0, 0);// / DEPTH_TO_FLOAT;
             }
             
             ENDCG
