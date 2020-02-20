@@ -73,10 +73,11 @@ namespace DepthSensorSandbox {
 #region Initializing
 
         private DepthSensorSandboxProcessor() {
+            NoiseFilter.Active = false;
             _processings = new ProcessingBase[] {
+                Hands,
                 NoiseFilter,
-                FixHoles,
-                Hands
+                FixHoles
             };
         }
 
@@ -305,14 +306,14 @@ namespace DepthSensorSandbox {
             var bufDevice = device.Depth.GetNewest();
             var bufProcessing = _bufDepth?.GetNewest();
             if (bufProcessing == null || bufProcessing.width != bufDevice.width || bufProcessing.height != bufDevice.height) {
+                foreach (var processing in _processings) {
+                    processing.InitInMainThread(bufDevice);
+                }
                 DisposeSensor(ref _bufDepth);
                 _bufDepth = new SensorDepth(bufDevice.CreateSome<DepthBuffer>()) {
                     BuffersCount = _buffersCount
                 };
                 _bufDepthInternal = new Sensor<DepthBuffer>.Internal(_bufDepth);
-                foreach (var processing in _processings) {
-                    processing.InitInMainThread(bufDevice);
-                }
 
                 DisposeBuffer(ref _bufDepthToColor);
                 _bufDepthToColor = new DepthToColorBuffer(bufDevice.width, bufDevice.height);
