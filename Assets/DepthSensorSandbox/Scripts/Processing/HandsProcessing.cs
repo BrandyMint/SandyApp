@@ -5,6 +5,7 @@
 #if HANDS_WAVE_STEP_DEBUG
     using System.Threading;
 #endif
+using System;
 using System.Threading.Tasks;
 using DepthSensor.Buffer;
 using DepthSensor.Sensor;
@@ -22,6 +23,7 @@ namespace DepthSensorSandbox.Processing {
         public ushort MaxError = 10;
         public ushort MaxErrorAura = 10;
         public ushort MinDistanceAtBorder = 100;
+        public int WavesCountErrorAuraExtend = 4;
         
         public SensorIndex HandsMask => _sensorHands;
         public IndexBuffer CurrHandsMask => _currHandsMask;
@@ -36,6 +38,7 @@ namespace DepthSensorSandbox.Processing {
         private Buffer2D<ushort> _depthLongExpos;
         private readonly ArrayIntQueue _queue = new ArrayIntQueue();
         private readonly ArrayIntQueue _queueErrorAura = new ArrayIntQueue();
+        private readonly ArrayIntQueue _queueErrorAuraExtend = new ArrayIntQueue();
 
         private enum Cell {
             INVALID,
@@ -66,6 +69,7 @@ namespace DepthSensorSandbox.Processing {
                 _sensorHandsInternal = new Sensor<IndexBuffer>.Internal(_sensorHands);
                 _queue.MaxSize = buffer.length;
                 _queueErrorAura.MaxSize = buffer.length;
+                _queueErrorAuraExtend.MaxSize = buffer.length;
             }
         }
 
@@ -75,12 +79,17 @@ namespace DepthSensorSandbox.Processing {
             
             _queue.Clear();
             _queueErrorAura.Clear();
+            _queueErrorAuraExtend.Clear();
             _currHandsMask = _sensorHands.GetOldest();
             _currHandsMask.Clear();
             
             Parallel.Invoke(FillBorderUp, FillBorderDown, FillBorderLeft, FillBorderRight);
-            FillHandsMask();
-            FillHandsMaskErrorAura();
+#if HANDS_WAVE_STEP_DEBUG
+            CurrWave = 0;
+#endif
+            WaveFill(_queue, FillHands);
+            WaveFill(_queueErrorAura, FillHandsErrorAura);
+            WaveFill(_queueErrorAuraExtend, FillHandsErrorAuraExtend, WavesCountErrorAuraExtend);
             _s.EachParallelHorizontal(WriteMaskResultBody);
             
             _sensorHandsInternal.OnNewFrameBackground();
@@ -103,23 +112,24 @@ namespace DepthSensorSandbox.Processing {
         }
         
         private void FillMaskLine(int id) {
-            if (CheckCell(id, MinDistanceAtBorder) == Cell.HAND)
-                Fill(COLOR, id);
+            if (CheckCell(id, MinDistanceAtBorder) == Cell.HAND) {
+                lock (_queue) {
+                    Fill(COLOR, id, _queue);
+                }
+            }
         }
 
-        private void Fill(byte color, int i) {
+        private void Fill(byte color, int i, ArrayIntQueue queue) {
             _currHandsMask.data[i] = color;
-            _queue.Enqueue(i);
+            queue.Enqueue(i);
         }
 
-        private void FillErrorAura(byte color, int i) {
-            _currHandsMask.data[i] = color;
-            _queueErrorAura.Enqueue(i);
+        private bool IsCellInvalid(int i) {
+            return i == Sampler.INVALID_ID || _currHandsMask.data[i] != CLEAR_COLOR;
         }
 
         private Cell CheckCell(int i, ushort minDiffer) {
-            if (i == Sampler.INVALID_ID 
-            || _currHandsMask.data[i] != CLEAR_COLOR)
+            if (IsCellInvalid(i))
                 return Cell.INVALID;
 
             var longExp = _depthLongExpos.data[i];
@@ -137,74 +147,62 @@ namespace DepthSensorSandbox.Processing {
             }
             return Cell.CLEAR;
         }
-        
-        private bool IsHand(int i, ushort minDiffer) {
-            ushort longExp;
-            ushort val;
-            return i != Sampler.INVALID_ID 
-                   && _currHandsMask.data[i] == CLEAR_COLOR
-                   && (val = _inDepth.data[i]) != Sampler.INVALID_DEPTH
-                   && (longExp = _depthLongExpos.data[i]) != Sampler.INVALID_DEPTH
-                   && longExp - val > minDiffer;
+
+        private void WaveFill(ArrayIntQueue queue, Action<int> fill, int maxWave = int.MaxValue) {
+            int countInCurrWave = queue.GetCount();
+            int currWave = 0;
+#if HANDS_WAVE_STEP_DEBUG
+            WaveBarrier.SignalAndWait();
+#endif
+            while (queue.GetCount() > 0) {
+                int i = queue.Dequeue();
+                for (int n = 0; n < 4; ++n) {
+                    int j = _s.GetIndexOfNeighbor(i, n);
+                    fill(j);
+                }
+                --countInCurrWave;
+                if (countInCurrWave == 0) {
+                    countInCurrWave = queue.GetCount();
+                    ++currWave;
+#if HANDS_WAVE_STEP_DEBUG
+                    ++CurrWave;
+                    WaveBarrier.SignalAndWait();
+#endif
+                    if (currWave >= maxWave)
+                        return;
+                }
+            }
         }
 
-        private void FillHandsMask() {
-#if HANDS_WAVE_STEP_DEBUG
-            int countInCurrWave = _queue.GetCount();
-            CurrWave = 0;
-            WaveBarrier.SignalAndWait();
-#endif
-            while (_queue.GetCount() > 0) {
-                int i = _queue.Dequeue();
-                for (int n = 0; n < 8; ++n) {
-                    int j = _s.GetIndexOfNeighbor(i, n);
-                    switch (CheckCell(j, MaxError)) {
-                        case Cell.HAND:
-                            Fill(COLOR, j);
-                            break;
-                        case Cell.ERROR_AURA:
-                            FillErrorAura(COLOR_ERROR_AURA, j);
-                            break;
-                    }
-                }
-#if HANDS_WAVE_STEP_DEBUG
-                --countInCurrWave;
-                if (countInCurrWave == 0) {
-                    countInCurrWave = _queue.GetCount();
-                    ++CurrWave;
-                    WaveBarrier.SignalAndWait();
-                }
-#endif
+        private void FillHands(int id) {
+            switch (CheckCell(id, MaxError)) {
+                case Cell.HAND:
+                    Fill(COLOR, id, _queue);
+                    break;
+                case Cell.ERROR_AURA:
+                    Fill(COLOR_ERROR_AURA, id, _queueErrorAura);
+                    break;
+                case Cell.CLEAR:
+                    Fill(COLOR_ERROR_AURA, id, _queueErrorAuraExtend);
+                    break;
             }
         }
         
-        private void FillHandsMaskErrorAura() {
-#if HANDS_WAVE_STEP_DEBUG
-            int countInCurrWave = _queueErrorAura.GetCount();
-            WaveBarrier.SignalAndWait();
-#endif
-            while (_queueErrorAura.GetCount() > 0) {
-                int i = _queueErrorAura.Dequeue();
-                for (int n = 0; n < 8; ++n) {
-                    int j = _s.GetIndexOfNeighbor(i, n);
-                    switch (CheckCell(j, MaxError)) {
-                        case Cell.ERROR_AURA:
-                            FillErrorAura(COLOR_ERROR_AURA, j);
-                            break;
-                        case Cell.CLEAR:
-                            _currHandsMask.data[i] = COLOR_ERROR_AURA;
-                            break;
-                    }
-                }
-#if HANDS_WAVE_STEP_DEBUG
-                --countInCurrWave;
-                if (countInCurrWave == 0) {
-                    countInCurrWave = _queueErrorAura.GetCount();
-                    ++CurrWave;
-                    WaveBarrier.SignalAndWait();
-                }
-#endif
+        private void FillHandsErrorAura(int id) {
+            switch (CheckCell(id, MaxError)) {
+                case Cell.ERROR_AURA:
+                    Fill(COLOR_ERROR_AURA, id, _queueErrorAura);
+                    break;
+                case Cell.HAND:
+                case Cell.CLEAR:
+                    Fill(COLOR_ERROR_AURA, id, _queueErrorAuraExtend);
+                    break;
             }
+        }
+        
+        private void FillHandsErrorAuraExtend(int id) {
+            if (!IsCellInvalid(id))
+                Fill(COLOR_ERROR_AURA, id, _queueErrorAuraExtend);
         }
 
         private void WriteMaskResultBody(int i) {
@@ -216,8 +214,10 @@ namespace DepthSensorSandbox.Processing {
             } else {
                 var inVal = _inDepth.data[i];
                 var outVal = inVal;
-                if (inVal != Sampler.INVALID_DEPTH && valLongExpos != Sampler.INVALID_DEPTH) {
-                    _depthLongExpos.data[i] = outVal = (ushort) Mathf.Lerp(inVal, valLongExpos, Exposition);
+                if (inVal != Sampler.INVALID_DEPTH) {
+                    if (valLongExpos != Sampler.INVALID_DEPTH)
+                        outVal = (ushort) Mathf.Lerp(inVal, valLongExpos, Exposition);
+                    _depthLongExpos.data[i] = outVal;
                 }
                 _out.data[i] = outVal;
             }

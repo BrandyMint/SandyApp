@@ -38,9 +38,11 @@
             }
             
             fixed4 frag (v2f i) : SV_Target {
-                fixed col = tex2D(_MainTex, i.uv).r;
-                if (col > 0)
-                    return fixed4(1, 0, 0, 1);
+                fixed col = tex2D(_MainTex, i.uv).r * 256;
+                if (col >= 2)
+                    return fixed4(0, 1, 0, 1);
+                if (col >= 1)
+                    return fixed4(1, 0, 0, 1);                
                 return fixed4(0, 0, 0, 1);
             }
             ENDCG

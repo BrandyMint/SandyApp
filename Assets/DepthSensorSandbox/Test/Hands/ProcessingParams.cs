@@ -9,6 +9,7 @@ namespace DepthSensorSandbox.Test.Hands {
         [SerializeField] private ushort MaxError = 10;
         [SerializeField] private ushort MaxErrorAura = 10;
         [SerializeField] private ushort MinDistanceAtBorder = 100;
+        [SerializeField] private int WavesCountErrorAuraExtend = 5;
         
         private void Start() {
             FixHoles = DepthSensorSandboxProcessor.Instance.FixHoles.Active;
@@ -19,6 +20,7 @@ namespace DepthSensorSandbox.Test.Hands {
             MaxError = DepthSensorSandboxProcessor.Instance.Hands.MaxError;
             MaxErrorAura = DepthSensorSandboxProcessor.Instance.Hands.MaxErrorAura;
             MinDistanceAtBorder = DepthSensorSandboxProcessor.Instance.Hands.MinDistanceAtBorder;
+            WavesCountErrorAuraExtend = DepthSensorSandboxProcessor.Instance.Hands.WavesCountErrorAuraExtend;
         }
         
         private void Update() {
@@ -30,6 +32,7 @@ namespace DepthSensorSandbox.Test.Hands {
             DepthSensorSandboxProcessor.Instance.Hands.MaxError = MaxError;
             DepthSensorSandboxProcessor.Instance.Hands.MaxErrorAura = MaxErrorAura;
             DepthSensorSandboxProcessor.Instance.Hands.MinDistanceAtBorder = MinDistanceAtBorder;
+            DepthSensorSandboxProcessor.Instance.Hands.WavesCountErrorAuraExtend = WavesCountErrorAuraExtend;
         }
     }
 }
