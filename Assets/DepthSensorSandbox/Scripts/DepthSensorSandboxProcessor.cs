@@ -73,7 +73,7 @@ namespace DepthSensorSandbox {
 #region Initializing
 
         private DepthSensorSandboxProcessor() {
-            NoiseFilter.Active = false;
+            HandsProcessingSwitch(false);
             _processings = new ProcessingBase[] {
                 Hands,
                 NoiseFilter,
@@ -109,6 +109,11 @@ namespace DepthSensorSandbox {
             foreach (var processing in _processings) {
                 processing.Dispose();
             }
+        }
+
+        public void HandsProcessingSwitch(bool enable) {
+            NoiseFilter.Active = !enable;
+            Hands.Active = enable;
         }
 
         private static void DisposeBuffer<T>(ref T stream) where T: AbstractBuffer {

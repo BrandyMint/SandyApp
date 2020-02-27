@@ -12,6 +12,7 @@ namespace DepthSensorSandbox.Test.Hands {
         [SerializeField] private int WavesCountErrorAuraExtend = 5;
         
         private void Start() {
+            DepthSensorSandboxProcessor.Instance.HandsProcessingSwitch(true);
             FixHoles = DepthSensorSandboxProcessor.Instance.FixHoles.Active;
             NoiseFilter = DepthSensorSandboxProcessor.Instance.NoiseFilter.Active;
             Hands = DepthSensorSandboxProcessor.Instance.Hands.Active;

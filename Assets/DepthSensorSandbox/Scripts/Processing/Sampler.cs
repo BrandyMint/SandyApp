@@ -18,10 +18,19 @@ namespace DepthSensorSandbox.Processing {
         private RectInt _cropping;
         private Rect _cropping01;
 
+        public int width => _width;
+        public int height => _height;
+
         public static Sampler Create() {
             return new Sampler {
                 _cropping01 = Rect.MinMaxRect(0f,0f, 1f, 1f)
             };
+        }
+        
+        public static Sampler Create(int w, int h) {
+            var s = Create();
+            s.SetDimens(w, h);
+            return s;
         }
 
         public RectInt GetRect() {
@@ -176,7 +185,8 @@ namespace DepthSensorSandbox.Processing {
         
 #region Each parallel simple
         private Action<int> _eachHandler;
-        
+        private int _downsize;
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void EachParallelHorizontal(Action<int> handler) {
             _eachHandler = handler;
@@ -193,8 +203,22 @@ namespace DepthSensorSandbox.Processing {
             Parallel.For(_cropping.xMin, _cropping.xMax, EachInVerticalBody);
         }
 
-        private void EachInVerticalBody(int y) {
-            EachInVertical(y, _eachHandler);
+        private void EachInVerticalBody(int x) {
+            EachInVertical(x, _eachHandler);
+        }
+        
+        public void EachParallelDownsizeSafe(Action<int> handler, int downsize) {
+            _eachHandler = handler;
+            _downsize = downsize;
+            Parallel.For(_cropping.xMin/downsize, _cropping.xMax/downsize, EachParallelVerticalDownsizeSafeBody);
+        }
+        
+        private void EachParallelVerticalDownsizeSafeBody(int xDownsized) {
+            for (int i = 0; i < _downsize; ++i) {
+                var x = xDownsized * _downsize + i;
+                if (x >= _cropping.xMin && x < _cropping.xMax)
+                    EachInVertical(x, _eachHandler);
+            }
         }
 #endregion
 

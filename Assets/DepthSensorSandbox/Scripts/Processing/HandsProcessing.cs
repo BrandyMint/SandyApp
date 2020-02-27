@@ -43,7 +43,8 @@ namespace DepthSensorSandbox.Processing {
         private SensorDepth.Internal _sensorHandsDepthInternal;
         private Sampler _samplerHandsDepth = Sampler.Create();
         
-        private Buffer2D<ushort> _depthLongExpos;
+        private ushort[] _depthLongExpos;
+        private byte[] _decreasedHandsSumCounts;
         private readonly ArrayIntQueue _queue = new ArrayIntQueue();
         private readonly ArrayIntQueue _queueErrorAura = new ArrayIntQueue();
         private readonly ArrayIntQueue _queueErrorAuraExtend = new ArrayIntQueue();
@@ -64,12 +65,8 @@ namespace DepthSensorSandbox.Processing {
         }
         
         protected override void InitInMainThreadInternal(DepthBuffer buffer) {
-            if (_depthLongExpos == null) {
-                _depthLongExpos = new Buffer2D<ushort>(1, 1);
-            }
-            
-            if (AbstractBuffer2D.ReCreateIfNeed(ref _depthLongExpos, buffer.width, buffer.height)) {
-                buffer.data.CopyTo(_depthLongExpos.data);
+            if (ReCreateIfNeed(ref _depthLongExpos, buffer.length)) {
+                buffer.data.CopyTo(_depthLongExpos);
                 _currHandsMask = new IndexBuffer(buffer.width, buffer.height);
                 _sensorHandsMask?.Dispose();
                 _sensorHandsMask = new SensorIndex(_currHandsMask) {
@@ -83,6 +80,8 @@ namespace DepthSensorSandbox.Processing {
                     BuffersCount = _HANDS_MASK_BUFFERS_COUNT
                 };
                 _sensorHandsDepthInternal = new Sensor<DepthBuffer>.Internal(_sensorHandsDepth);
+                if (ReCreateIfNeed(ref _decreasedHandsSumCounts, _currHandsDepth.length))
+                    Array.Clear(_decreasedHandsSumCounts, 0, _decreasedHandsSumCounts.Length);
                 _samplerHandsDepth.SetDimens(_currHandsDepth.width, _currHandsDepth.height);
 
                 _queue.MaxSize = buffer.length;
@@ -101,7 +100,7 @@ namespace DepthSensorSandbox.Processing {
         }
 
         protected override void ProcessInternal() {
-            if (!CheckValid(_depthLongExpos))
+            if (!CheckValid(_currHandsMask))
                 return;
             
             _queue.Clear();
@@ -111,6 +110,7 @@ namespace DepthSensorSandbox.Processing {
             _currHandsMask.Clear();
             _currHandsDepth = _sensorHandsDepth.GetOldest();
             _currHandsDepth.Clear();
+            //Array.Clear(_decreasedHandsSumCounts, 0, _decreasedHandsSumCounts.Length);
             
             Parallel.Invoke(FillBorderUp, FillBorderDown, FillBorderLeft, FillBorderRight);
 #if HANDS_WAVE_STEP_DEBUG
@@ -119,7 +119,8 @@ namespace DepthSensorSandbox.Processing {
             WaveFill(_queue, FillHands);
             WaveFill(_queueErrorAura, FillHandsErrorAura);
             WaveFill(_queueErrorAuraExtend, FillHandsErrorAuraExtend, WavesCountErrorAuraExtend);
-            _s.EachParallelHorizontal(WriteMaskResultBody);
+            _s.EachParallelDownsizeSafe(WriteMaskResultBody, _HANDS_DEPTH_DECREASE);
+            _samplerHandsDepth.EachParallelHorizontal(FixAverageHandsDepthBody);
             
             _sensorHandsMaskInternal.OnNewFrameBackground();
             _sensorHandsDepthInternal.OnNewFrameBackground();
@@ -178,7 +179,7 @@ namespace DepthSensorSandbox.Processing {
             if (IsCellInvalid(i))
                 return Cell.INVALID;
 
-            var longExp = _depthLongExpos.data[i];
+            var longExp = _depthLongExpos[i];
             if (longExp != Sampler.INVALID_DEPTH) {
                 var val = _inDepth.data[i];
                 if (val != Sampler.INVALID_DEPTH) {
@@ -252,23 +253,37 @@ namespace DepthSensorSandbox.Processing {
         }
 
         private void WriteMaskResultBody(int i) {
-            var valLongExpos = _depthLongExpos.data[i];
+            var valLongExpos = _depthLongExpos[i];
             var inVal = _inDepth.data[i];
-            var isHand = _currHandsMask.data[i] != CLEAR_COLOR;
+            var mask = _currHandsMask.data[i];
+            var isHand = _currHandsMask.data[i];
             
-            if (isHand) {
+            if (mask != CLEAR_COLOR) {
                 _out.data[i] = valLongExpos;
-                var handD = Mathf.Max(1, (valLongExpos - inVal + _HANDS_DEPTH_DECREASE / 2) /_HANDS_DEPTH_DECREASE);
-                _currHandsDepth.data[MaskToHands(i)] += (ushort) handD;
+                if (mask == COLOR) {
+                    var j = MaskToHands(i);
+                    if (_currHandsMask.data[HandsToMask(j)] == COLOR) { //central point is colored
+                        _currHandsDepth.data[j] += (ushort) (valLongExpos - inVal);
+                        ++_decreasedHandsSumCounts[j];
+                    }
+                }
             } else {
                 var outVal = inVal;
                 if (inVal != Sampler.INVALID_DEPTH) {
                     if (valLongExpos != Sampler.INVALID_DEPTH)
                         outVal = (ushort) Mathf.Lerp(inVal, valLongExpos, Exposition);
-                    _depthLongExpos.data[i] = outVal;
+                    _depthLongExpos[i] = outVal;
                 }
                 _out.data[i] = outVal;
             }
+        }
+
+        private void FixAverageHandsDepthBody(int i) {
+            var count = _decreasedHandsSumCounts[i];
+            if (count > 1)
+                _currHandsDepth.data[i] /= count;
+            //clear for next frame
+            _decreasedHandsSumCounts[i] = 0;
         }
     }
 }

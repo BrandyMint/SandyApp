@@ -71,7 +71,8 @@ Material:
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
-    - _HandsDepthMax: 0.3
+    - _HandsDepthMax: 0.03
+    - _HandsDepthMaxDebug: 0.04
     - _Metallic: 0
     - _OcclusionStrength: 1
     - _QueueOffset: 0
