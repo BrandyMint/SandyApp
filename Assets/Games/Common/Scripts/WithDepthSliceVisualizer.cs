@@ -1,8 +1,8 @@
 ﻿using DepthSensorSandbox.Visualisation;
 using UnityEngine;
 
-namespace Games.Balloons {
-    public class WithHandsVisualizer : SandboxVisualizerBase {
+namespace Games.Common {
+    public class WithDepthSliceVisualizer : SandboxVisualizerBase {
         private static readonly int _DEPTH_SLICE_OFFSET = Shader.PropertyToID("_DepthSliceOffset");
         
         [SerializeField] private float _handsOffset = 0.05f;

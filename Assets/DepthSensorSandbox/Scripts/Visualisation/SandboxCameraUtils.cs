@@ -17,6 +17,10 @@ namespace DepthSensorSandbox.Visualisation {
         public static Plane PlaneOnDist(this Camera t, float dist) {
             return PlaneOnDist(t.transform, dist);
         }
+        
+        public static Plane PlaneOnTransform(this Camera cam, Transform t) {
+            return PlaneOnDist(cam, Vector3.Distance(cam.transform.position, t.position), t.forward);
+        }
 
         public static Plane PlaneOnDist(this Camera t, float dist, Vector3 planeUp) {
             return PlaneOnDist(t.transform, dist, planeUp);

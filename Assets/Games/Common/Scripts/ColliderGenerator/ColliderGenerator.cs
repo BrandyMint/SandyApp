@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using DepthSensorSandbox.Processing;
 using UnityEngine;
 
 namespace Games.Common.ColliderGenerator {
@@ -35,7 +36,8 @@ namespace Games.Common.ColliderGenerator {
         public void Generate(IColliderGeneratorDataProvider data, IColliderGeneratorOutput collider) {
             _data = data;
             _collider = collider;
-            _rect = data.Rect;
+            _rect = data.Sampler.GetRect();
+            _collider.PrepareFrame();
             ReCreateIfNeed(ref _was, _rect.width, _rect.height);
             Clear(_was, false);
             _scan.Clear();
