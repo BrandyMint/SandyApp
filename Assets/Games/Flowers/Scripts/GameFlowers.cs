@@ -1,5 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using DepthSensor.Buffer;
+using DepthSensor.Device;
+using DepthSensorSandbox.Processing;
 using Games.Common;
 using Games.Common.ColliderGenerator;
 using Games.Common.Game;
@@ -8,22 +11,22 @@ using UnityEngine;
 using Utilities;
 
 namespace Games.Flowers {
-    public class GameFlowers : BaseGameWithGetDepth {
+    public class GameFlowers : BaseGameWithHandsRaycast {
         [SerializeField] private PolygonCollider2D _handsCollider;
         [SerializeField] private PolygonCollider2D _mouseCollider;
         [SerializeField] private int _mouseDebugDataSize = 128;
         [SerializeField] private float _mouseDebugSize = 0.1f;
         [SerializeField] private int _maxCount = 20;
         [SerializeField] protected float _maxSpeed = 0.01f;
+        [SerializeField] private float _maxHandsDepth = 0.1f;
 
         private float _defaultSpeed;
         
         private Texture2D _handsTexture;
 
         private readonly ColliderGenerator _colliderGenerator = new ColliderGenerator();
-        private readonly DataHandsByteArray _colliderGeneratorData = new DataHandsByteArray();
         private readonly DataMouse _colliderGeneratorDataMouse = new DataMouse();
-        private readonly OutputPolygonCollider2D _colliderGeneratorOutput = new OutputPolygonCollider2D();
+        private readonly OutputPolygonCollider2DRaycaster _colliderGeneratorOutput = new OutputPolygonCollider2DRaycaster();
         private readonly OutputPolygonCollider2D _colliderGeneratorOutputMouse = new OutputPolygonCollider2D();
 
         private readonly List<Transform> _tplsFlower = new List<Transform>();
@@ -46,6 +49,15 @@ namespace Games.Flowers {
             _testMouseModeHold = true;
             
             base.Start();
+            SetCustomMaxHandDepth(_maxHandsDepth);
+            _handsRaycaster.HandFire -= Fire;
+            _handsRaycaster.CustomProcessingFrame += ProcessDepthFrame;
+        }
+
+        protected override HandsRaycaster CreateHandsRaycaster() {
+            var raycaster = base.CreateHandsRaycaster();
+            _colliderGeneratorOutput.Raycaster = raycaster;
+            return raycaster;
         }
 
         protected override void OnDestroy() {
@@ -98,13 +110,15 @@ namespace Games.Flowers {
             _flowers.Clear();
         }
 
+        protected override void Update() { }
+
         protected virtual void FixedUpdate() {
             if (Input.GetMouseButton(0) && _isGameStarted) {
                 _colliderGeneratorDataMouse.CircleSize = _mouseDebugSize * _mouseDebugDataSize;
                 var dataSize = new Vector2Int((int) (_mouseDebugDataSize * _cam.aspect), _mouseDebugDataSize);
-                _colliderGeneratorDataMouse.Rect 
-                    = _colliderGeneratorOutputMouse.SourceRect
-                        = new RectInt(Vector2Int.zero, dataSize);
+                var sampler = Sampler.Create(dataSize.x, dataSize.y);
+                _colliderGeneratorDataMouse.Sampler = sampler;
+                _colliderGeneratorOutputMouse.SourceRect = sampler.GetRect(); 
                 
                 _colliderGeneratorDataMouse.MousePos = new Vector2(
                     (int) (Input.mousePosition.x / _cam.pixelWidth * dataSize.x),
@@ -122,15 +136,11 @@ namespace Games.Flowers {
             }
         }
 
-        protected override void ProcessDepthFrame() {
+        private void ProcessDepthFrame(DepthSensorDevice device, HandsProcessing processor, DepthBuffer hands, Sampler sampler) {
             if (!_isGameStarted) return;
 
-            _colliderGeneratorData.Rect 
-                = _colliderGeneratorOutput.SourceRect
-                    = new RectInt(Vector2Int.zero, new Vector2Int(_depthSize.x, _depthSize.y));
-            _colliderGeneratorData.arr = _depth.o;
             _colliderGeneratorOutput.Clear();
-            _colliderGenerator.Generate(_colliderGeneratorData, _colliderGeneratorOutput);
+            _colliderGenerator.Generate(_handsRaycaster, _colliderGeneratorOutput);
             _handsCollider.enabled = !_colliderGeneratorOutput.IsEmpty();
         }
     }

@@ -241,13 +241,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 507380211}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e2ac3bb491b04cb88c4c873572c4ccfd, type: 3}
+  m_Script: {fileID: 11500000, guid: 089e328740824ff2b7210c969f42086c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _material: {fileID: 2100000, guid: fa1ab4b2ca9a7064e98b03e6ca959fe0, type: 2}
-  _instantiateMaterial: 1
   _enableOnStart: 1
-  _handsOffset: 0.05
+  UpdateMask: 1
+  UpdateHandsDepth: 1
 --- !u!4 &507380213 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6145052356739669663, guid: 47cbe1775872baf289a77a580245e6e6,
@@ -272,6 +271,21 @@ Camera:
     type: 3}
   m_PrefabInstance: {fileID: 507380210}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &507380216
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 507380211}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d553eb0afe04b88aaf791a4e597a22d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _material: {fileID: 2100000, guid: fa1ab4b2ca9a7064e98b03e6ca959fe0, type: 2}
+  _instantiateMaterial: 1
+  _enableOnStart: 1
 --- !u!1001 &534900077
 PrefabInstance:
   m_ObjectHideFlags: 0

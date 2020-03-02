@@ -65,9 +65,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _cam: {fileID: 0}
   _gameField: {fileID: 2930534942948881871}
-  _depthHeight: 64
   _sandbox: {fileID: 0}
-  _matDepth: {fileID: 2100000, guid: d046492b8d6dc9f4192f245a7510eafb, type: 2}
   _tplBall: {fileID: 5755265551513782504}
   _player: {fileID: 5617379665100412346}
   _bricks: {fileID: 4886704578851975090}
@@ -318,52 +316,6 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!1 &1858068615937510749
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 6075201050786620194}
-  - component: {fileID: 4821571844145437184}
-  m_Layer: 0
-  m_Name: FlipSandbox
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &6075201050786620194
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1858068615937510749}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children:
-  - {fileID: 1224417017384621683}
-  m_Father: {fileID: 316360110961536988}
-  m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4821571844145437184
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1858068615937510749}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c9dfdc94c27e47f78168f7f8b77e04c0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _initialScaleSaved: 0
-  _initialScale: {x: 0, y: 0, z: 0}
 --- !u!1 &5336593984207238025
 GameObject:
   m_ObjectHideFlags: 0
@@ -373,7 +325,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1224417017384621683}
-  - component: {fileID: 6784402311332095341}
+  - component: {fileID: 2671562476199586560}
   m_Layer: 0
   m_Name: Flip
   m_TagString: Untagged
@@ -397,10 +349,10 @@ Transform:
   - {fileID: 286013370424425727}
   - {fileID: 286013371959365779}
   - {fileID: 1122850396782072614}
-  m_Father: {fileID: 6075201050786620194}
+  m_Father: {fileID: 316360110961536988}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6784402311332095341
+--- !u!114 &2671562476199586560
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -409,11 +361,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 5336593984207238025}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 972546a81f5f1824a850e9a849d1c457, type: 3}
+  m_Script: {fileID: 11500000, guid: a047a6b6a4b94249b381f15a13aa6497, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _initialScaleSaved: 0
-  _initialScale: {x: 0, y: 0, z: 0}
+  _byUIFlip: 1
+  _bySandboxFlip: 1
+  _method: 0
+  _prev: 1
 --- !u!1 &5610951447777072132
 GameObject:
   m_ObjectHideFlags: 0
@@ -444,7 +398,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 6075201050786620194}
+  - {fileID: 1224417017384621683}
   m_Father: {fileID: 286013370287034924}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -511,6 +465,7 @@ MonoBehaviour:
   _offsetedByWidthAndSize: []
   _fieldTexture: {fileID: 0}
   _scaleZ: 0
+  _bordersRoot: {fileID: 0}
 --- !u!1001 &1766524162282757118
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -12,7 +12,8 @@ namespace Games.Common.Game {
         protected readonly Dictionary<string, Vector3> _initialSizes = new Dictionary<string, Vector3>();
 
         protected virtual void Start() {
-            Prefs.Calibration.OnChanged += OnCalibrationChanged;
+            //Prefs.Calibration.OnChanged += OnCalibrationChanged;
+            SandboxCamera.AfterCalibrationUpdated += OnCalibrationChanged;
             Prefs.Sandbox.OnChanged += OnCalibrationChanged;
             OnCalibrationChanged();
 
@@ -25,13 +26,17 @@ namespace Games.Common.Game {
             GameEvent.OnStop -= StopGame;
             
             Prefs.Sandbox.OnChanged -= OnCalibrationChanged;
-            Prefs.Calibration.OnChanged -= OnCalibrationChanged;
+            SandboxCamera.AfterCalibrationUpdated -= OnCalibrationChanged;
+        }
+
+        private void OnCalibrationChanged(SandboxCamera cam) {
+            OnCalibrationChanged();
         }
 
         protected virtual void OnCalibrationChanged() {
             var cam = _cam.GetComponent<SandboxCamera>();
             if (cam != null) {
-                cam.OnCalibrationChanged();
+                //cam.OnCalibrationChanged();
                 SetSizes(Prefs.Sandbox.ZeroDepth);
             } else {
                 SetSizes(1.66f); //for testing
@@ -68,7 +73,7 @@ namespace Games.Common.Game {
             for (int i = 0; i < GameScore.PlayerScore.Count; ++i) {
                 GameScore.PlayerScore[i] = 0;
             }
-            _isGameStarted = true;;
+            _isGameStarted = true;
         }
 
         protected virtual void StopGame() {

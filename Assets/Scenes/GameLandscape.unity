@@ -2979,7 +2979,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 568054117}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.5039896
+  m_Size: 0.50474674
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -5475,7 +5475,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1712915435}
   m_Direction: 0
   m_Value: 0
-  m_Size: 1
+  m_Size: 0.9999999
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -7240,6 +7240,7 @@ GameObject:
   - component: {fileID: 2078943090}
   - component: {fileID: 2078943091}
   - component: {fileID: 2078943092}
+  - component: {fileID: 2078943093}
   m_Layer: 0
   m_Name: Game
   m_TagString: Untagged
@@ -7295,6 +7296,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _ui: {fileID: 678713454}
   _hideOnStart: 1
+--- !u!114 &2078943093
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2078943089}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa27c8f3754d4b058efe3177a0c3fcc6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _enable: 1
 --- !u!224 &3793052994098723804 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 5506004120098998, guid: 90891424b76abbad5b55ff313ac789ee,

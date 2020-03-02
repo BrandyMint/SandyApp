@@ -7,13 +7,13 @@ using UnityEngine;
 using Utilities;
 
 namespace Games.Common.GameFindObject {
-    public class FindObjectGame : BaseGameWithGetDepth {
-        [SerializeField] protected Interactable[] _tplItems;
+    public class FindObjectGame : BaseGameWithHandsRaycast {
+        [SerializeField] protected InteractableSimple[] _tplItems;
         [SerializeField] protected int _maxItems = 9;
         [SerializeField] private float _minItemTypeFullnes = 0.7f;
         [SerializeField] protected float _timeOffsetSpown = 1f;
 
-        protected List<Interactable> _items = new List<Interactable>();
+        protected List<InteractableSimple> _items = new List<InteractableSimple>();
         
         protected float _initialItemSize;
         private int _score;
@@ -26,11 +26,11 @@ namespace Games.Common.GameFindObject {
             
             base.Start();
 
-            Interactable.OnDestroyed += OnItemDestroyed;
+            InteractableSimple.OnDestroyed += OnItemDestroyed;
         }
 
         protected override void OnDestroy() {
-            Interactable.OnDestroyed -= OnItemDestroyed;
+            InteractableSimple.OnDestroyed -= OnItemDestroyed;
             base.OnDestroy();
         }
 
@@ -58,13 +58,13 @@ namespace Games.Common.GameFindObject {
                         spownType = itemTypes.Random();
                     }
 
-                    SpawnItem(_tplItems.First(i => i.ItemType == spownType));
+                    SpawnItem(_tplItems.Where(i => i.ItemType == spownType).Random());
                 }
                 yield return new WaitForSeconds(_timeOffsetSpown);
             }
         }
 
-        protected virtual Interactable SpawnItem(Interactable tpl) {
+        protected virtual InteractableSimple SpawnItem(InteractableSimple tpl) {
             var stayAway = _items.Select(b => b.transform.position).ToArray();
             var stayAwayDist = math.cmax(tpl.transform.localScale);
             if (SpawnArea.AnyGetRandomSpawn(out var worldPos, out var worldRot, stayAway, stayAwayDist)) {
@@ -78,11 +78,11 @@ namespace Games.Common.GameFindObject {
             return null;
         }
 
-        protected virtual void OnItemDestroyed(Interactable interactable) {
+        protected virtual void OnItemDestroyed(InteractableSimple interactable) {
             _items.Remove(interactable);
         }
 
-        protected override void OnFireItem(Interactable item, Vector2 viewPos) {
+        protected override void OnFireItem(IInteractable item, Vector2 viewPos) {
             var neededType = RandomChooseItemOnGameStart.Instance.ItemId;
             if (item.ItemType == neededType) {
                 ++GameScore.Score;

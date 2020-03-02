@@ -1,17 +1,18 @@
 ﻿using System.Collections;
+using Games.Common.GameFindObject;
 using UnityEngine;
 using Utilities;
 
 namespace Games.Moles {
     [RequireComponent(typeof(Renderer), typeof(ParticleSystem))]
-    public class Mole : MonoBehaviour {
+    public class Mole : MonoBehaviour, IInteractable {
         [SerializeField] private AudioClip[] _audioHit;
         [SerializeField] private AudioClip[] _audioDamage;
         
         private static readonly int _SHOW = Animator.StringToHash("show");
         private static readonly int _HIDE = Animator.StringToHash("hide");
 
-        public int Player;
+        public int ItemType { get; set; }
         
         private ParticleSystem _particles;
         private Collider _collider;
@@ -50,7 +51,7 @@ namespace Games.Moles {
                 _anim.SetTrigger(_HIDE);
         }
 
-        public void Bang() {
+        public void Bang(bool isRight) {
             SetInteractive(false);
             Hide();
 
@@ -96,6 +97,19 @@ namespace Games.Moles {
         private void SetInteractive(bool interactive) {
             //gameObject.layer = interactive ? _interactiveLayer : 0;
             _collider.enabled = interactive;
+        }
+
+        public void Dead() {
+            gameObject.layer = 0;
+            Destroy(gameObject);
+        }
+
+        public void PlayAudioBang(bool isRight) {
+            throw new System.NotImplementedException();
+        }
+
+        public void Show(bool show) {
+            throw new System.NotImplementedException();
         }
     }
 }

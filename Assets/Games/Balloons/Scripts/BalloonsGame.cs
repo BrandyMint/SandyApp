@@ -1,73 +1,39 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using DepthSensorCalibration;
-using DepthSensorSandbox.Visualisation;
 using Games.Common;
 using Games.Common.Game;
 using Games.Common.GameFindObject;
 using Unity.Mathematics;
 using UnityEngine;
-using UnityEngine.Rendering;
-using Utilities;
 
 namespace Games.Balloons {
-    public class BalloonsGame : MonoBehaviour {
-        [SerializeField] private Camera _cam;
+    public class BalloonsGame : BaseGameWithHandsRaycast {
         [SerializeField] private Balloon _tplBalloon;
-        [SerializeField] private BalloonsGameField _gameField;
         [SerializeField] private float _maxBallons = 12;
         [SerializeField] private float _timeOffsetSpown = 2f;
         [SerializeField] private float _startForce = 3f;
         [SerializeField] private float _explosionForceMult = 2f;
         [SerializeField] private float _explosionRadiusMult = 3f;
-        [SerializeField] private int _depthHeight = 64;
-        [SerializeField] private SandboxMesh _sandbox;
-        [SerializeField] private Material _matDepth;
 
-        private List<Interactable> _balloons = new List<Interactable>();
-        
-        private int _hitMask;
-        private CameraRenderToTexture _renderDepth;
-        private readonly DelayedDisposeNativeArray<byte> _depth = new DelayedDisposeNativeArray<byte>();
-        private int2 _depthSize; 
+        private List<InteractableSimple> _balloons = new List<InteractableSimple>(); 
         private float _initialBallSize;
         private int _score;
-        private bool _isGameStarted;
 
-        private void Start() {
-            _hitMask = LayerMask.GetMask("interactable");
-
-            _renderDepth = _cam.gameObject.AddComponent<CameraRenderToTexture>();
-            _renderDepth.InvokesOnlyOnProcessedFrame = true;
-            _renderDepth.MaxResolution = _depthHeight;
-            _renderDepth.Enable(_matDepth, RenderTextureFormat.R8, OnNewDepthFrame, CreateCommandBufferDepth);
-
+        protected override void Start() {
             _initialBallSize = math.cmax(_tplBalloon.transform.localScale);
             _tplBalloon.gameObject.SetActive(false);
 
-            Interactable.OnDestroyed += OnBalloonDestroyed;
-            Balloon.OnCollisionEntered += OnBalloonCollisionEnter;
-            Prefs.Calibration.OnChanged += OnCalibrationChanged;
-            Prefs.Sandbox.OnChanged += OnCalibrationChanged;
-            OnCalibrationChanged();
+            base.Start();
 
-            GameEvent.OnStart += StartGame;
-            GameEvent.OnStop += StopGame;
+            InteractableSimple.OnDestroyed += OnBalloonDestroyed;
+            Balloon.OnCollisionEntered += OnBalloonCollisionEnter;
         }
 
-        private void OnDestroy() {
-            GameEvent.OnStart -= StartGame;
-            GameEvent.OnStop -= StopGame;
-            
-            Prefs.Sandbox.OnChanged -= OnCalibrationChanged;
-            Prefs.Calibration.OnChanged -= OnCalibrationChanged;
+        protected override void OnDestroy() {
             Balloon.OnCollisionEntered -= OnBalloonCollisionEnter;
-            Interactable.OnDestroyed -= OnBalloonDestroyed;
-            if (_renderDepth != null) {
-                _renderDepth.Disable();
-            }
-            _depth.Dispose();
+            InteractableSimple.OnDestroyed -= OnBalloonDestroyed;
+            base.OnDestroy();
         }
 
         private IEnumerator Spawning() {
@@ -105,77 +71,33 @@ namespace Games.Balloons {
             }
         }
 
-        private void OnBalloonDestroyed(Interactable balloon) {
+        private void OnBalloonDestroyed(InteractableSimple balloon) {
             _balloons.Remove(balloon);
         }
 
         private void OnBalloonCollisionEnter(Balloon balloon, Collision collision) {
-            if (_gameField.ExitBorder.Contains(collision.collider)) {
+            var gameField = (BalloonsGameField) _gameField;
+            if (gameField.ExitBorder.Contains(collision.collider)) {
                 balloon.Dead();
             }
         }
 
-        private void Update() {
-            if (Input.GetMouseButtonDown(0)) {
-                var screen = new float2(_cam.pixelWidth, _cam.pixelHeight);
-                var pos = new float2(Input.mousePosition.x, Input.mousePosition.y);
-                Fire(pos / screen);
-            }
-        }
-
-        private void Fire(Vector2 viewPos) {
-            if (!_isGameStarted) return;
-            
-            var ray = _cam.ViewportPointToRay(viewPos);
-            if (Physics.Raycast(ray, out var hit, _cam.farClipPlane, _hitMask)) {
-                var balloon = hit.collider.GetComponentInParent<Balloon>();
-                if (balloon != null) {
-                    ++GameScore.Score;
-                    balloon.Bang(true);
-                    var force =  _explosionForceMult * _gameField.Scale * balloon.FullMass;
-                    var radius = math.cmax(balloon.transform.lossyScale) * _explosionRadiusMult;
-                    var pos = balloon.transform.position;
-                    foreach (var b in _balloons) {
-                        if (b != balloon) {
-                            b.GetComponent<Rigidbody>().AddExplosionForce(force, pos, radius);
-                        }
-                    }
+        protected override void OnFireItem(IInteractable item, Vector2 viewPos) {
+            var balloon = (Balloon) item;
+            ++GameScore.Score;
+            balloon.Bang(true);
+            var force =  _explosionForceMult * _gameField.Scale * balloon.FullMass;
+            var radius = math.cmax(balloon.transform.lossyScale) * _explosionRadiusMult;
+            var pos = balloon.transform.position;
+            foreach (var b in _balloons) {
+                if (b != balloon) {
+                    b.GetComponent<Rigidbody>().AddExplosionForce(force, pos, radius);
                 }
             }
         }
 
-        private void CreateCommandBufferDepth(CommandBuffer cmb, Material mat, RenderTexture rt, RenderTargetIdentifier src) {
-            cmb.SetRenderTarget(rt);
-            _sandbox.AddDrawToCommandBuffer(cmb, mat);
-        }
-
-        private void OnNewDepthFrame(RenderTexture t) {
-            _depthSize = new int2(t.width, t.height);
-            _renderDepth.RequestData(_depth, ProcessDepthFrame);
-        }
-        
-        private void ProcessDepthFrame() {
-            for (int x = 0; x < _depthSize.x; ++x) {
-                for (int y = 0; y < _depthSize.y; ++y) {
-                    if (_depth.o[x + y * _depthSize.x] > 0) {
-                        Fire(new float2(x, y) / _depthSize);
-                    }
-                }
-            }
-        }
-
-        private void OnCalibrationChanged() {
-            var cam = _cam.GetComponent<SandboxCamera>();
-            if (cam != null) {
-                cam.OnCalibrationChanged();
-                SetSizes(Prefs.Sandbox.ZeroDepth);
-            } else {
-                SetSizes(2f); //for testing
-            }
-        }
-
-        private void SetSizes(float dist) {
-            _gameField.AlignToCamera(_cam, dist);
+        protected override void SetSizes(float dist) {
+            base.SetSizes(dist);
             var size = _gameField.Scale * _initialBallSize;
             _tplBalloon.transform.localScale = Vector3.one * size;
             _gameField.SetWidth(size * 2f);
@@ -188,16 +110,15 @@ namespace Games.Balloons {
             _balloons.Clear();
         }
 
-        private void StartGame() {
+        protected override void StartGame() {
             ClearBalls();
-            GameScore.Score = 0;
-            _isGameStarted = true;
+            base.StartGame();
             StartCoroutine(nameof(Spawning));
         }
 
-        private void StopGame() {
-            _isGameStarted = false;
+        protected override void StopGame() {
             StopCoroutine(nameof(Spawning));
+            base.StopGame();
         }
     }
 }

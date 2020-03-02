@@ -42,7 +42,7 @@ namespace Games.Road {
         }
 
         private void OnCollision(Collidable collidable, Collision collision) {
-            var item = collidable.GetComponentInParent<Interactable>();
+            var item = collidable.GetComponentInParent<InteractableSimple>();
             if (item != null && item.CompareTag("Goal")) {
                 if (collision.gameObject.CompareTag("Player")) {
                     item.hideOnBang = false;
@@ -105,7 +105,7 @@ namespace Games.Road {
             }
         }
 
-        protected override Interactable SpawnItem(Interactable tpl) {
+        protected override InteractableSimple SpawnItem(InteractableSimple tpl) {
             if (_wayPoint.LastT + _minSpawnDistance * 1.2f > 1f)
                 return null;
             
@@ -125,8 +125,8 @@ namespace Games.Road {
             return null;
         }
 
-        protected override void OnFireItem(Interactable item, Vector2 viewPos) {
-            if (item.CompareTag("Goal")) {
+        protected override void OnFireItem(IInteractable item, Vector2 viewPos) {
+            if (item.gameObject.CompareTag("Goal")) {
                 ++GameScore.Score;
                 item.Bang(true);
             }

@@ -9,11 +9,11 @@ using UnityEngine.Assertions;
 
 namespace Games.Batty {
     public class Bricks : MonoBehaviour {
-        [SerializeField] private Interactable _tplBrick;
+        [SerializeField] private InteractableSimple _tplBrick;
         [TextArea] [SerializeField] private string _map;
 
         private string[] _mapLines;
-        private readonly List<Interactable> _bricks = new List<Interactable>();
+        private readonly List<InteractableSimple> _bricks = new List<InteractableSimple>();
         private readonly Dictionary<int, Color> _colors = new Dictionary<int, Color>();
 
         private void Awake() {

@@ -6,8 +6,8 @@ using Games.Common.GameFindObject;
 using UnityEngine;
 
 namespace Games.Batty {
-    public class GameBatty : BaseGameWithGetDepth {
-        [SerializeField] protected Interactable _tplBall;
+    public class GameBatty : BaseGameWithHandsRaycast {
+        [SerializeField] protected InteractableSimple _tplBall;
         [SerializeField] protected Transform _player;
         [SerializeField] protected Bricks _bricks;
         [SerializeField] private float _startBallVelocity = 0.5f;
@@ -15,7 +15,7 @@ namespace Games.Batty {
         [Header("when debug hold 'W' to win")]
         [SerializeField] private bool _debugMod = false;
         
-        protected Interactable _ball;
+        protected InteractableSimple _ball;
         private readonly List<Vector2> _handsPoints = new List<Vector2>();
         private float _handsYPos;
         private float _playerYPosViewport;
@@ -27,6 +27,8 @@ namespace Games.Batty {
             _playerYPosViewport = _gameField.ViewportFromWorld(_player.position).y;
             
             base.Start();
+            _handsRaycaster.OnPreProcessDepthFrame += PreprocessHands;
+            _handsRaycaster.OnPostProcessDepthFrame += PostProcessHands;
             Collidable.OnCollisionEntered2D += OnCollisionEntered;
         }
 
@@ -57,7 +59,7 @@ namespace Games.Batty {
             if (!_isGameStarted) return;
             
             if (collision.gameObject.CompareTag("Goal")) {
-                var brick = collision.gameObject.GetComponentInParent<Interactable>();
+                var brick = collision.gameObject.GetComponentInParent<InteractableSimple>();
                 brick.PlayAudioBang(true);
                 brick.Show(false);
                 ++GameScore.Score;
@@ -120,13 +122,6 @@ namespace Games.Batty {
             PostProcessHands();
         }
 
-        protected override void ProcessDepthFrame() {
-            if (!_isGameStarted) return;
-            PreprocessHands();
-            base.ProcessDepthFrame();
-            PostProcessHands();
-        }
-
         private void PreprocessHands() {
             _handsPoints.Clear();
         }
@@ -142,7 +137,7 @@ namespace Games.Batty {
             }
         }
 
-        protected override void Fire(Vector2 viewPos) {
+        protected override void Fire(Ray ray, Vector2 viewPos) {
             var hands = _handsPoints;
             if (!hands.Any()) {
                 _handsYPos = viewPos.y;

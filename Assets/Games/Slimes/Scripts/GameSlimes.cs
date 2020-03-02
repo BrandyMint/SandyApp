@@ -41,7 +41,7 @@ namespace Games.Slimes {
             yield break;
         }
 
-        protected override void OnFireItem(Interactable item, Vector2 viewPos) {
+        protected override void OnFireItem(IInteractable item, Vector2 viewPos) {
             if (item.ItemType == _targetColorType) {
                 ++GameScore.Score;
                 item.Bang(true);

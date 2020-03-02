@@ -1,4 +1,5 @@
 ﻿using DepthSensorCalibration;
+using DepthSensorSandbox;
 using DepthSensorSandbox.Visualisation;
 using Games.Common.GameFindObject;
 using Unity.Mathematics;
@@ -21,6 +22,7 @@ namespace Games.Common.Game {
         protected override void Start() {
             _hitMask = LayerMask.GetMask("interactable");
             
+            DepthSensorSandboxProcessor.Instance.HandsProcessingSwitch(false);
             _renderDepth = CreateRenderDepth();
             _renderDepth.InvokesOnlyOnProcessedFrame = true;
             _renderDepth.MaxResolution = _depthHeight;
@@ -54,14 +56,14 @@ namespace Games.Common.Game {
             
             var ray = _cam.ViewportPointToRay(viewPos);
             if (Physics.Raycast(ray, out var hit, _cam.farClipPlane, _hitMask)) {
-                var item = hit.collider.GetComponent<Interactable>() ?? hit.collider.GetComponentInParent<Interactable>();
+                var item = hit.collider.GetComponent<IInteractable>() ?? hit.collider.GetComponentInParent<IInteractable>();
                 if (item != null) {
                     OnFireItem(item, viewPos);
                 }
             }
         }
 
-        protected virtual void OnFireItem(Interactable item, Vector2 viewPos) {
+        protected virtual void OnFireItem(IInteractable item, Vector2 viewPos) {
         }
 
         private void CreateCommandBufferDepth(CommandBuffer cmb, Material mat, RenderTexture rt, RenderTargetIdentifier src) {

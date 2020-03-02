@@ -62,21 +62,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _cam: {fileID: 5989797392662178429}
+  _gameField: {fileID: 0}
+  _sandbox: {fileID: 0}
   _tplItems:
   - {fileID: 5922531897631230463}
   - {fileID: 2291080325028423984}
   - {fileID: 7809770484335484018}
   - {fileID: 1951215616765615319}
   - {fileID: 7409878126456794542}
-  _gameField: {fileID: 0}
   _maxItems: 9
   _minItemTypeFullnes: 0.7
   _timeOffsetSpown: 1
-  _depthHeight: 64
-  _sandbox: {fileID: 0}
-  _matDepth: {fileID: 2100000, guid: d046492b8d6dc9f4192f245a7510eafb, type: 2}
   _generator: {fileID: 0}
-  _camSandbox: {fileID: 0}
+  _camSandbox: {fileID: 5989797392662178429}
 --- !u!1 &5989797392662178430
 GameObject:
   m_ObjectHideFlags: 0
@@ -653,12 +651,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 890dedb9995f9724c93bf847f033589e, type: 3}
---- !u!4 &2223242151702307791 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 6036878774903243395, guid: 890dedb9995f9724c93bf847f033589e,
-    type: 3}
-  m_PrefabInstance: {fileID: 5556817108329832780}
-  m_PrefabAsset: {fileID: 0}
 --- !u!114 &2291080325028423984 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5969040670296672380, guid: 890dedb9995f9724c93bf847f033589e,
@@ -671,3 +663,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1caa10552a154428a26e732121e9ea57, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!4 &2223242151702307791 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6036878774903243395, guid: 890dedb9995f9724c93bf847f033589e,
+    type: 3}
+  m_PrefabInstance: {fileID: 5556817108329832780}
+  m_PrefabAsset: {fileID: 0}

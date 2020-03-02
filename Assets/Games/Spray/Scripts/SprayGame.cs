@@ -1,62 +1,28 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using DepthSensorCalibration;
 using DepthSensorSandbox.Visualisation;
 using Games.Common;
 using Games.Common.Game;
+using Games.Common.GameFindObject;
 using Unity.Mathematics;
 using UnityEngine;
-using UnityEngine.Rendering;
 using Utilities;
 
 namespace Games.Spray {
-    public class SprayGame : MonoBehaviour {
-        [SerializeField] private Camera _cam;
+    public class SprayGame : BaseGameWithHandsRaycast {
         [SerializeField] private Spray[] _items;
-        [SerializeField] private GameField _gameField;
-        [SerializeField] private int _depthHeight = 64;
-        [SerializeField] private SandboxMesh _sandbox;
-        [SerializeField] private Material _matDepth;
         [SerializeField] private ProjectorDestination _projector;
         
         private HashSet<Spray> _fired = new HashSet<Spray>();
-        private int _hitMask;
-        private CameraRenderToTexture _renderDepth;
-        private readonly DelayedDisposeNativeArray<byte> _depth = new DelayedDisposeNativeArray<byte>();
-        private int2 _depthSize; 
         private float _initialItemSize;
         private int _score;
-        private bool _isGameStarted;
 
-        private void Start() {
-            _hitMask = LayerMask.GetMask("interactable");
-
-            _renderDepth = _cam.gameObject.AddComponent<CameraRenderToTexture>();
-            _renderDepth.MaxResolution = _depthHeight;
-            _renderDepth.InvokesOnlyOnProcessedFrame = true;
-            _renderDepth.Enable(_matDepth, RenderTextureFormat.R8, OnNewDepthFrame, CreateCommandBufferDepth);
-
+        protected override void Start() {
             _initialItemSize = math.cmax(_items.First().transform.localScale);
 
-            Prefs.Calibration.OnChanged += OnCalibrationChanged;
-            Prefs.Sandbox.OnChanged += OnCalibrationChanged;
-            OnCalibrationChanged();
-
-            GameEvent.OnStart += StartGame;
-            GameEvent.OnStop += StopGame;
+            base.Start();
             ShowItems(false);
-        }
-
-        private void OnDestroy() {
-            GameEvent.OnStart -= StartGame;
-            GameEvent.OnStop -= StopGame;
-            
-            Prefs.Sandbox.OnChanged -= OnCalibrationChanged;
-            Prefs.Calibration.OnChanged -= OnCalibrationChanged;
-            if (_renderDepth != null) {
-                _renderDepth.Disable();
-            }
-            _depth.Dispose();
+            _handsRaycaster.OnPostProcessDepthFrame += PostProcessFrame;
         }
         
         private void Spawn() {
@@ -69,25 +35,17 @@ namespace Games.Spray {
                 }
             }
         }
-
-        private void Update() {
-            if (Input.GetMouseButton(0)) {
-                var screen = new float2(_cam.pixelWidth, _cam.pixelHeight);
-                var pos = new float2(Input.mousePosition.x, Input.mousePosition.y);
-                Fire(pos / screen);
-            }
+        
+        private void PostProcessFrame() {
+            CheckStopFire();
+            _fired.Clear();
         }
-
-        private void Fire(Vector2 viewPos) {
-            if (!_isGameStarted) return;
-            
-            var ray = _cam.ViewportPointToRay(viewPos);
-            if (Physics.Raycast(ray, out var hit, _cam.farClipPlane, _hitMask)) {
-                var item = hit.collider.GetComponentInParent<Spray>();
-                if (item != null && !item.Fire && !_fired.Contains(item)) {
-                    item.Fire = true;
-                    _fired.Add(item);
-                }
+        
+        protected override void OnFireItem(IInteractable item, Vector2 viewPos) {
+            var spray = (Spray) item;
+            if (spray != null && !spray.Fire && !_fired.Contains(spray)) {
+                spray.Fire = true;
+                _fired.Add(spray);
             }
         }
 
@@ -98,33 +56,10 @@ namespace Games.Spray {
             }
         }
 
-        private void CreateCommandBufferDepth(CommandBuffer cmb, Material mat, RenderTexture rt, RenderTargetIdentifier src) {
-            cmb.SetRenderTarget(rt);
-            _sandbox.AddDrawToCommandBuffer(cmb, mat);
-        }
-
-        private void OnNewDepthFrame(RenderTexture t) {
-            _depthSize = new int2(t.width, t.height);
-            _renderDepth.RequestData(_depth, ProcessDepthFrame);
-        }
-        
-        private void ProcessDepthFrame() {
-            for (int x = 0; x < _depthSize.x; ++x) {
-                for (int y = 0; y < _depthSize.y; ++y) {
-                    if (_depth.o[x + y * _depthSize.x] > 0) {
-                        Fire(new float2(x, y) / _depthSize);
-                    }
-                }
-            }
-            CheckStopFire();
-            _fired.Clear();
-        }
-
-        protected virtual void OnCalibrationChanged() {
+        protected override void OnCalibrationChanged() {
             var cam = _cam.GetComponent<SandboxCamera>();
             var spawnArea = SpawnArea.Areas.First().transform;
             if (cam != null) {
-                cam.OnCalibrationChanged();
                 SetSizes(SelectDist(Prefs.Sandbox.ZeroDepth, Prefs.Sandbox.OffsetMaxDepth));
                 CorrectSpraySpawns(spawnArea, Prefs.Sandbox.ZeroDepth + Prefs.Sandbox.OffsetMinDepth, _items.First());
             } else {
@@ -158,8 +93,8 @@ namespace Games.Spray {
             spawnArea.localEulerAngles = spawnRot;
         }
 
-        private void SetSizes(float dist) {
-            _gameField.AlignToCamera(_cam, dist);
+        protected override void SetSizes(float dist) {
+            base.SetSizes(dist);
             _gameField.SetWidth(0f);
             var size = _gameField.Scale * _initialItemSize;
             foreach (var item in _items) {
@@ -173,16 +108,16 @@ namespace Games.Spray {
             }
         }
 
-        private void StartGame() {
-            _isGameStarted = true;
+        protected override void StartGame() {
+            base.StartGame();
             ShowItems(true);
         }
 
-        private void StopGame() {
-            _isGameStarted = false;
+        protected override void StopGame() {
             ShowItems(false);
             _fired.Clear();
             _projector.Clear();
+            base.StopGame();
         }
     }
 }

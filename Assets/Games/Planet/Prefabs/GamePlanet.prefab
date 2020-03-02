@@ -12156,9 +12156,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _cam: {fileID: 0}
   _gameField: {fileID: 4995940672262205434}
-  _depthHeight: 64
   _sandbox: {fileID: 0}
-  _matDepth: {fileID: 2100000, guid: d046492b8d6dc9f4192f245a7510eafb, type: 2}
   _tplItems:
   - {fileID: 8356937666849563355}
   - {fileID: 6032202467343505052}

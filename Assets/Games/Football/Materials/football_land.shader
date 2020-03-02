@@ -1,5 +1,6 @@
 ﻿Shader "Sandbox/Game/Football" {
-    Properties {
+    Properties {        
+        _ColorHands ("Color Hands", Color) = (1, 1, 1, 0.6)
         _FieldTex ("Field", 2D) = "white" {}
         _PlayersTex ("Player Colors", 2D) = "white" {}
         _PlayerColorAlpha ("Player Color Aplpha", Float) = 1
@@ -10,11 +11,7 @@
         _stripesCount ("Stripes Count", Float) = 15 
         
         _LayoutTex ("Layout", 2D) = "white" {}
-        _LayoutCenterTex ("Layout Center", 2D) = "white" {}        
-        
-        _DepthSliceOffset ("Depth Slice", Float) = 0.05        
-        _DotSlice ("Dot Slice", Float) = 0.7        
-        _DotSliceOverride ("Dot Slice Override", Float) = 0.5
+        _LayoutCenterTex ("Layout Center", 2D) = "white" {}
         
         _DepthZero ("Depth Zero", Float) = 2
         _DepthMinOffset ("Depth Min Offset", Float) = 0.5
@@ -36,21 +33,19 @@
 
             #include "UnityCG.cginc"
             
-            #define CALC_NORMAL
-            
             #define EXTENSION_V2F \
                 float2 uvGrass : TEXCOORD3;       
 
             #include "Assets/DepthSensorSandbox/Resources/Materials/utils.cginc"
             #include "Assets/DepthSensorSandbox/Resources/Materials/sandbox.cginc"
-            #include "Assets/Games/Common/Materials/depth_slice.cginc"
+            #include "Assets/DepthSensorSandbox/Resources/Materials/hands.cginc"
             #include "Assets/Games/Common/Materials/multi_players.cginc"
             
-            float _DotSliceOverride;
             sampler2D _GrassTex; float4 _GrassTex_ST;
             fixed3 _hsvGrass1;
             fixed3 _hsvGrass2;
             float _stripesCount;
+            fixed4 _ColorHands;
                         
             sampler2D _LayoutTex; 
             sampler2D _LayoutCenterTex;            
@@ -61,11 +56,7 @@
                 return o;
             }
 
-            fixed4 frag (v2f i) : SV_Target {
-                float hands = fragSliceDot(i, _DotSliceOverride);
-                if (hands > 0)
-                    return fixed4(0, 0, 0, 1);
-                
+            fixed4 frag (v2f i) : SV_Target {                
                 fixed2 uv = i.screenPos.xy / i.screenPos.w;
                 fixed3 hsvGrass = _hsvGrass1;
                 if (frac(uv.x / _ScreenParams.z  * _stripesCount / 2) > 0.5)
@@ -88,6 +79,8 @@
                 uvc.x = (uvc.x - 0.5) * newAspect + 0.5; 
                 fixed4 l = max(tex2D(_LayoutTex, uv), tex2D(_LayoutCenterTex, uvc));
                 c = lerp(c, l, l.a);
+                
+                c.rgb = lerp(c.rgb, _ColorHands.rgb, _ColorHands.a * handsInteractAlpha(i));
                 return c;
             }            
             

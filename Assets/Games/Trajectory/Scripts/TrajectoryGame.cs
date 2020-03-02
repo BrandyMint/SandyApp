@@ -10,7 +10,7 @@ using Utilities;
 
 namespace Games.Trajectory {
     public class TrajectoryGame : BaseGame {
-        [SerializeField] private Interactable _ballTpl;
+        [SerializeField] private InteractableSimple _ballTpl;
         [SerializeField] private Transform _goal;
         [SerializeField] private SpawnArea[] _ballSpawns;
         [SerializeField] private SpawnArea _goalSpawns;
@@ -19,7 +19,7 @@ namespace Games.Trajectory {
         [SerializeField] private float _waitBeforeWin = 0.5f;
         [SerializeField] private float _areaForNoGoals = 0.4f;
         
-        private readonly List<Interactable> _balls = new List<Interactable>();
+        private readonly List<InteractableSimple> _balls = new List<InteractableSimple>();
         private readonly Dictionary<SpawnArea, float> _initialSpawnZ = new Dictionary<SpawnArea, float>();
 
         protected override void Start() {
@@ -32,12 +32,12 @@ namespace Games.Trajectory {
             
             base.Start();
 
-            Interactable.OnDestroyed += OnBallDestroyed;
+            InteractableSimple.OnDestroyed += OnBallDestroyed;
             Collidable.OnTriggerEntered += OnBallTrigger;
         }
 
         protected override void OnDestroy() {
-            Interactable.OnDestroyed -= OnBallDestroyed;
+            InteractableSimple.OnDestroyed -= OnBallDestroyed;
             base.OnDestroy();
         }
 
@@ -45,7 +45,7 @@ namespace Games.Trajectory {
             if (!_isGameStarted) return;
             
             collidable.Stop();
-            var interactable = collidable.GetComponent<Interactable>();
+            var interactable = collidable.GetComponent<InteractableSimple>();
             interactable.Bang(true);
             StartCoroutine(WaitAndWin());
         }
@@ -55,7 +55,7 @@ namespace Games.Trajectory {
             GameEvent.Current = GameState.STOP;
         }
 
-        private void OnBallDestroyed(Interactable obj) {
+        private void OnBallDestroyed(InteractableSimple obj) {
             _balls.Remove(obj);
         }
 

@@ -32,12 +32,12 @@ namespace Games.Planet {
             _planet.UpdateSize(_gameField);
         }
 
-        protected override void OnFireItem(Interactable item, Vector2 viewPos) {
+        protected override void OnFireItem(IInteractable item, Vector2 viewPos) {
             ++GameScore.Score;
             item.Bang(true);
         }
 
-        protected override Interactable SpawnItem(Interactable tpl) {
+        protected override InteractableSimple SpawnItem(InteractableSimple tpl) {
             var stayAway = _items.Cast<Ship>().Select(b => b.Spawn).ToArray();
             var stayAwayDist = math.cmax(tpl.transform.localScale);
             if (SpawnArea.AnyGetRandomSpawn(out var worldPos, out var worldRot, stayAway, stayAwayDist)) {

@@ -131,6 +131,7 @@ float percentToDepth(float p) {
 struct Input {
     float3 vpos;
     float4 screenPos;
+    float2 texcoord;
     EXTENSION_INPUT
 };
 
@@ -141,7 +142,8 @@ void vertSurf(inout appdata_full v, out Input o) {
     
     //fix over near clip
     if (pos.z > -_ProjectionParams.y) pos.z = -_ProjectionParams.y - 0.01;
-    
+
+    o.texcoord = v.texcoord.xy;
     o.screenPos = ComputeScreenPos(mul(UNITY_MATRIX_P, float4(pos, 1.0)));
     o.vpos = float3(pos.xy, -pos.z);
 }

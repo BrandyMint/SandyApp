@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 namespace Games.Arithmetic {
-    public class ArithmeticInteractable : Interactable {
+    public class ArithmeticInteractable : InteractableSimple {
         [SerializeField] private Text _txt;
         
         public override int ItemType {

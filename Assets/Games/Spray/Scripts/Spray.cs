@@ -1,13 +1,11 @@
-﻿using UnityEngine;
+﻿using Games.Common.GameFindObject;
+using UnityEngine;
 
 namespace Games.Spray {
-    public class Spray : MonoBehaviour {
-        private static readonly int _COLOR = Shader.PropertyToID("_Color");
-        
+    public class Spray : MonoBehaviour, IInteractable {
         [SerializeField] private Color _color = Color.red;
         [SerializeField] private float _projectAlpha = 0.3f;
         [SerializeField] private ParticleSystem _particle;
-        [SerializeField] private Renderer _renderer;
         [SerializeField] private Collider _collider;
         [SerializeField] private Projector _projector;
         [SerializeField] private GameObject[] _objsToHide;
@@ -49,6 +47,21 @@ namespace Games.Spray {
             } else {
                 _particle.Stop();
             }
+        }
+
+        public int ItemType { get; set; }
+
+        public void Bang(bool isRight) {
+            Fire = isRight;
+        }
+
+        public void PlayAudioBang(bool isRight) {
+            throw new System.NotImplementedException();
+        }
+
+        public void Dead() {
+            gameObject.layer = 0;
+            Destroy(gameObject);
         }
 
         public void Show(bool show) {

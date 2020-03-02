@@ -1,4 +1,7 @@
 ﻿using System.Linq;
+using DepthSensor.Buffer;
+using DepthSensor.Device;
+using DepthSensorSandbox.Processing;
 using Games.Common;
 using Games.Common.ColliderGenerator;
 using Games.Common.Game;
@@ -7,8 +10,8 @@ using UnityEngine;
 using Random = UnityEngine.Random;
 
 namespace Games.Football {
-    public class GameFootball : BaseGameWithGetDepth {
-        [SerializeField] protected Interactable _tplBall;
+    public class GameFootball : BaseGameWithHandsRaycast {
+        [SerializeField] protected InteractableSimple _tplBall;
         [SerializeField] protected SpawnArea _spawnsBall;
         [SerializeField] protected SpawnArea _spawnsGoals;
         [SerializeField] protected Transform[] _goals;
@@ -19,14 +22,13 @@ namespace Games.Football {
         [SerializeField] private int _mouseDebugDataSize = 128;
         [SerializeField] private float _mouseDebugSize = 0.1f;
         
-        protected Interactable _ball;
+        protected InteractableSimple _ball;
         private int _lastPlayerMakeGoal;
         private Texture2D _handsTexture;
 
         private readonly ColliderGenerator _colliderGenerator = new ColliderGenerator();
-        private readonly DataHandsByteArray _colliderGeneratorData = new DataHandsByteArray();
         private readonly DataMouse _colliderGeneratorDataMouse = new DataMouse();
-        private readonly OutputPolygonCollider2D _colliderGeneratorOutput = new OutputPolygonCollider2D();
+        private readonly OutputPolygonCollider2DRaycaster _colliderGeneratorOutput = new OutputPolygonCollider2DRaycaster();
         private readonly OutputPolygonCollider2D _colliderGeneratorOutputMouse = new OutputPolygonCollider2D();
         
 
@@ -40,14 +42,22 @@ namespace Games.Football {
             
             base.Start();
 
-            Interactable.OnDestroyed += SpawnBall;
+            InteractableSimple.OnDestroyed += SpawnBall;
             Collidable.OnCollisionEntered2D += OnCollisionEntered;
+            _handsRaycaster.HandFire -= Fire;
+            _handsRaycaster.CustomProcessingFrame += ProcessDepthFrame;
         }
 
         protected override void OnDestroy() {
-            Interactable.OnDestroyed -= SpawnBall;
+            InteractableSimple.OnDestroyed -= SpawnBall;
             Collidable.OnCollisionEntered2D -= OnCollisionEntered;
             base.OnDestroy();
+        }
+
+        protected override HandsRaycaster CreateHandsRaycaster() {
+            var raycaster = base.CreateHandsRaycaster();
+            _colliderGeneratorOutput.Raycaster = raycaster;
+            return raycaster;
         }
 
         protected override void StartGame() {
@@ -103,7 +113,7 @@ namespace Games.Football {
             }
         }
 
-        private void SpawnBall(Interactable deadBall = null) {
+        private void SpawnBall(InteractableSimple deadBall = null) {
             if (!_isGameStarted) return;
 
             for (int i = 0; i < GameScore.PlayerScore.Count; ++i) {
@@ -130,9 +140,9 @@ namespace Games.Football {
             if (Input.GetMouseButton(0) && _isGameStarted) {
                 _colliderGeneratorDataMouse.CircleSize = _mouseDebugSize * _mouseDebugDataSize;
                 var dataSize = new Vector2Int((int) (_mouseDebugDataSize * _cam.aspect), _mouseDebugDataSize);
-                _colliderGeneratorDataMouse.Rect 
-                    = _colliderGeneratorOutputMouse.SourceRect
-                        = new RectInt(Vector2Int.zero, dataSize);
+                var sampler = Sampler.Create(dataSize.x, dataSize.y);
+                _colliderGeneratorDataMouse.Sampler = sampler;
+                _colliderGeneratorOutputMouse.SourceRect = sampler.GetRect(); 
                 
                 _colliderGeneratorDataMouse.MousePos = new Vector2(
                     (int) (Input.mousePosition.x / _cam.pixelWidth * dataSize.x),
@@ -150,15 +160,11 @@ namespace Games.Football {
             }
         }
 
-        protected override void ProcessDepthFrame() {
+        private void ProcessDepthFrame(DepthSensorDevice device, HandsProcessing processor, DepthBuffer hands, Sampler sampler) {
             if (!_isGameStarted) return;
 
-            _colliderGeneratorData.Rect 
-                = _colliderGeneratorOutput.SourceRect
-                    = new RectInt(Vector2Int.zero, new Vector2Int(_depthSize.x, _depthSize.y));
-            _colliderGeneratorData.arr = _depth.o;
             _colliderGeneratorOutput.Clear();
-            _colliderGenerator.Generate(_colliderGeneratorData, _colliderGeneratorOutput);
+            _colliderGenerator.Generate(_handsRaycaster, _colliderGeneratorOutput);
             _handsCollider.enabled = !_colliderGeneratorOutput.IsEmpty();
         }
     }

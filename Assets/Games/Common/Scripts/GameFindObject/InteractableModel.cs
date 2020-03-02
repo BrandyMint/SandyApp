@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 namespace Games.Common.GameFindObject {
-    public class InteractableModel : Interactable {
+    public class InteractableModel : InteractableSimple {
         [SerializeField] protected GameObject _model;
 
         protected override void Awake() {

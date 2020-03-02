@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityStandardAssets.Vehicles.Car;
 
 namespace Games.Driving {
-    public class GameDriving : BaseGameWithGetDepth {
+    public class GameDriving : BaseGameWithHandsRaycast {
         [SerializeField] private CarController _car;
         [SerializeField] private UICarControl _uiCarControl;
         [SerializeField] private bool _testMouse = false;
@@ -20,6 +20,8 @@ namespace Games.Driving {
             _car.gameObject.SetActive(false);
             _uiCarControl.Car = _car;
             _uiCarControl.OnResetCar += RespawnCar;
+            _handsRaycaster.OnPreProcessDepthFrame += _uiCarControl.StartDepthInput;
+            _handsRaycaster.OnPostProcessDepthFrame += _uiCarControl.StopDepthInput;
         }
 
         protected override void StartGame() {
@@ -46,15 +48,8 @@ namespace Games.Driving {
             base.Update();
             _uiCarControl.StopDepthInput();
         }
-
-        protected override void ProcessDepthFrame() {
-            _uiCarControl.StartDepthInput();
-            base.ProcessDepthFrame();
-            _uiCarControl.StopDepthInput();
-        }
-
-        protected override void Fire(Vector2 viewPos) {
-            if (!_isGameStarted) return;
+        
+        protected override void Fire(Ray ray, Vector2 viewPos) {
             _uiCarControl.DepthInput(viewPos);
         }
 

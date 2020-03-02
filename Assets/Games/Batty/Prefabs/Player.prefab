@@ -263,7 +263,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7684495984358995631}
-  - component: {fileID: 8103624652756141733}
+  - component: {fileID: 7398260518755616289}
   m_Layer: 8
   m_Name: Flip
   m_TagString: Untagged
@@ -288,7 +288,7 @@ Transform:
   m_Father: {fileID: 6158396885310770756}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8103624652756141733
+--- !u!114 &7398260518755616289
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -297,11 +297,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 4526076158630287421}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 972546a81f5f1824a850e9a849d1c457, type: 3}
+  m_Script: {fileID: 11500000, guid: a047a6b6a4b94249b381f15a13aa6497, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _initialScaleSaved: 0
-  _initialScale: {x: 0, y: 0, z: 0}
+  _byUIFlip: 1
+  _bySandboxFlip: 1
+  _method: 0
+  _prev: 1
 --- !u!1 &4731218578253862357
 GameObject:
   m_ObjectHideFlags: 0
@@ -342,7 +344,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6158396885310770756}
-  - component: {fileID: 3827442266424612351}
   m_Layer: 8
   m_Name: Player
   m_TagString: Player
@@ -365,20 +366,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 90.00001}
---- !u!114 &3827442266424612351
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6158396885310770755}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c9dfdc94c27e47f78168f7f8b77e04c0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _initialScaleSaved: 0
-  _initialScale: {x: 0, y: 0, z: 0}
 --- !u!1 &7273534291304043567
 GameObject:
   m_ObjectHideFlags: 0

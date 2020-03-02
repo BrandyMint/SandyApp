@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using Games.Common.Game;
 using Games.Common.GameFindObject;
-using Unity.Mathematics;
 using UnityEngine;
 
 namespace Games.Tubs {
@@ -9,11 +8,12 @@ namespace Games.Tubs {
         [SerializeField] private TubesGenerator _generator;
         
         
-        private readonly HashSet<Interactable> _fixing = new HashSet<Interactable>();
+        private readonly HashSet<InteractableSimple> _fixing = new HashSet<InteractableSimple>();
 
         protected override void Start() {
             base.Start();
             GameEvent.OnCountdown += OnCountdown;
+            _handsRaycaster.OnPostProcessDepthFrame += PostProcessDepthFrame;
         }
 
         protected override void OnDestroy() {
@@ -34,26 +34,17 @@ namespace Games.Tubs {
             base.StartGame();
         }
         
-        private void Update() {
-            if (Input.GetMouseButton(0)) {
-                var screen = new float2(_cam.pixelWidth, _cam.pixelHeight);
-                var pos = new float2(Input.mousePosition.x, Input.mousePosition.y);
-                Fire(pos / screen);
-            }
-        }
-        
-        protected override void ProcessDepthFrame() {
-            base.ProcessDepthFrame();
+        private void PostProcessDepthFrame() {
             CheckStopFixing();
             _fixing.Clear();
         }
 
-        protected override void OnFireItem(Interactable item, Vector2 viewPos) {
+        protected override void OnFireItem(IInteractable item, Vector2 viewPos) {
             item.Bang(true);
-            _fixing.Add(item);
+            _fixing.Add((InteractableSimple) item);
         }
 
-        protected override void OnItemDestroyed(Interactable interactable) {
+        protected override void OnItemDestroyed(InteractableSimple interactable) {
             base.OnItemDestroyed(interactable);
             _fixing.Remove(interactable);
             if (_isGameStarted)

@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Linq;
-using DepthSensorCalibration;
 using Games.Common;
 using Games.Common.Game;
 using Games.Common.GameFindObject;
@@ -22,8 +21,10 @@ namespace Games.Arithmetic {
             ShowItems(false);
         }
 
-        protected override CameraRenderToTexture CreateRenderDepth() {
-            return _camSandbox.gameObject.AddComponent<CameraRenderToTexture>();
+        protected override HandsRaycaster CreateHandsRaycaster() {
+            var rayCaster = base.CreateHandsRaycaster(); 
+            rayCaster.Cam = _camSandbox;
+            return rayCaster;
         }
 
         protected override void StartGame() {
@@ -53,14 +54,16 @@ namespace Games.Arithmetic {
                 item.GetComponent<RandomColorRenderer>().SetRandomColor();
             }
             _isGameStarted = true;
+            _handsRaycaster.SetEnable(true);
         }
 
-        protected override void OnFireItem(Interactable item, Vector2 viewPos) {
+        protected override void OnFireItem(IInteractable item, Vector2 viewPos) {
             bool isRight = item.ItemType == _answer;
             if (isRight) {
                 ++GameScore.Score;
             }
             item.Bang(isRight);
+            _handsRaycaster.SetEnable(false);
             _isGameStarted = false;
             StartCoroutine(nameof(ShowAnswer), isRight);
         }

@@ -37,7 +37,7 @@ namespace Games.Eatable {
             }
         }
 
-        protected override void OnFireItem(Interactable item, Vector2 viewPos) {
+        protected override void OnFireItem(IInteractable item, Vector2 viewPos) {
             var player = _gameField.PlayerField(viewPos);
             if (player >= 0) {
                 GameScore.PlayerScore[player] = Mathf.Clamp(GameScore.PlayerScore[player] + item.ItemType,
@@ -48,7 +48,7 @@ namespace Games.Eatable {
                 } else {
                     item.Bang(false);
                 }
-                item.GetComponent<LifeTime>().enabled = false;
+                item.gameObject.GetComponent<LifeTime>().enabled = false;
             }
         }
     }

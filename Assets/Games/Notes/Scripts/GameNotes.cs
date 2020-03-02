@@ -31,11 +31,11 @@ namespace Games.Notes {
         protected override void Start() {
             SaveInitialSizes(_tplNotes);
             base.Start();
-            Interactable.OnDestroyed += OnItemDestroyed;
+            InteractableSimple.OnDestroyed += OnItemDestroyed;
         }
 
         protected override void OnDestroy() {
-            Interactable.OnDestroyed -= OnItemDestroyed;
+            InteractableSimple.OnDestroyed -= OnItemDestroyed;
             base.OnDestroy();
         }
 
@@ -85,7 +85,7 @@ namespace Games.Notes {
             _notes.Add(note);
         }
 
-        private void OnItemDestroyed(Interactable item) {
+        private void OnItemDestroyed(InteractableSimple item) {
             var note = item as Note;
             if (note != null) {
                 _notes.Remove(note);

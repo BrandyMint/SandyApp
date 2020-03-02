@@ -86,7 +86,6 @@ GameObject:
   m_Component:
   - component: {fileID: 8874198224165124136}
   - component: {fileID: 3754703406452870003}
-  - component: {fileID: 2288674019995526107}
   m_Layer: 8
   m_Name: Hands
   m_TagString: Player
@@ -138,20 +137,6 @@ PolygonCollider2D:
       - {x: -0.2938926, y: -0.40450853}
       - {x: 0.29389268, y: -0.40450847}
       - {x: 0.47552824, y: 0.15450856}
---- !u!114 &2288674019995526107
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2190889086837545382}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c9dfdc94c27e47f78168f7f8b77e04c0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _initialScaleSaved: 0
-  _initialScale: {x: 0, y: 0, z: 0}
 --- !u!1 &2683535186712080396
 GameObject:
   m_ObjectHideFlags: 0
@@ -256,6 +241,7 @@ MonoBehaviour:
   _offsetedByWidthAndSize: []
   _fieldTexture: {fileID: 2800000, guid: 4c41a2dae1c10cb89b9df0c7d4a74299, type: 3}
   _scaleZ: 0
+  _bordersRoot: {fileID: 0}
 --- !u!1 &7717991293928682650
 GameObject:
   m_ObjectHideFlags: 0
@@ -435,9 +421,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _cam: {fileID: 0}
   _gameField: {fileID: 4632116683243065799}
-  _depthHeight: 32
   _sandbox: {fileID: 0}
-  _matDepth: {fileID: 2100000, guid: d046492b8d6dc9f4192f245a7510eafb, type: 2}
   _tplBall: {fileID: 102683248805678215}
   _spawnsBall: {fileID: 3404113003427014425}
   _spawnsGoals: {fileID: 1819971648488462279}

@@ -50,7 +50,7 @@ namespace Games.Mahjong {
             yield break;
         }
 
-        protected override void OnFireItem(Interactable item, Vector2 viewPos) {
+        protected override void OnFireItem(IInteractable item, Vector2 viewPos) {
             if (_showingWrong == 0 && _newOpened.Count < 2) {
                 item.Show(true);
                 _newOpened.Add((Card) item);

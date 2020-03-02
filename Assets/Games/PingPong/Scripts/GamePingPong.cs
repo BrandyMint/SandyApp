@@ -6,15 +6,16 @@ using Games.Common.GameFindObject;
 using UnityEngine;
 
 namespace Games.PingPong {
-    public class GamePingPong : BaseGameWithGetDepth {
-        [SerializeField] protected Interactable _tplBall;
+    public class GamePingPong : BaseGameWithHandsRaycast {
+        [SerializeField] protected InteractableSimple _tplBall;
         [SerializeField] protected Transform[] _players;
         [SerializeField] private float _startBallVelocity = 0.5f;
         [SerializeField] private float _handsWindowWidth = 0.1f;
         [SerializeField] private int _maxScore = 7;
+        [SerializeField] private float _maxHandsDepth = 0.1f;
         
         
-        protected Interactable _ball;
+        protected InteractableSimple _ball;
         private List<Vector2>[] _handsPoints;
         private float[] _handsXPos;
         private float[] _playerXPosViewport;
@@ -34,13 +35,17 @@ namespace Games.PingPong {
             ShowPlayers(false);
             
             base.Start();
+            
+            SetCustomMaxHandDepth(_maxHandsDepth);
 
-            Interactable.OnDestroyed += SpawnBall;
+            InteractableSimple.OnDestroyed += SpawnBall;
             Collidable.OnCollisionEntered2D += OnCollisionEntered;
+            _handsRaycaster.OnPreProcessDepthFrame += PreprocessHands;
+            _handsRaycaster.OnPostProcessDepthFrame += PostProcessHands;
         }
 
         protected override void OnDestroy() {
-            Interactable.OnDestroyed -= SpawnBall;
+            InteractableSimple.OnDestroyed -= SpawnBall;
             Collidable.OnCollisionEntered2D -= OnCollisionEntered;
             base.OnDestroy();
         }
@@ -91,7 +96,7 @@ namespace Games.PingPong {
             SetSizes(_gameField.Scale, objs);
         }
 
-        private void SpawnBall(Interactable deadBall = null) {
+        private void SpawnBall(InteractableSimple deadBall = null) {
             if (!_isGameStarted) return;
 
             for (int i = 0; i < _players.Length; ++i) {
@@ -136,13 +141,6 @@ namespace Games.PingPong {
             PostProcessHands();
         }
 
-        protected override void ProcessDepthFrame() {
-            if (!_isGameStarted) return;
-            PreprocessHands();
-            base.ProcessDepthFrame();
-            PostProcessHands();
-        }
-
         private void PreprocessHands() {
             foreach (var list in _handsPoints) {
                 list.Clear();
@@ -172,7 +170,7 @@ namespace Games.PingPong {
             }
         }
 
-        protected override void Fire(Vector2 viewPos) {
+        protected override void Fire(Ray ray, Vector2 viewPos) {
             var player = _gameField.PlayerField(viewPos);
             if (player >= 0) {
                 var hands = _handsPoints[player];

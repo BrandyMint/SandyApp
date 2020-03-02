@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Games.Common.GameFindObject {
     //[RequireComponent(typeof(Renderer))]
-    public class Interactable : MonoBehaviour {
+    public class InteractableSimple : MonoBehaviour, IInteractable {
         [SerializeField] protected ParticleSystem _rightBang;
         [SerializeField] protected ParticleSystem _wrongBang;
         [SerializeField] protected int _itemType;
@@ -14,7 +14,7 @@ namespace Games.Common.GameFindObject {
         public bool hideOnBang = true;
         public bool destroyOnBang = true;
 
-        public static event Action<Interactable> OnDestroyed;
+        public static event Action<InteractableSimple> OnDestroyed;
 
         protected Renderer _r;
         protected AudioSource _audioSource;

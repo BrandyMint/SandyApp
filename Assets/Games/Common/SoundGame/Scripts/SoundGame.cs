@@ -4,7 +4,7 @@ using Games.Common.GameFindObject;
 using UnityEngine;
 
 namespace Games.Common.SoundGame {
-    public class SoundGame : BaseGameWithGetDepth {
+    public class SoundGame : BaseGameWithHandsRaycast {
         [SerializeField] protected Transform _instrumentRoot;
 
         protected SoundKey[] _sounds;
@@ -17,11 +17,7 @@ namespace Games.Common.SoundGame {
         protected override void Start() {
             _testMouseModeHold = true;
             base.Start();
-        }
-
-        protected override void ProcessDepthFrame() {
-            base.ProcessDepthFrame();
-            PostProcessDepthFrame();
+            _handsRaycaster.OnPostProcessDepthFrame += PostProcessDepthFrame;
         }
 
         protected virtual void PostProcessDepthFrame() {
@@ -32,7 +28,7 @@ namespace Games.Common.SoundGame {
             _soundsPlaying.Clear();
         }
 
-        protected override void OnFireItem(Interactable item, Vector2 viewPos) {
+        protected override void OnFireItem(IInteractable item, Vector2 viewPos) {
             var sound = item as SoundKey;
             if (sound != null)
                 OnSoundItem(sound, viewPos);
