@@ -1,6 +1,8 @@
 using System;
 using System.Linq;
+using DepthSensor.Buffer;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace DepthSensor.Sensor {
     public abstract class AbstractSensor : ISensor, IDisposable {
@@ -59,6 +61,13 @@ namespace DepthSensor.Sensor {
                     return !hasTargetInTypes;
                 return hasTargetInTypes;
             }));
+        }
+
+        public static S Create<S, B>(B buffer) where S : Sensor<B> where B : AbstractBuffer {
+            var type = typeof(S);
+            var constructor = type.GetConstructor(new []{typeof(B)});
+            Assert.IsNotNull(constructor, $"Cant find constructor for {type.Name}");
+            return (S) constructor.Invoke(new object[] {buffer});
         }
 
         public class Internal {

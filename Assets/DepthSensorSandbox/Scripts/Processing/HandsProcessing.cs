@@ -28,6 +28,7 @@ namespace DepthSensorSandbox.Processing {
         
         public SensorIndex HandsMask => _sensorHandsMask;
         public SensorDepth HandsDepth => _sensorHandsDepth;
+        public SensorDepth HandsDepthDecreased => _sensorHandsDepthDecreased;
         public IndexBuffer CurrHandsMask => _currHandsMask;
 #if HANDS_WAVE_STEP_DEBUG
         public int CurrWave { get;  private set; }
@@ -38,10 +39,14 @@ namespace DepthSensorSandbox.Processing {
         private SensorIndex _sensorHandsMask;
         private SensorIndex.Internal _sensorHandsMaskInternal;
         
+        private DepthBuffer _currHandsDepthDecreased;
+        private SensorDepth _sensorHandsDepthDecreased;
+        private SensorDepth.Internal _sensorHandsDepthDecreasedInternal;
+        
         private DepthBuffer _currHandsDepth;
         private SensorDepth _sensorHandsDepth;
         private SensorDepth.Internal _sensorHandsDepthInternal;
-        private Sampler _samplerHandsDepth = Sampler.Create();
+        private Sampler _samplerDecreased = Sampler.Create();
         
         private ushort[] _depthLongExpos;
         private byte[] _decreasedHandsSumCounts;
@@ -62,41 +67,45 @@ namespace DepthSensorSandbox.Processing {
 #endif
             _sensorHandsMask?.Dispose();
             _sensorHandsDepth?.Dispose();
+            _sensorHandsDepthDecreased?.Dispose();
         }
         
         protected override void InitInMainThreadInternal(DepthBuffer buffer) {
             if (ReCreateIfNeed(ref _depthLongExpos, buffer.length)) {
                 buffer.data.CopyTo(_depthLongExpos);
-                _currHandsMask = new IndexBuffer(buffer.width, buffer.height);
-                _sensorHandsMask?.Dispose();
-                _sensorHandsMask = new SensorIndex(_currHandsMask) {
-                    BuffersCount = _HANDS_MASK_BUFFERS_COUNT
-                };
-                _sensorHandsMaskInternal = new Sensor<IndexBuffer>.Internal(_sensorHandsMask);
+                RecreateSensor(buffer.width, buffer.height, 
+                    ref _sensorHandsMask, out _currHandsMask, out _sensorHandsMaskInternal);
+                RecreateSensor(buffer.width, buffer.height, 
+                    ref _sensorHandsDepth, out _currHandsDepth, out _sensorHandsDepthInternal);
+                RecreateSensor(buffer.width / _HANDS_DEPTH_DECREASE, buffer.height / _HANDS_DEPTH_DECREASE,
+                    ref _sensorHandsDepthDecreased, out _currHandsDepthDecreased, out _sensorHandsDepthDecreasedInternal);
 
-                _currHandsDepth = new DepthBuffer(buffer.width / _HANDS_DEPTH_DECREASE, buffer.height / _HANDS_DEPTH_DECREASE);
-                _sensorHandsDepth?.Dispose();
-                _sensorHandsDepth = new SensorDepth(_currHandsDepth) {
-                    BuffersCount = _HANDS_MASK_BUFFERS_COUNT
-                };
-                _sensorHandsDepthInternal = new Sensor<DepthBuffer>.Internal(_sensorHandsDepth);
-                if (ReCreateIfNeed(ref _decreasedHandsSumCounts, _currHandsDepth.length))
+                _samplerDecreased.SetDimens(_currHandsDepthDecreased.width, _currHandsDepthDecreased.height);
+                if (ReCreateIfNeed(ref _decreasedHandsSumCounts, _currHandsDepthDecreased.length))
                     Array.Clear(_decreasedHandsSumCounts, 0, _decreasedHandsSumCounts.Length);
-                _samplerHandsDepth.SetDimens(_currHandsDepth.width, _currHandsDepth.height);
 
                 _queue.MaxSize = buffer.length;
                 _queueErrorAura.MaxSize = buffer.length;
                 _queueErrorAuraExtend.MaxSize = buffer.length;
             }
         }
+
+        private static void RecreateSensor<S, B>(int w, int h, ref S sensor, out B buffer, out Sensor<B>.Internal intern)
+            where S : Sensor<B> where B : AbstractBuffer {
+            sensor?.Dispose();
+            buffer = AbstractBuffer.Create<B>(new object[] {w, h});
+            sensor = AbstractSensor.Create<S, B>(buffer);
+            sensor.BuffersCount = _HANDS_MASK_BUFFERS_COUNT;
+            intern = new Sensor<B>.Internal(sensor);
+        }
         
         public override void SetCropping(Rect cropping01) {
             base.SetCropping(cropping01);
-            _samplerHandsDepth.SetCropping01(cropping01);
+            _samplerDecreased.SetCropping01(cropping01);
         }
         
         public Sampler GetSamplerHandsDecreased() {
-            return _samplerHandsDepth;
+            return _samplerDecreased;
         }
 
         protected override void ProcessInternal() {
@@ -110,6 +119,8 @@ namespace DepthSensorSandbox.Processing {
             _currHandsMask.Clear();
             _currHandsDepth = _sensorHandsDepth.GetOldest();
             _currHandsDepth.Clear();
+            _currHandsDepthDecreased = _sensorHandsDepthDecreased.GetOldest();
+            _currHandsDepthDecreased.Clear();
             //Array.Clear(_decreasedHandsSumCounts, 0, _decreasedHandsSumCounts.Length);
             
             Parallel.Invoke(FillBorderUp, FillBorderDown, FillBorderLeft, FillBorderRight);
@@ -120,25 +131,26 @@ namespace DepthSensorSandbox.Processing {
             WaveFill(_queueErrorAura, FillHandsErrorAura);
             WaveFill(_queueErrorAuraExtend, FillHandsErrorAuraExtend, WavesCountErrorAuraExtend);
             _s.EachParallelDownsizeSafe(WriteMaskResultBody, _HANDS_DEPTH_DECREASE);
-            _samplerHandsDepth.EachParallelHorizontal(FixAverageHandsDepthBody);
+            _samplerDecreased.EachParallelHorizontal(FixAverageHandsDepthBody);
             
             _sensorHandsMaskInternal.OnNewFrameBackground();
             _sensorHandsDepthInternal.OnNewFrameBackground();
+            _sensorHandsDepthDecreasedInternal.OnNewFrameBackground();
         }
 
-        public int MaskToHands(int i) {
+        public int FullToDecreased(int i) {
             var p = _currHandsMask.GetXYFrom(i);
             p /= _HANDS_DEPTH_DECREASE;
-            return _currHandsDepth.GetIFrom((int) p.x, (int) p.y);
+            return _currHandsDepthDecreased.GetIFrom((int) p.x, (int) p.y);
         }
         
-        public int HandsToMask(int i) {
-            var p = HandsToMaskXY(i);
+        public int DecreasedToFull(int i) {
+            var p = DecreasedToFullXY(i);
             return _currHandsMask.GetIFrom((int) p.x, (int) p.y);
         }
         
-        public Vector2 HandsToMaskXY(int i) {
-            var p = _currHandsDepth.GetXYFrom(i);
+        public Vector2 DecreasedToFullXY(int i) {
+            var p = _currHandsDepthDecreased.GetXYFrom(i);
             return p * _HANDS_DEPTH_DECREASE + Vector2.one / 2f * _HANDS_DEPTH_DECREASE;
         }
 
@@ -194,8 +206,31 @@ namespace DepthSensorSandbox.Processing {
             }
             return Cell.CLEAR;
         }
+        
+        private Cell CheckCell(int i, int prevI, ushort minDiffer) {
+            if (IsCellInvalid(i))
+                return Cell.INVALID;
 
-        private void WaveFill(ArrayIntQueue queue, Action<int> fill, int maxWave = int.MaxValue) {
+            var longExp = _depthLongExpos[i];
+            if (longExp != Sampler.INVALID_DEPTH) {
+                var val = _inDepth.data[i];
+                if (val != Sampler.INVALID_DEPTH) {
+                    var diff = longExp - val;
+                    if (diff > minDiffer) {
+                        if (Mathf.Abs(val - _inDepth.data[prevI]) < MinDistanceAtBorder)
+                            return Cell.HAND;
+                        return Cell.ERROR_AURA;
+                    }
+                    if (-diff > MaxErrorAura)
+                        return Cell.ERROR_AURA;
+                } else {
+                    return Cell.ERROR_AURA;
+                }
+            }
+            return Cell.CLEAR;
+        }
+
+        private void WaveFill(ArrayIntQueue queue, Action<int, int> fill, int maxWave = int.MaxValue) {
             int countInCurrWave = queue.GetCount();
             int currWave = 0;
 #if HANDS_WAVE_STEP_DEBUG
@@ -205,7 +240,7 @@ namespace DepthSensorSandbox.Processing {
                 int i = queue.Dequeue();
                 for (int n = 0; n < 4; ++n) {
                     int j = _s.GetIndexOfNeighbor(i, n);
-                    fill(j);
+                    fill(j, i);
                 }
                 --countInCurrWave;
                 if (countInCurrWave == 0) {
@@ -221,8 +256,8 @@ namespace DepthSensorSandbox.Processing {
             }
         }
 
-        private void FillHands(int id) {
-            switch (CheckCell(id, MaxError)) {
+        private void FillHands(int id, int prevId) {
+            switch (CheckCell(id, prevId, MaxError)) {
                 case Cell.HAND:
                     Fill(COLOR, id, _queue);
                     break;
@@ -235,7 +270,7 @@ namespace DepthSensorSandbox.Processing {
             }
         }
         
-        private void FillHandsErrorAura(int id) {
+        private void FillHandsErrorAura(int id, int prevId) {
             switch (CheckCell(id, MaxError)) {
                 case Cell.ERROR_AURA:
                     Fill(COLOR_ERROR_AURA, id, _queueErrorAura);
@@ -247,7 +282,7 @@ namespace DepthSensorSandbox.Processing {
             }
         }
         
-        private void FillHandsErrorAuraExtend(int id) {
+        private void FillHandsErrorAuraExtend(int id, int prevId) {
             if (!IsCellInvalid(id))
                 Fill(COLOR_ERROR_AURA, id, _queueErrorAuraExtend);
         }
@@ -261,11 +296,15 @@ namespace DepthSensorSandbox.Processing {
             if (mask != CLEAR_COLOR) {
                 _out.data[i] = valLongExpos;
                 if (mask == COLOR) {
-                    var j = MaskToHands(i);
-                    if (_currHandsMask.data[HandsToMask(j)] == COLOR) { //central point is colored
-                        _currHandsDepth.data[j] += (ushort) (valLongExpos - inVal);
+                    var diff = (ushort) (valLongExpos - inVal);
+                    _currHandsDepth.data[i] = diff;
+                    var j = FullToDecreased(i);
+                    if (_currHandsMask.data[DecreasedToFull(j)] == COLOR) { //central point is colored
+                        _currHandsDepthDecreased.data[j] += diff;
                         ++_decreasedHandsSumCounts[j];
                     }
+                } else {
+                    _currHandsDepth.data[i] = Sampler.INVALID_DEPTH;
                 }
             } else {
                 var outVal = inVal;
@@ -274,6 +313,7 @@ namespace DepthSensorSandbox.Processing {
                         outVal = (ushort) Mathf.Lerp(inVal, valLongExpos, Exposition);
                     _depthLongExpos[i] = outVal;
                 }
+                _currHandsDepth.data[i] = Sampler.INVALID_DEPTH;
                 _out.data[i] = outVal;
             }
         }
@@ -281,7 +321,7 @@ namespace DepthSensorSandbox.Processing {
         private void FixAverageHandsDepthBody(int i) {
             var count = _decreasedHandsSumCounts[i];
             if (count > 1)
-                _currHandsDepth.data[i] /= count;
+                _currHandsDepthDecreased.data[i] /= count;
             //clear for next frame
             _decreasedHandsSumCounts[i] = 0;
         }

@@ -66,8 +66,8 @@ namespace DepthSensorSandbox.Visualisation {
             }
             if (UpdateHandsDepth) {
                 var hands = DepthSensorSandboxProcessor.Instance.Hands.HandsDepth.GetNewest();
-                if (hands.texture.filterMode != FilterMode.Point)
-                    hands.texture.filterMode = FilterMode.Point;
+                /*if (hands.texture.filterMode != FilterMode.Point)
+                    hands.texture.filterMode = FilterMode.Point;*/
                 hands.UpdateTexture();
                 props.SetTexture(_HANDS_DEPTH_TEX, hands.texture);
             }
