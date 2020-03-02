@@ -22,7 +22,8 @@ namespace Games.Common.Game {
         protected override void Start() {
             _hitMask = LayerMask.GetMask("interactable");
             
-            DepthSensorSandboxProcessor.Instance.HandsProcessingSwitch(false);
+            if (DepthSensorSandboxProcessor.Instance != null)
+                DepthSensorSandboxProcessor.Instance.HandsProcessingSwitch(false);
             _renderDepth = CreateRenderDepth();
             _renderDepth.InvokesOnlyOnProcessedFrame = true;
             _renderDepth.MaxResolution = _depthHeight;
