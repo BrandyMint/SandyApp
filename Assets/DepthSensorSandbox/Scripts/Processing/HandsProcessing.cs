@@ -8,6 +8,7 @@
 using System;
 using System.Threading.Tasks;
 using DepthSensor.Buffer;
+using DepthSensor.Device;
 using DepthSensor.Sensor;
 using UnityEngine;
 
@@ -53,6 +54,7 @@ namespace DepthSensorSandbox.Processing {
         private readonly ArrayIntQueue _queue = new ArrayIntQueue();
         private readonly ArrayIntQueue _queueErrorAura = new ArrayIntQueue();
         private readonly ArrayIntQueue _queueErrorAuraExtend = new ArrayIntQueue();
+        private bool _needUpdateLongExpos;
 
         private enum Cell {
             INVALID,
@@ -68,11 +70,12 @@ namespace DepthSensorSandbox.Processing {
             _sensorHandsMask?.Dispose();
             _sensorHandsDepth?.Dispose();
             _sensorHandsDepthDecreased?.Dispose();
+            base.Dispose();
         }
         
-        protected override void InitInMainThreadInternal(DepthBuffer buffer) {
+        protected override void InitInMainThreadInternal(DepthSensorDevice device) {
+            var buffer = device.Depth.GetNewest();
             if (ReCreateIfNeed(ref _depthLongExpos, buffer.length)) {
-                buffer.data.CopyTo(_depthLongExpos);
                 RecreateSensor(buffer.width, buffer.height, 
                     ref _sensorHandsMask, out _currHandsMask, out _sensorHandsMaskInternal);
                 RecreateSensor(buffer.width, buffer.height, 
@@ -88,6 +91,7 @@ namespace DepthSensorSandbox.Processing {
                 _queueErrorAura.MaxSize = buffer.length;
                 _queueErrorAuraExtend.MaxSize = buffer.length;
             }
+            _needUpdateLongExpos = true;
         }
 
         private static void RecreateSensor<S, B>(int w, int h, ref S sensor, out B buffer, out Sensor<B>.Internal intern)
@@ -108,9 +112,18 @@ namespace DepthSensorSandbox.Processing {
             return _samplerDecreased;
         }
 
+        protected override void OnActiveChange(bool active) {
+            _needUpdateLongExpos = true;
+        }
+
         protected override void ProcessInternal() {
             if (!CheckValid(_currHandsMask))
                 return;
+
+            if (_needUpdateLongExpos) {
+                _prev.data.CopyTo(_depthLongExpos);
+                _needUpdateLongExpos = false;
+            }
             
             _queue.Clear();
             _queueErrorAura.Clear();

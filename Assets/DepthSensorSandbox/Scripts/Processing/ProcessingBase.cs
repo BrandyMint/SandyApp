@@ -1,36 +1,47 @@
 using System;
 using DepthSensor.Buffer;
+using DepthSensor.Device;
 using UnityEngine;
 
 namespace DepthSensorSandbox.Processing {
     public abstract class ProcessingBase : IDisposable {
         public bool OnlyRawBufferIsInput = true;
-        public bool Active = true;
-        
+        public bool Active {
+            get => _active; 
+            set{ 
+                if (value != _active)
+                    OnActiveChange(value);
+                _active = value;
+            }
+        }
+
         protected DepthBuffer _inDepth;
         protected DepthBuffer _rawBuffer;
         protected DepthBuffer _out;
         protected DepthBuffer _prev;
         protected Sampler _s = Sampler.Create();
+        protected bool _active = true;
 
         public void Process(DepthBuffer rawBuffer, DepthBuffer outBuffer, DepthBuffer prevBuffer) {
-            if (Active) {
+            if (_active) {
                 _rawBuffer = rawBuffer;
                 _out = outBuffer;
                 _prev = prevBuffer;
                 _inDepth = OnlyRawBufferIsInput ? _rawBuffer : _out;
-                _s.SetDimens(_rawBuffer.width, _rawBuffer.height);
                 ProcessInternal();
             }
         }
 
         protected abstract void ProcessInternal();
 
-        public void InitInMainThread(DepthBuffer buffer) {
-            InitInMainThreadInternal(buffer);
+        public void InitInMainThread(DepthSensorDevice device) {
+            var buffer = device.Depth.GetNewest();
+            _s.SetDimens(buffer.width, buffer.height);
+            InitInMainThreadInternal(device);
         }
 
-        protected virtual void InitInMainThreadInternal(DepthBuffer buffer) {}
+        protected virtual void InitInMainThreadInternal(DepthSensorDevice device) {}
+        protected virtual void OnActiveChange(bool active) {}
 
         protected static bool ReCreateIfNeed<T>(ref T[] a, int len) {
             if (a == null || a.Length != len) {

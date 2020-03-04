@@ -67,6 +67,10 @@ namespace DepthSensorSandbox.Processing {
             UpdateDimensAndRect();
         }
 
+        public Rect GetCropping01() {
+            return _cropping01;
+        }
+
         public void ResetCropping() {
             SetCropping01(Rect.MinMaxRect(0f, 0f, 1f, 1f));
         }

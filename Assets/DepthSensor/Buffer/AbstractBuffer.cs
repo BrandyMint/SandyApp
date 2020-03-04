@@ -11,9 +11,8 @@ namespace DepthSensor.Buffer {
         }
         
         public static bool ReCreateIfNeed<T>(ref T buffer, int len) where T : AbstractBuffer {
-            Assert.IsNotNull(buffer, "Create buffer before using recreate!");
-            if (buffer.length != len) {
-                var type = buffer.GetType();
+            if (buffer == null || buffer.length != len) {
+                var type = buffer?.GetType() ?? typeof(T);
                 buffer?.Dispose();
                 buffer = (T) Create(type, new object[] {len});
                 return true;
