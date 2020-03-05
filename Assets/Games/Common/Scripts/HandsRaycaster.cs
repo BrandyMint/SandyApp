@@ -52,8 +52,9 @@ namespace Games.Common {
             var handsDepth = _hands.data[i];
             if (!IsHandInteract(handsDepth))
                 return;
-            
-            var uv = Cam.WorldToViewportPoint(ProjectToWorld(i, handsDepth));
+
+            var p = ProjectToWorld(i, handsDepth);
+            var uv = Cam.WorldToViewportPoint(p);
             var ray = Cam.ViewportPointToRay(uv);
             HandFire.Invoke(ray, uv);
         }
@@ -69,7 +70,7 @@ namespace Games.Common {
             var depthPoint = _handsProcessor.DecreasedToFullXY(i);
             var d = _depth.data[_depth.GetIFrom((int) depthPoint.x, (int) depthPoint.y)];
             var p = _device.DepthMapPosToCameraPos(depthPoint, (ushort) (d - handsDepth));
-            return SandboxTransform.TransformDirection(p);
+            return SandboxTransform.TransformPoint(p);
         }
 
         public Vector3 ProjectToWorld(Vector2 p) {
