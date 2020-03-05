@@ -8,6 +8,7 @@ namespace DepthSensorSandbox.Processing {
     public struct Sampler {
         public const int INVALID_ID = -1;
         public const ushort INVALID_DEPTH = 0;
+        public static readonly Rect FULL_CROPPING = UnityEngine.Rect.MinMaxRect(0f, 0f, 1f, 1f);
 
         private int _width;
         private int _height;
@@ -23,7 +24,7 @@ namespace DepthSensorSandbox.Processing {
 
         public static Sampler Create() {
             return new Sampler {
-                _cropping01 = Rect.MinMaxRect(0f,0f, 1f, 1f)
+                _cropping01 = FULL_CROPPING
             };
         }
         
@@ -33,9 +34,8 @@ namespace DepthSensorSandbox.Processing {
             return s;
         }
 
-        public RectInt GetRect() {
-            return _cropping;
-        }
+        public RectInt Rect { get; private set; }
+        public Rect Cropping01 { get; private set; }
         
         public void SetDimens(int w, int h) {
             if (_width == w && _height == h)
@@ -47,7 +47,7 @@ namespace DepthSensorSandbox.Processing {
 
         public void SetCropping(RectInt rect) {
             _cropping = rect;
-            _cropping01 = Rect.MinMaxRect(
+            _cropping01 = UnityEngine.Rect.MinMaxRect(
                 (float) _cropping.xMin / _width, 
                 (float) _cropping.yMin / _height,
                 (float) _cropping.xMax / _width,
@@ -67,12 +67,8 @@ namespace DepthSensorSandbox.Processing {
             UpdateDimensAndRect();
         }
 
-        public Rect GetCropping01() {
-            return _cropping01;
-        }
-
         public void ResetCropping() {
-            SetCropping01(Rect.MinMaxRect(0f, 0f, 1f, 1f));
+            SetCropping01(FULL_CROPPING);
         }
 
         private void UpdateDimensAndRect() {
@@ -89,6 +85,9 @@ namespace DepthSensorSandbox.Processing {
             _borderNbr1 = _cropping.xMax - 2;
             _borderNbr2 = _width * (_cropping.yMin + 1);
             _borderNbr3 = _cropping.xMin + 1;
+            
+            Rect = _cropping;
+            Cropping01 = _cropping01;
         }
         
         public ushort SafeGet(Buffer2D<ushort> depth, int x, int y) {

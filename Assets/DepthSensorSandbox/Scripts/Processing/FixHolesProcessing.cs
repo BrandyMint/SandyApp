@@ -34,6 +34,8 @@ namespace DepthSensorSandbox.Processing {
             //x.0->     <-z.2
             //      y.1
             private int2 CheckHole(int i, int dir, int2 h) {
+                if (i < 0) //TODO: it should not be a negative. bug somewhere else?
+                    return h;
                 var d = depth.data[i];
                 if (d == Sampler.INVALID_DEPTH)
                     ++h.x;
@@ -59,8 +61,8 @@ namespace DepthSensorSandbox.Processing {
                 holes = _holes,
                 dirStart = _DOWN,
                 dirEnd = _UP,
-                mirrorIdStep = _inDepth.width,
-                mirrorId = _s.GetIFrom(x, _s.GetRect().yMax-1)
+                mirrorIdStep = _s.width,
+                mirrorId = _s.GetIFrom(x, _s.Rect.yMax-1)
             };
         }
         
@@ -71,7 +73,7 @@ namespace DepthSensorSandbox.Processing {
                 dirStart = _LEFT,
                 dirEnd = _RIGHT,
                 mirrorIdStep = 1,
-                mirrorId = _s.GetIFrom(_s.GetRect().xMax-1, y)
+                mirrorId = _s.GetIFrom(_s.Rect.xMax-1, y)
             };
         }
 

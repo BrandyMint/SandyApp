@@ -36,7 +36,7 @@ namespace Games.Common.ColliderGenerator {
         public void Generate(IColliderGeneratorDataProvider data, IColliderGeneratorOutput collider) {
             _data = data;
             _collider = collider;
-            _rect = data.Sampler.GetRect();
+            _rect = data.Sampler.Rect;
             _collider.PrepareFrame();
             ReCreateIfNeed(ref _was, _rect.width, _rect.height);
             Clear(_was, false);

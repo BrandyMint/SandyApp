@@ -142,7 +142,7 @@ namespace Games.Football {
                 var dataSize = new Vector2Int((int) (_mouseDebugDataSize * _cam.aspect), _mouseDebugDataSize);
                 var sampler = Sampler.Create(dataSize.x, dataSize.y);
                 _colliderGeneratorDataMouse.Sampler = sampler;
-                _colliderGeneratorOutputMouse.SourceRect = sampler.GetRect(); 
+                _colliderGeneratorOutputMouse.SourceRect = sampler.Rect;
                 
                 _colliderGeneratorDataMouse.MousePos = new Vector2(
                     (int) (Input.mousePosition.x / _cam.pixelWidth * dataSize.x),
