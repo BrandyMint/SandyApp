@@ -85,15 +85,18 @@ namespace DepthSensorSandbox.Processing {
 
             Active = false;
             OnDone?.Invoke();
+#if UNITY_EDITOR
+            DebugLogMaxError();
+#endif
         }
 
         private void DoInitialProcessing() {
             var bufferChanged = false;
             foreach (var p in _processings) {
                 p.OnlyRawBufferIsInput = !bufferChanged;
-                p.SetCropping(_sFull.GetCropping01());
+                p.SetCropping(_sFull.Cropping01);
                 p.Process(_rawBuffer, _out, _prev);
-                p.SetCropping(_s.GetCropping01());
+                p.SetCropping(_s.Cropping01);
                 bufferChanged |= p.Active;
             }
 
@@ -127,5 +130,32 @@ namespace DepthSensorSandbox.Processing {
             _internalFixHoles.Active = true;
             _internalFixHoles.Process(_errorsMap, _errorsMap, _errorsMap);
         }
+
+#if UNITY_EDITOR
+        public void DebugLogMaxError() {
+            ushort maxError = 0;
+            float average = 0f;
+            int count = 0;
+            _s.Each(i => {
+                var err = _errorsMap.data[i];
+                average += err;
+                ++count;
+                if (err > maxError)
+                    maxError = err;
+            });
+            Debug.Log($"Max depth error {maxError}, average {average / count:F1}");
+        }
+
+        public void DebugShowErrorsMap(DepthBuffer depth, DepthSensorDevice device) {
+            _sFull.Each(i => {
+                var p = depth.GetXYFrom(i);
+                var d = depth.data[i];
+                var e = _errorsMap.data[i];
+                var p1 = device.DepthMapPosToCameraPos(p, d);
+                var p2 = device.DepthMapPosToCameraPos(p, (ushort) (d + e));
+                Debug.DrawLine(p1, p2, Color.magenta);
+            });
+        }
+#endif
     }
 }

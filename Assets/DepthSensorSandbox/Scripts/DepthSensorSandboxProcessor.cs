@@ -302,6 +302,7 @@ namespace DepthSensorSandbox {
 
                     if (_processDepth)
                         FlushTextureBuffer(depth, InvokeOnNewFrame);
+                    //_initProcessing.DebugShowErrorsMap(depth, device);
                 }
                 yield return null;
                 ActivateSensorsIfNeed();
