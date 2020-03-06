@@ -86,7 +86,7 @@ namespace DepthSensorSandbox {
             };
             _allProcessings = _initProcessings.Union(_standartProcessings).ToArray();
 
-            _initProcessing.OnDone += () => _processings = _standartProcessings;
+            _initProcessing.OnDone += OnInitProcessingsDone;
         }
 
         private void Awake() {
@@ -270,6 +270,7 @@ namespace DepthSensorSandbox {
                             ? sDepth.GetNewest()
                             : null;
                         if (depthRaw != null) {
+                            Hands.SetMapDepthToCamera(_bufMapToCamera);
                             var bufferChanged = false;
                             var depth = _bufDepth.GetOldest();
                             var depthPrev = _bufDepth.GetNewest();
@@ -328,6 +329,13 @@ namespace DepthSensorSandbox {
             }
 
             return false;
+        }
+
+        private void OnInitProcessingsDone() {
+            foreach (var processing in _allProcessings) {
+                processing.SetErrorsMap(_initProcessing.ErrorsMap);
+            }
+            _processings = _standartProcessings;
         }
         
         private static void OnUpdateMapDepthToCamera(ISensor abstractSensor) {

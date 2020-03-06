@@ -321,9 +321,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fef15de4396e4f529cfeb348bd9541ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  FixHoles: 1
+  NoiseFilter: 1
+  Hands: 1
   Exposition: 0.99
-  MaxError: 10
+  MaxErrorFactor: 0
+  MaxErrorAuraFactor: 0
   MinDistanceAtBorder: 100
+  MaxBiasDot: 0
+  WavesCountErrorAuraExtend: 0
 --- !u!114 &507380214
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -352,6 +358,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _enableOnStart: 1
+  UpdateMask: 1
+  UpdateHandsDepth: 1
+  _handsDepthMax: 0.06
+  _decreasedHandsFilterMod: 0
 --- !u!1 &938858881
 GameObject:
   m_ObjectHideFlags: 0

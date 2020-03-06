@@ -16,7 +16,7 @@ namespace Games.Common.Game {
                 DepthSensorSandboxProcessor.Instance.HandsProcessingSwitch(true);
             _hitMask = LayerMask.GetMask("interactable");
             _handsRaycaster = CreateHandsRaycaster();
-            SetCustomMaxHandDepth(0.04f);
+            SetCustomMaxHandDepth(0.06f);
             base.Start();
         }
 

@@ -18,7 +18,7 @@ namespace Games.Common {
         
         public Transform SandboxTransform;
         public Camera Cam;
-        public ushort MaxHandDepth = 30;
+        public ushort MaxHandDepth = 60;
 
         public virtual void SetEnable(bool enable) {
             if (enable) {

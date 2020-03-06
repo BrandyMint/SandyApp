@@ -12,10 +12,11 @@ namespace DepthSensorSandbox.Visualisation {
         [SerializeField] protected bool _enableOnStart = true;
         [SerializeField] public bool UpdateMask = true;
         [SerializeField] public bool UpdateHandsDepth = true;
+        [SerializeField] private float _handsDepthMax = 0.06f;
+        [SerializeField] private FilterMode _decreasedHandsFilterMod = FilterMode.Bilinear;
         
         protected SandboxMesh _sandbox;
         private SandboxParams _sandboxParams;
-        private float _handsDepthMax = 0.04f;
 
         protected virtual void Awake() {
             _sandbox = GetComponent<SandboxMesh>();
@@ -65,13 +66,19 @@ namespace DepthSensorSandbox.Visualisation {
                 props.SetTexture(_HANDS_MASK_TEX, mask.texture);
             }
             if (UpdateHandsDepth) {
-                var hands = DepthSensorSandboxProcessor.Instance.Hands.HandsDepth.GetNewest();
-                /*if (hands.texture.filterMode != FilterMode.Point)
-                    hands.texture.filterMode = FilterMode.Point;*/
+                var hands = DepthSensorSandboxProcessor.Instance.Hands.HandsDepthDecreased.GetNewest();
+                if (hands.texture.filterMode != _decreasedHandsFilterMod)
+                    hands.texture.filterMode = _decreasedHandsFilterMod;
                 hands.UpdateTexture();
                 props.SetTexture(_HANDS_DEPTH_TEX, hands.texture);
             }
             _sandbox.PropertyBlock = props;
         }
+        
+#if UNITY_EDITOR
+        private void OnValidate() {
+            UpdateHandsDepthMax(_handsDepthMax);
+        }
+#endif
     }
 }

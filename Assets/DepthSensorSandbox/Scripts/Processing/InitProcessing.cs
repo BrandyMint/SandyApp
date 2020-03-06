@@ -17,7 +17,6 @@ namespace DepthSensorSandbox.Processing {
             CALC_ERRORS_MAP
         }
 
-        private DepthBuffer _errorsMap;
         private Stage _stage;
         private SensorDepth _processingSensor;
         private ProcessingBase[] _processings;

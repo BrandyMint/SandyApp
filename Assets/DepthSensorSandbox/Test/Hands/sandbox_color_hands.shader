@@ -42,7 +42,7 @@ Shader "Sandbox/ColorHands" {
                 return col;*/
                 if (hands >= 2) {
                     float handsDepth = tex2D(_HandsDepthTex, i.uv).r * DEPTH_TO_FLOAT;
-                    fixed4 handColor = handsDepth < _HandsDepthMax ? _ColorHandsInteract : _ColorHands;
+                    fixed4 handColor = handsDepth > 0 && handsDepth < _HandsDepthMax ? _ColorHandsInteract : _ColorHands;
                     col.rgb = lerp(col.rgb, handColor.rgb, 1 - handColor.a);
                 }
                 else if (hands >= 1)

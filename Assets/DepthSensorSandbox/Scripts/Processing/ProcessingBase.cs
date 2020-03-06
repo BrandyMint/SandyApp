@@ -21,6 +21,7 @@ namespace DepthSensorSandbox.Processing {
         protected DepthBuffer _prev;
         protected Sampler _s = Sampler.Create();
         protected bool _active = true;
+        protected DepthBuffer _errorsMap;
 
         public void Process(DepthBuffer rawBuffer, DepthBuffer outBuffer, DepthBuffer prevBuffer) {
             if (_active) {
@@ -38,6 +39,10 @@ namespace DepthSensorSandbox.Processing {
             var buffer = device.Depth.GetNewest();
             _s.SetDimens(buffer.width, buffer.height);
             InitInMainThreadInternal(device);
+        }
+
+        public void SetErrorsMap(DepthBuffer errorsMap) {
+            _errorsMap = errorsMap;
         }
 
         protected virtual void InitInMainThreadInternal(DepthSensorDevice device) {}
