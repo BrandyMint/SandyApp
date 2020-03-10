@@ -8,12 +8,12 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: FlowersAndMushrooms
-  m_Shader: {fileID: 4800000, guid: f098453203a84d8b95cab425943e4e0d, type: 3}
+  m_Shader: {fileID: 4800000, guid: d00304171068f20419b3c75bdd757026, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
+  m_CustomRenderQueue: 1990
   stringTagMap: {}
   disabledShaderPasses: []
   m_SavedProperties:
@@ -48,16 +48,24 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MaxTex:
-        m_Texture: {fileID: 2800000, guid: b13de5e6cfd59734a922be2a86798444, type: 3}
-        m_Scale: {x: 3, y: 3}
+        m_Texture: {fileID: 2800000, guid: 9a2718cf8d7c5d9e6983c57e17eda6c9, type: 3}
+        m_Scale: {x: 4, y: 4}
+        m_Offset: {x: 0, y: 0}
+    - _MaxTexNormal:
+        m_Texture: {fileID: 2800000, guid: 13a4d9070f688729f9003f96a604795b, type: 3}
+        m_Scale: {x: 4, y: 4}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MinTex:
-        m_Texture: {fileID: 2800000, guid: 10408205ea5677f499a4232e86c5318c, type: 3}
-        m_Scale: {x: 5, y: 5}
+        m_Texture: {fileID: 2800000, guid: f63e98b61c2052c2b9519ba2b6fdae0e, type: 3}
+        m_Scale: {x: 4, y: 4}
+        m_Offset: {x: 0, y: 0}
+    - _MinTexNormal:
+        m_Texture: {fileID: 2800000, guid: b2851cf252418d979b01ad8889581478, type: 3}
+        m_Scale: {x: 4, y: 4}
         m_Offset: {x: 0, y: 0}
     - _MountainsTex:
         m_Texture: {fileID: 2800000, guid: 5950b77b1844e0830a111d61b902bf8c, type: 3}
@@ -99,7 +107,7 @@ Material:
     - _MinAlphaSea: 0.2
     - _Mix: 0.5
     - _MixDepth: 0.02
-    - _MixDepthPercent: 0.2
+    - _MixDepthPercent: 0.3
     - _MixNoiseSize: 20
     - _MixNoiseStrength: 0.05
     - _Mode: 0
@@ -112,12 +120,12 @@ Material:
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _UVSec: 0
-    - _ZWrite: 1
+    - _ZWrite: 0
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _Color1: {r: 0, g: 1, b: 0, a: 1}
     - _Color2: {r: 1, g: 1, b: 1, a: 1}
-    - _ColorHands: {r: 0.3, g: 0.3, b: 0.3, a: 1}
+    - _ColorHands: {r: 1, g: 1, b: 1, a: 0.6}
     - _ColorIce: {r: 1, g: 1, b: 1, a: 0.7294118}
     - _ColorMax: {r: 0.823, g: 0.823, b: 0.823, a: 1}
     - _ColorMin: {r: 0, g: 0, b: 1, a: 1}

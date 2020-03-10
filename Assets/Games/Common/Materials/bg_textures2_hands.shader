@@ -52,12 +52,12 @@
             float z = IN.vpos.z;
             
             fixed4 c = tex2D(_MinTex, IN.uv_MinTex);
-            addSample(c, _MaxTex, IN.uv_MinTex, _DepthZero, z);
+            addSample(c, _MaxTex, IN.uv_MaxTex, _DepthZero, z);
             c.rgb = lerp(c.rgb, _ColorHands.rgb, _ColorHands.a * handsInteractAlpha(IN.texcoord));
             o.Albedo = c;
             
             fixed4 n = tex2D(_MinTexNormal, IN.uv_MinTex);
-            addSample(n, _MaxTexNormal, IN.uv_MinTex, _DepthZero, z);
+            addSample(n, _MaxTexNormal, IN.uv_MaxTex, _DepthZero, z);
             o.Normal = UnpackNormal (n);
         }
         ENDCG
