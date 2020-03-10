@@ -138,15 +138,19 @@ namespace DepthSensor.Device {
 
         public RecordPlayerDevice(string path) : base(Init(path)) {
             _recordPath = path;
-            
-            _colorStream = InitStream(_internalColor, path, nameof(Color));
-            _infraredStream = InitStream(_internalInfrared, path, nameof(Infrared));
-            _mapStream = InitStream(_internalMapDepthToCamera, path, nameof(MapDepthToCamera));
-            _depthStream = InitStream(_internalDepth, path, nameof(Depth));
-
-            _initInfo = null;
             _calibration = new RecordCalibrationResult(path);
             _calibration.Load();
+
+            var depthFov = _calibration.IntrinsicDepth.GetFOV();
+            var colorFov = _calibration.IntrinsicDepth.GetFOV();
+            
+            _colorStream = InitStream(_internalColor, path, nameof(Color), colorFov);
+            _infraredStream = InitStream(_internalInfrared, path, nameof(Infrared), depthFov);
+            _mapStream = InitStream(_internalMapDepthToCamera, path, nameof(MapDepthToCamera), depthFov);
+            _depthStream = InitStream(_internalDepth, path, nameof(Depth), depthFov);
+
+            _initInfo = null;
+            
 #if TEST_COMPARE_PLAYER_WITH_DEVICE
             _testDev = new OpenNI2Device();
             _testDevInternal = new Internal(_testDev);
@@ -159,7 +163,7 @@ namespace DepthSensor.Device {
             _pollFrames.Start();
         }
 
-        private SensorStream InitStream<T>(Sensor<T>.Internal internalSensor, string path, string name) where T : AbstractBuffer2D {
+        private SensorStream InitStream<T>(Sensor<T>.Internal internalSensor, string path, string name, Vector2 fov) where T : AbstractBuffer2D {
             var stream = new SensorStream(Path.Combine(path, name)) {
                 SensorInternal = internalSensor,
                 Sensor = internalSensor.sensor
@@ -167,7 +171,7 @@ namespace DepthSensor.Device {
             var info = ((InitInfoRecordPlayer) _initInfo).manifest.Get<StreamInfo>(name);
             if (info != null) {
                 internalSensor.SetTargetFps(info.fps);
-                //TODO: internalSensor.SetFov();
+                internalSensor.SetFov(fov);
             }
             _streams.Add(stream);
 
