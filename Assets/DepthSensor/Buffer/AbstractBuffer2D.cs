@@ -37,5 +37,13 @@ namespace DepthSensor.Buffer {
                 i / width
             );
         }
+
+        public bool IsValidXY(int x, int y) {
+            return x >= 0 && x < width && y >= 0 && y < height;
+        }
+        
+        public bool IsValidXY(Vector2 p) {
+            return p.x >= 0 && p.x < width && p.y >= 0 && p.y < height;
+        }
     }
 }
