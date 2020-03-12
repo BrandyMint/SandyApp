@@ -7,23 +7,43 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: road_bg
-  m_Shader: {fileID: 4800000, guid: d00304171068f20419b3c75bdd757026, type: 3}
-  m_ShaderKeywords: 
+  m_Name: country_bg
+  m_Shader: {fileID: 4800000, guid: b7c50bfe00299ae6baaab1d45edc27e1, type: 3}
+  m_ShaderKeywords: _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: 1999
+  m_CustomRenderQueue: 1990
   stringTagMap: {}
   disabledShaderPasses: []
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
-    - _BumpMap:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
+    - _1Tex:
+        m_Texture: {fileID: 2800000, guid: 91b2f85d16501e0b9bb9859be29f635a, type: 3}
+        m_Scale: {x: 4, y: 4}
         m_Offset: {x: 0, y: 0}
-    - _ColorsTex:
+    - _1TexNormal:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 5, y: 5}
+        m_Offset: {x: 0, y: 0}
+    - _2Tex:
+        m_Texture: {fileID: 2800000, guid: 279dd49073f1f31babbd3ccc544be2ed, type: 3}
+        m_Scale: {x: 1.8, y: 1.8}
+        m_Offset: {x: 0, y: 0}
+    - _2TexNormal:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1.8, y: 1.8}
+        m_Offset: {x: 1, y: 1}
+    - _3Tex:
+        m_Texture: {fileID: 2800000, guid: bb06fc9b2161040fbab1a8223ef0da98, type: 3}
+        m_Scale: {x: 5, y: 5}
+        m_Offset: {x: 0, y: 0}
+    - _3TexNormal:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 5, y: 5}
+        m_Offset: {x: 0, y: 0}
+    - _BumpMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
@@ -43,33 +63,13 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    - _FieldTex:
-        m_Texture: {fileID: 2800000, guid: 20523635fe377504e99590a77b09189b, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
     - _MainTex:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    - _MaxTex:
-        m_Texture: {fileID: 2800000, guid: a63e7c0d3c6bcb24cbf7d69f38880663, type: 3}
-        m_Scale: {x: 5, y: 5}
-        m_Offset: {x: 0, y: 0}
-    - _MaxTexNormal:
-        m_Texture: {fileID: 2800000, guid: f3a1130c4998d2f4f9aa89f2a745e6a8, type: 3}
-        m_Scale: {x: 5, y: 5}
-        m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _MinTex:
-        m_Texture: {fileID: 2800000, guid: 4484adb582308dc4daa00403cb82dff7, type: 3}
-        m_Scale: {x: 5, y: 5}
-        m_Offset: {x: 0, y: 0}
-    - _MinTexNormal:
-        m_Texture: {fileID: 2800000, guid: a1bfba6d440f3a74db05157d811e2116, type: 3}
-        m_Scale: {x: 5, y: 5}
         m_Offset: {x: 0, y: 0}
     - _OcclusionMap:
         m_Texture: {fileID: 0}
@@ -79,44 +79,32 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    - _PlayersTex:
-        m_Texture: {fileID: 2800000, guid: 783e4d57846fa0947b5b5dff7a502124, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
     m_Floats:
+    - _12MixDepth: 0.4
+    - _1Depth: -0.2
+    - _23MixDepth: 0.2
+    - _2Depth: -0.3
+    - _3Depth: 0.3
     - _BumpScale: 1
-    - _ColorMix: 0.1
-    - _ColorScale: 1
     - _Cutoff: 0.5
     - _DepthMaxOffset: 0.2
     - _DepthMinOffset: 0.2
-    - _DepthSliceOffset: 0.05
-    - _DepthZero: 1.6
+    - _DepthZero: 1.66
     - _DetailNormalMapScale: 1
-    - _DotSlice: 0.7
-    - _DotSliceOverride: 0.5
     - _DstBlend: 0
-    - _GlossMapScale: 1
-    - _Glossiness: 0.5
+    - _GlossMapScale: 0
+    - _Glossiness: 0
     - _GlossyReflections: 1
-    - _Illumination: 0
-    - _Lighting: 1
     - _Metallic: 0
-    - _MixDepthPercent: 0.3
     - _Mode: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.02
-    - _PlayerColorAlpha: 0.35
-    - _SmoothnessTextureChannel: 0
+    - _SmoothnessTextureChannel: 1
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _UVSec: 0
     - _ZWrite: 0
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _ColorHands: {r: 1, g: 1, b: 1, a: 0.5019608}
-    - _ColorMax: {r: 0.13207549, g: 0.1302065, b: 0.1302065, a: 1}
-    - _ColorMin: {r: 0, g: 0, b: 0, a: 1}
-    - _ColorPlayerLeft: {r: 1, g: 0, b: 0, a: 1}
-    - _ColorPlayerRight: {r: 0, g: 0, b: 1, a: 1}
+    - _ColorHands: {r: 1, g: 1, b: 1, a: 0.8}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}

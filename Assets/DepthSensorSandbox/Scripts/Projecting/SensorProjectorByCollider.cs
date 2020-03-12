@@ -1,5 +1,6 @@
 using DepthSensorSandbox.Visualisation;
 using Unity.Mathematics;
+using UnityEditor;
 using UnityEngine;
 
 namespace DepthSensorSandbox.Projecting {
@@ -17,7 +18,7 @@ namespace DepthSensorSandbox.Projecting {
                 return worldPos;
             
             var b = _collider.bounds;
-            var forward = -transform.forward;
+            var forward = transform.forward;
             var bCenter = Vector3.Project(b.center - transform.position, forward);
             var bSize = math.cmax(b.extents);
             var bTop = bCenter - forward * bSize;
@@ -25,6 +26,12 @@ namespace DepthSensorSandbox.Projecting {
             var ray = new Ray(origin, forward);
             if (_collider.Raycast(ray, out var hit, bSize * 2f)) {
                 return hit.point;
+            } else {
+                origin = worldPos + worldPos - origin;
+                ray = new Ray(origin, -forward);
+                if (_collider.Raycast(ray, out hit, bSize * 2f)) {
+                    return hit.point;
+                }
             }
 
             return worldPos;

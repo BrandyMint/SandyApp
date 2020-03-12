@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.4512422, g: 0.50095326, b: 0.5735164, a: 1}
+  m_IndirectSpecularColor: {r: 0.45124263, g: 0.5009535, b: 0.5735183, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -207,7 +207,7 @@ PrefabInstance:
     - target: {fileID: 6145052358333956585, guid: 47cbe1775872baf289a77a580245e6e6,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.04
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6145052358333956585, guid: 47cbe1775872baf289a77a580245e6e6,
         type: 3}
@@ -234,7 +234,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: 499ad4638b1bc054094b0333bca6d702, type: 2}
+      objectReference: {fileID: 2100000, guid: cb619d1da2058d5439c1f323fa16bc8f, type: 2}
     - target: {fileID: 6145052358333956587, guid: 47cbe1775872baf289a77a580245e6e6,
         type: 3}
       propertyPath: m_Enabled
@@ -294,6 +294,18 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 585363455}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &585363457
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 585363456}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5893fef5c0de4f5691a661cdc92100f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!64 &585363458
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -405,13 +417,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 925452556}
-  m_LocalRotation: {x: 0.12631306, y: -0.85472, z: 0.24565208, w: 0.4394927}
+  m_LocalRotation: {x: -0.12688345, y: -0.8536965, z: 0.24535772, w: -0.44147745}
   m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 32.07, y: -125.576004, z: 0}
+  m_LocalEulerAnglesHint: {x: 32.07, y: -234.69, z: 0}
 --- !u!1 &1145366314
 GameObject:
   m_ObjectHideFlags: 0
@@ -909,6 +921,11 @@ PrefabInstance:
         type: 3}
       propertyPath: _testMouse
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4519905860647497006, guid: 92d52b198b967d64689ed0fe2108ed4b,
+        type: 3}
+      propertyPath: m_Range
+      value: 0.6696
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 92d52b198b967d64689ed0fe2108ed4b, type: 3}

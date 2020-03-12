@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Games.Common.Game {
     public class BaseGameWithHandsRaycast : BaseGame {
-        [SerializeField] private SandboxMesh _sandbox;
+        [SerializeField] protected SandboxMesh _sandbox;
 
         protected int _hitMask;
         protected bool _testMouseModeHold;

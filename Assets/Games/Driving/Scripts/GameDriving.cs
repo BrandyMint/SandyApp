@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using BezierSolution;
 using Games.Common.Game;
 using Unity.Mathematics;
 using UnityEngine;
@@ -9,6 +8,7 @@ namespace Games.Driving {
     public class GameDriving : BaseGameWithHandsRaycast {
         [SerializeField] private CarController _car;
         [SerializeField] private UICarControl _uiCarControl;
+        [SerializeField] private Country _country;
         [SerializeField] private bool _testMouse = false;
 
         protected override void Start() {
@@ -19,7 +19,9 @@ namespace Games.Driving {
             _hitMask = LayerMask.GetMask("border");
             _car.gameObject.SetActive(false);
             _uiCarControl.Car = _car;
-            _uiCarControl.OnResetCar += RespawnCar;
+            _uiCarControl.OnResetCar += () => {
+                RespawnCar();
+            };
             _handsRaycaster.OnPreProcessDepthFrame += _uiCarControl.StartDepthInput;
             _handsRaycaster.OnPostProcessDepthFrame += _uiCarControl.StopDepthInput;
         }
@@ -27,12 +29,13 @@ namespace Games.Driving {
         protected override void StartGame() {
             base.StartGame();
             _car.gameObject.SetActive(true);
-            StartCoroutine(RespawnCarOnNextFrame());
+            StartCoroutine(RespawningCar());
         }
 
-        private IEnumerator RespawnCarOnNextFrame() {
-            yield return null;
-            RespawnCar();
+        private IEnumerator RespawningCar() {
+            while (!RespawnCar()) {
+                yield return null;
+            }
         }
 
         protected override void SetSizes(float dist) {
@@ -40,6 +43,7 @@ namespace Games.Driving {
             SetSizes(_gameField.Scale, _car);
             var carScale = math.cmax(_car.transform.localScale);
             _car.DoScale(carScale);
+            _country.ReInit(_sandbox, _gameField);
         }
         
         protected void FixedUpdate() {
@@ -53,7 +57,7 @@ namespace Games.Driving {
             _uiCarControl.DepthInput(viewPos);
         }
 
-        public void RespawnCar() {
+        public bool RespawnCar() {
             var ray = _cam.ViewportPointToRay(Vector2.one / 2f);
             if (Physics.Raycast(ray, out var hit, _cam.farClipPlane, _hitMask)) {
                 var p = hit.point;
@@ -61,7 +65,10 @@ namespace Games.Driving {
                 _car.transform.position = p;
                 _car.transform.rotation = Quaternion.identity;
                 _car.WakeUp();
+                return true;
             }
+
+            return false;
         }
     }
 }
