@@ -6,7 +6,7 @@ using Random = UnityEngine.Random;
 namespace Games.Landscape {
     [RequireComponent(typeof(Animator))]
     public class Animal : MonoBehaviour {
-        //private static readonly int _ACCELERATION = Animator.StringToHash("acceleration");
+        private static readonly int _ACCELERATION = Animator.StringToHash("acceleration");
         protected static readonly int _IDLE = Animator.StringToHash("idle");
         protected static readonly int _WALK = Animator.StringToHash("walk");
         protected static readonly int _EAT = Animator.StringToHash("eat");
@@ -62,7 +62,7 @@ namespace Games.Landscape {
             if (isMoving != (_currState == _WALK)) {
                 SetAnimState(isMoving ? _WALK : _IDLE);
             }
-            //_anim.SetFloat(_ACCELERATION, a);
+            _anim.SetFloat(_ACCELERATION, a);
         }
 
         protected void SetAnimState(int state) {
