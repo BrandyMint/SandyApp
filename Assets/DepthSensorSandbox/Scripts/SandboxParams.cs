@@ -23,5 +23,13 @@ namespace DepthSensorSandbox {
             get => Get(nameof(OffsetMaxDepth), 0.2f);
             set => Set(nameof(OffsetMaxDepth), value);
         }
+        
+        public float PercentToDepth(float p) {
+            if (p < 0) {
+                return Mathf.Lerp(ZeroDepth + OffsetMinDepth, ZeroDepth, 1 + p);
+            } else {
+                return Mathf.Lerp(ZeroDepth, ZeroDepth - OffsetMaxDepth, p);
+            }
+        }
     }
 }

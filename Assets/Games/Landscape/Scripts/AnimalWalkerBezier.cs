@@ -6,74 +6,51 @@ using UnityEngine;
 using Random = UnityEngine.Random;
 
 namespace Games.Landscape {
-    public abstract class AbstractAnimal : MonoBehaviour {
+    [RequireComponent(typeof(BezierWalkerWithSpeed))]
+    public class AnimalWalkerBezier : MonoBehaviour, IAnimalWalker {
         protected const int _ITERATIONS = 40;
-        protected static readonly int _IDLE = Animator.StringToHash("idle");
-        protected static readonly int _WALK = Animator.StringToHash("walk");
-        protected static readonly int _EAT = Animator.StringToHash("eat");
-        protected int[] _animStates;
-
+        
         [SerializeField] protected float _speed = 0.2f;
         [SerializeField] protected float _minDistWalk = 0.1f;
         [SerializeField] protected float _maxDistWalk = 0.3f;
-        [SerializeField] protected float _minTimeState = 1f;
-        [SerializeField] protected float _maxTimeState = 3f;
         [SerializeField] protected float _maxAngleWalkTurn = 150f;
         [SerializeField] protected float _walkBorder = 0.5f;
         
-        public GameField field { get; set; }
-
-        protected Animator _anim;
         protected BezierSpline _spline;
         protected BezierWalkerWithSpeed _walker;
+        protected bool _isInited;
 
         private void Awake() {
-            _anim = GetComponent<Animator>();
             _walker = GetComponent<BezierWalkerWithSpeed>();
-            _spline = new GameObject(_anim.name).AddComponent<BezierSpline>();
+            _spline = new GameObject(gameObject.name).AddComponent<BezierSpline>();
             _spline.Initialize(2);
             _spline.gameObject.SetActive(false);
             _walker.onPathCompleted.AddListener(() => { _walker.enabled = false; });
             _walker.enabled = false;
-            _animStates = GetAnimStates();
         }
-
-        protected virtual int[] GetAnimStates() {
-            return new[] {_IDLE, _WALK, _EAT};
-        }
-
+        
         private void OnDestroy() {
             if (_spline != null)
                 Destroy(_spline.gameObject);
         }
 
-        private void OnEnable() {
-            StartAnimation();
-        }
-
-        public void StartAnimation() {
-            if (field == null)
-                return;
+        public void Init(GameField field) {
             _spline.transform.SetParent(field.transform, false);
-            StartCoroutine(Living());
+            _isInited = true;
         }
 
-        protected abstract IEnumerator Living();
-
-        protected void SetAnimState(int state) {
-            foreach (var s in _animStates) {
-                if (s == state)
-                    _anim.SetTrigger(s);
-                else
-                    _anim.ResetTrigger(s);
-            }
-        }
-        
-        protected IEnumerator WaitRandom() {
-            yield return new WaitForSeconds(Random.Range(_minTimeState, _maxTimeState));
+        public void RandomSpawn() {
+            var p = new Vector3(Random.value, Random.value) - Vector3.one / 2f;
+            p *= 0.8f;
+            CorrectWalkEndPoint(p);
+            transform.position = _spline.transform.TransformPoint(p);
+            transform.rotation = Quaternion.AngleAxis(Random.Range(0f, 360f), transform.up);
         }
 
-        protected IEnumerator WalkRandom() {
+        public IEnumerator WalkRandom() {
+            if (!_isInited)
+                yield break;
+            
             var start = _spline[0];
             start.position = transform.position;
             start.rotation = transform.rotation;
@@ -110,6 +87,12 @@ namespace Games.Landscape {
                 yield return null;
             }
             _spline.gameObject.SetActive(false);
+        }
+
+        public float CurrentAcceleration() {
+            if (_walker.enabled)
+                return 1f;
+            return 0f;
         }
 
         protected virtual Vector3 CorrectWalkEndPoint(Vector3 p) {

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace Utilities {
@@ -132,7 +133,7 @@ namespace Utilities {
             return new Vector3(p1.x * p2.x, p1.y * p2.y, p1.z * p2.z);
         }
 
-        public static ushort GetMedian(ushort[] a) {
+        public static T GetMedian<T>(params T[] a) where T: IComparable<T> {
             var n = a.Length;
             int low, high;
             int median;
@@ -144,16 +145,16 @@ namespace Utilities {
                     return a[median];
 
                 if (high == low + 1) {  /* Two elements only */
-                    if (a[low] > a[high])
+                    if (a[low].CompareTo(a[high]) < 0)
                         ElemSwap(a, low, high);
                     return a[median];
                 }
 
                 /* Find median of low, middle and high items; swap into position low */
                 middle = (low + high) / 2;
-                if (a[middle] > a[high])    ElemSwap(a, middle, high);
-                if (a[low] > a[high])       ElemSwap(a, low, high);
-                if (a[middle] > a[low])     ElemSwap(a, middle, low);
+                if (a[middle].CompareTo(a[high]) < 0)    ElemSwap(a, middle, high);
+                if (a[low].CompareTo(a[high]) < 0)       ElemSwap(a, low, high);
+                if (a[middle].CompareTo(a[low]) < 0)     ElemSwap(a, middle, low);
 
                 /* Swap low item (now in position middle) into position (low+1) */
                 ElemSwap(a, middle, low + 1);
@@ -162,8 +163,8 @@ namespace Utilities {
                 ll = low + 1;
                 hh = high;
                 for (;;) {
-                    do ll++; while (a[low] > a[ll]);
-                    do hh--; while (a[hh] > a[low]);
+                    do ll++; while (a[low].CompareTo(a[ll]) < 0);
+                    do hh--; while (a[hh].CompareTo(a[low]) < 0);
 
                     if (hh < ll)
                         break;

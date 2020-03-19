@@ -8,6 +8,8 @@ using Utilities;
 
 namespace Games.Common {
     public class GameField : MonoBehaviour {
+        public event Action OnChanged;
+        
         [SerializeField] protected Transform[] _offsetedByWidth;
         [SerializeField] protected Transform[] _offsetedByWidthAndSize;
         [SerializeField] private Texture2D _fieldTexture;
@@ -84,10 +86,20 @@ namespace Games.Common {
             );
             
             UpdateWidth();
+            OnChanged?.Invoke();
         }
 
         public Plane PlaneOnDist(float dist) {
             return _lastCam.PlaneOnDist(dist, transform.forward);
+        }
+        
+        public Vector3 CenterPosOnDist(float dist) {
+            if (_lastCam == null)
+                return transform.position - transform.forward * dist;
+            var t = _lastCam.transform;
+            var planeUp = transform.forward;
+            planeUp = (Vector3.Dot(planeUp, -t.forward) > 0f) ? planeUp : -planeUp;
+            return t.position - planeUp * dist;
         }
 
         public Vector3 PlaneRaycastFromViewport(Plane plane, Vector2 uv) {
@@ -140,6 +152,11 @@ namespace Games.Common {
                 return true;
             }
             return false;
+        }
+
+        private void OnDrawGizmos() {
+            Gizmos.color = Color.cyan;
+            Gizmos.DrawWireMesh(PrimitiveMesh.Get(PrimitiveType.Quad), transform.position, transform.rotation, transform.localScale);
         }
     }
 }
