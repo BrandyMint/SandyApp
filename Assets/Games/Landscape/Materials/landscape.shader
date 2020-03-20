@@ -76,7 +76,7 @@
         //float _SeaSmoothness;
         
         //#define CALC_NORMAL
-        #define INCLUDE_INPUT_WORLD_NORMAL
+        //#define INCLUDE_INPUT_WORLD_NORMAL
         #define EXTENSION_INPUT \
             float2 uv_MountainsTex; \
             float2 uv_DirtTex; \

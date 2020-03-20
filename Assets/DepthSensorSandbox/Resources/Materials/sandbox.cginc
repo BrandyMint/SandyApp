@@ -133,7 +133,21 @@ struct Input {
     float4 screenPos;
     float2 texcoord;
     EXTENSION_INPUT
+#ifdef INCLUDE_INPUT_WORLD_NORMAL
+    float3 worldNormal;
+    INTERNAL_DATA
+#endif
 };
+
+#ifdef INCLUDE_INPUT_WORLD_NORMAL
+    float3 WorldToTangentNormalVector(Input IN, float3 normal) {
+        float3 t2w0 = WorldNormalVector(IN, float3(1,0,0));
+        float3 t2w1 = WorldNormalVector(IN, float3(0,1,0));
+        float3 t2w2 = WorldNormalVector(IN, float3(0,0,1));
+        float3x3 t2w = float3x3(t2w0, t2w1, t2w2);
+        return normalize(mul(t2w, normal));
+    }
+#endif
 
 void vertSurf(inout appdata_full v, out Input o) {
     MODIFY_VERT(v, v.texcoord.xy)
