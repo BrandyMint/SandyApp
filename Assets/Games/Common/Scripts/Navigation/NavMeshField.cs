@@ -10,6 +10,8 @@ namespace Games.Common.Navigation {
         public float MinDepth = 1.6f;
         public float MaxDepth = 1.52f;
         public float AgentRadius = 0.01f;
+        [SerializeField] private float _maxUpdatePeriod = 2f;
+
         [Header("Agent Settings")]
         [HideInInspector] public int agentTypeID;
         public float AgentSlope = 45f;
@@ -23,6 +25,7 @@ namespace Games.Common.Navigation {
         private AsyncOperation _navMeshUpdatingOp;
         private NavMeshDataInstance _navMeshInstance;
         private List<NavMeshBuildSource> _sources = new List<NavMeshBuildSource>();
+        private float _lastUpdateTime = float.MinValue;
         
         private NavMeshBuildSettings _settings;
 
@@ -47,6 +50,9 @@ namespace Games.Common.Navigation {
 
         private IEnumerator Start() {
             while (true) {
+                var spendTime = Time.time - _lastUpdateTime;
+                if (spendTime < _maxUpdatePeriod)
+                    yield return new WaitForSeconds(_maxUpdatePeriod - spendTime);
                 UpdateNavMesh();
                 yield return _navMeshUpdatingOp;
             }
@@ -56,6 +62,7 @@ namespace Games.Common.Navigation {
             UpdateSettings();
             NavMeshFieldSource.Collect(ref _sources);
             var bounds = GetWorldBounds(MinDepth, MinDepth);
+            _lastUpdateTime = Time.time;
             _navMeshUpdatingOp = NavMeshBuilder.UpdateNavMeshDataAsync(_navMesh, _settings, _sources, bounds);
         }
 
