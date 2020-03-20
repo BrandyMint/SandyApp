@@ -33,9 +33,9 @@ MonoBehaviour:
     m_Extent: {x: 0.4, y: 0.4, z: 0}
   _maxSampleDistance: 0.2
   _timeNextIteration: 1
-  _timeToCheck: 0.5
-  _timeToShow: 1
+  _timeToCheck: 2
   _maxPosDifference: 0.01
+  _timeToShow: 1
 --- !u!208 &4192690936028723334
 NavMeshObstacle:
   m_ObjectHideFlags: 0
@@ -69,9 +69,9 @@ MonoBehaviour:
     m_Extent: {x: 0.4, y: 0.4, z: 0}
   _maxSampleDistance: 0.2
   _timeNextIteration: 1
-  _timeToCheck: 0.5
-  _timeToShow: 1
+  _timeToCheck: 2
   _maxPosDifference: 0.01
+  _timeToShow: 1
 --- !u!208 &4575105698475220208
 NavMeshObstacle:
   m_ObjectHideFlags: 0
@@ -105,9 +105,9 @@ MonoBehaviour:
     m_Extent: {x: 0.4, y: 0.4, z: 0}
   _maxSampleDistance: 0.2
   _timeNextIteration: 1
-  _timeToCheck: 0.5
-  _timeToShow: 1
+  _timeToCheck: 2
   _maxPosDifference: 0.01
+  _timeToShow: 1
 --- !u!1 &2428503746948608571
 GameObject:
   m_ObjectHideFlags: 0
@@ -186,9 +186,9 @@ MonoBehaviour:
     m_Extent: {x: 0.4, y: 0.4, z: 0}
   _maxSampleDistance: 0.2
   _timeNextIteration: 1
-  _timeToCheck: 0.5
-  _timeToShow: 1
+  _timeToCheck: 2
   _maxPosDifference: 0.01
+  _timeToShow: 1
 --- !u!1 &5224906412500783135
 GameObject:
   m_ObjectHideFlags: 0
@@ -258,9 +258,9 @@ MonoBehaviour:
     m_Extent: {x: 0.4, y: 0.4, z: 0}
   _maxSampleDistance: 0.2
   _timeNextIteration: 1
-  _timeToCheck: 0.5
-  _timeToShow: 1
+  _timeToCheck: 2
   _maxPosDifference: 0.01
+  _timeToShow: 1
 --- !u!1001 &3540625291254222084
 PrefabInstance:
   m_ObjectHideFlags: 0

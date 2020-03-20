@@ -25,6 +25,7 @@ namespace Games.Landscape {
             _spline = new GameObject(gameObject.name).AddComponent<BezierSpline>();
             _spline.Initialize(2);
             _spline.gameObject.SetActive(false);
+            _spline.transform.SetParent(transform, false);
             _walker.onPathCompleted.AddListener(() => { _walker.enabled = false; });
             _walker.enabled = false;
         }

@@ -1334,6 +1334,21 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6145052358333956587, guid: 47cbe1775872baf289a77a580245e6e6,
+        type: 3}
+      propertyPath: m_ReceiveShadows
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6145052358333956596, guid: 47cbe1775872baf289a77a580245e6e6,
+        type: 3}
+      propertyPath: _updateMeshOnGPU
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6145052358333956596, guid: 47cbe1775872baf289a77a580245e6e6,
+        type: 3}
+      propertyPath: _needNormalsOnCPU
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6145052358850914144, guid: 47cbe1775872baf289a77a580245e6e6,
         type: 3}
       propertyPath: m_TargetDisplay
@@ -1403,6 +1418,19 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 507380210}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &507380220
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 507380211}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf82ef5084c74e899a64f562f0d38ab3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _area: 0
 --- !u!1001 &524830434
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2979,7 +3007,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 568054117}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.50474674
+  m_Size: 0.50460494
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -3340,7 +3368,7 @@ Light:
     m_Resolution: -1
     m_CustomResolution: -1
     m_Strength: 1
-    m_Bias: 0.05
+    m_Bias: 0
     m_NormalBias: 0.4
     m_NearPlane: 0.2
     m_CullingMatrixOverride:
@@ -5475,7 +5503,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1712915435}
   m_Direction: 0
   m_Value: 0
-  m_Size: 0.9999999
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -6104,12 +6132,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6d2cd5f23bcea09cab6b387d0c6b9ac7, type: 3}
---- !u!1 &1628502897 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5598604238588772366, guid: 6d2cd5f23bcea09cab6b387d0c6b9ac7,
-    type: 3}
-  m_PrefabInstance: {fileID: 1628502896}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1684954835
 GameObject:
   m_ObjectHideFlags: 0
@@ -7281,7 +7303,6 @@ MonoBehaviour:
   _tglWater: {fileID: 1911661071}
   _landscape: {fileID: 507380212}
   _pnlParams: {fileID: 1178147654}
-  _animals: {fileID: 1628502897}
 --- !u!114 &2078943092
 MonoBehaviour:
   m_ObjectHideFlags: 0

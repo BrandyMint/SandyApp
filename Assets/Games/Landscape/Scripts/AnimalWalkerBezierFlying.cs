@@ -7,7 +7,7 @@ namespace Games.Landscape {
         public float ZFly { get; set; }
 
         protected override Vector3 CorrectWalkEndPoint(Vector3 p) {
-            p.z = ZFly * (1f + Random.Range(-_randomizeZFly, _randomizeZFly));
+            p.z = ZFly * (1f + Random.Range(0f, _randomizeZFly));
             return p;
         }
     }

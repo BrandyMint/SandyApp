@@ -8,21 +8,27 @@ using Random = UnityEngine.Random;
 
 namespace Games.Landscape {
     [RequireComponent(typeof(NavMeshAgent))]
-    public class AnimalWalkerNavMesh : SpawningToNavMesh, IAnimalWalker {
+    public class AnimalWalkerNavMesh : MagnetToNavMeshAbstract, IAnimalWalker {
         [Header("Animal")]
         [SerializeField] protected float _speed = 0.2f;
         [SerializeField] protected float _minDistWalk = 0.1f;
         [SerializeField] protected float _maxDistWalk = 0.3f;
         [SerializeField] protected float _maxTurnOnStart = 90f;
+        [SerializeField] protected float _lerpRotation = 0.1f;
+        [SerializeField] protected float _lerpZWalk = 0.05f;
 
         private NavMeshAgent _agent;
         private GameField _field;
         
         private bool _isInited;
+        private bool _isWalking;
 
-        private void Awake() {
+        protected override void Awake() {
             _agent = GetComponent<NavMeshAgent>();
-            OnSpawned += OnSpawnedSuccess;
+            _agent.updateRotation = false;
+            _agent.updatePosition = false;
+            _areaMask = _agent.areaMask;
+            base.Awake();
         }
 
         public void Init(GameField field) {
@@ -31,8 +37,9 @@ namespace Games.Landscape {
             _isInited = true;
         }
 
-        private void OnSpawnedSuccess() {
+        protected override void OnSpawnedSuccess() {
             _agent.enabled = true;
+            base.OnSpawnedSuccess();
         }
 
         protected override void OnWaitSpawnNextIteration() {
@@ -40,20 +47,19 @@ namespace Games.Landscape {
             base.OnWaitSpawnNextIteration();
         }
 
-        public IEnumerator WalkRandom() {
-            var scale = math.cmax(transform.localScale);
-            _agent.speed = _speed * scale;
-            
-            if (!_isInited || !_isSpawned)
-                yield break;
+        protected override void OnMagnetFail() {
+            StartCoroutine(WalkRandom());
+        }
 
+        private bool FindRandomDestination(out Vector3 destPos) {
             int i = 0;
             var currPos = transform.position;
-            var destPos = currPos;
-            var destPosValid = false; 
+            destPos = currPos;
+            var destPosValid = false;
             do {
-                if (i++ >= _ITERATIONS)
-                    yield break;
+                if (i++ >= _ITERATIONS) {
+                    return false;
+                }
 
                 var dir = transform.rotation * Vector3.forward;
                 if (i < _ITERATIONS / 2)
@@ -67,12 +73,23 @@ namespace Games.Landscape {
                     destPos = hit.position;
             } while (!destPosValid);
 
+            return true;
+        }
+
+        public IEnumerator WalkRandom() {
+            var scale = math.cmax(transform.localScale);
+            _agent.speed = _speed * scale;
+            
+            if (!_isInited || !_isSpawned || _isWalking || !FindRandomDestination(out var destPos))
+                yield break;
+
             _agent.destination = destPos;
             _agent.isStopped = false;
+            StopMagneting();
+            _isWalking = true;
 
             var wasGoodVelocity = false;
             while (true) {
-                _agent.updateRotation = !_agent.pathPending;
                 if (!_agent.pathPending) {
                     var velocity = _agent.velocity.magnitude;
                     var desiredVelocity = _agent.desiredVelocity.magnitude;
@@ -86,17 +103,33 @@ namespace Games.Landscape {
                         || badVelocity && velocityNotEmpty) {
                         _agent.destination = transform.position;
                         _agent.isStopped = true;
-                        yield break;
+                        break;
                     }
                 }
 
-                yield return null;
+                var up = transform.up;
+                var toNext = _agent.nextPosition - transform.position;
+                var toNextZ = Vector3.Project(toNext, up);
+                transform.position += toNext - toNextZ * (1f - _lerpZWalk);
                 
+                var dir = Vector3.ProjectOnPlane(_agent.velocity, up);
+                var r1 = transform.rotation;
+                var r2 = Quaternion.LookRotation(dir, up);
+                transform.rotation = Quaternion.RotateTowards(
+                    r1, 
+                    Quaternion.Lerp(r1, r2, _lerpRotation),
+                    _agent.angularSpeed * Time.deltaTime
+                );
+
+                yield return null;
             }
+            _isWalking = false;
+            StartMagneting();
         }
 
         public float CurrentAcceleration() {
-            return _agent.velocity.magnitude / _agent.speed;
+            var horizontal = Vector3.ProjectOnPlane(_agent.velocity, transform.up);
+            return horizontal.magnitude / _agent.speed;
         }
 
         private float SampleDist() {
