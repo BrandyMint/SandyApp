@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using DepthSensor.Buffer;
+using DepthSensorSandbox.Processing;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -12,6 +13,7 @@ namespace DepthSensorSandbox.Visualisation {
         private static readonly int _MAP_TO_CAMERA_TEX = Shader.PropertyToID("_MapToCameraTex");
 
         [SerializeField] private bool _updateMeshOnGPU;
+        [SerializeField] private bool _needNormalsOnCPU;
 
         public bool UpdateMeshOnGpu {
             get => _updateMeshOnGPU;
@@ -21,6 +23,7 @@ namespace DepthSensorSandbox.Visualisation {
         private MeshFilter _meshFilter;
         private Mesh _mesh;
         private Vector3[] _vert;
+        private Vector3[] _normals;
         private int[] _triangles;
         private Vector2[] _uv;
         private Renderer _r;
@@ -171,9 +174,38 @@ namespace DepthSensorSandbox.Visualisation {
 
         private void OnDepthDataCPU(DepthBuffer depth, MapDepthToCameraBuffer mapToCamera) {
             ReInitMeshIfNeed(depth.width, depth.height, ref _vert, ref _triangles, ref _uv);
-            Parallel.For(0, depth.length, i => {
-                _vert[i] = PointDepthToVector3(depth, mapToCamera, i);
-            });
+            _currDepth = depth;
+            _currMapToCamera = mapToCamera;
+            Parallel.For(0, depth.length, UpdateMeshBody);
+            if (_needNormalsOnCPU) {
+                _sampler.SetDimens(depth.width, depth.height);
+                ReInitVertsIfNeed(depth.width, depth.height, ref _normals);
+                Parallel.For(0, depth.length, UpdateMeshNormalsBody);
+            }
+        }
+
+        private DepthBuffer _currDepth;
+        private MapDepthToCameraBuffer _currMapToCamera;
+        private void UpdateMeshBody(int i) {
+            _vert[i] = PointDepthToVector3(_currDepth, _currMapToCamera, i);
+        }
+        
+        private Sampler _sampler = Sampler.Create();
+        private Vector3[] _normalRhs = {
+            Vector3.right,
+            Vector3.up, 
+            Vector3.left,
+            Vector3.down
+        };
+        private void UpdateMeshNormalsBody(int i) {
+            var cross = Vector3.zero;
+            var v = _vert[i];
+            for (int k = 0; k < 4; ++k) {
+                var j = _sampler.GetIndexOfNeighbor(i, k);
+                if (j != Sampler.INVALID_ID)
+                    cross += Vector3.Cross(v - _vert[j], _normalRhs[k]);
+            }
+            _normals[i] = cross.normalized;
         }
 
         public static Vector3 PointDepthToVector3(DepthBuffer depth, MapDepthToCameraBuffer mapToCamera, int i) {
@@ -185,8 +217,11 @@ namespace DepthSensorSandbox.Visualisation {
 
         private void OnNewFrameCPU(DepthBuffer depth, MapDepthToCameraBuffer mapToCamera) {
             if (_vert != null && _triangles != null) {
-                if (!_updateMeshOnGPU || _mesh.vertexCount != _vert.Length || _needUpdateBounds)
+                if (!_updateMeshOnGPU || _mesh.vertexCount != _vert.Length || _needUpdateBounds) {
                     _mesh.vertices = _vert;
+                    if (_needNormalsOnCPU)
+                        _mesh.normals = _normals;
+                }
                 if (_mesh.GetIndexCount(0) != _triangles.LongLength) {
                     _mesh.uv = _uv;
                     _mesh.indexFormat = _vert.Length > UInt16.MaxValue ? IndexFormat.UInt32 : IndexFormat.UInt16;
