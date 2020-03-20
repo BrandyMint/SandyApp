@@ -147,6 +147,13 @@ namespace DepthSensorSandbox.Processing {
             );
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int GetIInRect(int i) {
+            var v = GetXYiFrom(i);
+            v -= _cropping.min;
+            return v.y * _cropping.width + v.x;;
+        }
+
         public void EachInHorizontal(int y, Action<int> handler) {
             EachInHorizontal(y, handler, 0, 0);
         }

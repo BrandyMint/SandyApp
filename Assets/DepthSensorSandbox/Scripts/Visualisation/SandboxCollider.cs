@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Threading.Tasks;
 using DepthSensor.Buffer;
+using DepthSensorSandbox.Processing;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -9,6 +9,7 @@ namespace DepthSensorSandbox.Visualisation {
     public class SandboxCollider : MonoBehaviour, ISandboxBounds {
         [SerializeField] private int _maxHeight = 64;
         [SerializeField] private int _updateOnFrame = 3;
+        [SerializeField] private float _croppingExtend = 0.1f;
         
         private Mesh _mesh;
         private Vector3[] _vert;
@@ -18,6 +19,12 @@ namespace DepthSensorSandbox.Visualisation {
         private MeshCollider _collider;
         private int _frameBG;
         private int _frameMain;
+        private Sampler _s = Sampler.Create();
+        private Sampler _sFull = Sampler.Create();
+        private Rect _cropping = Sampler.FULL_CROPPING;
+        private bool _needUpdateCropping;
+        private bool _needRecalcIndexes;
+        private bool _needUpdateIndexes;
 
         private void Awake() {
             var meshFilter = GetComponent<MeshFilter>();
@@ -34,51 +41,93 @@ namespace DepthSensorSandbox.Visualisation {
         }
 
         private void Start() {
+            if (DepthSensorSandboxProcessor.Instance) {
+                OnCroppingChanged(DepthSensorSandboxProcessor.Instance.GetCropping());
+                UpdateCropping(_cropping);
+            }
             DepthSensorSandboxProcessor.OnDepthDataBackground += OnDepthData;
             DepthSensorSandboxProcessor.OnNewFrame += OnNewFrame;
+            DepthSensorSandboxProcessor.OnCroppingChanged += OnCroppingChanged;
         }
 
         private void OnDestroy() {
             DepthSensorSandboxProcessor.OnDepthDataBackground -= OnDepthData;
             DepthSensorSandboxProcessor.OnNewFrame -= OnNewFrame;
+            DepthSensorSandboxProcessor.OnCroppingChanged -= OnCroppingChanged;
+        }
+        
+        private void OnCroppingChanged(Rect rect) {
+            _cropping = rect;
+            _needUpdateCropping = true;
+        }
+        
+        private void UpdateCropping(Rect rect) {
+            rect.max += Vector2.one * _croppingExtend;
+            rect.min -= Vector2.one * _croppingExtend;
+            _s.SetCropping01(rect);
+            _needUpdateCropping = false;
+            _needRecalcIndexes = true;
+        }
+        
+        public bool ReInitMeshIfNeed(int width, int height) {
+            _s.SetDimens(width, height);
+            var updated = SandboxMesh.ReInitMeshIfNeed(_s, ref _vert, ref _triangles, _needRecalcIndexes);
+            _needRecalcIndexes = false;
+            _needUpdateIndexes |= updated;
+            return updated;
         }
 
         private void OnDepthData(DepthBuffer depth, MapDepthToCameraBuffer mapToCamera) {
             if (!IsExecuteFrame(ref _frameBG)) return;
             
-            var scale = Mathf.RoundToInt((float) depth.height / Mathf.Min(depth.height, _maxHeight));
-            int height = depth.height / scale;
-            int width = depth.width / scale;
-            SandboxMesh.ReInitMeshIfNeed(width, height, ref _vert, ref _triangles);
-            var scale2 = Mathf.RoundToInt((float) scale / 2);
-            Parallel.For(0, height, y => {
-                var i = y * width;
-                var ii = scale * y * depth.width;
-                for (var x = 0; x < width; ++x) {
-                    var d = Vector3.zero;
-                    var count = 0; 
-                    for (var xd = -scale2; xd < scale2; ++xd) {
-                        var xx = scale * x + xd;
-                        if (xx >= 0 && xx < depth.width) {
-                            d += SandboxMesh.PointDepthToVector3(depth, mapToCamera, ii + xd);
-                            ++count;
-                        }
-                    }
-                    _vert[i] = d / count;
-                    ++i;
-                    ii += scale;
+            _sFull.SetDimens(depth.width, depth.height);
+            _scale = Mathf.RoundToInt((float) depth.height / Mathf.Min(depth.height, _maxHeight));
+            int height = depth.height / _scale;
+            int width = depth.width / _scale;
+            ReInitMeshIfNeed(width, height);
+            _scale2 = Mathf.RoundToInt((float) _scale / 2);
+            _currDepth = depth;
+            _currMapToCamera = mapToCamera;
+            _s.EachParallelHorizontal(UpdateMeshBody);
+        }
+
+        private int _scale;
+        private int _scale2;
+        private DepthBuffer _currDepth;
+        private MapDepthToCameraBuffer _currMapToCamera;
+        private void UpdateMeshBody(int i) {
+            var pFull = _s.GetXYiFrom(i) * _scale;
+            var iFull = _sFull.GetIFrom(pFull.x, pFull.y);
+            var d = Vector3.zero;
+            var count = 0;
+            for (var xd = -_scale2; xd < _scale2; ++xd) {
+                var xx = pFull.x + xd;
+                if (xx >= 0 && xx < _sFull.width) {
+                    d += SandboxMesh.PointDepthToVector3(_currDepth, _currMapToCamera, iFull + xd);
+                    ++count;
                 }
-            });
+            }
+            
+            var j = _s.GetIInRect(i);
+            _vert[j] = d / count;
         }
 
         private void OnNewFrame(DepthBuffer depth, MapDepthToCameraBuffer mapToCamera) {
             if (!IsExecuteFrame(ref _frameMain)) return;
             
+            if (_needUpdateCropping) {
+                UpdateCropping(_cropping);
+            }
+            
             if (_vert != null && _triangles != null) {
+                if (_needUpdateIndexes)
+                    _mesh.Clear();
                 _mesh.vertices = _vert;
-                if (_mesh.GetIndexCount(0) != _triangles.LongLength) {
+                if (_needUpdateIndexes) {
+                    _needUpdateIndexes = false;
                     _mesh.indexFormat = _vert.Length > UInt16.MaxValue ? IndexFormat.UInt32 : IndexFormat.UInt16;
                     _mesh.triangles = _triangles;
+                    _needUpdateBounds = true;
                 }
 
                 if (_needUpdateBounds) {

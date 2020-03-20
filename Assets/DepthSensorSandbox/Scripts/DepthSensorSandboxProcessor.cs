@@ -40,6 +40,8 @@ namespace DepthSensorSandbox {
             remove { _onNewFrame -= value; ActivateSensors(); }
         }
 
+        public static event Action<Rect> OnCroppingChanged; 
+
         public static DepthSensorSandboxProcessor Instance { get; private set; }
 
         private InitProcessing _initProcessing = new InitProcessing();
@@ -70,6 +72,7 @@ namespace DepthSensorSandbox {
         private static bool _processDepth;
         private static bool _processMap;
         private SandboxCamera _needUpdateCroppingCamera;
+        private Rect _cropping;
 
 #region Initializing
 
@@ -244,12 +247,17 @@ namespace DepthSensorSandbox {
             var meshTransform = FindObjectOfType<SandboxMesh>()?.transform;
             var croppingMax = cam.GetCroppingToDepth(meshTransform, maxDist, device);
             var croppingMin = cam.GetCroppingToDepth(meshTransform, minDist, device);
-            var cropping = RectUtils.Encompass(croppingMin, croppingMax);
+            _cropping = RectUtils.Encompass(croppingMin, croppingMax);
             //Debug.Log("cropping " + cropping);
             //return;
             foreach (var processing in _allProcessings) {
-                processing.SetCropping(cropping);
+                processing.SetCropping(_cropping);
             }
+            OnCroppingChanged?.Invoke(_cropping);
+        }
+
+        public Rect GetCropping() {
+            return _cropping;
         }
 #endregion
 
