@@ -111,10 +111,10 @@ namespace Games.Landscape {
                 var toNext = _agent.nextPosition - transform.position;
                 var toNextZ = Vector3.Project(toNext, up);
                 transform.position += toNext - toNextZ * (1f - _lerpZWalk);
-                
-                var dir = Vector3.ProjectOnPlane(_agent.velocity, up);
+
                 var r1 = transform.rotation;
-                var r2 = Quaternion.LookRotation(dir, up);
+                var dir = Vector3.ProjectOnPlane(_agent.velocity, up);
+                var r2 = dir != Vector3.zero ? Quaternion.LookRotation(dir, up) : r1;
                 transform.rotation = Quaternion.RotateTowards(
                     r1, 
                     Quaternion.Lerp(r1, r2, _lerpRotation),
