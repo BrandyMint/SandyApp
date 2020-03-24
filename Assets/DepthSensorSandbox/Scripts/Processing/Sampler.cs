@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using DepthSensor.Buffer;
@@ -220,7 +220,7 @@ namespace DepthSensorSandbox.Processing {
         public void EachParallelDownsizeSafe(Action<int> handler, int downsize) {
             _eachHandler = handler;
             _downsize = downsize;
-            Parallel.For(_cropping.xMin/downsize, _cropping.xMax/downsize, EachParallelVerticalDownsizeSafeBody);
+            Parallel.For(_cropping.xMin/downsize, _cropping.xMax/downsize + 1, EachParallelVerticalDownsizeSafeBody);
         }
         
         private void EachParallelVerticalDownsizeSafeBody(int xDownsized) {
