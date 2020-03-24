@@ -50,6 +50,7 @@ namespace DepthSensorSandbox.Processing {
         
         protected override void ProcessInternal() {
             ReCreateIfNeed(ref _holes, _out.length);
+            _s.SetDimens(_inDepth.width, _inDepth.height);
             _s.EachParallelVertical(InitFindHolesLineStateVertical);
             _s.EachParallelHorizontal(InitFindHolesLineStateHorizontal);
             _s.EachParallelHorizontal(FixDepthHolesBody);
