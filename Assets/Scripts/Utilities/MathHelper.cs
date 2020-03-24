@@ -133,8 +133,11 @@ namespace Utilities {
             return new Vector3(p1.x * p2.x, p1.y * p2.y, p1.z * p2.z);
         }
 
-        public static T GetMedian<T>(params T[] a) where T: IComparable<T> {
-            var n = a.Length;
+        public static T GetMedian<T>(params T[] a) where T : IComparable<T> {
+            return GetMedian(a, a.Length);
+        }
+
+        public static T GetMedian<T>(T[] a, int n) where T: IComparable<T> {
             int low, high;
             int median;
             int middle, ll, hh;
