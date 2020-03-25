@@ -4,7 +4,8 @@ using UnityEngine;
 
 namespace DepthSensorSandbox.Processing {
     public class FixHolesProcessing : ProcessingBase {
-        private const ushort _BAD_HOLE_FIX = 5000;
+        private const ushort _BAD_HOLE_FIX = 3000;
+        private const ushort _BAD_HOLE_FIND_MAX_RADIUS = 100;
 
         private int2x4[] _holes;
 
@@ -89,10 +90,10 @@ namespace DepthSensorSandbox.Processing {
                 var down = hole[_DOWN];
                 var left = hole[_LEFT];
                 var right = hole[_RIGHT];
-                up.y = SetPriorityToIfInvalid(up.y, down.y, left.y, right.y);
-                down.y = SetPriorityToIfInvalid(down.y, up.y, left.y, right.y);
-                left.y = SetPriorityToIfInvalid(left.y, right.y, up.y, down.y);
-                right.y = SetPriorityToIfInvalid(right.y, left.y, up.y, down.y);
+                up.y = SetPriorityToIfInvalid(i, up.y, down.y, left.y, right.y);
+                down.y = SetPriorityToIfInvalid(i, down.y, up.y, left.y, right.y);
+                left.y = SetPriorityToIfInvalid(i, left.y, right.y, up.y, down.y);
+                right.y = SetPriorityToIfInvalid(i, right.y, left.y, up.y, down.y);
                 var dd = FixDepthHole(up, down) + FixDepthHole(left, right);
                 _out.data[i] = (ushort) (dd / 2);
             } else if (OnlyRawBufferIsInput) {
@@ -105,7 +106,7 @@ namespace DepthSensorSandbox.Processing {
             return (ushort) Mathf.Lerp(v1.y, v2.y, k);
         }
         
-        private static int SetPriorityToIfInvalid(int val, int v1, int v2, int v3) {
+        private int SetPriorityToIfInvalid(int i, int val, int v1, int v2, int v3) {
             if (val != Sampler.INVALID_DEPTH)
                 return val;
             if (v1 != Sampler.INVALID_DEPTH)
@@ -114,6 +115,34 @@ namespace DepthSensorSandbox.Processing {
                 return v2;
             if (v3 != Sampler.INVALID_DEPTH)
                 return v3;
+            
+            var k = _s.GetDirToCenter4Diag(_s.GetXYFrom(i));
+            //  7 0 4    //      w.3
+            //  3 i 1    //x.0->     <-z.2
+            //  6 2 5    //      y.1
+            int kHole1, kHole2;
+            if (k < 6) {
+                kHole1 = 2;
+                kHole2 = k == 4 ? 3 : 1;
+            } else {
+                kHole1 = 0;
+                kHole2 = k == 7 ? 3 : 1;
+            }
+            for (int n = 0; n < _BAD_HOLE_FIND_MAX_RADIUS; ++n) {
+                i = _s.GetIndexOfNeighbor(i, k);
+                if (i == Sampler.INVALID_ID)
+                    break;
+
+                int d;
+                /*if ((d = _out.data[i]) != Sampler.INVALID_DEPTH)
+                    return d;*/
+                var hole = _holes[i];
+                if ((d = hole[kHole1].y) != Sampler.INVALID_DEPTH)
+                    return d;
+                if ((d = hole[kHole2].y) != Sampler.INVALID_DEPTH)
+                    return d;
+            }
+            
             return _BAD_HOLE_FIX;
         }
     }
