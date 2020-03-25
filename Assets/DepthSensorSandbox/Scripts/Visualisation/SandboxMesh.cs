@@ -14,7 +14,6 @@ namespace DepthSensorSandbox.Visualisation {
 
         [SerializeField] private bool _updateMeshOnGPU;
         [SerializeField] private bool _needNormalsOnCPU;
-        [SerializeField] private float _croppingExtend = 0.05f;
 
         public bool UpdateMeshOnGpu {
             get => _updateMeshOnGPU;
@@ -36,7 +35,6 @@ namespace DepthSensorSandbox.Visualisation {
         private Sampler _s = Sampler.Create();
         private Rect _cropping = Sampler.FULL_CROPPING;
         private bool _needUpdateCropping;
-        private bool _needRecalcUVAndIndexes;
         private bool _needUpdateUVAndIndexes;
 
         private void Awake() {
@@ -55,14 +53,13 @@ namespace DepthSensorSandbox.Visualisation {
         }
 
         private void OnCroppingChanged(Rect rect) {
-            _cropping = rect;
+            _cropping = DepthSensorSandboxProcessor.Instance.GetCroppingExtended();
             _needUpdateCropping = true;
         }
 
         private void Start() {
             if (DepthSensorSandboxProcessor.Instance) {
-                OnCroppingChanged(DepthSensorSandboxProcessor.Instance.GetCropping());
-                UpdateCropping(_cropping);
+                OnCroppingChanged(DepthSensorSandboxProcessor.Instance.GetCroppingExtended());
             }
 
             SetUpdateMeshOnGPU(_updateMeshOnGPU, true);
@@ -145,8 +142,12 @@ namespace DepthSensorSandbox.Visualisation {
 
         public bool ReInitMeshIfNeed(int width, int height) {
             _s.SetDimens(width, height);
-            var updated = ReInitMeshIfNeed(_s, ref _vert, ref _triangles, ref _uv, _needRecalcUVAndIndexes);
-            _needRecalcUVAndIndexes = false;
+            var needRecalcUVAndIndexes = _needUpdateCropping;
+            if (_needUpdateCropping) {
+                _s.SetCropping01(_cropping);
+                _needUpdateCropping = false;
+            }
+            var updated = ReInitMeshIfNeed(_s, ref _vert, ref _triangles, ref _uv, needRecalcUVAndIndexes);
             _needUpdateUVAndIndexes |= updated;
             return updated;
         }
@@ -256,19 +257,7 @@ namespace DepthSensorSandbox.Visualisation {
             return new Vector3(xy.x * d, xy.y * d, d);
         }
 
-        private void UpdateCropping(Rect rect) {
-            rect.max += Vector2.one * _croppingExtend;
-            rect.min -= Vector2.one * _croppingExtend;
-            _s.SetCropping01(rect);
-            _needUpdateCropping = false;
-            _needRecalcUVAndIndexes = true;
-        }
-
         private void OnNewFrameCPU(DepthBuffer depth, MapDepthToCameraBuffer mapToCamera) {
-            if (_needUpdateCropping) {
-                UpdateCropping(_cropping);
-            }
-
             if (_vert != null && _triangles != null) {
                 if (_needUpdateUVAndIndexes)
                     _mesh.Clear();

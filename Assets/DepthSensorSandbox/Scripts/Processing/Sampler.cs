@@ -58,12 +58,10 @@ namespace DepthSensorSandbox.Processing {
 
         public void SetCropping01(Rect rect01) {
             _cropping01 = rect01;
-            _cropping = new RectInt(
-                Mathf.FloorToInt(_cropping01.xMin * _width), 
-                Mathf.FloorToInt(_cropping01.yMin * _height),
-                Mathf.CeilToInt(_cropping01.width * _width),
-                Mathf.CeilToInt(_cropping01.height * _height)
-            );
+            _cropping.xMin = Mathf.FloorToInt(_cropping01.xMin * _width);
+            _cropping.yMin = Mathf.FloorToInt(_cropping01.yMin * _height);
+            _cropping.xMax = Mathf.CeilToInt(_cropping01.xMax * _width);
+            _cropping.yMax = Mathf.CeilToInt(_cropping01.yMax * _height);
             UpdateDimensAndRect();
         }
 
@@ -99,6 +97,43 @@ namespace DepthSensorSandbox.Processing {
 
         public ushort SafeGet(Buffer2D<ushort> depth, Vector2Int xy) {
             return SafeGet(depth, xy.x, xy.y);
+        }
+        
+        public int GetDirToCenter4Diag(int i) {
+            return GetDirToCenter4Diag(GetXYFrom(i));
+        }
+        
+        
+        //    0 
+        //  3 i 1
+        //    2 
+        public int GetDirToCenter4(Vector2 p) {
+            var d = _cropping.center - p;
+            if (Math.Abs(d.x) > Math.Abs(d.y)) {
+                if (d.x > 0f) {
+                    return 1;
+                }
+                return 3;
+            }
+            if (d.y > 0f)
+                return 0;
+            return 2;
+        }
+        
+        //  7   4
+        //    i 
+        //  6   5
+        public int GetDirToCenter4Diag(Vector2 p) {
+            var d = _cropping.center - p;
+            if (d.x > 0f) {
+                if (d.y > 0f)
+                    return 4;
+                return 5;
+            } else {
+                if (d.y > 0f)
+                    return 7;
+                return 6;
+            }
         }
         
         //  7 0 4

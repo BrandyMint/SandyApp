@@ -9,7 +9,6 @@ namespace DepthSensorSandbox.Visualisation {
     public class SandboxCollider : MonoBehaviour, ISandboxBounds {
         [SerializeField] private int _maxHeight = 64;
         [SerializeField] private int _updateOnFrame = 3;
-        [SerializeField] private float _croppingExtend = 0.1f;
         
         private Mesh _mesh;
         private Vector3[] _vert;
@@ -23,7 +22,6 @@ namespace DepthSensorSandbox.Visualisation {
         private Sampler _sFull = Sampler.Create();
         private Rect _cropping = Sampler.FULL_CROPPING;
         private bool _needUpdateCropping;
-        private bool _needRecalcIndexes;
         private bool _needUpdateIndexes;
 
         private void Awake() {
@@ -42,8 +40,7 @@ namespace DepthSensorSandbox.Visualisation {
 
         private void Start() {
             if (DepthSensorSandboxProcessor.Instance) {
-                OnCroppingChanged(DepthSensorSandboxProcessor.Instance.GetCropping());
-                UpdateCropping(_cropping);
+                OnCroppingChanged(DepthSensorSandboxProcessor.Instance.GetCroppingExtended());
             }
             DepthSensorSandboxProcessor.OnDepthDataBackground += OnDepthData;
             DepthSensorSandboxProcessor.OnNewFrame += OnNewFrame;
@@ -57,22 +54,19 @@ namespace DepthSensorSandbox.Visualisation {
         }
         
         private void OnCroppingChanged(Rect rect) {
-            _cropping = rect;
+            _cropping = DepthSensorSandboxProcessor.Instance.GetCroppingExtended();
             _needUpdateCropping = true;
-        }
-        
-        private void UpdateCropping(Rect rect) {
-            rect.max += Vector2.one * _croppingExtend;
-            rect.min -= Vector2.one * _croppingExtend;
-            _s.SetCropping01(rect);
-            _needUpdateCropping = false;
-            _needRecalcIndexes = true;
         }
         
         public bool ReInitMeshIfNeed(int width, int height) {
             _s.SetDimens(width, height);
-            var updated = SandboxMesh.ReInitMeshIfNeed(_s, ref _vert, ref _triangles, _needRecalcIndexes);
-            _needRecalcIndexes = false;
+            var needRecalcIndexes = _needUpdateCropping;
+            if (_needUpdateCropping) {
+                _sFull.SetCropping01(_cropping);
+                _s.SetCropping01(_cropping);
+                _needUpdateCropping = false;
+            }
+            var updated = SandboxMesh.ReInitMeshIfNeed(_s, ref _vert, ref _triangles, needRecalcIndexes);
             _needUpdateIndexes |= updated;
             return updated;
         }
@@ -96,16 +90,24 @@ namespace DepthSensorSandbox.Visualisation {
         private DepthBuffer _currDepth;
         private MapDepthToCameraBuffer _currMapToCamera;
         private void UpdateMeshBody(int i) {
-            var pFull = _s.GetXYiFrom(i) * _scale;
+            var r = _sFull.Rect;
+            var pFull = _sFull.GetXYiConverted(_s, i);
+            pFull.y = Mathf.Clamp(pFull.y, r.yMin, r.yMax);
             var iFull = _sFull.GetIFrom(pFull.x, pFull.y);
+            
             var d = Vector3.zero;
-            var count = 0;
-            for (var xd = -_scale2; xd < _scale2; ++xd) {
-                var xx = pFull.x + xd;
-                if (xx >= 0 && xx < _sFull.width) {
-                    d += SandboxMesh.PointDepthToVector3(_currDepth, _currMapToCamera, iFull + xd);
-                    ++count;
-                }
+            var s1 = Mathf.Clamp(-_scale2, r.xMin - pFull.x, 0);
+            var s2 = Mathf.Clamp(_scale2,  0, r.xMax - pFull.x);
+            var count = s2 - s1;
+            if (count < _scale2) {
+                var d2 = (_scale2 - count) / 2;
+                s1 -= d2;
+                s2 += d2;
+                count = s2 - s1;
+            }
+
+            for (var xd = s1; xd < s2; ++xd) {
+                d += SandboxMesh.PointDepthToVector3(_currDepth, _currMapToCamera, iFull + xd);
             }
             
             var j = _s.GetIInRect(i);
@@ -114,10 +116,6 @@ namespace DepthSensorSandbox.Visualisation {
 
         private void OnNewFrame(DepthBuffer depth, MapDepthToCameraBuffer mapToCamera) {
             if (!IsExecuteFrame(ref _frameMain)) return;
-            
-            if (_needUpdateCropping) {
-                UpdateCropping(_cropping);
-            }
             
             if (_vert != null && _triangles != null) {
                 if (_needUpdateIndexes)
