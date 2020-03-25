@@ -193,6 +193,21 @@ namespace DepthSensorSandbox.Processing {
             }
         }
         
+        public bool Each(Func<int, bool> handler) {
+            for (var y = _cropping.yMin; y < _cropping.yMax; ++y) {
+                var x = _cropping.xMin;
+                var id = GetIFrom(x, y);
+                var n = _cropping.width;
+                for (int i = 0; i < n; ++i) {
+                    if (!handler(id))
+                        return false;
+                    ++id;
+                }
+            }
+
+            return true;
+        }
+        
 #region Each parallel simple
         private Action<int> _eachHandler;
         private int _downsize;

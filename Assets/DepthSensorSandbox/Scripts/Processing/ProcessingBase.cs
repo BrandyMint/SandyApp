@@ -23,14 +23,20 @@ namespace DepthSensorSandbox.Processing {
         protected bool _active = true;
         protected DepthBuffer _errorsMap;
 
-        public void Process(DepthBuffer rawBuffer, DepthBuffer outBuffer, DepthBuffer prevBuffer) {
+        public bool Process(DepthBuffer rawBuffer, DepthBuffer outBuffer, DepthBuffer prevBuffer) {
             if (_active) {
-                _rawBuffer = rawBuffer;
-                _out = outBuffer;
-                _prev = prevBuffer;
-                _inDepth = OnlyRawBufferIsInput ? _rawBuffer : _out;
+                PrepareProcessing(rawBuffer, outBuffer, prevBuffer);
                 ProcessInternal();
+                return true;
             }
+            return false;
+        }
+
+        protected void PrepareProcessing(DepthBuffer rawBuffer, DepthBuffer outBuffer, DepthBuffer prevBuffer) {
+            _rawBuffer = rawBuffer;
+            _out = outBuffer;
+            _prev = prevBuffer;
+            _inDepth = OnlyRawBufferIsInput ? _rawBuffer : _out;
         }
 
         protected abstract void ProcessInternal();

@@ -52,12 +52,10 @@ namespace DepthSensorSandbox.Processing {
                 return;
 
             if (_stage == Stage.WAIT_VALID) {
-                for (int i = 0; i < _inDepth.length; ++i) {
-                    if (_inDepth.data[i] != Sampler.INVALID_DEPTH) {
-                        ++_stage;
-                        break;
-                    }
-                }
+                if (!_s.Each(i => _inDepth.data[i] == Sampler.INVALID_DEPTH))
+                    ++_stage;
+                else
+                    return;
             }
             
             if (_stage == Stage.FILL_PROCESSING_SENSOR) {
@@ -94,9 +92,8 @@ namespace DepthSensorSandbox.Processing {
             foreach (var p in _processings) {
                 p.OnlyRawBufferIsInput = !bufferChanged;
                 p.SetCropping(_sFull.Cropping01);
-                p.Process(_rawBuffer, _out, _prev);
+                bufferChanged |= p.Process(_inDepth, _out, _prev);
                 p.SetCropping(_s.Cropping01);
-                bufferChanged |= p.Active;
             }
 
             if (!bufferChanged) {

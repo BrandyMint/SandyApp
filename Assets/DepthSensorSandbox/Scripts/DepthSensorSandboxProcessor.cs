@@ -57,6 +57,7 @@ namespace DepthSensorSandbox {
         private static volatile bool _needActivateSensors;
 
         private DepthSensorConveyer _conveyer;
+        private ZeroInBordersProcessing _zeroInBorders = new ZeroInBordersProcessing();
         private ProcessingBase[] _processings;
         private readonly ProcessingBase[] _standartProcessings;
         private readonly ProcessingBase[] _allProcessings;
@@ -79,9 +80,11 @@ namespace DepthSensorSandbox {
         private DepthSensorSandboxProcessor() {
             HandsProcessingSwitch(false);
             _processings = _initProcessings = new ProcessingBase[] {
+                _zeroInBorders,
                 _initProcessing
             };
             _standartProcessings = new ProcessingBase[] {
+                _zeroInBorders,
                 Hands,
                 NoiseFilter,
                 FixHoles,
@@ -97,6 +100,8 @@ namespace DepthSensorSandbox {
         }
 
         private void Start() {
+            Prefs.Sandbox.OnChanged += OnSandboxCalibrationChanged;
+            Prefs.Calibration.OnChanged += OnSandboxCalibrationChanged;
             _conveyer = gameObject.AddComponent<DepthSensorConveyer>();
             _conveyer.OnNoFrame += ActivateSensorsIfNeed;
             DepthSensorManager.OnInitialized += OnDepthSensorAvailable;
@@ -109,6 +114,8 @@ namespace DepthSensorSandbox {
         }
 
         private void OnDestroy() {
+            Prefs.Calibration.OnChanged -= OnSandboxCalibrationChanged;
+            Prefs.Sandbox.OnChanged -= OnSandboxCalibrationChanged;
             SandboxCamera.AfterCalibrationUpdated -= UpdateCropping;
             if (_conveyer != null)
                 _conveyer.OnNoFrame -= ActivateSensorsIfNeed;
@@ -253,11 +260,17 @@ namespace DepthSensorSandbox {
             foreach (var processing in _allProcessings) {
                 processing.SetCropping(_cropping);
             }
+
+            _zeroInBorders.Active = true;
             OnCroppingChanged?.Invoke(_cropping);
         }
 
         public Rect GetCropping() {
             return _cropping;
+        }
+
+        private void OnSandboxCalibrationChanged() {
+            _zeroInBorders.Active = true;
         }
 #endregion
 
@@ -284,8 +297,7 @@ namespace DepthSensorSandbox {
                             var depthPrev = _bufDepth.GetNewest();
                             foreach (var p in _processings) {
                                 p.OnlyRawBufferIsInput = !bufferChanged;
-                                p.Process(depthRaw, depth, depthPrev);
-                                bufferChanged |= p.Active;
+                                bufferChanged |= p.Process(depthRaw, depth, depthPrev);
                             }
 
                             _bufDepthInternal.OnNewFrameBackground();
@@ -331,6 +343,7 @@ namespace DepthSensorSandbox {
                 };
                 _bufDepthInternal = new Sensor<DepthBuffer>.Internal(_bufDepth);
 
+                _zeroInBorders.AutoDeactivate = false;
                 _processings = _initProcessings;
                 _initProcessing.StartInit(_bufDepth, new ProcessingBase[]{FixHoles});
                 return true;
@@ -344,6 +357,7 @@ namespace DepthSensorSandbox {
                 processing.SetErrorsMap(_initProcessing.ErrorsMap);
             }
             _processings = _standartProcessings;
+            _zeroInBorders.AutoDeactivate = true;
         }
         
         private static void OnUpdateMapDepthToCamera(ISensor abstractSensor) {
