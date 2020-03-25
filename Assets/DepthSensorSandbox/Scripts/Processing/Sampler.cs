@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using DepthSensor.Buffer;
@@ -189,6 +189,33 @@ namespace DepthSensorSandbox.Processing {
             return v.y * _cropping.width + v.x;;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Vector2 GetXYConverted(Sampler from, int i) {
+            var p = from.GetXYFrom(i) + new Vector2(0.5f, 0.5f);
+            var scale = new Vector2( (float) width / from.width, (float) height / from.height);
+            return new Vector2(p.x * scale.x, p.y * scale.y);
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Vector2Int GetXYiConverted(Sampler from, int i) {
+            var p = GetXYConverted(from, i);
+            return new Vector2Int((int) p.x, (int) p.y);
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int GetIConverted(Sampler from, int i) {
+            var p = GetXYConverted(from, i);
+            return GetIFrom((int) p.x, (int) p.y);
+        }
+
+        public Vector2 GetXYScaled01(Vector2 p) {
+            p.x /= width;
+            p.y /= height;
+            return p;
+        }
+
+#region Processing
+
         public void EachInHorizontal(int y, Action<int> handler) {
             EachInHorizontal(y, handler, 0, 0);
         }
@@ -340,6 +367,8 @@ namespace DepthSensorSandbox.Processing {
                 eachInLine(x, state.Handle);
             }
         }
+#endregion
+
 #endregion
     }
 }
