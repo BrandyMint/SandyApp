@@ -6,6 +6,7 @@ using UnityEngine;
 namespace DepthSensorSandbox.Processing {
     public abstract class ProcessingBase : IDisposable {
         public bool OnlyRawBufferIsInput = true;
+        public bool UseFullRectNextFrame = false;
         public bool Active {
             get => _active; 
             set{ 
@@ -20,6 +21,8 @@ namespace DepthSensorSandbox.Processing {
         protected DepthBuffer _out;
         protected DepthBuffer _prev;
         protected Sampler _s = Sampler.Create();
+        protected Sampler _sFull = Sampler.Create();
+        private Sampler _sOrig = Sampler.Create();
         protected bool _active = true;
         protected DepthBuffer _errorsMap;
 
@@ -27,16 +30,26 @@ namespace DepthSensorSandbox.Processing {
             if (_active) {
                 PrepareProcessing(rawBuffer, outBuffer, prevBuffer);
                 ProcessInternal();
+                PostPrecessing();
                 return true;
             }
             return false;
         }
 
         protected void PrepareProcessing(DepthBuffer rawBuffer, DepthBuffer outBuffer, DepthBuffer prevBuffer) {
+            if (UseFullRectNextFrame)
+                _s = _sFull;
             _rawBuffer = rawBuffer;
             _out = outBuffer;
             _prev = prevBuffer;
             _inDepth = OnlyRawBufferIsInput ? _rawBuffer : _out;
+        }
+
+        protected void PostPrecessing() {
+            if (UseFullRectNextFrame) {
+                _s = _sOrig;
+                UseFullRectNextFrame = false;
+            }
         }
 
         protected abstract void ProcessInternal();
@@ -44,6 +57,8 @@ namespace DepthSensorSandbox.Processing {
         public void InitInMainThread(DepthSensorDevice device) {
             var buffer = device.Depth.GetNewest();
             _s.SetDimens(buffer.width, buffer.height);
+            _sFull.SetDimens(buffer.width, buffer.height);
+            _sOrig.SetDimens(buffer.width, buffer.height);
             InitInMainThreadInternal(device);
         }
 
@@ -67,11 +82,13 @@ namespace DepthSensorSandbox.Processing {
         }
 
         public virtual void SetCropping(Rect cropping01) {
-            _s.SetCropping01(cropping01);
+            if (!UseFullRectNextFrame)
+                _s.SetCropping01(cropping01);
+            _sOrig.SetCropping01(cropping01);
         }
 
         public Sampler GetSampler() {
-            return _s;
+            return _sOrig;
         }
 
         public virtual void Dispose() {}

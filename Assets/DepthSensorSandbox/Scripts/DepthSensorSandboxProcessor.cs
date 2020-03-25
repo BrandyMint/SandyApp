@@ -93,6 +93,7 @@ namespace DepthSensorSandbox {
                 DepthToColor
             };
             _allProcessings = _initProcessings.Union(_standartProcessings).ToArray();
+            _processings = new ProcessingBase[0];
 
             _initProcessing.OnDone += OnInitProcessingsDone;
         }
@@ -346,7 +347,11 @@ namespace DepthSensorSandbox {
                 _bufDepthInternal = new Sensor<DepthBuffer>.Internal(_bufDepth);
                 
                 _processings = _initProcessings;
-                _initProcessing.StartInit(_bufDepth, new ProcessingBase[]{FixHoles});
+                var inits = _standartProcessings
+                    .Select(p => p as IInitProcessing)
+                    .Where(p => p != null)
+                    .ToArray();
+                _initProcessing.StartInit(_bufDepth, new ProcessingBase[]{FixHoles}, inits);
                 return true;
             }
 

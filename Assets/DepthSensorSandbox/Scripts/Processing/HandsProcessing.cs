@@ -6,17 +6,21 @@
     using System.Threading;
 #endif
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using DepthSensor.Buffer;
 using DepthSensor.Device;
 using DepthSensor.Sensor;
 using DepthSensorSandbox.Visualisation;
+using Unity.Mathematics;
 using UnityEngine;
+using Utilities;
 
 namespace DepthSensorSandbox.Processing {
-    public class HandsProcessing : ProcessingBase {
+    public class HandsProcessing : ProcessingBase, IInitProcessing {
         private const int _HANDS_MASK_BUFFERS_COUNT = 3;
         private const int _HANDS_DEPTH_DECREASE = 8;
+        private const int _ZERO_MAP_DECREASE = 64;
     
         public const byte CLEAR_COLOR = 0;
         public const byte COLOR_ERROR_AURA = 1;
@@ -52,14 +56,19 @@ namespace DepthSensorSandbox.Processing {
         //private DepthBuffer _currHandsDepth;
         //private SensorDepth _sensorHandsDepth;
         //private SensorDepth.Internal _sensorHandsDepthInternal;
+
+        private DepthBuffer _depthZero;
+        private Sampler _samplerDepthZero = Sampler.Create();
+        private bool _needUpdateDepthZero;
         
         private ushort[] _depthLongExpos;
         private byte[] _decreasedHandsCounts;
+        
         private readonly ArrayIntQueue _queue = new ArrayIntQueue();
         private readonly ArrayIntQueue _queueErrorAura = new ArrayIntQueue();
         private readonly ArrayIntQueue _queueErrorAuraExtend = new ArrayIntQueue();
         private MapDepthToCameraBuffer _map;
-        private bool _needUpdateLongExpos;
+        private bool _needUpdateLongExpos = true;
 
         private enum Cell {
             INVALID,
@@ -75,6 +84,7 @@ namespace DepthSensorSandbox.Processing {
             _sensorHandsMask?.Dispose();
             //_sensorHandsDepth?.Dispose();
             _sensorHandsDepthDecreased?.Dispose();
+            _depthZero?.Dispose();
             base.Dispose();
         }
         
@@ -88,6 +98,13 @@ namespace DepthSensorSandbox.Processing {
                 RecreateSensor(buffer.width / _HANDS_DEPTH_DECREASE, buffer.height / _HANDS_DEPTH_DECREASE,
                     ref _sensorHandsDepthDecreased, out _currHandsDepthDecreased, out _sensorHandsDepthDecreasedInternal);
                 _samplerDecreased.SetDimens(_currHandsDepthDecreased.width, _currHandsDepthDecreased.height);
+                
+                AbstractBuffer2D.ReCreateIfNeed(ref _depthZero, 
+                    Mathf.FloorToInt((float) buffer.width / _ZERO_MAP_DECREASE), 
+                    Mathf.FloorToInt((float) buffer.height / _ZERO_MAP_DECREASE)
+                );
+                _needUpdateDepthZero = true;
+                _samplerDepthZero.SetDimens(_depthZero.width, _depthZero.height);
                 
                 if (ReCreateIfNeed(ref _decreasedHandsCounts, _currHandsDepthDecreased.length))
                     Array.Clear(_decreasedHandsCounts, 0, _decreasedHandsCounts.Length);
@@ -115,6 +132,7 @@ namespace DepthSensorSandbox.Processing {
         public override void SetCropping(Rect cropping01) {
             base.SetCropping(cropping01);
             _samplerDecreased.SetCropping01(cropping01);
+            _needUpdateLongExpos = true;
         }
         
         public Sampler GetSamplerHandsDecreased() {
@@ -125,12 +143,107 @@ namespace DepthSensorSandbox.Processing {
             _needUpdateLongExpos = true;
         }
 
+#region Init Process
+        private class CalcZeroBodyLocal {
+            public ushort[] a;
+            public static CalcZeroBodyLocal Create() {
+                return new CalcZeroBodyLocal {
+                    a = new ushort[(_ZERO_MAP_DECREASE + 1) * (_ZERO_MAP_DECREASE + 1)]
+                };
+            }
+            public static void Finally(CalcZeroBodyLocal local) {}
+        }
+
+        public void PrepareInitProcess() {
+            _depthZero.Clear();
+        }
+
+        public bool InitProcess(DepthBuffer rawBuffer, DepthBuffer outBuffer, DepthBuffer prevBuffer) {
+            PrepareProcessing(rawBuffer, outBuffer, prevBuffer);
+            if (!CheckValid(_currHandsMask))
+                return false;
+
+            Parallel.For(0, _depthZero.length, CalcZeroBodyLocal.Create, CalcDepthZeroBody, CalcZeroBodyLocal.Finally);
+            _needUpdateDepthZero = false;
+            return true;
+        }
+
+        public IEnumerable<DepthBuffer> GetMapsForFixHoles() {
+            yield return _depthZero;
+        }
+
+        private CalcZeroBodyLocal CalcDepthZeroBody(int i, ParallelLoopState loop, CalcZeroBodyLocal state) {
+            var pFull = _s.GetXYiConverted(_samplerDepthZero, i);
+            var scale = _ZERO_MAP_DECREASE / 2;
+            var aLen = 0;
+            for (int x = -scale; x < scale; ++x) {
+                for (int y = -scale; y < scale; ++y) {
+                    var iFull = _s.GetIFrom(pFull.x + x, pFull.y + y);
+                    ushort val;
+                    if (iFull >= 0 && iFull < _rawBuffer.length && (val = _rawBuffer.data[iFull]) != Sampler.INVALID_DEPTH) {
+                        state.a[aLen++] = val;
+                    }
+                }
+            }
+
+            if (aLen > 0) {
+                var curr = MathHelper.GetMedian(state.a, aLen);
+                var prev = _depthZero.data[i];
+                _depthZero.data[i] = (ushort) (prev == Sampler.INVALID_DEPTH ? curr : Mathf.Max(prev, curr));
+            }
+            
+            return state;
+        }
+
+        private ushort GetZeroDepthInterpolated(int iFull) {
+            var p = _samplerDepthZero.GetXYConverted(_s, iFull);
+            var i = _samplerDepthZero.GetIFrom((int) p.x, (int) p.y);
+            var t = math.frac(p);
+            var val = _depthZero.data[i];
+            int nx, ny;
+            if (t.x < 0.5f) {
+                nx = 3;
+                t.x = 0.5f - t.x;
+            } else {
+                nx = 1;
+                t.x = t.x - 0.5f;
+            }
+            if (t.y < 0.5f) {
+                ny = 2;
+                t.y = 0.5f - t.y;
+            } else {
+                ny = 0;
+                t.y = t.y - 0.5f;
+            }
+
+            int j;
+            if ((j = _samplerDepthZero.GetIndexOfNeighbor(i, nx)) != Sampler.INVALID_ID) {
+                val = (ushort) Mathf.Lerp(val, _depthZero.data[j], t.x);
+            }
+            if ((j = _samplerDepthZero.GetIndexOfNeighbor(i, ny)) != Sampler.INVALID_ID) {
+                var valy = _depthZero.data[j];
+                if ((j = _samplerDepthZero.GetIndexOfNeighbor(j, nx)) != Sampler.INVALID_ID) {
+                    valy = (ushort) Mathf.Lerp(valy, _depthZero.data[j], t.x);
+                }
+                
+                val = (ushort) Mathf.Lerp(val, valy, t.y);
+            }
+
+            return val;
+        }
+#endregion
+
         protected override void ProcessInternal() {
             if (!CheckValid(_currHandsMask))
                 return;
 
+            if (_needUpdateDepthZero) {
+                PrepareInitProcess();
+                InitProcess(_rawBuffer, _out, _prev);
+                return;
+            }
             if (_needUpdateLongExpos) {
-                _prev.data.CopyTo(_depthLongExpos);
+                _s.EachParallelHorizontal(UpdateLongExposBody);
                 _needUpdateLongExpos = false;
             }
             
@@ -145,6 +258,7 @@ namespace DepthSensorSandbox.Processing {
             _currHandsDepthDecreased.Clear();
             
             Parallel.Invoke(FillBorderUp, FillBorderDown, FillBorderLeft, FillBorderRight);
+            //var hasHands = _queue.GetCount() > 0;
 #if HANDS_WAVE_STEP_DEBUG
             CurrWave = 0;
 #endif
@@ -159,20 +273,23 @@ namespace DepthSensorSandbox.Processing {
             _sensorHandsDepthDecreasedInternal.OnNewFrameBackground();
         }
 
-        public int FullToDecreased(int i) {
-            var p = _currHandsMask.GetXYFrom(i);
-            p /= _HANDS_DEPTH_DECREASE;
-            return _currHandsDepthDecreased.GetIFrom((int) p.x, (int) p.y);
+        private void UpdateLongExposBody(int i) {
+            var longExpos = _depthLongExpos[i];
+            if (longExpos == Sampler.INVALID_DEPTH)
+                longExpos = _inDepth.data[i];
+            var zero = GetZeroDepthInterpolated(i);
+            if (longExpos == Sampler.INVALID_DEPTH || Mathf.Abs(zero - longExpos) > GetErrorInCellBorder(i) / 2)
+                _depthLongExpos[i] = zero;
+            else
+                _depthLongExpos[i] = longExpos;
         }
-        
-        public int DecreasedToFull(int i) {
-            var p = DecreasedToFullXY(i);
-            return _currHandsMask.GetIFrom((int) p.x, (int) p.y);
+
+        public int FullToDecreased(int i) {
+            return _samplerDecreased.GetIConverted(_s, i);
         }
         
         public Vector2 DecreasedToFullXY(int i) {
-            var p = _currHandsDepthDecreased.GetXYFrom(i);
-            return p * _HANDS_DEPTH_DECREASE + Vector2.one / 2f * _HANDS_DEPTH_DECREASE;
+            return _s.GetXYConverted(_samplerDecreased, i);
         }
 
         private void FillBorderUp() {
@@ -215,7 +332,10 @@ namespace DepthSensorSandbox.Processing {
         }
         
         private Cell CheckCell(int i, int prevI, ushort minDiffer) {
-            var longExp = _depthLongExpos[i];
+            return CheckCell(i, prevI, minDiffer, _depthLongExpos[i]);
+        }
+        
+        private Cell CheckCell(int i, int prevI, ushort minDiffer, ushort longExp) {
             if (longExp != Sampler.INVALID_DEPTH) {
                 var val = _inDepth.data[i];
                 if (val != Sampler.INVALID_DEPTH) {
@@ -313,7 +433,6 @@ namespace DepthSensorSandbox.Processing {
             var valLongExpos = _depthLongExpos[i];
             var inVal = _inDepth.data[i];
             var mask = _currHandsMask.data[i];
-            var isHand = _currHandsMask.data[i];
             
             if (mask != CLEAR_COLOR) {
                 _out.data[i] = valLongExpos;
