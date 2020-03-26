@@ -142,7 +142,7 @@ namespace DepthSensor.Device {
             _calibration.Load();
 
             var depthFov = _calibration.IntrinsicDepth.GetFOV();
-            var colorFov = _calibration.IntrinsicDepth.GetFOV();
+            var colorFov = _calibration.IntrinsicColor.GetFOV();
             
             _colorStream = InitStream(_internalColor, path, nameof(Color), colorFov);
             _infraredStream = InitStream(_internalInfrared, path, nameof(Infrared), depthFov);
