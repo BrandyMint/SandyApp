@@ -20,13 +20,16 @@ namespace DepthSensor {
             this.use = use;
         }
         
-        public static readonly StreamParams Default = new StreamParams(640, 480, 30);
+        public static readonly StreamParams Default = new StreamParams(640, 424, 30);
+        public static readonly StreamParams DefaultVideo = new StreamParams(1280, 720, 15);
     }
     
     public class SensorParams : SerializableParams {
+        public override int ActualVersion => 2;
+
         protected override void OnLoadedNotActualVersion() {
             base.OnLoadedNotActualVersion();
-            if (Version == 0) {
+            if (Version < 2) {
                 Reset();
                 Save();
             }
@@ -38,7 +41,7 @@ namespace DepthSensor {
         }
         
         public StreamParams Color {
-            get => Get(nameof(Color), StreamParams.Default);
+            get => Get(nameof(Color), StreamParams.DefaultVideo);
             set => Set(nameof(Color), value);
         }
         
