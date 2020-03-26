@@ -255,7 +255,7 @@ namespace DepthSensorSandbox.Processing {
             }
         }
         
-        public bool Each(Func<int, bool> handler) {
+        public bool EachAre(Func<int, bool> handler) {
             for (var y = _cropping.yMin; y < _cropping.yMax; ++y) {
                 var x = _cropping.xMin;
                 var id = GetIFrom(x, y);

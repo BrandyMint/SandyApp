@@ -53,7 +53,7 @@ namespace DepthSensorSandbox.Processing {
                 return;
 
             if (_stage == Stage.WAIT_VALID) {
-                if (!_s.Each(i => _inDepth.data[i] == Sampler.INVALID_DEPTH))
+                if (!_s.EachAre(i => _inDepth.data[i] == Sampler.INVALID_DEPTH))
                     ++_stage;
                 else
                     return;
