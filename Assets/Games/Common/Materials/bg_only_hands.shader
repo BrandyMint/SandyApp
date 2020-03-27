@@ -1,7 +1,6 @@
 ﻿Shader "Sandbox/Game/BGOnlyHands" {
     Properties {
         _ColorHands ("Color Hands", Color) = (0.3, 0.3, 0.3, 1)
-        _HandsDepthMax ("Hands", Float) = 0.3
     }
     
     SubShader {
