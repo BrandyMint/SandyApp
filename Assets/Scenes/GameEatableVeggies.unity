@@ -492,6 +492,8 @@ MonoBehaviour:
   _enableOnStart: 1
   UpdateMask: 1
   UpdateHandsDepth: 1
+  _handsDepthMax: 0.06
+  _decreasedHandsFilterMod: 1
 --- !u!4 &507380213 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6145052356739669663, guid: 47cbe1775872baf289a77a580245e6e6,
@@ -968,6 +970,21 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 507380213}
     m_Modifications:
+    - target: {fileID: 19670623329316710, guid: 7199545a4a673cf4b8f7869f53c50494,
+        type: 3}
+      propertyPath: EmissionModule.rateOverDistance.scalar
+      value: 59.999996
+      objectReference: {fileID: 0}
+    - target: {fileID: 1206031236787968062, guid: 7199545a4a673cf4b8f7869f53c50494,
+        type: 3}
+      propertyPath: EmissionModule.rateOverDistance.scalar
+      value: 59.999996
+      objectReference: {fileID: 0}
+    - target: {fileID: 1727651198172811879, guid: 7199545a4a673cf4b8f7869f53c50494,
+        type: 3}
+      propertyPath: EmissionModule.rateOverDistance.scalar
+      value: 59.999996
+      objectReference: {fileID: 0}
     - target: {fileID: 1896282222971402334, guid: 7199545a4a673cf4b8f7869f53c50494,
         type: 3}
       propertyPath: _cam
@@ -978,6 +995,31 @@ PrefabInstance:
       propertyPath: _sandbox
       value: 
       objectReference: {fileID: 507380214}
+    - target: {fileID: 2109925467851425511, guid: 7199545a4a673cf4b8f7869f53c50494,
+        type: 3}
+      propertyPath: EmissionModule.rateOverDistance.scalar
+      value: 59.999996
+      objectReference: {fileID: 0}
+    - target: {fileID: 2317579929433069224, guid: 7199545a4a673cf4b8f7869f53c50494,
+        type: 3}
+      propertyPath: EmissionModule.rateOverDistance.scalar
+      value: 59.999996
+      objectReference: {fileID: 0}
+    - target: {fileID: 3972186045129230061, guid: 7199545a4a673cf4b8f7869f53c50494,
+        type: 3}
+      propertyPath: EmissionModule.rateOverDistance.scalar
+      value: 59.999996
+      objectReference: {fileID: 0}
+    - target: {fileID: 4416851544098308780, guid: 7199545a4a673cf4b8f7869f53c50494,
+        type: 3}
+      propertyPath: EmissionModule.rateOverDistance.scalar
+      value: 59.999996
+      objectReference: {fileID: 0}
+    - target: {fileID: 5871326965909735227, guid: 7199545a4a673cf4b8f7869f53c50494,
+        type: 3}
+      propertyPath: EmissionModule.rateOverDistance.scalar
+      value: 59.999996
+      objectReference: {fileID: 0}
     - target: {fileID: 5958409801024613861, guid: 7199545a4a673cf4b8f7869f53c50494,
         type: 3}
       propertyPath: m_Name
@@ -1037,6 +1079,41 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6407922109499376180, guid: 7199545a4a673cf4b8f7869f53c50494,
+        type: 3}
+      propertyPath: EmissionModule.rateOverDistance.scalar
+      value: 59.999996
+      objectReference: {fileID: 0}
+    - target: {fileID: 6730819455910678465, guid: 7199545a4a673cf4b8f7869f53c50494,
+        type: 3}
+      propertyPath: EmissionModule.rateOverDistance.scalar
+      value: 59.999996
+      objectReference: {fileID: 0}
+    - target: {fileID: 6949144972518781058, guid: 7199545a4a673cf4b8f7869f53c50494,
+        type: 3}
+      propertyPath: EmissionModule.rateOverDistance.scalar
+      value: 59.999996
+      objectReference: {fileID: 0}
+    - target: {fileID: 7049647521337114979, guid: 7199545a4a673cf4b8f7869f53c50494,
+        type: 3}
+      propertyPath: EmissionModule.rateOverDistance.scalar
+      value: 59.999996
+      objectReference: {fileID: 0}
+    - target: {fileID: 7517211926539208813, guid: 7199545a4a673cf4b8f7869f53c50494,
+        type: 3}
+      propertyPath: EmissionModule.rateOverDistance.scalar
+      value: 59.999996
+      objectReference: {fileID: 0}
+    - target: {fileID: 7566065593930671586, guid: 7199545a4a673cf4b8f7869f53c50494,
+        type: 3}
+      propertyPath: EmissionModule.rateOverDistance.scalar
+      value: 59.999996
+      objectReference: {fileID: 0}
+    - target: {fileID: 8820220589564143932, guid: 7199545a4a673cf4b8f7869f53c50494,
+        type: 3}
+      propertyPath: EmissionModule.rateOverDistance.scalar
+      value: 59.999996
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7199545a4a673cf4b8f7869f53c50494, type: 3}
@@ -1121,11 +1198,11 @@ Light:
   m_InnerSpotAngle: 21.802082
   m_CookieSize: 10
   m_Shadows:
-    m_Type: 0
+    m_Type: 2
     m_Resolution: -1
     m_CustomResolution: -1
     m_Strength: 1
-    m_Bias: 0.05
+    m_Bias: 0
     m_NormalBias: 0.4
     m_NearPlane: 0.2
     m_CullingMatrixOverride:
@@ -1171,13 +1248,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2017840567}
-  m_LocalRotation: {x: 0.4778192, y: -0.29987565, z: 0.17769937, w: 0.80634135}
+  m_LocalRotation: {x: 0.71645635, y: -0.26339614, z: 0.14350796, w: 0.6298557}
   m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 61.3, y: -40.8, z: 0}
+  m_LocalEulerAnglesHint: {x: 77.994, y: -142.65901, z: -109.02601}
 --- !u!1 &2078943089
 GameObject:
   m_ObjectHideFlags: 0

@@ -49,7 +49,9 @@
                     c.a *= a * _FieldLight;
                 }
                 
-                c.rgb = lerp(c.rgb, _ColorHands.rgb, _ColorHands.a * handsInteractAlpha(i));
+                float handsAlpha = _ColorHands.a * handsInteractAlpha(i);
+                c.rgb = lerp(c.rgb, _ColorHands.rgb, handsAlpha);
+                c.a = max(c.a, handsAlpha);
                 return c;
             }
             ENDCG
