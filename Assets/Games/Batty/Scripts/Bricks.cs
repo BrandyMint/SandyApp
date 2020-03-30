@@ -6,18 +6,22 @@ using Games.Common.GameFindObject;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Assertions;
+using Utilities;
 
 namespace Games.Batty {
     public class Bricks : MonoBehaviour {
-        [SerializeField] private InteractableSimple _tplBrick;
         [TextArea] [SerializeField] private string _map;
 
         private string[] _mapLines;
         private readonly List<InteractableSimple> _bricks = new List<InteractableSimple>();
         private readonly Dictionary<int, Color> _colors = new Dictionary<int, Color>();
+        private InteractableSimple[] _tplBricks;
 
         private void Awake() {
-            _tplBrick.gameObject.SetActive(false);
+            _tplBricks = GetComponentsInChildren<InteractableSimple>();
+            foreach (var tpl in _tplBricks) {
+                tpl.gameObject.SetActive(false);
+            }
             _mapLines = Regex.Split(_map, "\r\n|\r|\n");
             var first = _mapLines.First();
             Assert.IsTrue(_mapLines.All(l => l.Length == first.Length), "Check Bricks map");
@@ -45,22 +49,29 @@ namespace Games.Batty {
             var size = new float3(
                 1f / _mapLines.First().Length, 
                 1f / _mapLines.Length,
-                _tplBrick.transform.localScale.z 
+                _tplBricks.First().transform.localScale.z 
             );
             for (p.y = 0; p.y < _mapLines.Length; ++p.y) {
                 var line = _mapLines[_mapLines.Length - p.y - 1];
                 for (p.x = 0; p.x < line.Length; ++p.x) {
                     var type = int.Parse(line[p.x].ToString());
                     if (type != 0) {
-                        var brick = Instantiate(_tplBrick, _tplBrick.transform.parent, false);
+                        var tpl = _tplBricks.Random();
+                        var brick = Instantiate(tpl, tpl.transform.parent, false);
                         brick.transform.localScale = size;
                         brick.transform.localPosition = new float3(size.xy * p + size.xy / 2f, 0f) - new float3(0.5f, 0.5f, 0f);
                         brick.ItemType = type;
-                        SetColor(brick.GetComponentInChildren<RandomColorRenderer>(), type);
+                        SetColor(brick, type);
                         brick.gameObject.SetActive(true);
                         _bricks.Add(brick);
                     }
                 }
+            }
+        }
+
+        private void SetColor(InteractableSimple brick, int type) {
+            foreach (var colorRend in brick.GetComponentsInChildren<RandomColorRenderer>()) {
+                SetColor(colorRend, type);
             }
         }
 

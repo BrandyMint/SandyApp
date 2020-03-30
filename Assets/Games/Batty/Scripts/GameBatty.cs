@@ -60,8 +60,7 @@ namespace Games.Batty {
             
             if (collision.gameObject.CompareTag("Goal")) {
                 var brick = collision.gameObject.GetComponentInParent<InteractableSimple>();
-                brick.PlayAudioBang(true);
-                brick.Show(false);
+                brick.Bang(true);
                 ++GameScore.Score;
                 if (GameScore.Score >= _bricks.Count || (_debugMod && Input.GetKey(KeyCode.W))) {
                     GameEvent.Current = GameState.STOP;

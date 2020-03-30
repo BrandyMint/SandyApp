@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: batty
-  m_Shader: {fileID: 4800000, guid: f11106338217c6a45a144576a65c72e1, type: 3}
+  m_Shader: {fileID: 4800000, guid: 9ef1015817b2290578ded34e3b6a336d, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -96,7 +96,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _ColorHands: {r: 0.3, g: 0.3, b: 0.3, a: 1}
+    - _ColorHands: {r: 1, g: 1, b: 1, a: 0.5019608}
     - _ColorMax: {r: 0.13207549, g: 0.1302065, b: 0.1302065, a: 1}
     - _ColorMin: {r: 0, g: 0, b: 0, a: 1}
     - _ColorPlayerLeft: {r: 1, g: 0, b: 0, a: 1}
