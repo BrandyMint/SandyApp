@@ -3,6 +3,8 @@
 namespace Launcher.Flip {
     [RequireComponent(typeof(Camera))]
     public class CameraFlipper : MonoBehaviour {
+        private static readonly int _CAMERA_FLIP = Shader.PropertyToID("_CameraFlip");
+        
         public bool horizontal;
         public bool vertical;
         public Vector2 obliqueness;
@@ -34,12 +36,11 @@ namespace Launcher.Flip {
             _cam.ResetWorldToCameraMatrix();
             _cam.ResetProjectionMatrix();
             SetObliqueness(obliqueness);
+            var h = horizontal ? -1f : 1f;
+            var v = vertical ? -1f : 1f;
+            Shader.SetGlobalVector(_CAMERA_FLIP, new Vector4(h, v));
             if (horizontal || vertical) {
-                _cam.projectionMatrix *= Matrix4x4.Scale(new Vector3(
-                    horizontal ? -1f : 1f,
-                    vertical ? -1f : 1f,
-                    1f
-                ));
+                _cam.projectionMatrix *= Matrix4x4.Scale(new Vector3(h, v, 1f));
             }
         }
         

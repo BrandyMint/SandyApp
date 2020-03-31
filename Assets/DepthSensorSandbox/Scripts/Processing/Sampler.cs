@@ -307,6 +307,24 @@ namespace DepthSensorSandbox.Processing {
                     EachInVertical(x, _eachHandler);
             }
         }
+        
+        public void EachParallelDownsize(Action<int> handler, int downsize) {
+            _eachHandler = handler;
+            _downsize = downsize;
+            Parallel.For(_cropping.xMin/downsize, _cropping.xMax/downsize + 1, EachParallelHorizontalDownsizeBody);
+        }
+        
+        private void EachParallelHorizontalDownsizeBody(int yDownsized) {
+            var x = _cropping.xMin;
+            var y = Mathf.Clamp(yDownsized * _downsize, _cropping.yMin, _cropping.yMax - 1);
+            var start = GetIFrom(x, y);
+            var n = _cropping.width/_downsize;
+            EachInLine(start, _downsize, n, _eachHandler);
+            if (_cropping.width % _downsize != 0) {
+                var end = GetIFrom(_cropping.xMax - 1, y);
+                _eachHandler(end);
+            }
+        }
 #endregion
 
 #region Each with ParallelLocalState

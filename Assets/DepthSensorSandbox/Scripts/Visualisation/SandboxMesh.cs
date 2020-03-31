@@ -22,20 +22,20 @@ namespace DepthSensorSandbox.Visualisation {
 
         private MeshFilter _meshFilter;
         private Mesh _mesh;
-        private Vector3[] _vert;
+        protected Vector3[] _vert;
         private Vector3[] _normals;
-        private int[] _triangles;
-        private Vector2[] _uv;
+        protected int[] _triangles;
+        protected Vector2[] _uv;
         private Renderer _r;
         private Material _mat;
         private MaterialPropertyBlock _propBlock;
         private bool _prevUpdateMeshOnGPU;
         private bool _needUpdateBounds = true;
         private bool _isBoundsValid;
-        private Sampler _s = Sampler.Create();
-        private Rect _cropping = Sampler.FULL_CROPPING;
-        private bool _needUpdateCropping;
-        private bool _needUpdateUVAndIndexes;
+        protected Sampler _s = Sampler.Create();
+        protected Rect _cropping = Sampler.FULL_CROPPING;
+        protected bool _needUpdateCropping;
+        protected bool _needUpdateUVAndIndexes;
 
         private void Awake() {
             _r = GetComponent<MeshRenderer>();
@@ -140,7 +140,7 @@ namespace DepthSensorSandbox.Visualisation {
             return false;
         }
 
-        public bool ReInitMeshIfNeed(int width, int height) {
+        public virtual bool ReInitMeshIfNeed(int width, int height) {
             _s.SetDimens(width, height);
             var needRecalcUVAndIndexes = _needUpdateCropping;
             if (_needUpdateCropping) {
@@ -223,9 +223,10 @@ namespace DepthSensorSandbox.Visualisation {
             }
         }
 
-        private DepthBuffer _currDepth;
-        private MapDepthToCameraBuffer _currMapToCamera;
-        private void UpdateMeshBody(int i) {
+        protected DepthBuffer _currDepth;
+        protected MapDepthToCameraBuffer _currMapToCamera;
+
+        protected virtual void UpdateMeshBody(int i) {
             var j = _s.GetIInRect(i);
             _vert[j] = PointDepthToVector3(_currDepth, _currMapToCamera, i);
         }
