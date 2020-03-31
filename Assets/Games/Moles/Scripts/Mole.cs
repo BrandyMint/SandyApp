@@ -8,6 +8,7 @@ namespace Games.Moles {
     public class Mole : MonoBehaviour, IInteractable {
         [SerializeField] private AudioClip[] _audioHit;
         [SerializeField] private AudioClip[] _audioDamage;
+        [SerializeField] private Animator _anim; 
         
         private static readonly int _SHOW = Animator.StringToHash("show");
         private static readonly int _HIDE = Animator.StringToHash("hide");
@@ -17,14 +18,13 @@ namespace Games.Moles {
         private ParticleSystem _particles;
         private Collider _collider;
         private float _showTime;
-        private Animator _anim;
         private AudioSource _audioSourceHit;
         private AudioSource _audioSourceDamage;
 
         private void Awake() {
+            GetComponentInChildren<MoleShowEvent>().OnShow += OnTransition;
             _particles = GetComponent<ParticleSystem>();
             _collider = GetComponent<Collider>();
-            _anim = GetComponent<Animator>();
             _audioSourceHit = gameObject.AddComponent<AudioSource>();
             _audioSourceDamage = gameObject.AddComponent<AudioSource>();
 

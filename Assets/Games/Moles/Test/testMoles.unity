@@ -231,6 +231,11 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 6145052358333956587, guid: 47cbe1775872baf289a77a580245e6e6,
+        type: 3}
+      propertyPath: m_ReceiveShadows
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6145052358333956596, guid: 47cbe1775872baf289a77a580245e6e6,
         type: 3}
       propertyPath: _updateMeshOnGPU
@@ -283,6 +288,32 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _delimeterColor: {r: 1, g: 1, b: 1, a: 1}
+--- !u!114 &585363458
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 585363456}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5893fef5c0de4f5691a661cdc92100f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!64 &585363459
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 585363456}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 9127120572191758296, guid: 14e7c53709255572c81e919f78f100ab, type: 3}
 --- !u!1 &925452556
 GameObject:
   m_ObjectHideFlags: 0
@@ -318,11 +349,11 @@ Light:
   m_InnerSpotAngle: 21.802082
   m_CookieSize: 10
   m_Shadows:
-    m_Type: 0
+    m_Type: 2
     m_Resolution: -1
     m_CustomResolution: -1
     m_Strength: 1
-    m_Bias: 0.05
+    m_Bias: 0
     m_NormalBias: 0.4
     m_NearPlane: 0.2
     m_CullingMatrixOverride:
