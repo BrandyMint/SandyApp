@@ -95,10 +95,14 @@ namespace Games.Common.GameFindObject {
         protected override void SetSizes(float dist) {
             base.SetSizes(dist);
             var size = _gameField.Scale * _initialItemSize;
+            SetItemsSizes(dist, size);
+            _gameField.SetWidth(size);
+        }
+
+        protected virtual void SetItemsSizes(float dist, float size) {
             foreach (var item in _tplItems.Concat(_items)) {
                 item.transform.localScale = Vector3.one * size;
             }
-            _gameField.SetWidth(size);
         }
 
         protected void ClearItems() {

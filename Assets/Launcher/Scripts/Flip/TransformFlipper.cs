@@ -8,7 +8,7 @@ namespace Launcher.Flip {
         [HideInInspector] [SerializeField] protected bool _initialScaleSaved;
         [HideInInspector] [SerializeField] protected Vector3 _initialScale;
 
-        private void Start() {
+        protected virtual void Start() {
             _flip = GetComponent<Canvas>() != null ? InitCanvasFlip() : transform;
             if (!_initialScaleSaved) {
                 _initialScale = _flip.localScale;
@@ -19,7 +19,7 @@ namespace Launcher.Flip {
             Prefs.App.OnChanged += OnAppParamChanged;
         }
 
-        private void OnDestroy() {
+        protected virtual void OnDestroy() {
             if (Prefs.App != null)
                 Prefs.App.OnChanged -= OnAppParamChanged;
         }

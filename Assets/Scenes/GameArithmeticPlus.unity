@@ -409,7 +409,7 @@ PrefabInstance:
     - target: {fileID: 6145052356739669663, guid: 47cbe1775872baf289a77a580245e6e6,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: 0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: 6145052356739669663, guid: 47cbe1775872baf289a77a580245e6e6,
         type: 3}
@@ -424,7 +424,7 @@ PrefabInstance:
     - target: {fileID: 6145052356739669663, guid: 47cbe1775872baf289a77a580245e6e6,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: 0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: 6145052356739669663, guid: 47cbe1775872baf289a77a580245e6e6,
         type: 3}
@@ -434,7 +434,7 @@ PrefabInstance:
     - target: {fileID: 6145052356739669663, guid: 47cbe1775872baf289a77a580245e6e6,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
+      value: 90
       objectReference: {fileID: 0}
     - target: {fileID: 6145052356739669663, guid: 47cbe1775872baf289a77a580245e6e6,
         type: 3}
@@ -469,7 +469,7 @@ PrefabInstance:
     - target: {fileID: 6145052358850914144, guid: 47cbe1775872baf289a77a580245e6e6,
         type: 3}
       propertyPath: m_CullingMask.m_Bits
-      value: 23
+      value: 535
       objectReference: {fileID: 0}
     - target: {fileID: 6145052358850914144, guid: 47cbe1775872baf289a77a580245e6e6,
         type: 3}
@@ -504,6 +504,8 @@ MonoBehaviour:
   _enableOnStart: 1
   UpdateMask: 1
   UpdateHandsDepth: 1
+  _handsDepthMax: 0.06
+  _decreasedHandsFilterMod: 1
 --- !u!4 &507380213 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6145052356739669663, guid: 47cbe1775872baf289a77a580245e6e6,
@@ -537,6 +539,12 @@ MonoBehaviour:
   _material: {fileID: 2100000, guid: b5d67499ee737a84b8b732811f7660dd, type: 2}
   _instantiateMaterial: 1
   _enableOnStart: 1
+--- !u!20 &507380216 stripped
+Camera:
+  m_CorrespondingSourceObject: {fileID: 6145052358850914144, guid: 47cbe1775872baf289a77a580245e6e6,
+    type: 3}
+  m_PrefabInstance: {fileID: 507380210}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &534900077
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -897,6 +905,11 @@ PrefabInstance:
       propertyPath: _generator
       value: 
       objectReference: {fileID: 344910569}
+    - target: {fileID: 2554214626254990306, guid: 4dc3489d7e3aa2b468c736762ea36490,
+        type: 3}
+      propertyPath: _cam
+      value: 
+      objectReference: {fileID: 507380216}
     - target: {fileID: 5989797391904271905, guid: 4dc3489d7e3aa2b468c736762ea36490,
         type: 3}
       propertyPath: m_Name
@@ -1114,11 +1127,11 @@ Light:
   m_InnerSpotAngle: 21.802082
   m_CookieSize: 10
   m_Shadows:
-    m_Type: 0
+    m_Type: 2
     m_Resolution: -1
     m_CustomResolution: -1
-    m_Strength: 1
-    m_Bias: 0.05
+    m_Strength: 0.664
+    m_Bias: 0
     m_NormalBias: 0.4
     m_NearPlane: 0.2
     m_CullingMatrixOverride:
@@ -1164,13 +1177,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2017840567}
-  m_LocalRotation: {x: 0.4778192, y: -0.29987565, z: 0.17769937, w: 0.80634135}
+  m_LocalRotation: {x: -0.13623732, y: -0.8602502, z: 0.36748463, w: -0.32613537}
   m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 61.3, y: -40.8, z: 0}
+  m_LocalEulerAnglesHint: {x: 46.147003, y: -221.71199, z: -0.439}
 --- !u!1 &2078943089
 GameObject:
   m_ObjectHideFlags: 0

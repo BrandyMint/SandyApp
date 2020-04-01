@@ -1,14 +1,11 @@
 ﻿using UnityEngine;
-using Random = UnityEngine.Random;
 
 namespace Games.Common {
     [RequireComponent(typeof(Renderer))]
-    public class RandomColorRenderer : MonoBehaviour {
+    public class RandomColorRenderer : RandomColorBase {
         private static readonly int _COLOR = Shader.PropertyToID("_Color");
         [SerializeField] private int _onlyForMaterialId = -1;
-        [SerializeField] private bool _randomOnAwake = true;
-
-        private Color _color;
+        
         private Renderer _r;
         private Renderer Rend {
             get {
@@ -19,19 +16,11 @@ namespace Games.Common {
             }
         }
 
-        private void Awake() {
-            if (_randomOnAwake)
-                SetRandomColor();
+        protected override Color GetObjectColor() {
+            return Rend.material.GetColor(_COLOR);
         }
 
-        public void SetRandomColor() {
-            _color = Rend.material.GetColor(_COLOR);
-            Color.RGBToHSV(_color, out _, out var s, out var v);
-            _color = Color.HSVToRGB(Random.value, s, v);
-            SetColor(_color);
-        }
-
-        public void SetColor(Color color) {
+        public override void SetColor(Color color) {
             _color = color;
             if (_onlyForMaterialId >= 0 && _onlyForMaterialId < Rend.materials.Length) {
                 var materials = Rend.materials;
@@ -45,10 +34,6 @@ namespace Games.Common {
                 props.SetColor(_COLOR, _color);
                 Rend.SetPropertyBlock(props);
             }
-        }
-
-        public Color GetColor() {
-            return _color;
         }
     }
 }

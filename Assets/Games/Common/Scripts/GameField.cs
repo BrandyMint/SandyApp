@@ -15,6 +15,8 @@ namespace Games.Common {
         [SerializeField] private Texture2D _fieldTexture;
         [SerializeField] private bool _scaleZ = false;
         [SerializeField] protected Transform _bordersRoot;
+        [SerializeField] private bool _proportionalScale;
+        [SerializeField] private float _gizmoScaleX = 1f;
 
         private Camera _lastCam;
 
@@ -79,11 +81,16 @@ namespace Games.Common {
             transform.position = pos;
             var vert = Vector3.Distance(up, down);
             var hor = Vector3.Distance(left, right);
-            transform.localScale = _startScale * new float3(
-                hor,
-                vert,
-                _scaleZ ? vert : 1f
-            );
+            if (_proportionalScale) {
+                transform.localScale = _startScale * vert;
+            } else {
+                transform.localScale = _startScale * new float3(
+                    hor,
+                    vert,
+                    _scaleZ ? vert : 1f
+                );
+            }
+            
             
             UpdateWidth();
             OnChanged?.Invoke();
@@ -156,7 +163,9 @@ namespace Games.Common {
 
         private void OnDrawGizmos() {
             Gizmos.color = Color.cyan;
-            Gizmos.DrawWireMesh(PrimitiveMesh.Get(PrimitiveType.Quad), transform.position, transform.rotation, transform.localScale);
+            var scale = transform.localScale;
+            scale.x *= _gizmoScaleX;
+            Gizmos.DrawWireMesh(PrimitiveMesh.Get(PrimitiveType.Quad), transform.position, transform.rotation, scale);
         }
     }
 }

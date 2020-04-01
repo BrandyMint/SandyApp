@@ -8,7 +8,6 @@ using UnityEngine;
 namespace Games.Arithmetic {
     public class ArithmeticGame : FindObjectGame {
         [SerializeField] private ExerciveGenerator _generator;
-        [SerializeField] private Camera _camSandbox;
 
         private int _answer;
 
@@ -19,12 +18,6 @@ namespace Games.Arithmetic {
                 item.gameObject.SetActive(true);
             }
             ShowItems(false);
-        }
-
-        protected override HandsRaycaster CreateHandsRaycaster() {
-            var rayCaster = base.CreateHandsRaycaster(); 
-            rayCaster.Cam = _camSandbox;
-            return rayCaster;
         }
 
         protected override void StartGame() {
@@ -51,7 +44,7 @@ namespace Games.Arithmetic {
             foreach (var answer in answers) {
                 var item = _items[i++];
                 item.ItemType = answer;
-                item.GetComponent<RandomColorRenderer>().SetRandomColor();
+                item.GetComponentInChildren<RandomColorBase>().SetRandomColor();
             }
             _isGameStarted = true;
             _handsRaycaster.SetEnable(true);
@@ -75,6 +68,6 @@ namespace Games.Arithmetic {
             NextExercive();
         }
 
-        protected override void OnCalibrationChanged() { }
+        protected override void SetItemsSizes(float dist, float size) { }
     }
 }
