@@ -326,6 +326,8 @@ MonoBehaviour:
   _enableOnStart: 1
   UpdateMask: 1
   UpdateHandsDepth: 1
+  _handsDepthMax: 0.06
+  _decreasedHandsFilterMod: 1
 --- !u!4 &507380213 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6145052356739669663, guid: 47cbe1775872baf289a77a580245e6e6,

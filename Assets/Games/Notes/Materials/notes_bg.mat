@@ -96,7 +96,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _ColorHands: {r: 0.3, g: 0.3, b: 0.3, a: 1}
+    - _ColorHands: {r: 1, g: 1, b: 1, a: 0.5019608}
     - _ColorMax: {r: 0.6509804, g: 0.58123213, b: 0.25098038, a: 1}
     - _ColorMin: {r: 0.433, g: 0, b: 0.39197886, a: 1}
     - _ColorPlayerLeft: {r: 1, g: 0, b: 0, a: 1}

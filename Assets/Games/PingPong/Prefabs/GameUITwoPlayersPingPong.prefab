@@ -44,6 +44,26 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2038432717208342768, guid: bcc87629a2adda946842da79a2fcbcea,
+        type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2038432717208342768, guid: bcc87629a2adda946842da79a2fcbcea,
+        type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2038432717208342768, guid: bcc87629a2adda946842da79a2fcbcea,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2038432717208342768, guid: bcc87629a2adda946842da79a2fcbcea,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2355073824813511724, guid: bcc87629a2adda946842da79a2fcbcea,
         type: 3}
       propertyPath: m_IsActive
@@ -64,6 +84,26 @@ PrefabInstance:
       propertyPath: _objsSwitch.Array.data[1]
       value: 
       objectReference: {fileID: 7175766600961551727}
+    - target: {fileID: 2817266590835621792, guid: bcc87629a2adda946842da79a2fcbcea,
+        type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2817266590835621792, guid: bcc87629a2adda946842da79a2fcbcea,
+        type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2817266590835621792, guid: bcc87629a2adda946842da79a2fcbcea,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2817266590835621792, guid: bcc87629a2adda946842da79a2fcbcea,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3795032847118393985, guid: bcc87629a2adda946842da79a2fcbcea,
         type: 3}
       propertyPath: m_Text
@@ -72,7 +112,7 @@ PrefabInstance:
     - target: {fileID: 4677885620995768420, guid: bcc87629a2adda946842da79a2fcbcea,
         type: 3}
       propertyPath: m_Name
-      value: GameUITwoPlayers
+      value: GameUITwoPlayersPingPong
       objectReference: {fileID: 0}
     - target: {fileID: 5237005055880077238, guid: bcc87629a2adda946842da79a2fcbcea,
         type: 3}

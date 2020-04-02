@@ -289,6 +289,11 @@ PrefabInstance:
       propertyPath: m_SizeDelta.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1353996556607380812, guid: 805392e466041b24e96aeaacfdf73659,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4299813470469489489, guid: 805392e466041b24e96aeaacfdf73659,
         type: 3}
       propertyPath: m_AnchorMin.y
@@ -318,6 +323,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_SizeDelta.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4895910972284904929, guid: 805392e466041b24e96aeaacfdf73659,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 460
       objectReference: {fileID: 0}
     - target: {fileID: 6456789007064340864, guid: 805392e466041b24e96aeaacfdf73659,
         type: 3}
@@ -522,6 +532,8 @@ MonoBehaviour:
   _enableOnStart: 1
   UpdateMask: 1
   UpdateHandsDepth: 1
+  _handsDepthMax: 0.06
+  _decreasedHandsFilterMod: 1
 --- !u!4 &507380213 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6145052356739669663, guid: 47cbe1775872baf289a77a580245e6e6,
