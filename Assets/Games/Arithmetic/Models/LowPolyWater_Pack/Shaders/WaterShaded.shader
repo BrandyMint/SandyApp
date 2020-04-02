@@ -56,7 +56,7 @@ CGINCLUDE
 		half3 worldRefl : TEXCOORD6;
 		float4 posWorld : TEXCOORD7;
         float3 normalDir : TEXCOORD8;
-        //float4 invFadeScreen : TEXCOORD9;
+        float4 invFadeScreen : TEXCOORD9;
 	}; 
  
 	inline half4 Foam(sampler2D shoreTex, half4 coords) 
@@ -79,7 +79,7 @@ CGINCLUDE
 		
 		v.vertex.xyz += offsets;
 		 
-		half2 tileableUv = mul(unity_ObjectToWorld,(v.vertex)).xz;
+		half2 tileableUv = mul(unity_ObjectToWorld,(v.vertex)).xz * length(mul(unity_WorldToObject, float4(1,0,0,1)).xyz);
 		
 		o.bumpCoords.xyzw = (tileableUv.xyxy + _Time.xxxx * _BumpDirection.xyzw) * _BumpTiling.xyzw;
 
@@ -100,8 +100,8 @@ CGINCLUDE
         float3 worldViewDir = normalize(UnityWorldSpaceViewDir(worldPos)); 
         o.worldRefl = reflect(-worldViewDir, worldNormal);
 
-
-        //o.invFadeScreen = _InvFadeParemeter * length(ComputeScreenPos(float4(0.0, 1.0, 0.0, 0.0)));
+        float3 viewDir = mul(UNITY_MATRIX_P, float3(0, 1, 0));
+        o.invFadeScreen = _InvFadeParemeter * length(ComputeScreenPos(float4(viewDir, 1.0)));
 		return o;
 	}
  
@@ -158,7 +158,7 @@ CGINCLUDE
 		#ifdef WATER_EDGEBLEND_ON
 			half depth = SAMPLE_DEPTH_TEXTURE_PROJ(_CameraDepthTexture, UNITY_PROJ_COORD(i.screenPos));
 			depth = LinearEyeDepth(depth);
-			edgeBlendFactors = saturate(_InvFadeParemeter * (depth-i.screenPos.w));
+			edgeBlendFactors = saturate(i.invFadeScreen * (depth-i.screenPos.w));
 			edgeBlendFactors.y = 1.0-edgeBlendFactors.y;
 		#endif
 		
@@ -198,7 +198,7 @@ Subshader
 			#pragma vertex vert
 			#pragma fragment frag
 		
-			//#pragma multi_compile WATER_EDGEBLEND_ON WATER_EDGEBLEND_OFF
+			#pragma multi_compile WATER_EDGEBLEND_ON WATER_EDGEBLEND_OFF
 			#define WATER_EDGEBLEND_OFF 
 		
 			ENDCG
