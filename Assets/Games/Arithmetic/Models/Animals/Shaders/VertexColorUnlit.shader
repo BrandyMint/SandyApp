@@ -19,5 +19,7 @@ Category {
 			}
 		}
 	}
+	
+    Fallback "Diffuse"
 }
 }

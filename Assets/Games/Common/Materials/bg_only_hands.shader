@@ -33,6 +33,6 @@
             }
             ENDCG
         }
-        UsePass "Sandbox/ShadowCaster"
     }
+    Fallback "Sandbox/ShadowCaster"
 }
