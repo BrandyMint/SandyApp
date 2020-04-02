@@ -11,7 +11,6 @@
 	fixed _LightSaberFactor;
 	fixed4 _Color;
 #endif
-    float2 _CameraFlip;
 	
 	// Vertex shader input attributes
 	struct a2v
@@ -46,7 +45,7 @@
 		// The `projScale` factor also handles different field of view values, which 
 		// used to be handled via FOV_SCALING_OFF in previous versions of this asset.
 		// Furthermore, `projScale` handles orthographic projection matrices gracefully.
-		float projScale = unity_CameraProjection._m11 * 0.5 * _CameraFlip.y;
+		float projScale = abs(unity_CameraProjection._m11 * 0.5);
 		float scaledLineWidth = _LineWidth * _LineScale * projScale;
 
 		float aspectRatio = _ScreenParams.x / _ScreenParams.y;
