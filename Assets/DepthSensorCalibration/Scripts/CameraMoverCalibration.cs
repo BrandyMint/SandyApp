@@ -56,8 +56,8 @@ namespace DepthSensorCalibration {
             KeyMapper.AddListener(KeyEvent.RIGHT, MoveRight);
             KeyMapper.AddListener(KeyEvent.DOWN, MoveDown);
             KeyMapper.AddListener(KeyEvent.UP, MoveUp);
-            KeyMapper.AddListener(KeyEvent.ZOOM_IN, MoveForward);
-            KeyMapper.AddListener(KeyEvent.ZOOM_OUT, MoveBackward);
+            KeyMapper.AddListener(KeyEvent.ZOOM_OUT, MoveForward);
+            KeyMapper.AddListener(KeyEvent.ZOOM_IN, MoveBackward);
         }
 
         private void UnSubscribeKeys() {
