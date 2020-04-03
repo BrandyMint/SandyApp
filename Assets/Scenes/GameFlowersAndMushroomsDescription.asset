@@ -14,3 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _scenePath: Assets/Scenes/GameFlowersAndMushrooms.unity
   _sceneName: "\u0426\u0412\u0415\u0422\u042B \u0418 \u0413\u0420\u0418\u0411\u042B"
+  _icon: {fileID: 0}
+  _loadingScreenOverride: {fileID: 6054792565445227640, guid: 2acd08ad5a167aee9a79bacea51a200e,
+    type: 3}

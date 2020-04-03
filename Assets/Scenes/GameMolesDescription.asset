@@ -14,3 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _scenePath: Assets/Scenes/GameMoles.unity
   _sceneName: "\u041A\u0420\u041E\u0422\u042B"
+  _icon: {fileID: 0}
+  _loadingScreenOverride: {fileID: 6054792565445227640, guid: 47fa901bb50083b8ca5e225aa4ef23fd,
+    type: 3}

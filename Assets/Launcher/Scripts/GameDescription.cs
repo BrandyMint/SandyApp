@@ -7,6 +7,7 @@ namespace Launcher {
         [TextArea]
         [SerializeField] private string _sceneName;
         [SerializeField] private Sprite _icon;
+        [SerializeField] private GameObject _loadingScreenOverride;
 
         public string ScenePath {
             get => _scenePath;
@@ -16,5 +17,7 @@ namespace Launcher {
         public string SceneName => _sceneName;
 
         public Sprite Icon => _icon;
+
+        public GameObject LoadingScreenOverride => _loadingScreenOverride;
     }
 }

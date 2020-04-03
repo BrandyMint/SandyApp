@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using DepthSensorSandbox.Visualisation;
 using Launcher.KeyMapping;
 using Launcher.MultiMonitorSupport;
 using UINotify;
@@ -11,17 +12,22 @@ namespace Launcher {
         private const string _TXT_NO_MONITORS_TITTLE = "Проектор подключен?";
         private const string _TXT_NO_MONITORS = "Убедитесь, что проектор подключен как расширенный экран, монитор компьютера активен и является главным. Перезапустите приложение.";
 
-        [SerializeField] private string _sceneMainPath;
+        [HideInInspector][SerializeField] private string _sceneMainPath;
         //[SerializeField] private string _sceneProjectorParamsPath;
-        [SerializeField] private string _sceneCalibrationPath;
-        [SerializeField] private string _sceneSandboxCalibrationPath;
-        [SerializeField] private string _sceneCalibrationViewPath;
+        [HideInInspector][SerializeField] private string _sceneCalibrationPath;
+        [HideInInspector][SerializeField] private string _sceneSandboxCalibrationPath;
+        [HideInInspector][SerializeField] private string _sceneCalibrationViewPath;
+        [Header("Loading")]
+        [SerializeField] private GameObject _loadingScreenDefault;
+        [SerializeField] private GameObject _loadingScreenGame;
         
         private static Scenes _instance;
         
         //private readonly Stack<int> _scenes = new Stack<int>();
         private Notify.Control _notifyNoMonitors;
         private int _currentGameSceneId;
+        private GameObject _currLoadingScreen;
+        private static string _currLoadingOrActiveScenePath;
         private readonly List<Scene> _toUnload = new List<Scene>();
         /*private CalibrationStep[] _calibrationSteps;
 
@@ -49,10 +55,12 @@ namespace Launcher {
                 new CalibrationStep(new ProjectorParams(), _sceneProjectorParamsPath),
                 new CalibrationStep(new CalibrationParams(), _sceneCalibrationPath)
             };*/
-            
-            OnSceneLoaded(SceneManager.GetActiveScene(), LoadSceneMode.Single);
+
+            var scene = SceneManager.GetActiveScene();
+            OnSceneLoaded(scene, LoadSceneMode.Single);
             SceneManager.sceneLoaded += OnSceneLoaded;
             SceneManager.sceneUnloaded += OnSceneUnloaded;
+            ShowLoading(scene.path);
 
             MultiMonitor.OnNotEnoughMonitors += OnNotEnoughMonitors;
             
@@ -83,6 +91,14 @@ namespace Launcher {
         }
         
         public static string CurrentGamePath => GamesList.GetDescription(_instance._currentGameSceneId).ScenePath;
+
+        public static string LoadingOrActiveScenePath {
+            get {
+                if (_currLoadingOrActiveScenePath != null)
+                    return _currLoadingOrActiveScenePath;
+                return SceneManager.GetActiveScene().path;
+            }
+        }
 
         private void OnNotEnoughMonitors() {
             if (_notifyNoMonitors == null)
@@ -131,9 +147,35 @@ namespace Launcher {
             //if (!GoCalibrationBefore(scenePath))
             var currentScene = SceneManager.GetActiveScene();
             if (currentScene.path != scenePath) {
+                _currLoadingOrActiveScenePath = scenePath;
+                ShowLoading(scenePath);
                 SceneManager.LoadScene(scenePath, LoadSceneMode.Additive);
                 if (_instance != null)
                     _instance._toUnload.Add(currentScene);
+            }
+        }
+
+        private static void ShowLoading(string scenePath) {
+            if (_instance == null) return;
+            if (_instance._currLoadingScreen != null) {
+                Destroy(_instance._currLoadingScreen);
+                _instance._currLoadingScreen = null;
+            }
+            if (scenePath == _instance._sceneMainPath) return;
+
+            GameObject loading = null;
+            var desc = GamesList.GetDescription(scenePath);
+            if (desc != null) {
+                loading = desc.LoadingScreenOverride;
+                if (loading == null)
+                    loading = _instance._loadingScreenGame;
+            } else {
+                loading = _instance._loadingScreenDefault;
+            }
+
+            if (loading != null) {
+                _instance._currLoadingScreen = loading = Instantiate(loading, null, false);
+                DontDestroyOnLoad(loading);
             }
         }
 
@@ -162,11 +204,11 @@ namespace Launcher {
             //|| scenePath == _sceneProjectorParamsPath;
         }
         
-        private bool IsGameScene(Scene scene) {
+        private static bool IsGameScene(Scene scene) {
             return IsGameScene(scene.path);
         }
         
-        private bool IsGameScene(string scenePath) {
+        private static bool IsGameScene(string scenePath) {
             return GamesList.IsGame(scenePath);
         }
 

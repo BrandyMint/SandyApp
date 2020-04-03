@@ -15,3 +15,5 @@ MonoBehaviour:
   _scenePath: Assets/Scenes/GameBatty.unity
   _sceneName: "\u0411\u0410\u0422\u0422\u0418"
   _icon: {fileID: 0}
+  _loadingScreenOverride: {fileID: 6054792565445227640, guid: f1c9360b05dd35d5d83d710d8e2d7dff,
+    type: 3}

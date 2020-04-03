@@ -15,6 +15,7 @@ namespace Launcher.UI.Editor {
         
         public override void OnInspectorGUI() {
             scenes.OnInspectorGUI(serializedObject);
+            DrawDefaultInspector ();
         }
     }
 }

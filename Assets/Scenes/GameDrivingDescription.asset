@@ -15,3 +15,5 @@ MonoBehaviour:
   _scenePath: Assets/Scenes/GameDriving.unity
   _sceneName: "\u0412\u041E\u0416\u0414\u0415\u041D\u0418\u0415"
   _icon: {fileID: 0}
+  _loadingScreenOverride: {fileID: 6054792565445227640, guid: 5d1000c551653eadf88f3da7049dbc66,
+    type: 3}

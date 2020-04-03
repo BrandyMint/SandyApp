@@ -14,3 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _scenePath: Assets/Scenes/GameEatableFruits.unity
   _sceneName: "\u0421\u042A\u0415\u0414\u041E\u0411\u041D\u041E\u0415-\u041D\u0415\u0421\u042A\u0415\u0414\u041E\u0411\u041D\u041E\u0415.\n\u0424\u0420\u0423\u041A\u0422\u042B"
+  _icon: {fileID: 0}
+  _loadingScreenOverride: {fileID: 6054792565445227640, guid: 7afc01e9313ec8162aa7763d1fa0f2b0,
+    type: 3}

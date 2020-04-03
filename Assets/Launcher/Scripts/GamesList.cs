@@ -42,7 +42,7 @@ namespace Launcher {
         }
         
         public static GameDescription GetDescriptionCurrent() {
-            return GetDescription(SceneManager.GetActiveScene());
+            return GetDescription(Scenes.LoadingOrActiveScenePath);
         }
         
         public static int GetId(string scenePath) {
@@ -54,7 +54,7 @@ namespace Launcher {
         }
 
         public static int GetIdCurrent() {
-            return GetId(SceneManager.GetActiveScene());
+            return GetId(Scenes.LoadingOrActiveScenePath);
         }
 
         public static bool IsGame(string scenePath) {

@@ -50,6 +50,10 @@ MonoBehaviour:
   _sceneCalibrationPath: Assets/DepthSensorCalibration/Scenes/DepthSensorCalibration2.unity
   _sceneSandboxCalibrationPath: Assets/DepthSensorCalibration/Scenes/SandboxCalibration.unity
   _sceneCalibrationViewPath: Assets/DepthSensorCalibration/Scenes/Viewer.unity
+  _loadingScreenDefault: {fileID: 2963034212431048975, guid: 78288941cf733032a9021128338ac96e,
+    type: 3}
+  _loadingScreenGame: {fileID: 6054792565445227640, guid: a177ac178223696e896cbab45ea55215,
+    type: 3}
 --- !u!114 &-8017239747588144962
 MonoBehaviour:
   m_ObjectHideFlags: 0

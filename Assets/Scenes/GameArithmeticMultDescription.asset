@@ -15,3 +15,5 @@ MonoBehaviour:
   _scenePath: Assets/Scenes/GameArithmeticMult.unity
   _sceneName: "\u0410\u0420\u0418\u0424\u041C\u0415\u0422\u0418\u041A\u0410.\n\u0423\u041C\u041D\u041E\u0416\u0415\u041D\u0418\u0415"
   _icon: {fileID: 0}
+  _loadingScreenOverride: {fileID: 6054792565445227640, guid: 9032f4f759bf2195ca5b09119f82d6e8,
+    type: 3}
