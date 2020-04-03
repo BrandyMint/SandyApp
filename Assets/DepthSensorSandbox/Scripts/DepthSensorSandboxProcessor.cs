@@ -80,6 +80,7 @@ namespace DepthSensorSandbox {
 #region Initializing
 
         private DepthSensorSandboxProcessor() {
+            _initProcessing.Active = false;
             HandsProcessingSwitch(false);
             _initProcessings = new ProcessingBase[] {
                 //_zeroInBorders,
