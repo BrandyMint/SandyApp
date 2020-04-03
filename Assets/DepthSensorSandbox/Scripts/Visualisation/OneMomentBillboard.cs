@@ -11,6 +11,7 @@ namespace DepthSensorSandbox.Visualisation {
         [SerializeField] private bool _hideByTimer = false;
         [SerializeField] private float _timer = 2f;
         [SerializeField] private bool _simulate;
+        [SerializeField] private bool _keepClearFlags;
 
         private Camera _cam;
         private bool _isDepthValid;
@@ -43,8 +44,11 @@ namespace DepthSensorSandbox.Visualisation {
                 t += Time.unscaledDeltaTime;
             }
             yield return null;
-            _cam.clearFlags = CameraClearFlags.Depth;
-            
+
+            if (!_keepClearFlags) {
+                _cam.clearFlags = CameraClearFlags.Depth;
+            }
+
             while (_hideByTimer && t < _timer) {
                 yield return null;
                 t += Time.unscaledDeltaTime;

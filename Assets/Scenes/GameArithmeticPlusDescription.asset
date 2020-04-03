@@ -13,4 +13,5 @@ MonoBehaviour:
   m_Name: GameArithmeticPlusDescription
   m_EditorClassIdentifier: 
   _scenePath: Assets/Scenes/GameArithmeticPlus.unity
-  _sceneName: "\u0410\u0420\u0418\u0424\u041C\u0415\u0422\u0418\u041A\u0410. \u0421\u041B\u041E\u0416\u0415\u041D\u0418\u0415"
+  _sceneName: "\u0410\u0420\u0418\u0424\u041C\u0415\u0422\u0418\u041A\u0410.\n\u0421\u041B\u041E\u0416\u0415\u041D\u0418\u0415"
+  _icon: {fileID: 0}
