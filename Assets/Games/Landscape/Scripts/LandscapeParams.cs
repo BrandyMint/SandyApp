@@ -9,6 +9,15 @@ namespace Games.Landscape {
 
     namespace DepthSensorSandbox {
         public class LandscapeParams : SerializableParams {
+            public override int ActualVersion => 2;
+            protected override void OnLoadedNotActualVersion() {
+                base.OnLoadedNotActualVersion();
+                if (Version < 2) {
+                    Reset();
+                    Save();
+                }
+            }
+            
             public float DepthSeaBottom {
                 get => Get(nameof(DepthSeaBottom), -1f);
                 set => Set(nameof(DepthSeaBottom), value);
