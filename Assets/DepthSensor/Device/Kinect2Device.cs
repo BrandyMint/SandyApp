@@ -1,4 +1,4 @@
-﻿﻿#if UNITY_STANDALONE_WIN
+﻿#if UNITY_STANDALONE_WIN
 using Unity.Mathematics;
 using System;
 using System.Collections;
@@ -123,15 +123,10 @@ namespace DepthSensor.Device {
         }
 
         private void ReActivateSensors() {
-            CloseSensors();
-            if (!Depth.Active && !Infrared.Active && !Index.Active && !Body.Active && !Color.Active) 
+            if (_multiReader != null)
                 return;
             _multiReader = _kinect.OpenMultiSourceFrameReader(
-                (Depth.Active ? FrameSourceTypes.Depth : 0) |
-                (Infrared.Active ? FrameSourceTypes.Infrared : 0) |
-                (Index.Active ? FrameSourceTypes.BodyIndex : 0) | 
-                (Body.Active ? FrameSourceTypes.Body : 0) |
-                (Color.Active ? FrameSourceTypes.Color : 0));
+                FrameSourceTypes.Depth | FrameSourceTypes.Infrared | FrameSourceTypes.Color);
             _multiReader.MultiSourceFrameArrived += PollFrames;
         }
 
@@ -150,14 +145,14 @@ namespace DepthSensor.Device {
             if (!Monitor.TryEnter(_multiReaderSync, 0))
                 return;
 
-            var frame = multiSourceFrame.FrameReference.AcquireFrame();;
+            var frame = multiSourceFrame.FrameReference.AcquireFrame();
             
             if (frame != null) {
-                using (var body = frame.BodyFrameReference.AcquireFrame())
-                using (var index = frame.BodyIndexFrameReference.AcquireFrame())    
-                using (var color = frame.ColorFrameReference.AcquireFrame())
-                using (var infrared = frame.InfraredFrameReference.AcquireFrame())
-                using (var depth = frame.DepthFrameReference.AcquireFrame()) {
+                using (var body = Body.Active ? frame.BodyFrameReference.AcquireFrame() : null)
+                using (var index = Index.Active ? frame.BodyIndexFrameReference.AcquireFrame() : null)    
+                using (var color = Color.Active ? frame.ColorFrameReference.AcquireFrame() : null)
+                using (var infrared = Infrared.Active ? frame.InfraredFrameReference.AcquireFrame() : null)
+                using (var depth = Depth.Active ? frame.DepthFrameReference.AcquireFrame() : null) {
                     if (body != null) {
                         UpdateBodies(body);
                         _internalBody.OnNewFrameBackground();
