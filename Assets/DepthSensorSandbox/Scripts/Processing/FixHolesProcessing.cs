@@ -122,11 +122,11 @@ namespace DepthSensorSandbox.Processing {
             //  6 2 5    //      y.1
             int kHole1, kHole2;
             if (k < 6) {
-                kHole1 = 2;
-                kHole2 = k == 4 ? 3 : 1;
+                kHole1 = 1;
+                kHole2 = k == 4 ? 0 : 2;
             } else {
-                kHole1 = 0;
-                kHole2 = k == 7 ? 3 : 1;
+                kHole1 = 3;
+                kHole2 = k == 7 ? 0 : 2;
             }
             for (int n = 0; n < _BAD_HOLE_FIND_MAX_RADIUS; ++n) {
                 i = _s.GetIndexOfNeighbor(i, k);
