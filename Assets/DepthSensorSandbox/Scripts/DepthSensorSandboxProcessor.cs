@@ -255,10 +255,16 @@ namespace DepthSensorSandbox {
             var croppingMax = cam.GetCroppingToDepth(meshTransform, maxDist, device);
             var croppingMin = cam.GetCroppingToDepth(meshTransform, minDist, device);
             _cropping = RectUtils.Encompass(croppingMin, croppingMax);
+            
             _croppingExtended = _cropping;
             _croppingExtended.max += Vector2.one * _croppingExtend;
             _croppingExtended.min -= Vector2.one * _croppingExtend;
             _zeroInBorders.SetMaxCropping01(_croppingExtended);
+            
+            var croppingZero =  cam.GetCroppingToDepth(meshTransform,  Prefs.Sandbox.ZeroDepth, device);
+            croppingZero.max -= Vector2.one * Prefs.Sandbox.CroppingZeroHands;
+            croppingZero.min += Vector2.one * Prefs.Sandbox.CroppingZeroHands;
+            Hands.SetCroppingZero(croppingZero);
             
             //Debug.Log("cropping " + cropping);
             //return;

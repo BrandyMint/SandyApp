@@ -59,6 +59,7 @@ namespace DepthSensorSandbox.Processing {
 
         private DepthBuffer _depthZero;
         private Sampler _samplerDepthZero = Sampler.Create();
+        private Sampler _samplerDepthZeroFullCropping = Sampler.Create();
         private bool _needUpdateDepthZero;
         
         private ushort[] _depthLongExpos;
@@ -93,6 +94,9 @@ namespace DepthSensorSandbox.Processing {
             if (ReCreateIfNeed(ref _depthLongExpos, buffer.length)) {
                 RecreateSensor(buffer.width, buffer.height, 
                     ref _sensorHandsMask, out _currHandsMask, out _sensorHandsMaskInternal);
+                
+                _samplerDepthZeroFullCropping.SetDimens(buffer.width, buffer.height);
+                
                 //RecreateSensor(buffer.width, buffer.height, 
                     //ref _sensorHandsDepth, out _currHandsDepth, out _sensorHandsDepthInternal);
                 RecreateSensor(buffer.width / _HANDS_DEPTH_DECREASE, buffer.height / _HANDS_DEPTH_DECREASE,
@@ -133,6 +137,11 @@ namespace DepthSensorSandbox.Processing {
             base.SetCropping(cropping01);
             _samplerDecreased.SetCropping01(cropping01);
             _needUpdateLongExpos = true;
+        }
+        
+        public void SetCroppingZero(Rect cropping01) {
+            _samplerDepthZeroFullCropping.SetCropping01(cropping01);
+            _needUpdateDepthZero = true;
         }
         
         public Sampler GetSamplerHandsDecreased() {
@@ -180,7 +189,8 @@ namespace DepthSensorSandbox.Processing {
                 for (int y = -scale; y < scale; ++y) {
                     var iFull = _s.GetIFrom(pFull.x + x, pFull.y + y);
                     ushort val;
-                    if (iFull >= 0 && iFull < _rawBuffer.length && (val = _rawBuffer.data[iFull]) != Sampler.INVALID_DEPTH) {
+                    var p = _samplerDepthZeroFullCropping.GetXYiFrom(iFull);
+                    if (_samplerDepthZeroFullCropping.Rect.Contains(p) && (val = _rawBuffer.data[iFull]) != Sampler.INVALID_DEPTH) {
                         state.a[aLen++] = val;
                     }
                 }
