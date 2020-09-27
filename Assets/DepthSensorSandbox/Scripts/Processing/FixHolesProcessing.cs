@@ -4,7 +4,6 @@ using UnityEngine;
 
 namespace DepthSensorSandbox.Processing {
     public class FixHolesProcessing : ProcessingBase {
-        private const ushort _BAD_HOLE_FIX = 3000;
         private const ushort _BAD_HOLE_FIND_MAX_RADIUS = 100;
 
         private int2x4[] _holes;
@@ -13,22 +12,29 @@ namespace DepthSensorSandbox.Processing {
         private const int _DOWN = 1;
         private const int _LEFT = 2;
         private const int _RIGHT = 3;
+        private ushort[] _maxes;
+        private ushort _maxDepth;
 
         private struct FindHolesLineState : Sampler.IParallelLineState {
             private int2 hStart;
             private int2 hEnd;
+            private ushort maxDepth;
             
             public DepthBuffer depth;
             public int2x4[] holes;
+            public ushort[] maxes;
             public int dirStart;
             public int dirEnd;
             public int mirrorId;
             public int mirrorIdStep;
+            public int iMax;
 
             public void Handle(int id) {
                 hStart = CheckHole(id, dirStart, hStart);
                 hEnd = CheckHole(mirrorId, dirEnd, hEnd);
                 mirrorId -= mirrorIdStep;
+                if (maxes != null && hStart.y > maxDepth) 
+                    maxes[iMax] = maxDepth = (ushort) hStart.y;
             }
             
             //      w.3
@@ -51,9 +57,17 @@ namespace DepthSensorSandbox.Processing {
         
         protected override void ProcessInternal() {
             ReCreateIfNeed(ref _holes, _out.length);
+            ReCreateIfNeed(ref _maxes, _out.height);
             _s.SetDimens(_inDepth.width, _inDepth.height);
+            
             _s.EachParallelVertical(InitFindHolesLineStateVertical);
             _s.EachParallelHorizontal(InitFindHolesLineStateHorizontal);
+
+            _maxDepth = 0;
+            for (int i = _s.Rect.yMin; i < _s.Rect.yMax; ++i) {
+                var d = _maxes[i];
+                if (d > _maxDepth) _maxDepth = d;
+            }
             _s.EachParallelHorizontal(FixDepthHolesBody);
         }
 
@@ -75,7 +89,9 @@ namespace DepthSensorSandbox.Processing {
                 dirStart = _LEFT,
                 dirEnd = _RIGHT,
                 mirrorIdStep = 1,
-                mirrorId = _s.GetIFrom(_s.Rect.xMax-1, y)
+                mirrorId = _s.GetIFrom(_s.Rect.xMax-1, y),
+                maxes = _maxes,
+                iMax = y
             };
         }
 
@@ -143,7 +159,7 @@ namespace DepthSensorSandbox.Processing {
                     return d;
             }
             
-            return _BAD_HOLE_FIX;
+            return _maxDepth;
         }
     }
 }
