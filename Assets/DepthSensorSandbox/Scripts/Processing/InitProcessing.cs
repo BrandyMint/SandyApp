@@ -134,10 +134,12 @@ namespace DepthSensorSandbox.Processing {
                             diff = min;
                         else
                             diff = max;
-                        _errorsMap.data[i] = (ushort) diff;
-                    } else if (diff < _MAX_VALID_ERROR) {
-                        _errorsMap.data[i] = (ushort) diff;
+                    } else if (diff > _MAX_VALID_ERROR) {
+                        diff = 0;
                     }
+                    
+                    if (diff > 0)
+                        _errorsMap.data[i] = (ushort) diff;
                 }
             }
         }
