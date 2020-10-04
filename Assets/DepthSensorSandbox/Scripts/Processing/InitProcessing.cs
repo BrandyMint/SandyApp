@@ -131,7 +131,7 @@ namespace DepthSensorSandbox.Processing {
                         var max = Mathf.Max(diff, old);
                         var min = Mathf.Min(diff, old);
                         if ((max > _MAX_VALID_ERROR || min > _MAX_VALID_ERROR) && (float)max / min >= 2f)
-                            diff = min;
+                            diff = (int) Mathf.Lerp(min, max, 0.5f);
                         else
                             diff = max;
                     } else if (diff > _MAX_VALID_ERROR) {
