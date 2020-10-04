@@ -140,8 +140,11 @@ namespace DepthSensorSandbox.Processing {
         }
         
         public void SetCroppingZero(Rect cropping01) {
+            var odlRect = _samplerDepthZeroFullCropping.Rect;
             _samplerDepthZeroFullCropping.SetCropping01(cropping01);
-            _needUpdateDepthZero = true;
+            if (!_samplerDepthZeroFullCropping.Rect.Equals(odlRect)) {
+                _needUpdateDepthZero = true;
+            }
         }
         
         public Sampler GetSamplerHandsDecreased() {
@@ -172,13 +175,17 @@ namespace DepthSensorSandbox.Processing {
             if (!CheckValid(_currHandsMask))
                 return false;
 
-            Parallel.For(0, _depthZero.length, CalcZeroBodyLocal.Create, CalcDepthZeroBody, CalcZeroBodyLocal.Finally);
+            UpdateDepthZero();
             _needUpdateDepthZero = false;
             return true;
         }
 
         public IEnumerable<DepthBuffer> GetMapsForFixHoles() {
             yield return _depthZero;
+        }
+
+        private void UpdateDepthZero() {
+            Parallel.For(0, _depthZero.length, CalcZeroBodyLocal.Create, CalcDepthZeroBody, CalcZeroBodyLocal.Finally);
         }
 
         private CalcZeroBodyLocal CalcDepthZeroBody(int i, ParallelLoopState loop, CalcZeroBodyLocal state) {
@@ -248,9 +255,8 @@ namespace DepthSensorSandbox.Processing {
                 return;
 
             if (_needUpdateDepthZero) {
-                PrepareInitProcess();
-                InitProcess(_rawBuffer, _out, _prev);
-                return;
+                UpdateDepthZero();
+                _needUpdateDepthZero = true;
             }
             if (_needUpdateLongExpos) {
                 _s.EachParallelHorizontal(UpdateLongExposBody);
